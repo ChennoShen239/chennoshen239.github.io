@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - google645b38a52c1b6a3d.html
 
 website:
   title: "Chen Gao"
