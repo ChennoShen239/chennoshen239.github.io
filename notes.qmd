@@ -5,25 +5,23 @@ aliases:
 ---
 
 ## Notes
-
 #### [Search and Matching: The DMP Model](notes/dmp.qmd)
 
-Notes on unemployment dynamics, the Beveridge curve, and the Diamond–Mortensen–Pissarides model. [PDF version](files/dmp-notes.pdf).
+*Notes on unemployment dynamics, the Beveridge curve, and the Diamond–Mortensen–Pissarides model. [PDF version](files/dmp-notes.pdf).*
 
 #### [Introduction to Economic and Social Network](files/iesn-notes.pdf)
 
-Course notes for IESN (PKU, Fall 2025): network games, centrality measures, strategic complements and substitutes, and cooperation on networks.
+*Course notes for IESN (PKU, Fall 2025): network games, centrality measures, strategic complements and substitutes, and cooperation on networks.*
 
 #### [Quantitative Macro using JAX](https://chennoshen239.github.io/compecon-notes/)
 
-Full course notes for graduate Computational Economics (PKU, Spring 2026).
+*Full course notes for graduate Computational Economics (PKU, Spring 2026).*
 
 ## Code
-
 #### [RunPod Scripts](https://github.com/ChennoShen239/runpod_scripts)
 
-Scripts that automatically send files to a remote server, execute code, and email back the results.
+*Scripts that automatically send files to a remote server, execute code, and email back the results.*
 
 #### [Typst Templates](https://github.com/ChennoShen239/typst_templates)
 
-A collection of Typst templates for academic presentations and course notes.
+*A collection of Typst templates for academic presentations and course notes.*
