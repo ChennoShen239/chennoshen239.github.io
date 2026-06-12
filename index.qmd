@@ -18,7 +18,9 @@ about:
       href: files/cv.pdf
 ---
 
-I am a senior undergraduate at the [National School of Development](https://en.nsd.pku.edu.cn/), Peking University. In Fall 2026, I will join the [Centre for Macroeconomics](https://www.lse.ac.uk/CFM) at the London School of Economics as a research assistant.
+Welcome!
+
+I am a senior undergraduate at the [National School of Development](https://en.nsd.pku.edu.cn/), Peking University. 
 
 My research interests lie in **macroeconomics**, **monetary economics**, and **computational methods**, with a particular focus on heterogeneity. I enjoy combining structural modeling with data-driven approaches, and am especially interested in applying **machine learning** and **deep learning** to solve and estimate rich heterogeneous-agent models.
 
