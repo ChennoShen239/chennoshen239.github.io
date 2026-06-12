@@ -49,11 +49,32 @@
     "text": "Footnotes\n\n\nIt’s possible that \\(V\\left(t\\right)&lt;0\\) when \\(v\\left(t\\right)=0\\).↩︎"
   },
   {
-    "objectID": "code.html",
-    "href": "code.html",
-    "title": "Code",
+    "objectID": "notes.html",
+    "href": "notes.html",
+    "title": "Notes & Code",
     "section": "",
-    "text": "Quantitative Macro using JAX\nComplete course notes for graduate Computational Economics at Peking University, Spring 2026.\n\n\nRunPod Scripts\nScripts that automatically send files to a remote server, execute code, and email back the results.\n\n\nTypst Templates\nA collection of Typst templates for academic presentations and course notes."
+    "text": "Notes on unemployment dynamics, the Beveridge curve, and the Diamond–Mortensen–Pissarides model. PDF version.\n\n\n\nFull course notes for graduate Computational Economics (PKU, Spring 2026)."
+  },
+  {
+    "objectID": "notes.html#notes",
+    "href": "notes.html#notes",
+    "title": "Notes & Code",
+    "section": "",
+    "text": "Notes on unemployment dynamics, the Beveridge curve, and the Diamond–Mortensen–Pissarides model. PDF version.\n\n\n\nFull course notes for graduate Computational Economics (PKU, Spring 2026)."
+  },
+  {
+    "objectID": "notes.html#code",
+    "href": "notes.html#code",
+    "title": "Notes & Code",
+    "section": "Code",
+    "text": "Code\n\nRunPod Scripts\nScripts that automatically send files to a remote server, execute code, and email back the results.\n\n\nTypst Templates\nA collection of Typst templates for academic presentations and course notes."
+  },
+  {
+    "objectID": "teaching.html",
+    "href": "teaching.html",
+    "title": "Teaching",
+    "section": "",
+    "text": "Computational Economics (graduate)\nTeaching assistant for Prof. Bo Li\nPeking University, Spring 2026\nCourse notes: Quantitative Macro using JAX\n\n\nIntermediate Macroeconomics (Honors)\nTeaching assistant for Prof. Bo Zhao\nPeking University, Fall 2024"
   },
   {
     "objectID": "research.html",
@@ -74,28 +95,14 @@
     "href": "research.html#work-in-progress",
     "title": "Research",
     "section": "Work in progress",
-    "text": "Work in progress\n\nForecasting Inflation with Microdata: An Adaptive Machine Learning Approach\nwith Catherine Chen, Jonathan Hazell, Lihua Lei, and Chen Lian"
-  },
-  {
-    "objectID": "teaching.html",
-    "href": "teaching.html",
-    "title": "Teaching",
-    "section": "",
-    "text": "Computational Economics (graduate)\nTeaching assistant for Prof. Bo Li · Peking University, Spring 2026\nCourse notes: Quantitative Macro using JAX\n\n\nIntermediate Macroeconomics (Honors)\nTeaching assistant for Prof. Bo Zhao · Peking University, Fall 2024"
-  },
-  {
-    "objectID": "notes.html",
-    "href": "notes.html",
-    "title": "Notes",
-    "section": "",
-    "text": "Search and Matching: The DMP Model\nNotes on unemployment dynamics, the Beveridge curve, and the Diamond–Mortensen–Pissarides model. PDF version.\n\n\nQuantitative Macro using JAX\nFull course notes for graduate Computational Economics (PKU, Spring 2026)."
+    "text": "Work in progress\n\nForecasting Inflation with Microdata: An Adaptive Machine Learning Approach\nwith Catherine Chen, Jonathon Hazell, Lihua Lei, and Chen Lian"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Chen Gao (高琛)",
     "section": "",
-    "text": "I am a senior undergraduate at the National School of Development, Peking University. In Fall 2026, I will join the Centre for Macroeconomics at the London School of Economics as a research assistant.\nMy research interests lie in macroeconomics, monetary economics, and computational methods, with a particular focus on heterogeneity. I enjoy combining structural modeling with data-driven approaches.\nYou can reach me at chengao0716 at gmail dot com."
+    "text": "I am a senior undergraduate at the National School of Development, Peking University. In Fall 2026, I will join the Centre for Macroeconomics at the London School of Economics as a research assistant.\nMy research interests lie in macroeconomics, monetary economics, and computational methods, with a particular focus on heterogeneity. I enjoy combining structural modeling with data-driven approaches, and am especially interested in applying machine learning and deep learning to solve and estimate rich heterogeneous-agent models.\nYou can reach me at chengao0716 at gmail dot com."
   },
   {
     "objectID": "index.html#news",
