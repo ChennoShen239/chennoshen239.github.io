@@ -1,0 +1,28 @@
+---
+title: "Chen Gao"
+pagetitle: "Chen Gao — Economics, Peking University & LSE CFM"
+image: img/profile.svg
+about:
+  template: solana
+  image-width: 10em
+  image-shape: rounded
+  links:
+    - icon: envelope
+      text: Email
+      href: mailto:chengao0716@gmail.com
+    - icon: github
+      text: GitHub
+      href: https://github.com/ChennoShen239
+    - icon: file-earmark-text
+      text: CV
+      href: files/cv.pdf
+---
+
+I am a senior undergraduate at the [National School of Development](https://en.nsd.pku.edu.cn/), Peking University. In Fall 2026, I will join the [Centre for Macroeconomics](https://www.lse.ac.uk/CFM) at the London School of Economics as a research assistant.
+
+My research interests lie in **macroeconomics**, **monetary economics**, and **computational methods**, with a particular focus on heterogeneity. I enjoy combining structural modeling with data-driven approaches.
+
+## Education
+
+- **B.A. in Economics**, Peking University, 2022–2026 (with Honors)
+- **Visiting Undergraduate**, University of California, Berkeley, Spring 2025

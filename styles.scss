@@ -1,0 +1,53 @@
+/*-- scss:defaults --*/
+
+$primary: #94070a;
+$link-color: #94070a;
+$font-size-root: 17px;
+$navbar-bg: #ffffff;
+$navbar-fg: #1a1a1a;
+$footer-bg: #ffffff;
+
+/*-- scss:rules --*/
+
+body {
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.005em;
+}
+
+.navbar {
+  border-bottom: 1px solid #eee;
+}
+
+.navbar-title {
+  font-weight: 600;
+}
+
+h1.title {
+  font-size: 1.9rem;
+  font-weight: 650;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 650;
+  border-bottom: none;
+  margin-top: 2rem;
+}
+
+h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1.6rem;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.about-links .about-link {
+  border: 1px solid #ddd;
+}

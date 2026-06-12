@@ -1,0 +1,19 @@
+---
+title: "Research"
+---
+
+## Working papers
+
+#### Default with Policy-Randomness Overestimation
+
+*January 2025 – present* · [paper](files/bounded_default.pdf)
+
+Why do some sovereigns pay high spreads despite moderate debt? I build a quantitative default model where lenders overweight the dispersion of policy realizations (policy-randomness overestimation, PRO). Within a single pricing operator, PRO pivots price/spread schedules around a state-contingent threshold: the sovereign deleverages while defaulting at higher debt, raising average spreads and producing a "stability illusion" (lower volatility with higher premia). Policy and information extensions show limited power of fiscal transfers, persistence from negativity-biased learning, and welfare gains from transparency. Event-style hooks (e.g., Argentina's inflation misreporting) align with the model's pivot, threshold, and decoupling predictions. A rational-inattention microfoundation based on a mental-model-plus-residual representation endogenizes the tail weight within the same pricing operator.
+
+Recipient of the [2024 Peking University Outstanding Undergraduate Research Project (funded)](https://dean.pku.edu.cn/web/notice_details.php?id=714).
+
+## Work in progress
+
+#### Forecasting Inflation with Microdata: An Adaptive Machine Learning Approach
+
+*July 2025 – present* · with Catherine Chen, Jonathan Hazell, Lihua Lei, and Chen Lian

@@ -1,0 +1,324 @@
+---
+title: "Search and Matching: The DMP Model"
+date: 2026-06-10
+toc: true
+toc-depth: 3
+---
+
+::: {.callout-note appearance="simple"}
+A [PDF version](../files/dmp-notes.pdf) of these notes is available.
+:::
+
+This note follows a lot from the note by Toshihiko Mukoyama.
+
+# Unemployment Dynamics
+
+Let the period length be $\Delta$ and unemp. rate at time $t$ be
+$u\left(t\right)$:
+$$u\left(t+\Delta\right)=\sigma\Delta\left(1-u\left(t\right)\right)+\left(1-\lambda_{w}\Delta\right)u\left(t\right)$$
+where $\sigma\Delta>0$ is the prob. of losing the job,
+$\lambda_{w}\Delta>0$ be the prob. of finding a job over $\Delta$.
+
+We can rewrite it as: $$\begin{align*}
+u\left(t+\Delta\right) & =\sigma\Delta-\sigma\Delta u\left(t\right)+u\left(t\right)-\lambda_{w}\Delta u\left(t\right)\\
+u\left(t+\Delta\right)-u\left(t\right) & =\sigma\Delta-\sigma\Delta u\left(t\right)-\lambda_{w}\Delta u\left(t\right)\\
+\frac{u\left(t+\Delta\right)-u\left(t\right)}{\Delta} & =\sigma-\sigma u\left(t\right)-\lambda_{w}u\left(t\right)\\
+\frac{u\left(t+\Delta\right)-u\left(t\right)}{\Delta} & =\sigma\left(1-u\left(t\right)\right)-\lambda_{w}u\left(t\right)
+\end{align*}$$ so taking $\Delta\to0$:
+$$u'\left(t\right)=\sigma\left(1-u\left(t\right)\right)-\lambda_{w}u\left(t\right)$$
+
+We then try to endogenize job-finding rate $\lambda_{w}$. Let agg.
+vacancy be $v$ and the matching function takes the form of
+$$M\left(u,v\right)\Delta$$ Some assumptions:
+
+1.  matching is random
+
+    1.  all vacancies have an equal chance to match w/ an employed
+        worker
+
+    2.  all unemployed workers have an equal chance to match w/ a
+        vacancy
+
+2.  $M$ is increasing in both terms
+
+3.  $M$ is CRS
+
+Under these assumptions, the prob. of a vacancy matching w/ an unemp.
+worker during $\Delta$ is
+$$\frac{M\left(u,v\right)\Delta}{v}=M\left(\frac{1}{\theta},1\right)\Delta=\lambda_{f}\left(\theta\right)\Delta$$
+where $\theta\equiv\frac{v}{u}$ is the tightness. The prob. of an unemp.
+worker matching w/ a vacancy during $\Delta$ is:
+$$\frac{M\left(u,v\right)\Delta}{u}=M\left(1,\theta\right)\Delta=\lambda_{w}\left(\theta\right)\Delta$$
+and
+$\lambda_{w}\left(\theta\right)=M\left(1,\theta\right)=\theta M\left(\frac{1}{\theta},1\right)=\theta\lambda_{f}\left(\theta\right).$
+So unemp. rate dynamics now become:
+$$u'\left(t\right)=\sigma\left(1-u\left(t\right)\right)-\lambda_{w}\left(\theta\left(t\right)\right)u\left(t\right)$$
+
+## Beveridge curve condition
+
+Consider ss. whre $v\left(t\right)\equiv v,\forall t$ and
+$u'\left(t\right)=0$: $$\begin{align*}
+0 & =\sigma\left(1-u\right)-\lambda_{w}\left(\frac{v}{u}\right)u\\
+\lambda_{w}\left(\frac{v}{u}\right)u & =\sigma\left(1-u\right)\\
+u\left(\sigma+\lambda_{w}\left(\frac{v}{u}\right)\right) & =\sigma\\
+u & =\frac{\sigma}{\sigma+\lambda_{w}\left(\frac{v}{u}\right)}
+\end{align*}$$
+
+This $u=\frac{\sigma}{\sigma+\lambda_{w}\left(\frac{v}{u}\right)}$ is
+referred to as the Beveridge curve condition.
+
+# DMP Model
+
+## Workers and Firms
+
+The DMP builds on the unemp. dynamics and adds the endo. determination
+of agg. vacancy $v\left(t\right)$. Firms create vacancies by trading off
+the current vacancy posting cost and future profit from the firm-worker
+match.
+
+We assume that each vacancy hires one worker. Let $w\left(t\right)$ be
+the eq. wage. The PV of being employed, in discrete-time setting w/
+period length $\Delta$ is $$\begin{equation}
+W\left(t\right)=w\left(t\right)\Delta+\frac{1}{1+r\Delta}\left(\left(1-\sigma\Delta\right)W\left(t+\Delta\right)+\sigma\Delta U\left(t+\Delta\right)\right)\label{eq:W}
+\end{equation}$$ where $U\left(t\right)$ is the value of being
+unemployed.
+$$U\left(t\right)=b\Delta+\frac{1}{1+r\Delta}\left(\lambda_{w}\left(\theta\left(t\right)\right)\Delta W\left(t+\Delta\right)+\left(1-\lambda_{w}\left(\theta\left(t\right)\right)\Delta\right)U\left(t+\Delta\right)\right)$$
+
+Multiplying $1+r\Delta$ on both sides of
+[\[eq:W\]](#eq:W){reference-type="eqref" reference="eq:W"} we get:
+$$\begin{align*}
+\left(1+r\Delta\right)W\left(t\right) & =\left(1+r\Delta\right)w\left(t\right)\Delta+\left(\left(1-\sigma\Delta\right)W\left(t+\Delta\right)+\sigma\Delta U\left(t+\Delta\right)\right)\\
+r\Delta W\left(t\right) & =\left(1+r\Delta\right)w\left(t\right)\Delta+\left(\left(1-\sigma\Delta\right)W\left(t+\Delta\right)+\sigma\Delta U\left(t+\Delta\right)\right)-W\left(t\right)\\
+rW\left(t\right) & =\left(1+r\Delta\right)w\left(t\right)+\sigma U\left(t+\Delta\right)+\left(\frac{1}{\Delta}-\sigma\right)W\left(t+\Delta\right)-\frac{1}{\Delta}W\left(t\right)\\
+rW\left(t\right) & =\left(1+r\Delta\right)w\left(t\right)+\sigma\left(U\left(t+\Delta\right)-W\left(t+\Delta\right)\right)+\frac{W\left(t+\Delta\right)-W\left(t\right)}{\Delta}
+\end{align*}$$
+
+so taking $\Delta\to0$:
+$$rW\left(t\right)=w\left(t\right)+\sigma\left(U\left(t\right)-W\left(t\right)\right)+W'\left(t\right)$$
+Similarly for $U\left(t\right)$: $$\begin{align*}
+\left(1+r\Delta\right)U\left(t\right) & =\left(1+r\Delta\right)b\Delta+\left(\lambda_{w}\left(\theta\left(t\right)\right)\Delta W\left(t+\Delta\right)+\left(1-\lambda_{w}\left(\theta\left(t\right)\right)\Delta\right)U\left(t+\Delta\right)\right)\\
+r\Delta U\left(t\right) & =\left(1+r\Delta\right)b\Delta+\left(\lambda_{w}\left(\theta\left(t\right)\right)\Delta W\left(t+\Delta\right)+\left(1-\lambda_{w}\left(\theta\left(t\right)\right)\Delta\right)U\left(t+\Delta\right)\right)-U\left(t\right)\\
+rU\left(t\right) & =\left(1+r\Delta\right)b+\left(\lambda_{w}\left(\theta\left(t\right)\right)W\left(t+\Delta\right)-\lambda_{w}\left(\theta\left(t\right)\right)U\left(t+\Delta\right)\right)+\frac{U\left(t+\Delta\right)-U\left(t\right)}{\Delta}
+\end{align*}$$ so taking $\Delta\to0$:
+$$rU\left(t\right)=b+\lambda_{w}\left(\theta\left(t\right)\right)\left(W\left(t\right)-U\left(t\right)\right)+U'\left(t\right)$$
+
+Because of the one-firm to one-worker assumption, the firm is either
+matched or vacant, the value of a matched firm is:
+$$J\left(t\right)=p\left(t\right)\Delta-w\left(t\right)\Delta+\frac{1}{1+r\Delta}\left(\sigma\Delta V\left(t+\Delta\right)+\left(1-\sigma\Delta\right)J\left(t+\Delta\right)\right)$$
+where $p\left(t\right)\Delta$is the product produced by the match and
+$V\left(t\right)$ is the value of vacancy, computed by:
+$$V\left(t\right)=-\kappa\Delta+\frac{1}{1+r\Delta}\left(\lambda_{f}\left(\theta\left(t\right)\right)\Delta J\left(t+\Delta\right)+\left(1-\lambda_{f}\left(\theta\left(t\right)\right)\Delta\right)V\left(t+\Delta\right)\right)$$
+where $\kappa\Delta$ is the cost of posting a vacancy. It's then easy to
+see that
+$$rJ\left(t\right)=p\left(t\right)-w\left(t\right)+\sigma\left(V\left(t\right)-J\left(t\right)\right)+J'\left(t\right)$$
+and $$\begin{equation}
+rV\left(t\right)=-\kappa+\lambda_{f}\left(\theta\left(t\right)\right)\left(J\left(t\right)-V\left(t\right)\right)+V'\left(t\right)\label{eq:V}
+\end{equation}$$
+
+We assume that anyone can start a firm by posting a vacancy
+
+1.  if $V\left(t\right)>0$, new entrants would keep posting vacancies
+    until $V\left(t\right)$ becomes $0$. Additional vacancies would drop
+    the value of $V\left(t\right)$because
+    $\lambda_{f}\left(\theta\left(t\right)\right)$ is a decreasing
+    function of
+    $\theta\left(t\right)=\frac{v\left(t\right)}{u\left(t\right)}$.
+    Therefore $V\left(t\right)=0$ has to always hold, as long as
+    $v\left(t\right)>0$. [^1]
+
+2.  We call the condition $$V\left(t\right)=0$$ the *free-entry
+    condition*
+
+One can formalize 1 as follows:
+
+Let $u\left(t\right)$ be the state var. at time $t$, which evolves as
+$$u'=\sigma\left(1-u\right)-\lambda_{w}u$$
+
+and $v\left(t\right)$be the control var. and $v\ge0$.Given
+[\[eq:V\]](#eq:V){reference-type="eqref" reference="eq:V"} and taking
+$u\left(t\right),J\left(t\right),V'\left(t\right)$as given, we have
+$$V\left(t\right)=\frac{\lambda_{f}\left(\theta\left(t\right)\right)J\left(t\right)-\kappa+V'\left(t\right)}{r+\lambda_{f}\left(\theta\left(t\right)\right)}$$
+so
+$$\frac{\partial V}{\partial\lambda_{f}}=\frac{J\left(t\right)\left(r+\lambda_{f}\left(\theta\left(t\right)\right)\right)-\left(\lambda_{f}\left(\theta\left(t\right)\right)J\left(t\right)-\kappa+V'\left(t\right)\right)}{\left(r+\lambda_{f}\left(\theta\left(t\right)\right)\right)^{2}}$$
+
+at ss., $V'\left(t\right)=0$, so we have $$\begin{align*}
+\frac{\partial V}{\partial\lambda_{f}} & =\frac{rJ\left(t\right)+\kappa-V'\left(t\right)}{\left(r+\lambda_{f}\left(\theta\left(t\right)\right)\right)^{2}}\\
+ & =\frac{rJ\left(t\right)+\kappa}{\left(r+\lambda_{f}\left(\theta\left(t\right)\right)\right)^{2}}>0
+\end{align*}$$
+
+Given the matching function, it's easy to see that
+$\lambda_{f}\left(\theta\right)=M\left(\frac{1}{\theta},1\right)$ is
+decreasing in $\theta$:
+$$\frac{\partial\lambda_{f}}{\partial v}=\lambda_{f}'\left(\theta\right)\frac{1}{u}<0$$
+
+so
+$$\frac{\partial V}{\partial v}=\frac{\partial V}{\partial\lambda_{f}}\frac{\partial\lambda_{f}}{\partial v}<0$$
+
+Therefore, if $V\left(t\right)>0$, then it follows that vacancy goes up
+and in turn pushing $V\left(t\right)\to0$. If $V\left(t\right)<0$, then
+nobody is willing to post a vacancy and in turn $v\left(t\right)=0$.
+Finally if $V\left(t\right)=0$, then entrants are indifferent and
+therefore
+$\forall v\left(t\right)\ge0,s.t.V\left(v\left(t\right)\right)=0$ will
+work.
+
+## Wage Determination
+
+In this framework, for a worker to meet w/ another firm, the worker has
+to endure the cost of unemployment. Similarly, for the firm, losing a
+worker would imply waiting for another worker by incurring the vacancy
+cost. Thus, the matched worker and firm are in a bilateral monopoly
+situation.
+
+Here we assume that the surplus is split by the level of wage that
+solves the following maximization problem: $$\begin{equation}
+\max_{w}\left(\tilde{W}\left(w,t\right)-U\left(t\right)\right)^{\gamma}\left(\tilde{J}\left(w,t\right)-V\left(t\right)\right)^{1-\gamma}\label{eq:nash}
+\end{equation}$$ where $\gamma\in\left(0,1\right)$. The functions
+$\tilde{W}\left(w,t\right)$ and $\tilde{J}\left(w,t\right)$are the
+values of employed workers and a matched firm, here we make it explicit
+that only $w$ in this period can move. The solution to this problem is
+often called *Generalized Nash Bargaining Rule.*
+
+The functions $\tilde{W}\left(w,t\right)$ and
+$\tilde{J}\left(w,t\right)$ can be written as:
+$$\tilde{W}\left(w,t\right)=w\Delta+\frac{1}{1+r\Delta}\left(\left(1-\sigma\Delta\right)W\left(t+\Delta\right)+\sigma\Delta U\left(t+\Delta\right)\right)$$
+and
+$$\tilde{J}\left(w,t\right)=p\left(t\right)\Delta-w\Delta+\frac{1}{1+r\Delta}\left(\sigma\Delta V\left(t+\Delta\right)+\left(1-\sigma\Delta\right)J\left(t+\Delta\right)\right).$$
+
+By taking FOC for [\[eq:nash\]](#eq:nash){reference-type="eqref"
+reference="eq:nash"}, we have: $$\begin{align*}
+\max_{w} & \gamma\ln\left(\tilde{W}\left(w,t\right)-U\left(t\right)\right)+\left(1-\gamma\right)\ln\left(\tilde{J}\left(w,t\right)-V\left(t\right)\right)\\
+0 & =\frac{\gamma}{\tilde{W}\left(w,t\right)-U\left(t\right)}\frac{\partial\tilde{W}\left(w,t\right)}{\partial w}+\frac{1-\gamma}{\tilde{J}\left(w,t\right)-V\left(t\right)}\frac{\partial\tilde{J}\left(w,t\right)}{\partial w}
+\end{align*}$$
+
+Given
+$\frac{\partial\tilde{W}\left(w,t\right)}{\partial w}=\Delta,\frac{\partial\tilde{J}\left(w,t\right)}{\partial w}=-\Delta$,
+we have $$\begin{align}
+0 & =\frac{\gamma}{\tilde{W}\left(w,t\right)-U\left(t\right)}\Delta-\frac{1-\gamma}{\tilde{J}\left(w,t\right)-V\left(t\right)}\Delta\nonumber \\
+0 & =\frac{\gamma}{\tilde{W}\left(w,t\right)-U\left(t\right)}-\frac{1-\gamma}{\tilde{J}\left(w,t\right)-V\left(t\right)}\nonumber \\
+\frac{1-\gamma}{\tilde{J}\left(w,t\right)-V\left(t\right)} & =\frac{\gamma}{\tilde{W}\left(w,t\right)-U\left(t\right)}\nonumber \\
+\left(1-\gamma\right)\left(\tilde{W}\left(w,t\right)-U\left(t\right)\right) & =\gamma\left(\tilde{J}\left(w,t\right)-V\left(t\right)\right)\label{eq:foc}
+\end{align}$$
+
+so the $w^{*}$that satisfies
+[\[eq:foc\]](#eq:foc){reference-type="eqref" reference="eq:foc"} is the
+eq. wage.
+
+## Steady State Equilibrium
+
+First, consider the ss. eq. where $u\left(t\right)$ and
+$v\left(t\right)$ are constant. With the conditions above we have
+$$\begin{align*}
+rW & =w-\sigma\left(W-U\right)\\
+rU & =b+\lambda_{w}\left(\theta\right)\left(W-U\right)\\
+rJ & =p-w-\sigma\left(J-V\right)\\
+rV & =-\kappa+\lambda_{f}\left(\theta\right)\left(J-V\right)\\
+V & =0\\
+\left(1-\gamma\right)\left(W-U\right) & =\gamma\left(J-V\right)
+\end{align*}$$
+
+in total 6 equations w/ 6 unknowns $W,U,J,V,\theta,w$. We can then try
+to reduce this system to 1 to 1. It can be shown that we have
+$$(1-\gamma)(p-b)-\frac{r+\sigma+\gamma\lambda_{w}(\bar{\theta})}{\lambda_{f}(\bar{\theta})}\kappa=0.$$
+This condition is then used to solve for $\theta$ and is often referred
+to as the *job creation condition.*
+
+For simple math, we have $$\begin{align*}
+rV & =-\kappa+\lambda_{f}\left(\theta\right)\left(J-V\right)\\
+0 & =-\kappa+\lambda_{f}\left(\theta\right)\left(J-0\right)\\
+J & =\frac{\kappa}{\lambda_{f}\left(\theta\right)}
+\end{align*}$$ Given $$\begin{align*}
+rJ & =p-w-\sigma\left(J-V\right)\\
+rJ & =p-w-\sigma J\\
+J & =\frac{p-w}{r+\sigma}
+\end{align*}$$ we have the free-entry condition on firm side:
+$$\frac{\kappa}{\lambda_{f}\left(\theta\right)}=\frac{p-w}{r+\sigma}$$
+
+Given $$\begin{align*}
+rW & =w-\sigma\left(W-U\right)\\
+rU & =b+\lambda_{w}\left(\theta\right)\left(W-U\right)\\
+r\left(W-U\right) & =w-b-\left(\sigma+\lambda_{w}\left(\theta\right)\right)\left(W-U\right)\\
+\left(r+\sigma+\lambda_{w}\left(\theta\right)\right)\left(W-U\right) & =w-b\\
+W-U & =\frac{w-b}{r+\sigma+\lambda_{w}\left(\theta\right)}
+\end{align*}$$
+
+so given $\left(1-\gamma\right)\left(W-U\right)=\gamma\left(J-V\right)$,
+we have $$\begin{align*}
+\left(1-\gamma\right)\frac{w-b}{r+\sigma+\lambda_{w}\left(\theta\right)} & =\gamma\frac{\kappa}{\lambda_{f}\left(\theta\right)}\\
+w-b & =\frac{\gamma}{1-\gamma}\frac{\kappa}{\lambda_{f}\left(\theta\right)}\left(r+\sigma+\lambda_{w}\left(\theta\right)\right)\\
+p-w & =p-\left[\frac{\gamma}{1-\gamma}\frac{\kappa}{\lambda_{f}\left(\theta\right)}\left(r+\sigma+\lambda_{w}\left(\theta\right)\right)+b\right]\\
+\left(r+\sigma\right)\frac{\kappa}{\lambda_{f}\left(\theta\right)} & =p-\left[\frac{\gamma}{1-\gamma}\frac{\kappa}{\lambda_{f}\left(\theta\right)}\left(r+\sigma+\lambda_{w}\left(\theta\right)\right)+b\right]\\
+\left(r+\sigma\right)\kappa & =\lambda_{f}\left(\theta\right)\left(p-b\right)-\frac{\gamma\kappa}{1-\gamma}\left(r+\sigma+\lambda_{w}\left(\theta\right)\right)\\
+\left(r+\sigma\right)\kappa+\frac{\gamma\kappa}{1-\gamma}\left(r+\sigma+\lambda_{w}\left(\theta\right)\right) & =\lambda_{f}\left(\theta\right)\left(p-b\right)\\
+\left(1-\gamma\right)\left(r+\sigma\right)\kappa+\gamma\kappa\left(r+\sigma+\lambda_{w}\left(\theta\right)\right) & =\left(1-\gamma\right)\left(p-b\right)\lambda_{f}\left(\theta\right)\\
+\left(r+\sigma\right)\kappa+\gamma\kappa\lambda_{w}\left(\theta\right) & =\left(1-\gamma\right)\left(p-b\right)\lambda_{f}\left(\theta\right)\\
+\frac{r+\sigma+\gamma\lambda_{w}\left(\theta\right)}{\lambda_{f}\left(\theta\right)}\kappa & =\left(1-\gamma\right)\left(p-b\right)
+\end{align*}$$ which is exactly the job creation condition. To explain
+this:
+$$\underbrace{\frac{r+\sigma+\gamma\lambda_{w}\left(\theta\right)}{\lambda_{f}\left(\theta\right)}}_{\text{annuitized job creation cost}}\kappa=\underbrace{\left(1-\gamma\right)\left(p-b\right)}_{\text{firm's share of match surplus}}$$
+
+## Transition Dynamics
+
+Now let's consider the transition dynamics by not imposing ss.
+conditions. Collect: $$\begin{align*}
+rW\left(t\right) & =w\left(t\right)+\sigma\left(U\left(t\right)-W\left(t\right)\right)+W'\left(t\right)\\
+rU\left(t\right) & =b+\lambda_{w}\left(\theta\left(t\right)\right)\left(W\left(t\right)-U\left(t\right)\right)+U'\left(t\right)\\
+rJ\left(t\right) & =p\left(t\right)-w\left(t\right)+\sigma\left(V\left(t\right)-J\left(t\right)\right)+J'\left(t\right)\\
+rV\left(t\right) & =-\kappa+\lambda_{f}\left(\theta\left(t\right)\right)\left(J\left(t\right)-V\left(t\right)\right)+V'\left(t\right)\\
+\left(1-\gamma\right)\left(\tilde{W}\left(w,t\right)-U\left(t\right)\right) & =\gamma\left(\tilde{J}\left(w,t\right)-V\left(t\right)\right)\\
+V\left(t\right) & =0
+\end{align*}$$ so $$\begin{align*}
+0 & =-\kappa+\lambda_{f}\left(\theta\left(t\right)\right)\left(J\left(t\right)-0\right)\\
+J\left(t\right) & =\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}
+\end{align*}$$ and $$\begin{align*}
+J'\left(t\right) & =rJ\left(t\right)-\left[p\left(t\right)-w\left(t\right)+\sigma\left(V\left(t\right)-J\left(t\right)\right)\right]\\
+ & =\left(r+\sigma\right)J\left(t\right)-\left[p\left(t\right)-w\left(t\right)\right]\\
+ & =\left(r+\sigma\right)\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}-p\left(t\right)+w\left(t\right)
+\end{align*}$$ also given
+$\left(1-\gamma\right)\left(W\left(t\right)-U\left(t\right)\right)=\gamma\left(J\left(t\right)-V\left(t\right)\right)$
+holds, we have that $$\begin{align*}
+\left(1-\gamma\right)\left(W'\left(t\right)-U'\left(t\right)\right) & =\gamma\left(J'\left(t\right)-V'\left(t\right)\right)\\
+\left(1-\gamma\right)\left(W'\left(t\right)-U'\left(t\right)\right) & =\gamma J'\left(t\right)
+\end{align*}$$ and $$\begin{align*}
+W'\left(t\right)-U'\left(t\right) & =rW\left(t\right)-\left[w\left(t\right)+\sigma\left(U\left(t\right)-W\left(t\right)\right)\right]-rU\left(t\right)+b+\lambda_{w}\left(\theta\left(t\right)\right)\left(W\left(t\right)-U\left(t\right)\right)\\
+ & =\left(r+\lambda_{w}\left(\theta\left(t\right)\right)+\sigma\right)\left(W\left(t\right)-U\left(t\right)\right)-w\left(t\right)+b
+\end{align*}$$ so $$\begin{align*}
+\frac{\gamma J'\left(t\right)}{1-\gamma} & =\left(r+\lambda_{w}\left(\theta\left(t\right)\right)+\sigma\right)\frac{\gamma}{1-\gamma}\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}-w\left(t\right)+b\\
+\frac{\gamma J'\left(t\right)}{1-\gamma}+J'\left(t\right) & =\left[\left(r+\lambda_{w}\left(\theta\left(t\right)\right)+\sigma\right)\frac{\gamma}{1-\gamma}\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}-w\left(t\right)+b\right]+\left[\left(r+\sigma\right)\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}-p\left(t\right)+w\left(t\right)\right]\\
+\frac{J'\left(t\right)}{1-\gamma} & =\frac{r+\sigma+\gamma\lambda_{w}\left(\theta\left(t\right)\right)}{1-\gamma}\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}+b-p\left(t\right)\\
+J'\left(t\right) & =\frac{r+\sigma+\gamma\lambda_{w}\left(\theta\left(t\right)\right)}{\lambda_{f}\left(\theta\left(t\right)\right)}\kappa-\left(1-\gamma\right)\left[p\left(t\right)-b\right]
+\end{align*}$$ I've been checking this and it seems that Toshihiko's
+note is having the wrong sign here. Anyway let's move on. Given
+$J\left(t\right)=\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}$
+we have $$\begin{align*}
+J\left(t\right) & =\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}\\
+J'\left(t\right) & =\frac{-\lambda_{f}'\left(\theta\left(t\right)\right)\theta'\left(t\right)}{\left[\lambda_{f}\left(\theta\left(t\right)\right)\right]^{2}}\\
+ & =\frac{\kappa}{\lambda_{f}\left(\theta\left(t\right)\right)}\underbrace{\left(-\frac{\lambda_{f}'\left(\theta\left(t\right)\right)\theta\left(t\right)}{\lambda_{f}\left(\theta\left(t\right)\right)}\right)}_{\equiv\eta\left(\theta\left(t\right)\right)}\frac{\theta'\left(t\right)}{\theta\left(t\right)}\\
+ & =J\left(t\right)\eta\left(\theta\left(t\right)\right)\frac{\theta'\left(t\right)}{\theta\left(t\right)}
+\end{align*}$$ where
+$\eta\left(\theta\left(t\right)\right)=-\frac{\lambda_{f}'\left(\theta\left(t\right)\right)\theta\left(t\right)}{\lambda_{f}\left(\theta\left(t\right)\right)}>0$
+is the elasticity of matching function. So if
+$\theta\left(t\right)>\theta$ where $\theta$ is the ss. value of the
+tightness, we have $J'\left(t\right)>0$ so that
+$\theta'\left(t\right)>0$, similarly if $\theta\left(t\right)<\theta$,
+we have $\theta'\left(t\right)<0$ . So that the only case where
+$\theta\left(t\right)$ does converge is that
+$\theta\left(t\right)\equiv\theta$, then it's easy to see that
+$J'\left(t\right)=0$ and $J\left(t\right)$ is fixed too.
+
+Therefore, we can say that job-creation condition holds even not in ss.
+So given $$\begin{align*}
+\theta & =\frac{v\left(t\right)}{u\left(t\right)}\\
+\frac{r+\sigma+\gamma\lambda_{w}\left(\theta\right)}{\lambda_{f}\left(\theta\right)}\kappa & =\left(1-\gamma\right)\left(p-b\right)\\
+u'\left(t\right) & =\sigma\left(1-u\left(t\right)\right)-\lambda_{w}\left(\theta\left(t\right)\right)u\left(t\right)
+\end{align*}$$ one can pin down the dynamics of
+$\left(v\left(t\right),u\left(t\right),\theta\right)$. Now let's
+consider the case where $u\left(t\right)>u$, where $u$ is given by the
+Beveridge curve condition:
+$$u=\frac{\sigma}{\sigma+\lambda_{w}\left(\frac{v}{u}\right)}$$ then we
+have $u'\left(t\right)<0$, similarly we have $u'\left(t\right)>0$ when
+$u\left(t\right)<u$, so it's easy to establish that
+$u\left(t\right)\to u$ monotonically. Given $v=\theta u$, the dynamic of
+$v'\left(t\right)$ is similar.
+
+[^1]: It's possible that $V\left(t\right)<0$ when $v\left(t\right)=0$.
