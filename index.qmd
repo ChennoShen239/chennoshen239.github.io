@@ -1,6 +1,6 @@
 ---
 title: "Chen Gao (高琛)"
-pagetitle: "Chen Gao 高琛 — Economics, Peking University & LSE CFM"
+pagetitle: "Chen Gao 高琛"
 image: img/profile.jpg
 about:
   template: solana
@@ -20,7 +20,7 @@ about:
 
 I am a senior undergraduate at the [National School of Development](https://en.nsd.pku.edu.cn/), Peking University. In Fall 2026, I will join the [Centre for Macroeconomics](https://www.lse.ac.uk/CFM) at the London School of Economics as a research assistant.
 
-My research interests lie in **macroeconomics**, **monetary economics**, and **computational methods**, with a particular focus on heterogeneity. I enjoy combining structural modeling with data-driven approaches.
+My research interests lie in **macroeconomics**, **monetary economics**, and **computational methods**, with a particular focus on heterogeneity. I enjoy combining structural modeling with data-driven approaches, and am especially interested in applying **machine learning** and **deep learning** to solve and estimate rich heterogeneous-agent models.
 
 You can reach me at [chengao0716@gmail.com](mailto:chengao0716@gmail.com).
 

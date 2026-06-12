@@ -21,4 +21,4 @@ Recipient of the [2024 Peking University Outstanding Undergraduate Research Proj
 
 #### Forecasting Inflation with Microdata: An Adaptive Machine Learning Approach
 
-with Catherine Chen, Jonathan Hazell, Lihua Lei, and Chen Lian
+with [Catherine Chen](https://icme.stanford.edu/people/catherine-chen), [Jonathon Hazell](https://sites.google.com/view/jadhazell/home), [Lihua Lei](https://lihualei71.github.io/), and [Chen Lian](https://sites.google.com/view/chenlian/home)

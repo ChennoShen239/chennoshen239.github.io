@@ -4,10 +4,14 @@ title: "Teaching"
 
 #### Computational Economics (graduate)
 
-Teaching assistant for Prof. Bo Li · Peking University, Spring 2026
+Teaching assistant for Prof. Bo Li 
+
+*Peking University, Spring 2026*
 
 Course notes: [Quantitative Macro using JAX](https://chennoshen239.github.io/compecon-notes/)
 
 #### Intermediate Macroeconomics (Honors)
 
-Teaching assistant for Prof. Bo Zhao · Peking University, Fall 2024
+Teaching assistant for Prof. Bo Zhao 
+
+*Peking University, Fall 2024*

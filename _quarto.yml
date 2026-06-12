@@ -16,12 +16,10 @@ website:
     right:
       - text: Research
         href: research.qmd
-      - text: Notes
+      - text: Notes & Code
         href: notes.qmd
       - text: Teaching
         href: teaching.qmd
-      - text: Code
-        href: code.qmd
       - text: CV
         href: files/cv.pdf
   page-footer:
