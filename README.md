@@ -13,3 +13,11 @@ quarto publish gh-pages   # render + deploy
 
 Drop a square-ish photo at `img/profile.jpg`, then in `index.qmd` change
 `image: img/profile.svg` to `image: img/profile.jpg`.
+
+## Deploy 
+
+```sh
+cd ~/Dropbox/Website/chennoshen239.github.io
+git add -A && git commit -m "update" && git push   
+quarto publish gh-pages --no-prompt             
+```
