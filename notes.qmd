@@ -1,8 +1,6 @@
 ---
-title: "Notes & Teaching"
+title: "Notes"
 ---
-
-## Lecture notes
 
 #### [Search and Matching: The DMP Model](notes/dmp.qmd)
 
@@ -11,8 +9,3 @@ Notes on unemployment dynamics, the Beveridge curve, and the Diamond–Mortensen
 #### [Quantitative Macro using JAX](https://chennoshen239.github.io/compecon-notes/)
 
 Full course notes for graduate Computational Economics (PKU, Spring 2026).
-
-## Teaching
-
-- **Computational Economics** (graduate), Peking University, Spring 2026 — TA for Prof. Bo Li
-- **Intermediate Macroeconomics** (Honors), Peking University, Fall 2024 — TA for Prof. Bo Zhao

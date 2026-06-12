@@ -7,16 +7,19 @@ website:
   site-url: https://chennoshen239.github.io
   repo-url: https://github.com/ChennoShen239/chennoshen239.github.io
   open-graph: true
+  favicon: img/favicon.svg
   navbar:
     title: "Chen Gao"
     pinned: false
     right:
       - text: Research
         href: research.qmd
-      - text: Code
-        href: code.qmd
       - text: Notes
         href: notes.qmd
+      - text: Teaching
+        href: teaching.qmd
+      - text: Code
+        href: code.qmd
       - text: CV
         href: files/cv.pdf
   page-footer:
@@ -39,6 +42,7 @@ format:
             "@context": "https://schema.org",
             "@type": "Person",
             "name": "Chen Gao",
+            "alternateName": "高琛",
             "url": "https://chennoshen239.github.io",
             "email": "mailto:chengao0716@gmail.com",
             "affiliation": {
