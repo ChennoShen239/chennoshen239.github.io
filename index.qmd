@@ -1,6 +1,7 @@
 ---
 title: "Chen Gao (高琛)"
 pagetitle: "Chen Gao 高琛"
+title-prefix: ""
 image: img/profile.jpg
 about:
   template: solana
@@ -26,10 +27,22 @@ My research interests lie in **macroeconomics**, **monetary economics**, and **c
 
 You can reach me at [chengao0716@gmail.com](mailto:chengao0716@gmail.com).
 
+## Research
+
+#### [Default with Policy-Randomness Overestimation](research.qmd)
+
+When lenders overweight how unpredictable a government's policy is, the sovereign borrows less yet defaults at higher debt, producing a "stability illusion." [PDF](files/bounded_default.pdf)
+
+#### Forecasting Inflation with Microdata: An Adaptive Machine Learning Approach
+
+*Work in progress with [Catherine Chen](https://icme.stanford.edu/people/catherine-chen), [Jonathon Hazell](https://sites.google.com/view/jadhazell/home), [Lihua Lei](https://lihualei71.github.io/), and [Chen Lian](https://sites.google.com/view/chenlian/home).*
+
+[Full abstracts & details →](research.qmd)
+
 ## News
 
-- **Fall 2026** — Joining the [Centre for Macroeconomics](https://www.lse.ac.uk/CFM) at LSE as a research assistant.
-- **October 2025** — New draft of my working paper, [*Default with Policy-Randomness Overestimation*](research.qmd).
+- **Fall 2026.** Joining the [Centre for Macroeconomics](https://www.lse.ac.uk/CFM) at LSE as a research assistant.
+- **October 2025.** New draft of my working paper, [*Default with Policy-Randomness Overestimation*](research.qmd).
 
 ## Education
 

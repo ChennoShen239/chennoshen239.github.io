@@ -11,7 +11,7 @@ title: "Research"
 <details>
 <summary>Abstract</summary>
 
-Why do some sovereigns pay high spreads despite moderate debt? I build a quantitative default model where lenders overweight the dispersion of policy realizations (policy-randomness overestimation, PRO). Within a single pricing operator, PRO pivots price/spread schedules around a state-contingent threshold: the sovereign deleverages while defaulting at higher debt, raising average spreads and producing a "stability illusion" (lower volatility with higher premia). Policy and information extensions show limited power of fiscal transfers, persistence from negativity-biased learning, and welfare gains from transparency. Event-style hooks (e.g., Argentina's inflation misreporting) align with the model's pivot, threshold, and decoupling predictions. A rational-inattention microfoundation based on a mental-model-plus-residual representation endogenizes the tail weight within the same pricing operator.
+Why do some sovereigns pay high spreads despite moderate debt? When lenders overweight how unpredictable a government's policy is, the sovereign deleverages yet defaults at higher debt, raising average spreads and producing a "stability illusion" of calmer markets at a higher price. I build a quantitative default model that formalizes this channel: lenders overweight the dispersion of policy realizations (policy-randomness overestimation, PRO). Within a single pricing operator, PRO pivots price/spread schedules around a state-contingent threshold. Policy and information extensions show limited power of fiscal transfers, persistence from negativity-biased learning, and welfare gains from transparency. Event-style hooks (e.g., Argentina's inflation misreporting) align with the model's pivot, threshold, and decoupling predictions. A rational-inattention microfoundation based on a mental-model-plus-residual representation endogenizes the tail weight within the same pricing operator.
 
 </details>
 
@@ -22,3 +22,5 @@ Recipient of the [2024 Peking University Outstanding Undergraduate Research Proj
 #### Forecasting Inflation with Microdata: An Adaptive Machine Learning Approach
 
 with [Catherine Chen](https://icme.stanford.edu/people/catherine-chen), [Jonathon Hazell](https://sites.google.com/view/jadhazell/home), [Lihua Lei](https://lihualei71.github.io/), and [Chen Lian](https://sites.google.com/view/chenlian/home)
+
+Does micro-level heterogeneity help forecast aggregate inflation? Using UK CPI micro-price data, we develop a scan test for occasional forecasting power and an adaptive machine-learning pipeline, and find that the cross-section of price changes improves aggregate inflation forecasts, but only after large shocks, as in the post-2020 surge.
