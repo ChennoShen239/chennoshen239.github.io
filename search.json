@@ -81,21 +81,21 @@
     "href": "research.html",
     "title": "Research",
     "section": "",
-    "text": "October 2025 · paper\n\n\nAbstract\n\nWhy do some sovereigns pay high spreads despite moderate debt? I build a quantitative default model where lenders overweight the dispersion of policy realizations (policy-randomness overestimation, PRO). Within a single pricing operator, PRO pivots price/spread schedules around a state-contingent threshold: the sovereign deleverages while defaulting at higher debt, raising average spreads and producing a “stability illusion” (lower volatility with higher premia). Policy and information extensions show limited power of fiscal transfers, persistence from negativity-biased learning, and welfare gains from transparency. Event-style hooks (e.g., Argentina’s inflation misreporting) align with the model’s pivot, threshold, and decoupling predictions. A rational-inattention microfoundation based on a mental-model-plus-residual representation endogenizes the tail weight within the same pricing operator.\n\nRecipient of the 2024 Peking University Outstanding Undergraduate Research Project (funded)."
+    "text": "October 2025 · paper\n\n\nAbstract\n\nWhy do some sovereigns pay high spreads despite moderate debt? When lenders overweight how unpredictable a government’s policy is, the sovereign deleverages yet defaults at higher debt, raising average spreads and producing a “stability illusion” of calmer markets at a higher price. I build a quantitative default model that formalizes this channel: lenders overweight the dispersion of policy realizations (policy-randomness overestimation, PRO). Within a single pricing operator, PRO pivots price/spread schedules around a state-contingent threshold. Policy and information extensions show limited power of fiscal transfers, persistence from negativity-biased learning, and welfare gains from transparency. Event-style hooks (e.g., Argentina’s inflation misreporting) align with the model’s pivot, threshold, and decoupling predictions. A rational-inattention microfoundation based on a mental-model-plus-residual representation endogenizes the tail weight within the same pricing operator.\n\nRecipient of the 2024 Peking University Outstanding Undergraduate Research Project (funded)."
   },
   {
     "objectID": "research.html#working-papers",
     "href": "research.html#working-papers",
     "title": "Research",
     "section": "",
-    "text": "October 2025 · paper\n\n\nAbstract\n\nWhy do some sovereigns pay high spreads despite moderate debt? I build a quantitative default model where lenders overweight the dispersion of policy realizations (policy-randomness overestimation, PRO). Within a single pricing operator, PRO pivots price/spread schedules around a state-contingent threshold: the sovereign deleverages while defaulting at higher debt, raising average spreads and producing a “stability illusion” (lower volatility with higher premia). Policy and information extensions show limited power of fiscal transfers, persistence from negativity-biased learning, and welfare gains from transparency. Event-style hooks (e.g., Argentina’s inflation misreporting) align with the model’s pivot, threshold, and decoupling predictions. A rational-inattention microfoundation based on a mental-model-plus-residual representation endogenizes the tail weight within the same pricing operator.\n\nRecipient of the 2024 Peking University Outstanding Undergraduate Research Project (funded)."
+    "text": "October 2025 · paper\n\n\nAbstract\n\nWhy do some sovereigns pay high spreads despite moderate debt? When lenders overweight how unpredictable a government’s policy is, the sovereign deleverages yet defaults at higher debt, raising average spreads and producing a “stability illusion” of calmer markets at a higher price. I build a quantitative default model that formalizes this channel: lenders overweight the dispersion of policy realizations (policy-randomness overestimation, PRO). Within a single pricing operator, PRO pivots price/spread schedules around a state-contingent threshold. Policy and information extensions show limited power of fiscal transfers, persistence from negativity-biased learning, and welfare gains from transparency. Event-style hooks (e.g., Argentina’s inflation misreporting) align with the model’s pivot, threshold, and decoupling predictions. A rational-inattention microfoundation based on a mental-model-plus-residual representation endogenizes the tail weight within the same pricing operator.\n\nRecipient of the 2024 Peking University Outstanding Undergraduate Research Project (funded)."
   },
   {
     "objectID": "research.html#work-in-progress",
     "href": "research.html#work-in-progress",
     "title": "Research",
     "section": "Work in progress",
-    "text": "Work in progress\n\nForecasting Inflation with Microdata: An Adaptive Machine Learning Approach\nwith Catherine Chen, Jonathon Hazell, Lihua Lei, and Chen Lian"
+    "text": "Work in progress\n\nForecasting Inflation with Microdata: An Adaptive Machine Learning Approach\nwith Catherine Chen, Jonathon Hazell, Lihua Lei, and Chen Lian\nDoes micro-level heterogeneity help forecast aggregate inflation? Using UK CPI micro-price data, we develop a scan test for occasional forecasting power and an adaptive machine-learning pipeline, and find that the cross-section of price changes improves aggregate inflation forecasts, but only after large shocks, as in the post-2020 surge."
   },
   {
     "objectID": "index.html",
@@ -105,11 +105,18 @@
     "text": "Welcome!\nI am a senior undergraduate at the National School of Development, Peking University.\nMy research interests lie in macroeconomics, monetary economics, and computational methods, with a particular focus on heterogeneity. I enjoy combining structural modeling with data-driven approaches, and am especially interested in applying machine learning and deep learning to solve and estimate rich heterogeneous-agent models.\nYou can reach me at chengao0716 at gmail dot com."
   },
   {
+    "objectID": "index.html#research",
+    "href": "index.html#research",
+    "title": "Chen Gao (高琛)",
+    "section": "Research",
+    "text": "Research\n\nDefault with Policy-Randomness Overestimation\nWhen lenders overweight how unpredictable a government’s policy is, the sovereign borrows less yet defaults at higher debt, producing a “stability illusion.” PDF\n\n\nForecasting Inflation with Microdata: An Adaptive Machine Learning Approach\nWork in progress with Catherine Chen, Jonathon Hazell, Lihua Lei, and Chen Lian.\nFull abstracts & details →"
+  },
+  {
     "objectID": "index.html#news",
     "href": "index.html#news",
     "title": "Chen Gao (高琛)",
     "section": "News",
-    "text": "News\n\nFall 2026 — Joining the Centre for Macroeconomics at LSE as a research assistant.\nOctober 2025 — New draft of my working paper, Default with Policy-Randomness Overestimation."
+    "text": "News\n\nFall 2026. Joining the Centre for Macroeconomics at LSE as a research assistant.\nOctober 2025. New draft of my working paper, Default with Policy-Randomness Overestimation."
   },
   {
     "objectID": "index.html#education",
