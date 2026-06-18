@@ -53,7 +53,7 @@ h1.name{font-family:var(--sans);font-weight:700;font-size:clamp(46px,6vw,68px);l
 h1.page-title{font-family:var(--sans);font-weight:700;font-size:clamp(38px,4.6vw,54px);line-height:1.05;letter-spacing:-.025em}
 h2.title{font-family:var(--sans);font-weight:600;font-size:28px;line-height:1.22;letter-spacing:-.015em;margin-bottom:10px}
 h2.title.sm{font-size:24px;line-height:1.28;margin-bottom:14px}
-.zh{font-family:'Noto Serif SC',var(--body);font-size:30px;color:var(--muted);font-weight:500;letter-spacing:.08em;margin-top:6px}
+.zh{font-family:'Noto Serif SC',var(--body);font-size:36px;color:var(--ink);font-weight:500;letter-spacing:.08em;margin-top:3px}
 
 /* red accent bar */
 .accent-bar{width:54px;height:4px;background:var(--red);border-radius:2px;transform-origin:left center;margin:24px 0}
@@ -82,7 +82,7 @@ a.accent:hover{border-bottom-color:var(--red)}
 .hero{display:grid;grid-template-columns:1fr 320px;gap:64px;align-items:start;padding:60px 0 58px}
 .hero .intro{max-width:600px}
 .portrait{position:relative}
-.portrait img{width:100%;border-radius:2px;border:1px solid var(--line);filter:grayscale(.12) contrast(1.02);transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.portrait img{width:100%;border-radius:2px;border:1px solid var(--line-2);filter:grayscale(.12) contrast(1.02);transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
 .portrait:hover img{transform:translateY(-2px);box-shadow:0 14px 32px rgba(22,24,29,.12)}
 .portrait .tag{font-family:var(--sans);font-size:14.5px;letter-spacing:.01em;color:var(--muted);margin-top:12px}
 
@@ -137,6 +137,9 @@ details.abstract[open] .ab-state::after{content:'Hide'}
 
 /* page head (interior pages) */
 .page-head{padding:58px 0 0}
+.page-head + .divider{margin-top:36px}
+.page-head .eyebrow{position:relative}
+.page-head .eyebrow::after{content:'';display:block;width:54px;height:4px;border-radius:2px;background:var(--red);margin:16px 0 2px}
 
 /* animations */
 @keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
