@@ -22,7 +22,7 @@ Edit the HTML/CSS on `main` and push. Plain HTML + two shared CSS files + self-h
 | Social / OpenGraph share card (1200×630) | `assets/img/og.png` (referenced in each page `<head>`) |
 | CV and paper PDFs | `files/` — e.g. `files/cv.pdf`, `files/bounded_default.pdf`, `files/iesn-notes.pdf`, `files/dmp-notes.pdf` |
 | SEO / metadata | the `<head>` of each page (title, description, canonical, OG/Twitter, JSON-LD on `index.html`) + `sitemap.xml` + `robots.txt` |
-| The DMP lecture-notes page | `notes/dmp.html` (this one is Quarto-rendered HTML; its `.qmd` source lives on the owner's machine, **not** in this repo) |
+| The DMP lecture note | Now a **PDF**: `files/dmp-notes.pdf`, compiled from the owner's LyX master at `Website/notes/DMP.lyx`. To update, recompile that LyX → PDF and overwrite the file. `notes/dmp.html` is just a redirect to the PDF (the Quarto/HTML version is retired). |
 
 The header / nav / footer markup is **duplicated in all four page files** (there are no includes).
 If you change the nav, the wordmark, or the footer, update all four by hand. The active nav link is
