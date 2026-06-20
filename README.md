@@ -1,12 +1,13 @@
-# Chen Gao — personal website (`gh-pages`)
+# Chen Gao — personal website
 
-This branch is the **live, hand-edited static site** served at <https://chennoshen239.github.io>.
-There is **no build step** — edit the HTML/CSS in this branch directly and push. Plain HTML +
-two shared CSS files + self-hosted fonts. No JS framework, no Quarto on this branch.
+The **`main` branch is the live, hand-edited static site** served at <https://chennoshen239.github.io>.
+GitHub Pages serves from `main` / root (Settings → Pages; legacy branch-deploy, no Actions, no build step).
+Edit the HTML/CSS on `main` and push. Plain HTML + two shared CSS files + self-hosted fonts. No JS framework, no Quarto.
 
-> ⚠️ **Never run `quarto publish gh-pages`.** The `main` branch still holds an old Quarto project.
-> Publishing it would rebuild from `main` and **overwrite this entire static site**. This site is
-> authored by hand here, not generated.
+> ⚠️ **One live branch only: `main`.** The old Quarto source is archived on the **`legacy-quarto`** branch,
+> kept for reference. Never `quarto publish` it or merge it into `main`; that would overwrite this
+> hand-authored static site. (History: the site used to live on a separate `gh-pages` branch with `main`
+> holding Quarto; those were consolidated into a single `main`.)
 
 ---
 
@@ -64,11 +65,11 @@ marked with `aria-current="page"`.
 ## Deploy
 
 ```sh
-# in a clone/worktree of this gh-pages branch
+# on the main branch of a clone of this repo
 #   …edit the .html / assets/*.css …
 git add -A
 git commit -m "describe the change"
-git push deploy gh-pages          # HTTPS remote; retry if it times out
+git push deploy main              # HTTPS remote; retry if it times out
 ```
 
 GitHub Pages rebuilds in ~30–60s. The CDN can lag **per file** (one file updates before another), so verify the
