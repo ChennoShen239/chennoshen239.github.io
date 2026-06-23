@@ -63,7 +63,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-648ef3d9445146c9b2790911d1461dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -437,7 +437,7 @@ A_k&gt;0\)</span>. Conversely suppose <span class="math inline">\(D_1,\dots,D_n&
 </div>
 <p>A finite-dimensional avatar of separation is <strong>Farkas’ lemma</strong>, the exact algebraic tool we need to prove the KKT conditions in <a href="#sec-con" class="quarto-xref"><span>Section 1.3</span></a>. It is a <em>theorem of the alternative</em>: of two systems, exactly one is solvable.</p>
 <div id="lem-farkas" class="theorem lemma">
-<p><span class="theorem-title"><strong>Lemma 1.1 (Farkas’ lemma)</strong></span> Let <span class="math inline">\(a_1,\dots,a_n,\beta\in\mathbb{R}^m\)</span> (here <span class="math inline">\(\beta\)</span> is the target vector, <em>not</em> the discount factor of <code>notation.qmd</code>). Then <strong>exactly one</strong> of the following holds:</p>
+<p><span class="theorem-title"><strong>Lemma 1.1 (Farkas’ lemma)</strong></span> Let <span class="math inline">\(a_1,\dots,a_n,\beta\in\mathbb{R}^m\)</span> (here <span class="math inline">\(\beta\)</span> is the target vector, <em>not</em> the discount factor that <span class="math inline">\(\beta\)</span> denotes in the <a href="./notation.html">Notation</a> appendix). Then <strong>exactly one</strong> of the following holds:</p>
 <ol type="1">
 <li>there exists <span class="math inline">\(x\in\mathbb{R}^m\)</span> with <span class="math inline">\(a_k^\top x\ge 0\)</span> for all <span class="math inline">\(k\)</span> and <span class="math inline">\(\beta^\top x&lt;0\)</span>; or</li>
 <li>there exist non-negative scalars <span class="math inline">\(p_1,\dots,p_n\ge 0\)</span> with <span class="math inline">\(\beta=\sum_{k=1}^n p_k a_k\)</span>.</li>
@@ -864,7 +864,7 @@ D_p x=D_p h-D_y x\cdot x^\top,
 </section>
 <section id="sec-markowitz" class="level3">
 <h3 class="anchored" data-anchor-id="sec-markowitz">The Markowitz frontier, two-fund theorem, and CAPM</h3>
-<p>(Throughout this section <span class="math inline">\(\beta\)</span> denotes the frontier-portfolio direction vector <a href="#eq-markowitz-affine" class="quarto-xref">Equation&nbsp;<span>1.40</span></a> and, later, the CAPM beta <a href="#eq-capm" class="quarto-xref">Equation&nbsp;<span>1.42</span></a> — <em>not</em> the discount factor reserved for <span class="math inline">\(\beta\)</span> in <code>notation.qmd</code> and used in this chapter’s cake-eating example.)</p>
+<p>(Throughout this section <span class="math inline">\(\beta\)</span> denotes the frontier-portfolio direction vector <a href="#eq-markowitz-affine" class="quarto-xref">Equation&nbsp;<span>1.40</span></a> and, later, the CAPM beta <a href="#eq-capm" class="quarto-xref">Equation&nbsp;<span>1.42</span></a> — <em>not</em> the discount factor reserved for <span class="math inline">\(\beta\)</span> in the <a href="./notation.html">Notation</a> appendix and used in this chapter’s cake-eating example.)</p>
 <p>Consider a one-period market with <span class="math inline">\(n\)</span> risky assets, expected-return vector <span class="math inline">\(\theta\ne\mathbf{1}\)</span>, and positive-definite return-covariance matrix <span class="math inline">\(A\)</span>. A portfolio <span class="math inline">\(x\)</span> (weights summing to one) has expected return <span class="math inline">\(\theta^\top x\)</span> and return variance <span class="math inline">\(x^\top A x\)</span>. A portfolio is a <strong>frontier portfolio</strong> if it minimizes variance among all portfolios with its expected return <span class="math inline">\(r\)</span>: <span id="eq-markowitz"><span class="math display">\[
 \min_x\ x^\top A x\quad\text{s.t.}\quad \theta^\top x=r,\quad \mathbf{1}^\top x=1 .
 \tag{1.38}\]</span></span> The objective is strictly convex, the constraints linear and independent (LICQ holds), so KKT is necessary and sufficient. With <span class="math inline">\(\mathcal{L}=x^\top A x+\lambda(r-\theta^\top
