@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Static Games with Incomplete Information – Game Theory</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./05-dynamic-incomplete.html" rel="next">
+<link href="./03-dynamic-complete.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./04-static-incomplete.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Static Games with Incomplete Information</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Game Theory</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-static-complete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Static Games with Complete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-dynamic-complete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Dynamic Games with Complete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-static-incomplete.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Static Games with Incomplete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-incomplete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Games with Incomplete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation &amp; Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-4-chicken" id="toc-sec-4-chicken" class="nav-link active" data-scroll-target="#sec-4-chicken"><span class="header-section-number">4.1</span> A motivating example</a></li>
+  <li><a href="#sec-4-bayesian" id="toc-sec-4-bayesian" class="nav-link" data-scroll-target="#sec-4-bayesian"><span class="header-section-number">4.2</span> Bayesian games</a></li>
+  <li><a href="#sec-4-examples" id="toc-sec-4-examples" class="nav-link" data-scroll-target="#sec-4-examples"><span class="header-section-number">4.3</span> Examples</a>
+  <ul class="collapse">
+  <li><a href="#sec-4-cournot" id="toc-sec-4-cournot" class="nav-link" data-scroll-target="#sec-4-cournot">Cournot duopoly with private cost</a></li>
+  <li><a href="#sec-4-studygroups" id="toc-sec-4-studygroups" class="nav-link" data-scroll-target="#sec-4-studygroups">Study groups</a></li>
+  </ul></li>
+  <li><a href="#sec-4-applications" id="toc-sec-4-applications" class="nav-link" data-scroll-target="#sec-4-applications"><span class="header-section-number">4.4</span> Applications</a>
+  <ul class="collapse">
+  <li><a href="#sec-4-lemons" id="toc-sec-4-lemons" class="nav-link" data-scroll-target="#sec-4-lemons">Adverse selection: the market for lemons</a></li>
+  <li><a href="#sec-4-jury" id="toc-sec-4-jury" class="nav-link" data-scroll-target="#sec-4-jury">Committee and jury voting</a></li>
+  <li><a href="#sec-4-purification" id="toc-sec-4-purification" class="nav-link" data-scroll-target="#sec-4-purification">Purification of mixed strategies</a></li>
+  </ul></li>
+  <li><a href="#sec-4-auctions" id="toc-sec-4-auctions" class="nav-link" data-scroll-target="#sec-4-auctions"><span class="header-section-number">4.5</span> Auctions</a>
+  <ul class="collapse">
+  <li><a href="#sec-4-second-price" id="toc-sec-4-second-price" class="nav-link" data-scroll-target="#sec-4-second-price">Second-price and English auctions</a></li>
+  <li><a href="#sec-4-first-price" id="toc-sec-4-first-price" class="nav-link" data-scroll-target="#sec-4-first-price">First-price and Dutch auctions</a></li>
+  <li><a href="#sec-4-revenue" id="toc-sec-4-revenue" class="nav-link" data-scroll-target="#sec-4-revenue">Revenue equivalence</a></li>
+  <li><a href="#sec-4-winners-curse" id="toc-sec-4-winners-curse" class="nav-link" data-scroll-target="#sec-4-winners-curse">Common-value auctions and the winner’s curse</a></li>
+  </ul></li>
+  <li><a href="#sec-4-summary" id="toc-sec-4-summary" class="nav-link" data-scroll-target="#sec-4-summary"><span class="header-section-number">4.6</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-static-incomplete" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Static Games with Incomplete Information</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\BR}{\operatorname{BR}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,\vert\,}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sm}{\setminus}
+\newcommand{\defeq}{\equiv}
+\]</span></p>
+</div>
+<p>So far players have known everything about the game they are playing. But in many strategic situations a player is uncertain about something fundamental — a rival’s costs, a buyer’s valuation, an opponent’s preferences. This chapter develops the model of <strong>incomplete information</strong>, in which each player has a privately known <strong>type</strong>. The central device, due to John Harsanyi, is to let a fictitious player “Nature” draw the types at the start of the game, converting incomplete information into an extensive-form game of <em>imperfect</em> information that we can analyse with the tools of <a href="03-dynamic-complete.html" class="quarto-xref"><span>Chapter 3</span></a>. The resulting equilibrium concept is the <strong>Bayesian Nash equilibrium</strong>, and we put it to work on Cournot competition, public-good provision, the market for lemons, jury voting, the purification of mixed strategies, and the theory of auctions.</p>
+<section id="sec-4-chicken" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="sec-4-chicken"><span class="header-section-number">4.1</span> A motivating example</h2>
+<p>Two teenagers drive toward each other; each can <strong>swerve</strong> (be “chicken”) or <strong>continue</strong> straight. In the complete-information <strong>game of Chicken</strong>, player 1 chooses a row <span class="math inline">\(C\)</span> (swerve) or <span class="math inline">\(D\)</span> (drive on) and player 2 a column <span class="math inline">\(c\)</span> or <span class="math inline">\(d\)</span>:</p>
+<div id="tbl-4-chicken-ci" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-chicken-ci-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.1: The game of Chicken with common-knowledge punishment <span class="math inline">\(k\)</span>.
+</figcaption>
+<div aria-describedby="tbl-4-chicken-ci-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(c\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(d\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(C\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,R\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(D\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(R,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\tfrac{R}{2}-k,\ \tfrac{R}{2}-k\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Here <span class="math inline">\(R&gt;0\)</span> is the prize (the respect won by the bolder driver) and <span class="math inline">\(k\ge 0\)</span> is the <strong>punishment</strong> — the personal cost of a collision, which depends on how harshly a teenager’s parents will react.</p>
+<p>Now suppose the punishment is each player’s <strong>private information</strong>. A teenager’s parents are <strong>harsh</strong> (<span class="math inline">\(k_i = H\)</span>, “high”) or <strong>lenient</strong> (<span class="math inline">\(k_i = L\)</span>, “low”), each with probability <span class="math inline">\(\tfrac12\)</span>, independently across the two players. Player <span class="math inline">\(i\)</span> knows his own <span class="math inline">\(k_i\)</span> but not his rival’s. This is a game of <em>incomplete</em> information: the payoffs depend on something — the rival’s <span class="math inline">\(k\)</span> — that a player does not observe.</p>
+<p><strong>Harsanyi’s idea.</strong> Introduce a fictitious player <span class="math inline">\(0\)</span>, <strong>Nature</strong>, who moves first and draws the type profile <span class="math inline">\((k_1,k_2)\)</span> from <span class="math inline">\(\{LL, LH, HL, HH\}\)</span>, each with probability <span class="math inline">\(\tfrac14\)</span> (a fixed behaviour strategy). Player 1 observes <span class="math inline">\(k_1\)</span> but not <span class="math inline">\(k_2\)</span>; player 2 observes <span class="math inline">\(k_2\)</span> but neither <span class="math inline">\(k_1\)</span> nor player 1’s choice; players 1 and 2 then move simultaneously. This is an extensive-form game of imperfect information (<a href="#fig-4-chicken" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>). The dashed lines are information sets: player 1’s two information sets group the nodes sharing <span class="math inline">\(k_1=L\)</span> (after <span class="math inline">\(LL\)</span> and <span class="math inline">\(LH\)</span>) and those sharing <span class="math inline">\(k_1=H\)</span> (after <span class="math inline">\(HL\)</span> and <span class="math inline">\(HH\)</span>); player 2’s two information sets group the nodes sharing <span class="math inline">\(k_2=L\)</span> (after <span class="math inline">\(LL\)</span> and <span class="math inline">\(HL\)</span>) and those sharing <span class="math inline">\(k_2=H\)</span> (after <span class="math inline">\(LH\)</span> and <span class="math inline">\(HH\)</span>).</p>
+<div id="fig-4-chicken" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-chicken-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/chicken-bayes.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-chicken-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: The extensive form of Chicken with private punishment. Nature (player <span class="math inline">\(0\)</span>) draws <span class="math inline">\((k_1,k_2)\in\{LL,LH,HL,HH\}\)</span>, each with probability <span class="math inline">\(\tfrac14\)</span>. Dashed lines marked <span class="math inline">\(1\)</span> are player 1’s information sets (he knows only his own <span class="math inline">\(k_1\)</span>); those marked <span class="math inline">\(2\)</span> are player 2’s (she knows only her own <span class="math inline">\(k_2\)</span>).
+</figcaption>
+</figure>
+</div>
+<p>Because player 1 has two information sets and a binary action at each, he has four <strong>strategies</strong>, <span class="math inline">\(S_1 = \{CC, CD, DC, DD\}\)</span>, under the convention that the first letter is the action when <span class="math inline">\(k_1 = L\)</span> and the second when <span class="math inline">\(k_1 = H\)</span> — so <span class="math inline">\(DC\)</span> means “drive on if lenient, swerve if harsh.” Likewise <span class="math inline">\(S_2 = \{cc, cd, dc, dd\}\)</span>, with the first letter the action when <span class="math inline">\(k_2 = L\)</span>.</p>
+<p>For a profile <span class="math inline">\((A_L A_H,\, a_L a_H)\)</span>, Nature’s draw makes the outcome a lottery, <span class="math display">\[
+\tfrac14\,(LL, A_L, a_L) + \tfrac14\,(LH, A_L, a_H)
++ \tfrac14\,(HL, A_H, a_L) + \tfrac14\,(HH, A_H, a_H),
+\]</span> so the expected payoffs are <span class="math display">\[
+\tilde v_1(A_L A_H, a_L a_H) = \tfrac14 v_1(A_L,a_L; L) + \tfrac14 v_1(A_L,a_H; L)
++ \tfrac14 v_1(A_H,a_L; H) + \tfrac14 v_1(A_H,a_H; H),
+\]</span> <span class="math display">\[
+\tilde v_2(A_L A_H, a_L a_H) = \tfrac14 v_2(A_L,a_L; L) + \tfrac14 v_2(A_L,a_H; H)
++ \tfrac14 v_2(A_H,a_L; L) + \tfrac14 v_2(A_H,a_H; H).
+\]</span> This reduces the game to an ordinary <span class="math inline">\(4\times 4\)</span> normal form. With the numerical values <span class="math inline">\(R = 8\)</span>, <span class="math inline">\(H = 16\)</span>, <span class="math inline">\(L = 0\)</span>, the bimatrix is</p>
+<div id="tbl-4-chicken-bne" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-chicken-bne-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.2: Chicken with private punishment, <span class="math inline">\(R=8,\,H=16,\,L=0\)</span>.
+</figcaption>
+<div aria-describedby="tbl-4-chicken-bne-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(cc\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(cd\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(dc\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(dd\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(CC\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,8\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(CD\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(4,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,-1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-6,\,2\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(DC\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(4,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,-1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,2\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(DD\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(8,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,-6\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-4,\,-4\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Checking best responses cell by cell, the game has a <strong>unique pure-strategy Nash equilibrium, <span class="math inline">\((DC, dc)\)</span></strong>. Reading off the convention: a teenager with <em>harsh</em> parents (<span class="math inline">\(k_i = H\)</span>) swerves, while a teenager with <em>lenient</em> parents (<span class="math inline">\(k_i = L\)</span>) drives on. The threat of severe punishment makes the harsh-parented type back down, exactly as intuition would suggest — and the analysis required nothing beyond turning the incomplete-information game into a familiar extensive form.</p>
+</section>
+<section id="sec-4-bayesian" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="sec-4-bayesian"><span class="header-section-number">4.2</span> Bayesian games</h2>
+<p>The Harsanyi recipe generalises. Each player <span class="math inline">\(i\)</span> has a <strong>type</strong> <span class="math inline">\(\theta_i\)</span> summarising his privately known characteristics, drawn from a <strong>type space</strong> <span class="math inline">\(\Theta_i\)</span>. Write <span class="math inline">\(\Theta = \Theta_1 \times \cdots \times \Theta_n\)</span> for the set of type profiles and <span class="math inline">\(A = A_1 \times \cdots \times A_n\)</span> for the set of action profiles. Payoffs may depend on the whole type profile, <span class="math inline">\(v_i : A \times \Theta \to
+\R\)</span>. The distribution of types is governed by a <strong>common prior</strong> — a single probability distribution over <span class="math inline">\(\Theta\)</span> that is common knowledge.</p>
+<div id="def-4-bayesian-game" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.1 (Bayesian game)</strong></span> The normal-form representation of an <span class="math inline">\(n\)</span>-player <strong>Bayesian game</strong> (or <strong>static game of incomplete information</strong>) is the tuple <span class="math display">\[
+\big(N,\ \{A_i\}_{i=1}^n,\ \{\Theta_i\}_{i=1}^n,\ \{v_i\}_{i=1}^n,\ \Prob\big),
+\]</span> where</p>
+<ol type="1">
+<li><span class="math inline">\(N = \{1, 2, \dots, n\}\)</span> is the set of players;</li>
+<li><span class="math inline">\(A_i\)</span> is player <span class="math inline">\(i\)</span>’s <strong>action space</strong>;</li>
+<li><span class="math inline">\(\Theta_i\)</span> is player <span class="math inline">\(i\)</span>’s <strong>type space</strong>, and each <span class="math inline">\(\theta_i \in \Theta_i\)</span> is a <strong>type</strong>;</li>
+<li><span class="math inline">\(v_i : A \times \Theta \to \R\)</span> is player <span class="math inline">\(i\)</span>’s <strong>payoff function</strong>, so <span class="math inline">\(v_i(a;\theta)\)</span> is <span class="math inline">\(i\)</span>’s payoff when the action profile is <span class="math inline">\(a\)</span> and the type profile is <span class="math inline">\(\theta\)</span>;</li>
+<li><span class="math inline">\(\Prob\)</span> is the <strong>common prior</strong>, a probability distribution over <span class="math inline">\(\Theta\)</span>.</li>
+</ol>
+</div>
+<p><strong>Beliefs from the prior.</strong> Once player <span class="math inline">\(i\)</span> learns his own type <span class="math inline">\(\theta_i\)</span>, he updates his beliefs about the others’ types <span class="math inline">\(\theta_{-i}\)</span> by <strong>Bayes’ rule</strong>. Recall that for a distribution <span class="math inline">\(\Prob\)</span> on a space <span class="math inline">\(X\)</span> and events <span class="math inline">\(A, B\)</span> with <span class="math inline">\(\Prob(A) &gt; 0\)</span>, <span class="math display">\[
+\Prob(B \given A) \defeq \frac{\Prob(B \cap A)}{\Prob(A)}.
+\]</span> Applying this to <span class="math inline">\(\Prob\)</span> over <span class="math inline">\(\Theta\)</span>, player <span class="math inline">\(i\)</span>’s <strong>posterior belief</strong> about <span class="math inline">\(\theta_{-i}\)</span> given own type <span class="math inline">\(\theta_i\)</span> is <span class="math display">\[
+\phi_i(\theta_{-i} \given \theta_i)
+= \frac{\Prob(\theta_i, \theta_{-i})}{\Prob(\theta_i)},
+\qquad
+\Prob(\theta_i) = \sum_{\theta'_{-i} \in \Theta_{-i}} \Prob(\theta_i, \theta'_{-i}),
+\]</span> where <span class="math inline">\(\Prob(\theta_i)\)</span> is the marginal probability of <span class="math inline">\(i\)</span> being type <span class="math inline">\(\theta_i\)</span>.</p>
+<p>In the Chicken example, types are independent and uniform, so each player’s posterior is just the marginal: <span class="math inline">\(\phi_i(H \given \theta_i) = \phi_i(L \given
+\theta_i) = \tfrac12\)</span> for either own type. The prior need not make types independent, however. With the <strong>correlated prior</strong></p>
+<div id="tbl-4-corr-prior" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-corr-prior-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.3: A correlated prior over <span class="math inline">\((\theta_1,\theta_2)\)</span>.
+</figcaption>
+<div aria-describedby="tbl-4-corr-prior-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(L\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(H\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(L\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1/3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1/6\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(H\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1/6\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1/3\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>the posteriors become <span class="math inline">\(\phi_i(L\given L) = \tfrac23\)</span>, <span class="math inline">\(\phi_i(H\given L) =
+\tfrac13\)</span>, <span class="math inline">\(\phi_i(L\given H) = \tfrac13\)</span>, <span class="math inline">\(\phi_i(H\given H) = \tfrac23\)</span>: different types hold different beliefs, and every type thinks the opponent is more likely to be the <em>same</em> type as himself.</p>
+<p>A strategy must specify what to do as a function of one’s type.</p>
+<div id="def-4-strategy" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.2 (Strategies in a Bayesian game)</strong></span> In a Bayesian game <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>:</p>
+<ul>
+<li>a <strong>pure strategy</strong> for player <span class="math inline">\(i\)</span> is a function <span class="math inline">\(s_i : \Theta_i \to A_i\)</span> specifying the action <span class="math inline">\(s_i(\theta_i)\)</span> that <span class="math inline">\(i\)</span> chooses when his type is <span class="math inline">\(\theta_i\)</span>;</li>
+<li>a <strong>mixed strategy</strong> is a function <span class="math inline">\(\sigma_i : \Theta_i \to \Delta(A_i)\)</span> specifying a mixed action <span class="math inline">\(\sigma_i(\theta_i)\)</span> for each type.</li>
+</ul>
+</div>
+<p>A strategy is thus a complete type-contingent plan. In the equivalent extensive form, where each type is an information set, a pure strategy is a map from information sets to actions and a mixed strategy is a behavioural strategy. Given the opponents’ profile <span class="math inline">\(s_{-i}\)</span>, the <strong>expected payoff</strong> to player <span class="math inline">\(i\)</span> of type <span class="math inline">\(\theta_i\)</span> from choosing action <span class="math inline">\(a_i\)</span> is computed against his posterior beliefs: <span class="math display">\[
+\sum_{\theta_{-i} \in \Theta_{-i}}
+\phi_i(\theta_{-i} \given \theta_i)\,
+v_i\big(a_i, s_{-i}(\theta_{-i});\ \theta_i, \theta_{-i}\big).
+\]</span></p>
+<p>The equilibrium concept now requires that <em>every type</em> of every player be playing a best response in this conditional sense.</p>
+<div id="def-4-bne" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.3 (Bayesian Nash equilibrium)</strong></span> In the Bayesian game <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>, a strategy profile <span class="math inline">\(s^* = (s_1^*, \dots, s_n^*)\)</span> is a <strong>(pure-strategy) Bayesian Nash equilibrium (BNE)</strong> if for every player <span class="math inline">\(i\)</span> and every type <span class="math inline">\(\theta_i \in \Theta_i\)</span>, <span id="eq-4-bne"><span class="math display">\[
+\sum_{\theta_{-i}} \phi_i(\theta_{-i} \given \theta_i)\,
+v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big)
+\ \ge\
+\sum_{\theta_{-i}} \phi_i(\theta_{-i} \given \theta_i)\,
+v_i\big(a_i, s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big)
+\quad \text{for all } a_i \in A_i.
+\tag{4.1}\]</span></span> A mixed-strategy BNE is defined analogously.</p>
+</div>
+<p>The condition says that no type of any player wants to deviate. The next result confirms that this is exactly the Nash equilibrium of the Harsanyi extensive form, so the two views agree.</p>
+<div id="thm-4-bne-ne" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.1 (BNE equals NE of the extensive form)</strong></span> In any Bayesian game, a strategy profile is a Bayesian Nash equilibrium if and only if it is a Nash equilibrium of the equivalent extensive-form game with Nature (<a href="03-dynamic-complete.html#def-3-extensive" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>).</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><em>(Only if: BNE <span class="math inline">\(\Rightarrow\)</span> NE.)</em> Let <span class="math inline">\(s^*\)</span> satisfy <a href="#eq-4-bne" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> and fix any player <span class="math inline">\(i\)</span> and any alternative strategy <span class="math inline">\(s_i\)</span> of the extensive form. Applying <a href="#eq-4-bne" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> with <span class="math inline">\(a_i = s_i(\theta_i)\)</span> gives, for each type <span class="math inline">\(\theta_i\)</span>, <span class="math display">\[
+\sum_{\theta_{-i}} \phi_i(\theta_{-i} \given \theta_i)\,
+v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big)
+\ \ge\
+\sum_{\theta_{-i}} \phi_i(\theta_{-i} \given \theta_i)\,
+v_i\big(s_i(\theta_i), s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big).
+\]</span> Multiply both sides by <span class="math inline">\(\Prob(\theta_i)\)</span> and sum over <span class="math inline">\(\theta_i \in \Theta_i\)</span>: <span class="math display">\[
+\sum_{\theta_i} \Prob(\theta_i) \sum_{\theta_{-i}}
+\phi_i(\theta_{-i} \given \theta_i)\,
+v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big)
+\ \ge\
+\sum_{\theta_i} \Prob(\theta_i) \sum_{\theta_{-i}}
+\phi_i(\theta_{-i} \given \theta_i)\,
+v_i\big(s_i(\theta_i), s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big).
+\]</span> Because <span class="math inline">\(\Prob(\theta_i)\,\phi_i(\theta_{-i} \given \theta_i)
+= \Prob(\theta_i, \theta_{-i}) = \Prob(\theta)\)</span>, the double sums collapse to single sums over <span class="math inline">\(\theta \in \Theta\)</span>: <span class="math display">\[
+\sum_{\theta \in \Theta} \Prob(\theta)\,
+v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big)
+\ \ge\
+\sum_{\theta \in \Theta} \Prob(\theta)\,
+v_i\big(s_i(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big).
+\]</span> The left side is <span class="math inline">\(i\)</span>’s expected payoff in the extensive form from <span class="math inline">\((s_i^*,
+s_{-i}^*)\)</span> and the right side that from <span class="math inline">\((s_i, s_{-i}^*)\)</span>. Since <span class="math inline">\(s_i\)</span> was arbitrary, <span class="math inline">\(s^*\)</span> is a Nash equilibrium of the extensive form.</p>
+<p><em>(If: NE <span class="math inline">\(\Rightarrow\)</span> BNE.)</em> We argue the contrapositive. Suppose <a href="#eq-4-bne" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> fails for some player <span class="math inline">\(i\)</span> of some type <span class="math inline">\(\hat\theta_i\)</span>: there is an action <span class="math inline">\(\hat a_i\)</span> with <span class="math display">\[
+\sum_{\theta_{-i}} \phi_i(\theta_{-i} \given \hat\theta_i)\,
+v_i\big(\hat a_i, s_{-i}^*(\theta_{-i});\ \hat\theta_i, \theta_{-i}\big)
+\ &gt;\
+\sum_{\theta_{-i}} \phi_i(\theta_{-i} \given \hat\theta_i)\,
+v_i\big(s_i^*(\hat\theta_i), s_{-i}^*(\theta_{-i});\ \hat\theta_i, \theta_{-i}\big).
+\]</span> Define the strategy <span class="math display">\[
+s_i(\theta_i) =
+\begin{cases}
+\hat a_i, &amp; \theta_i = \hat\theta_i,\\
+s_i^*(\theta_i), &amp; \theta_i \ne \hat\theta_i,
+\end{cases}
+\]</span> which differs from <span class="math inline">\(s_i^*\)</span> only at <span class="math inline">\(\hat\theta_i\)</span>. Multiplying by priors and summing over types exactly as in the first part (the inequality is strict at <span class="math inline">\(\hat\theta_i\)</span> and an equality at every other type) yields <span class="math display">\[
+\sum_{\theta \in \Theta} \Prob(\theta)\,
+v_i\big(s_i(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big)
+\ &gt;\
+\sum_{\theta \in \Theta} \Prob(\theta)\,
+v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big).
+\]</span> So <span class="math inline">\(s_i^*\)</span> is not a best response to <span class="math inline">\(s_{-i}^*\)</span> in the extensive form, and <span class="math inline">\(s^*\)</span> is not a Nash equilibrium of it. <span class="math inline">\(\square\)</span></p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Beliefs, not the prior, are what matter — and the common prior can be dropped
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Inspecting <a href="#def-4-bne" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>, the prior <span class="math inline">\(\Prob\)</span> enters only through the posterior beliefs <span class="math inline">\(\{\phi_i\}\)</span>. One may therefore specify the <strong>system of posterior beliefs</strong> <span class="math inline">\(\{\phi_i\}\)</span> directly, and the BNE definition still applies. This enlarges the scope of Bayesian games to settings <em>without</em> a common prior — at the cost that such a game can no longer be transformed into an equivalent extensive form with a single Nature move.</p>
+<p>A no-common-prior belief system genuinely exists. Take two types <span class="math inline">\(H, L\)</span> for each player and the beliefs <span class="math display">\[
+\phi_1 = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{pmatrix},
+\qquad
+\phi_2 = \begin{pmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{pmatrix},
+\]</span> where the rows of <span class="math inline">\(\phi_1\)</span> are player 1’s own type <span class="math inline">\(\theta_1 \in \{H, L\}\)</span> and the columns are <span class="math inline">\(\theta_2 \in \{H, L\}\)</span> (and symmetrically for <span class="math inline">\(\phi_2\)</span>). Suppose a common prior <span class="math inline">\(\Prob\)</span> generated these. From <span class="math inline">\(\phi_1\)</span>, type <span class="math inline">\(H\)</span> of player 1 is <em>sure</em> the opponent is <span class="math inline">\(H\)</span>, so <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) = 0\)</span>. But from <span class="math inline">\(\phi_2\)</span>, type <span class="math inline">\(H\)</span> of player 2 is sure player 1 is <span class="math inline">\(L\)</span>, which forces <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) &gt; 0\)</span>. Contradiction — no common prior exists.</p>
+</div>
+</div>
+</section>
+<section id="sec-4-examples" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="sec-4-examples"><span class="header-section-number">4.3</span> Examples</h2>
+<section id="sec-4-cournot" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-cournot">Cournot duopoly with private cost</h3>
+<p>Return to Cournot competition (<a href="02-static-complete.html" class="quarto-xref"><span>Chapter 2</span></a>), but now firm 1’s marginal cost is private. It is <strong>high</strong>, <span class="math inline">\(c_h\)</span>, with probability <span class="math inline">\(\theta \in (0,1)\)</span>, or <strong>low</strong>, <span class="math inline">\(c_\ell\)</span>, with probability <span class="math inline">\(1 - \theta\)</span>; only firm 1 knows which. Firm 2’s cost <span class="math inline">\(c_2\)</span> is common knowledge. The two firms choose quantities simultaneously, and inverse demand is <span class="math inline">\(P(q) = \max\{a - q, 0\}\)</span>.</p>
+<p>Firm 1’s strategy is a type-contingent pair <span class="math inline">\((q_h, q_\ell) \in \R_+^2\)</span> (output when high-cost and when low-cost); firm 2’s strategy is a single <span class="math inline">\(q_2 \in \R_+\)</span>. A profile <span class="math inline">\((q_h^*, q_\ell^*, q_2^*)\)</span> is a BNE if and only if each component maximises the relevant (expected) profit: <span class="math display">\[
+q_h^* \in \argmax_{q_h \ge 0} \big[P(q_h + q_2^*) - c_h\big] q_h,
+\qquad
+q_\ell^* \in \argmax_{q_\ell \ge 0} \big[P(q_\ell + q_2^*) - c_\ell\big] q_\ell,
+\]</span> <span class="math display">\[
+q_2^* \in \argmax_{q_2 \ge 0}
+\Big\{ \theta\big[P(q_h^* + q_2) - c_2\big] q_2
++ (1-\theta)\big[P(q_\ell^* + q_2) - c_2\big] q_2 \Big\}.
+\]</span> Note that firm 2, not knowing firm 1’s cost, maximises <em>expected</em> profit, weighting the two cost states by their probabilities. With <span class="math inline">\(P(q) = a - q\)</span>, the first-order conditions give the best-response system <span class="math display">\[
+q_h^* = \frac{a - q_2^* - c_h}{2}, \qquad
+q_\ell^* = \frac{a - q_2^* - c_\ell}{2}, \qquad
+q_2^* = \frac{a - \theta q_h^* - (1-\theta) q_\ell^* - c_2}{2}.
+\]</span> Solving this linear system yields the closed form <span class="math display">\[
+q_h^* = \frac{a - 2c_h + c_2}{3} + \frac{1 - \theta}{6}(c_h - c_\ell),
+\]</span> <span class="math display">\[
+q_\ell^* = \frac{a - 2c_\ell + c_2}{3} - \frac{\theta}{6}(c_h - c_\ell),
+\]</span> <span class="math display">\[
+q_2^* = \frac{a - 2c_2 + \theta c_h + (1-\theta) c_\ell}{3}.
+\]</span> The benchmark complete-information Cournot outputs are recovered by setting <span class="math inline">\(c_h = c_\ell\)</span>. The new feature is the correction term <span class="math inline">\(\pm\frac{1}{6}(c_h -
+c_\ell)\)</span> in firm 1’s outputs: relative to a firm that knew its own cost and faced a rival who knew it too, the high-cost type produces a little <em>more</em> and the low-cost type a little <em>less</em>, because firm 2 hedges against firm 1’s uncertain cost and firm 1 responds to that hedging.</p>
+</section>
+<section id="sec-4-studygroups" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-studygroups">Study groups</h3>
+<p>Two students submit a joint lab report. Each <span class="math inline">\(i\)</span> either <strong>exerts effort</strong> (<span class="math inline">\(e_i = 1\)</span>) at cost <span class="math inline">\(c\)</span>, with <span class="math inline">\(0 &lt; c &lt; 1\)</span>, or <strong>shirks</strong> (<span class="math inline">\(e_i = 0\)</span>) at no cost. If at least one exerts effort, the lab is a <strong>success</strong>; if both shirk, it <strong>fails</strong>. A failure is worth <span class="math inline">\(0\)</span> to both. A success is worth <span class="math inline">\(\theta_i^2\)</span> to student <span class="math inline">\(i\)</span>, where the <strong>type</strong> <span class="math inline">\(\theta_i\)</span> is private information, and <span class="math inline">\(\theta_1, \theta_2\)</span> are independent and uniform on <span class="math inline">\([0,1]\)</span>. This is a voluntary contribution to a public good.</p>
+<p>A strategy is a function <span class="math inline">\(\sigma_i : [0,1] \to [0,1]\)</span>, where <span class="math inline">\(\sigma_i(\theta_i)\)</span> is the probability that type <span class="math inline">\(\theta_i\)</span> exerts effort. From the other student’s perspective, the probability that <span class="math inline">\(i\)</span> exerts effort is <span class="math display">\[
+p^{\sigma_i} = \int_0^1 \sigma_i(\theta_i)\, f(\theta_i)\,\mathrm d\theta_i
+= \int_0^1 \sigma_i(\theta_i)\,\mathrm d\theta_i,
+\]</span> since the density <span class="math inline">\(f \equiv 1\)</span> on <span class="math inline">\([0,1]\)</span>. Consider student 1 of type <span class="math inline">\(\theta_1\)</span> facing <span class="math inline">\(\sigma_2\)</span>. Exerting effort guarantees success and pays <span class="math inline">\(\theta_1^2 - c\)</span>. Shirking yields a success — worth <span class="math inline">\(\theta_1^2\)</span> — only if student 2 exerts effort, which happens with probability <span class="math inline">\(p^{\sigma_2}\)</span>, for an expected payoff <span class="math inline">\(p^{\sigma_2}\theta_1^2\)</span>. So effort is optimal exactly when <span class="math inline">\(\theta_1^2 - c &gt;
+p^{\sigma_2}\theta_1^2\)</span>, i.e.&nbsp;<span class="math inline">\(\theta_1^2 &gt; c/(1 - p^{\sigma_2})\)</span>. The best response is the <strong>cutoff (threshold) strategy</strong> <span id="eq-4-sg-br1"><span class="math display">\[
+\sigma_1(\theta_1) =
+\begin{cases}
+1, &amp; \theta_1^2 &gt; c/(1 - p^{\sigma_2}),\\
+0, &amp; \theta_1^2 &lt; c/(1 - p^{\sigma_2}),
+\end{cases}
+\tag{4.2}\]</span></span> with threshold <span class="math inline">\(\hat\theta_1 = \sqrt{c/(1 - p^{\sigma_2})}\)</span>, and symmetrically <span id="eq-4-sg-br2"><span class="math display">\[
+\sigma_2(\theta_2) =
+\begin{cases}
+1, &amp; \theta_2^2 &gt; c/(1 - p^{\sigma_1}),\\
+0, &amp; \theta_2^2 &lt; c/(1 - p^{\sigma_1}).
+\end{cases}
+\tag{4.3}\]</span></span> Higher types — who value success more — work; lower types free-ride. Integrating the cutoff rules gives the fixed-point equations for the effort probabilities, <span id="eq-4-sg-fp1"><span class="math display">\[
+p^{\sigma_1} = 1 - \min\!\Big\{1,\ \sqrt{c/(1 - p^{\sigma_2})}\Big\},
+\tag{4.4}\]</span></span> <span id="eq-4-sg-fp2"><span class="math display">\[
+p^{\sigma_2} = 1 - \min\!\Big\{1,\ \sqrt{c/(1 - p^{\sigma_1})}\Big\}.
+\tag{4.5}\]</span></span> For <span class="math inline">\(0 &lt; c &lt; 1\)</span> this system has a <strong>unique solution</strong>, <span class="math inline">\(p^{\sigma_1} = p^{\sigma_2}
+= 1 - c^{1/3}\)</span>, giving an <strong>essentially unique BNE</strong> with cutoff <span class="math inline">\(c^{1/3}\)</span>: <span class="math display">\[
+\sigma_i^*(\theta_i) =
+\begin{cases}
+1, &amp; \theta_i &gt; c^{1/3},\\
+0, &amp; \theta_i &lt; c^{1/3}.
+\end{cases}
+\]</span> (“Essentially” because the borderline type <span class="math inline">\(\theta_i = c^{1/3}\)</span> may play any <span class="math inline">\(\sigma_i(\theta_i) \in [0,1]\)</span> without affecting anything, the event having probability zero.) Only sufficiently high types contribute, and the free-riding that besets public goods reappears here through the cutoff.</p>
+</section>
+</section>
+<section id="sec-4-applications" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="sec-4-applications"><span class="header-section-number">4.4</span> Applications</h2>
+<section id="sec-4-lemons" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-lemons">Adverse selection: the market for lemons</h3>
+<p>Player 1 owns a used car and wishes to sell it to player 2. The car’s <strong>mechanical condition</strong> is player 1’s private information. Player 2 believes it is <strong>poor</strong> (<span class="math inline">\(P\)</span>), <strong>fair</strong> (<span class="math inline">\(F\)</span>), or <strong>good</strong> (<span class="math inline">\(G\)</span>), each with probability <span class="math inline">\(\tfrac13\)</span>. The seller’s <strong>reservation value</strong> <span class="math inline">\(v_1(\theta)\)</span> and the buyer’s <strong>willingness to pay</strong> <span class="math inline">\(v_2(\theta)\)</span> are <span class="math display">\[
+v_1(\theta) =
+\begin{cases} 10, &amp; \theta = P\\ 20, &amp; \theta = F\\ 30, &amp; \theta = G \end{cases}
+\qquad\qquad
+v_2(\theta) =
+\begin{cases} 14, &amp; \theta = P\\ 24, &amp; \theta = F\\ 34, &amp; \theta = G. \end{cases}
+\]</span> The buyer values the car more than the seller in every state (<span class="math inline">\(v_2 &gt; v_1\)</span>), so trade is always efficient.</p>
+<p><strong>Complete-information benchmark.</strong> If the condition were commonly known, model the trade as an ultimatum game: player 2 announces a price <span class="math inline">\(p\)</span>, and player 1 accepts or rejects (no trade if rejected). The unique subgame-perfect outcome (<a href="03-dynamic-complete.html#def-3-spe" class="quarto-xref">Definition&nbsp;<span>3.11</span></a>) has the buyer offer exactly the seller’s reservation value: trade occurs at <span class="math inline">\(p = 10\)</span> if <span class="math inline">\(\theta = P\)</span>, at <span class="math inline">\(p = 20\)</span> if <span class="math inline">\(\theta = F\)</span>, and at <span class="math inline">\(p = 30\)</span> if <span class="math inline">\(\theta = G\)</span>. Trade always occurs, and the outcome is <strong>efficient</strong>.</p>
+<p><strong>Private information.</strong> Now the condition is known only to the seller. Model the encounter as a (simultaneous-move) Bayesian game in which the seller of type <span class="math inline">\(\theta\)</span> chooses an acceptance plan <span class="math inline">\(s_1^\theta : \R \to \{a, r\}\)</span> — accept or reject as a function of the price. We show that good and fair cars never trade.</p>
+<p><strong>Step 1 — the good type cannot sell.</strong> Suppose, toward a contradiction, that in equilibrium the good type accepts the equilibrium price, <span class="math inline">\(s_1^G(p) = a\)</span>. Acceptance by the good type requires <span class="math inline">\(p \ge 30\)</span>; but then <span class="math inline">\(p \ge 30 \ge v_1(F) \ge v_1(P)\)</span>, so the fair and poor types accept as well, <span class="math inline">\(s_1^F(p) = s_1^P(p) = a\)</span>. Facing all three types with equal probability, the buyer’s expected payoff from <span class="math inline">\(p\)</span> is <span class="math display">\[
+\tfrac13 v_2(P) + \tfrac13 v_2(F) + \tfrac13 v_2(G) - p = 24 - p &lt; 0,
+\]</span> since <span class="math inline">\(p \ge 30\)</span>. By deviating to <span class="math inline">\(p' = 0\)</span> (which no type accepts) the buyer secures at least <span class="math inline">\(0\)</span> — a profitable deviation. Contradiction.</p>
+<p><strong>Step 2 — the fair type cannot sell.</strong> Knowing the good type never sells at the equilibrium price, suppose the fair type accepts, <span class="math inline">\(s_1^F(p) = a\)</span>. This requires <span class="math inline">\(p \ge 20\)</span>, so the poor type also accepts, <span class="math inline">\(s_1^P(p) = a\)</span>. Conditioning on the two types who would trade, the buyer’s expected payoff is <span class="math display">\[
+\tfrac12 v_2(P) + \tfrac12 v_2(F) - p = 19 - p &lt; 0,
+\]</span> since <span class="math inline">\(p \ge 20\)</span>. Again deviating to <span class="math inline">\(p' = 0\)</span> gives at least <span class="math inline">\(0\)</span>. Contradiction.</p>
+<p><strong>Conclusion.</strong> In any BNE the fair and good cars are <strong>not</strong> sold. There is a BNE in which only the poor car trades, at <span class="math inline">\(p = 10\)</span>, with each type following the reservation rule <span class="math display">\[
+s_1^\theta(p) =
+\begin{cases}
+a, &amp; p \ge v_1(\theta),\\
+r, &amp; p &lt; v_1(\theta).
+\end{cases}
+\]</span> Only the lowest-quality cars remain on the market and trade; the fair and good cars, which it would be efficient to sell, do not. This is <strong>adverse selection</strong>: asymmetric information drives high-quality sellers out and selects sellers adverse to the buyer, producing an inefficient outcome even though complete-information trade is fully efficient. The phenomenon was identified by George Akerlof (Nobel Prize, 2001) in his “market for lemons.”</p>
+</section>
+<section id="sec-4-jury" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-jury">Committee and jury voting</h3>
+<p>Two jurors must collectively decide to <strong>acquit</strong> (<span class="math inline">\(A\)</span>) or <strong>convict</strong> (<span class="math inline">\(C\)</span>). Under the <strong>unanimity</strong> rule the defendant is convicted only if <em>both</em> vote <span class="math inline">\(C\)</span>. The defendant is <strong>guilty</strong> (<span class="math inline">\(G\)</span>) or <strong>innocent</strong> (<span class="math inline">\(I\)</span>), with prior <span class="math inline">\(\Prob(G) = q &gt;
+\tfrac12\)</span>. Each juror wants the correct verdict, with payoff <span class="math inline">\(1\)</span> for a correct decision and <span class="math inline">\(0\)</span> otherwise. In state <span class="math inline">\(G\)</span> the right verdict is to convict, so the payoff matrix is</p>
+<div id="tbl-4-jury-g" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-jury-g-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.4: Payoffs in state <span class="math inline">\(G\)</span> (guilty).
+</figcaption>
+<div aria-describedby="tbl-4-jury-g-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(A\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(C\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>while in state <span class="math inline">\(I\)</span> acquittal is right (and unanimity means conviction requires both <span class="math inline">\(C\)</span>):</p>
+<div id="tbl-4-jury-i" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-jury-i-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.5: Payoffs in state <span class="math inline">\(I\)</span> (innocent).
+</figcaption>
+<div aria-describedby="tbl-4-jury-i-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(A\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(C\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><strong>Symmetric-information benchmark.</strong> If jurors had only the prior and no further information, they would play the expected-payoff game</p>
+<div id="tbl-4-jury-prior" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-jury-prior-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.6: Expected-payoff game under the prior only.
+</figcaption>
+<div aria-describedby="tbl-4-jury-prior-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(A\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1-q,\,1-q\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1-q,\,1-q\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(C\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1-q,\,1-q\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(q,\,q\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>which has two Nash equilibria, <span class="math inline">\((A,A)\)</span> and <span class="math inline">\((C,C)\)</span>.</p>
+<p><strong>Private signals.</strong> Now each juror <span class="math inline">\(i\)</span> receives a private signal <span class="math inline">\(\theta_i \in
+\{\theta_G, \theta_I\}\)</span> correlated with the truth: <span class="math display">\[
+\Prob(\theta_i = \theta_G \given G) = \Prob(\theta_i = \theta_I \given I) = p
+&gt; \tfrac12,
+\qquad
+\Prob(\theta_i = \theta_I \given G) = \Prob(\theta_i = \theta_G \given I) = 1 - p.
+\]</span> The signal <span class="math inline">\(\theta_x\)</span> is more likely in state <span class="math inline">\(x\)</span>; a larger <span class="math inline">\(p\)</span> means a more <strong>informative</strong> signal. Signals are conditionally independent across jurors.</p>
+<p><strong>Single-voter posteriors.</strong> For one juror, Bayes’ rule gives <span class="math display">\[
+\Prob(G \given \theta_1 = \theta_G)
+= \frac{qp}{qp + (1-q)(1-p)} &gt; q &gt; \tfrac12,
+\qquad
+\Prob(G \given \theta_1 = \theta_I)
+= \frac{q(1-p)}{q(1-p) + (1-q)p} &lt; q.
+\]</span> A “guilty” signal makes a lone juror more sure of guilt; an “innocent” signal makes him less sure. With a single decision-maker, if <span class="math inline">\(p &gt; q\)</span> the innocent signal is informative enough to flip him to acquittal, while if <span class="math inline">\(p &lt; q\)</span> the prior dominates and he still convicts.</p>
+<p><strong>Voting one’s own signal is not a BNE.</strong> Suppose juror 2 “votes her signal,” <span class="math inline">\(\sigma_2(\theta_G) = c\)</span> and <span class="math inline">\(\sigma_2(\theta_I) = a\)</span>, and consider juror 1 who has received <span class="math inline">\(\theta_1 = \theta_I\)</span>. Conditioning on <span class="math inline">\(\theta_1 = \theta_I\)</span>, the joint posterior over <span class="math inline">\((\text{state}, \theta_2)\)</span> is</p>
+<div id="tbl-4-jury-post" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-jury-post-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.7: Posterior of <span class="math inline">\((\text{state},\theta_2)\)</span> given <span class="math inline">\(\theta_1=\theta_I\)</span>.
+</figcaption>
+<div aria-describedby="tbl-4-jury-post-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 43%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(\theta_2 = \theta_G\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\theta_2 = \theta_I\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(G\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(q(1-p)p / \Prob(\theta_1 = \theta_I)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(q(1-p)^2 / \Prob(\theta_1 = \theta_I)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(I\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\((1-q)p(1-p) / \Prob(\theta_1=\theta_I)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\((1-q)p^2 / \Prob(\theta_1 = \theta_I)\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>where <span class="math inline">\(\Prob(\theta_1 = \theta_I) = q(1-p)p + q(1-p)^2 + (1-q)p(1-p) + (1-q)p^2 = q(1-p) + (1-q)p\)</span> (the sum of the four cell numerators above). If juror 1 acquits (<span class="math inline">\(a\)</span>), the verdict is acquit regardless of juror 2, which is correct precisely in state <span class="math inline">\(I\)</span>, giving expected payoff <span class="math display">\[
+\frac{(1-q)p(1-p) + (1-q)p^2}{\Prob(\theta_1 = \theta_I)}.
+\]</span> If juror 1 convicts (<span class="math inline">\(c\)</span>), the verdict is convict only when juror 2 also votes <span class="math inline">\(c\)</span> (i.e.&nbsp;<span class="math inline">\(\theta_2 = \theta_G\)</span>), which is correct only in state <span class="math inline">\(G\)</span>; the expected payoff is <span class="math display">\[
+\frac{q(1-p)p + (1-q)p^2}{\Prob(\theta_1 = \theta_I)}.
+\]</span> Comparing numerators, conviction does at least as well whenever <span class="math inline">\(q(1-p)p \ge
+(1-q)p(1-p)\)</span>, i.e.&nbsp;<span class="math inline">\(q \ge 1-q\)</span>, which holds because <span class="math inline">\(q &gt; \tfrac12\)</span>. So juror 1 prefers to convict despite his “innocent” signal — and <strong>voting one’s own signal is not a Bayesian Nash equilibrium</strong>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Condition on being pivotal
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The resolution is the logic of <strong>pivotal voting</strong>. Under unanimity, juror 1’s vote matters only when juror 2 votes to convict (<span class="math inline">\(\theta_2 = \theta_G\)</span>); if juror 2 acquits, the verdict is acquittal whatever juror 1 does. A rational juror therefore conditions not just on his own signal but on the <em>event that he is pivotal</em>. Even though it may be that <span class="math inline">\(\Prob(G \given \theta_1 = \theta_I) &lt; \Prob(I \given
+\theta_1 = \theta_I)\)</span> when <span class="math inline">\(p &gt; q\)</span>, conditioning on being pivotal always tilts toward guilt: <span class="math display">\[
+\frac{\Prob(G, \theta_2 = \theta_G \given \theta_1 = \theta_I)}
+{\Prob(I, \theta_2 = \theta_G \given \theta_1 = \theta_I)}
+= \frac{\Prob(G, \theta_1 = \theta_I, \theta_2 = \theta_G)}
+{\Prob(I, \theta_1 = \theta_I, \theta_2 = \theta_G)}
+= \frac{q(1-p)p}{(1-q)p(1-p)} = \frac{q}{1-q} &gt; 1.
+\]</span> Being pivotal means juror 2 saw a guilty signal, which is bad news for the defendant — so even a juror with an innocent signal may rationally vote to convict.</p>
+</div>
+</div>
+</section>
+<section id="sec-4-purification" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-purification">Purification of mixed strategies</h3>
+<p>Recall <strong>Matching Pennies</strong>, the zero-sum game</p>
+<div id="tbl-4-mp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-mp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.8: Matching Pennies.
+</figcaption>
+<div aria-describedby="tbl-4-mp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(H\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(T\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(H\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,-1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(T\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,-1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Its unique Nash equilibrium has each player mixing <span class="math inline">\(\tfrac12 H + \tfrac12 T\)</span>, with each player exactly indifferent between <span class="math inline">\(H\)</span> and <span class="math inline">\(T\)</span>. Harsanyi found this knife-edge precision uncomfortable: do players really randomise so finely when indifferent? His <strong>purification</strong> answer: players may always have a slight strict preference one way or the other; the apparent mixing is an artefact of an outside observer’s imprecise information about those preferences.</p>
+<p>Perturb the payoffs with small, privately known shocks:</p>
+<div id="tbl-4-pmp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-pmp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.9: Perturbed Matching Pennies.
+</figcaption>
+<div aria-describedby="tbl-4-pmp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 46%">
+<col style="width: 41%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(H\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(T\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(H\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1+\eps_1,\ -1+\eps_2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-1+\eps_1,\ 1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(T\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\ 1+\eps_2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\ -1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Here <span class="math inline">\(\eps_1, \eps_2\)</span> are independent and uniform on <span class="math inline">\([-\eps, \eps]\)</span> for a small <span class="math inline">\(\eps &gt; 0\)</span>, and <span class="math inline">\(\eps_i\)</span> is player <span class="math inline">\(i\)</span>’s private information (his type). A strategy is <span class="math inline">\(\sigma_i : [-\eps, \eps] \to [0,1]\)</span>, where <span class="math inline">\(\sigma_i(\eps_i)\)</span> is the probability that type <span class="math inline">\(\eps_i\)</span> plays <span class="math inline">\(H\)</span>. From the opponent’s view the probability that <span class="math inline">\(i\)</span> plays <span class="math inline">\(H\)</span> is <span class="math display">\[
+p^{\sigma_i} \defeq \int_{-\eps}^{\eps} \sigma_i(\eps_i)\, f(\eps_i)\,\mathrm d\eps_i
+= \frac{1}{2\eps} \int_{-\eps}^{\eps} \sigma_i(\eps_i)\,\mathrm d\eps_i,
+\qquad f(\eps_i) = \frac{1}{2\eps}.
+\]</span> For player 1 of type <span class="math inline">\(\eps_1\)</span>, playing <span class="math inline">\(H\)</span> pays <span class="math inline">\((1 + \eps_1)p^{\sigma_2} + (-1 + \eps_1)(1 - p^{\sigma_2}) = 2p^{\sigma_2} - 1 +
+\eps_1\)</span>, while playing <span class="math inline">\(T\)</span> pays <span class="math inline">\(-p^{\sigma_2} + (1 - p^{\sigma_2}) = -2p^{\sigma_2}
++ 1\)</span>. So <span class="math inline">\(H\)</span> is better exactly when <span class="math inline">\(\eps_1 &gt; 2 - 4p^{\sigma_2}\)</span>, giving the cutoff best response and the induced probability <span id="eq-4-pmp1"><span class="math display">\[
+\sigma_1(\eps_1) =
+\begin{cases} 1, &amp; \eps_1 &gt; 2 - 4p^{\sigma_2},\\ 0, &amp; \eps_1 &lt; 2 - 4p^{\sigma_2},
+\end{cases}
+\qquad
+p^{\sigma_1} =
+\begin{cases}
+1, &amp; 2 - 4p^{\sigma_2} \le -\eps,\\[2pt]
+\dfrac{\eps - 2 + 4p^{\sigma_2}}{2\eps}, &amp; -\eps &lt; 2 - 4p^{\sigma_2} &lt; \eps,\\[4pt]
+0, &amp; 2 - 4p^{\sigma_2} \ge \eps.
+\end{cases}
+\tag{4.6}\]</span></span> Symmetrically, player 2 prefers <span class="math inline">\(H\)</span> when <span class="math inline">\(\eps_2 &gt; 4p^{\sigma_1} - 2\)</span>, so <span id="eq-4-pmp2"><span class="math display">\[
+\sigma_2(\eps_2) =
+\begin{cases} 1, &amp; \eps_2 &gt; 4p^{\sigma_1} - 2,\\ 0, &amp; \eps_2 &lt; 4p^{\sigma_1} - 2,
+\end{cases}
+\qquad
+p^{\sigma_2} =
+\begin{cases}
+1, &amp; 4p^{\sigma_1} - 2 \le -\eps,\\[2pt]
+\dfrac{\eps + 2 - 4p^{\sigma_1}}{2\eps}, &amp; -\eps &lt; 4p^{\sigma_1} - 2 &lt; \eps,\\[4pt]
+0, &amp; 4p^{\sigma_1} - 2 \ge \eps.
+\end{cases}
+\tag{4.7}\]</span></span> For <span class="math inline">\(\eps &lt; 2\)</span>, solving <a href="#eq-4-pmp1" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> and <a href="#eq-4-pmp2" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> simultaneously yields the <strong>unique solution</strong> <span class="math inline">\(p^{\sigma_1} = p^{\sigma_2} = \tfrac12\)</span>, and the essentially unique BNE <span class="math display">\[
+\sigma_i^*(\eps_i) =
+\begin{cases} H, &amp; \eps_i &gt; 0,\\ T, &amp; \eps_i &lt; 0, \end{cases}
+\]</span> with <span class="math inline">\(\sigma_i^*(0)\)</span> arbitrary. In this equilibrium every type plays a <strong>pure</strong> action with a strict preference (except on the probability-zero event <span class="math inline">\(\eps_i = 0\)</span>). Yet because <span class="math inline">\(p^{\sigma_1} = p^{\sigma_2} = \tfrac12\)</span>, each player chooses <span class="math inline">\(H\)</span> half the time, so to an outside observer their behaviour looks <em>exactly like</em> the half-and-half mixing of the original game.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Purification (Harsanyi)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A mixed-strategy Nash equilibrium of a complete-information game can be obtained as the limit, as <span class="math inline">\(\eps \to 0\)</span>, of pure-strategy Bayesian Nash equilibria of nearby incomplete-information games with small private payoff shocks. The “mixing” is the observer’s artefact: each player is in fact playing a deterministic best response to his own private shock.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-4-auctions" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="sec-4-auctions"><span class="header-section-number">4.5</span> Auctions</h2>
+<p>Auctions are the workhorse application of Bayesian games. There are four classic formats:</p>
+<ul>
+<li>the <strong>English</strong> (open ascending) auction, in which the price rises until one bidder remains;</li>
+<li>the <strong>Dutch</strong> (open descending) auction, in which the price falls until a bidder claims the object;</li>
+<li>the <strong>first-price sealed-bid</strong> auction, in which the highest bidder wins and pays her own bid;</li>
+<li>the <strong>second-price sealed-bid</strong> (or <strong>Vickrey</strong>) auction, in which the highest bidder wins but pays the <em>second</em>-highest bid.</li>
+</ul>
+<p>William Vickrey was the first to analyse auctions with formal game theory (Nobel Prize, 1996). We work in the <strong>independent private values (IPV)</strong> environment: there are <span class="math inline">\(n\)</span> bidders, bidder <span class="math inline">\(i\)</span> has a privately known valuation <span class="math inline">\(\theta_i\)</span> drawn from <span class="math inline">\([\underline\theta_i, \overline\theta_i]\)</span> with cdf <span class="math inline">\(F_i\)</span> and density <span class="math inline">\(f_i\)</span>, and valuations are independent across bidders. (“Private value” because <span class="math inline">\(i\)</span>’s own type fully determines his willingness to pay; “independent” because types are drawn independently.) The final subsection treats a common-value variant.</p>
+<section id="sec-4-second-price" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-second-price">Second-price and English auctions</h3>
+<p>In the <strong>second-price</strong> auction the highest bidder wins and pays the highest of the <em>other</em> bids, so bidder <span class="math inline">\(i\)</span>’s payoff is <span class="math display">\[
+v_i(b_i, b_{-i}; \theta_i) =
+\begin{cases}
+\dfrac{\theta_i - \max_{j \ne i} b_j}{|\{k : b_k = \max_j b_j\}|},
+&amp; b_i = \max_j b_j,\\[3mm]
+0, &amp; b_i &lt; \max_j b_j,
+\end{cases}
+\]</span> with ties broken by allocating the object uniformly at random among the highest bidders.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Bidding your value is weakly dominant
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For bidder <span class="math inline">\(i\)</span> of type <span class="math inline">\(\theta_i\)</span> and any bid <span class="math inline">\(b_i \ne \theta_i\)</span>, <span id="eq-4-2p-weak"><span class="math display">\[
+v_i(\theta_i, b_{-i}; \theta_i) \ge v_i(b_i, b_{-i}; \theta_i)
+\quad \text{for all } b_{-i},
+\tag{4.8}\]</span></span> with strict inequality for some <span class="math inline">\(b_{-i}\)</span>: <span id="eq-4-2p-strict"><span class="math display">\[
+v_i(\theta_i, b_{-i}; \theta_i) &gt; v_i(b_i, b_{-i}; \theta_i).
+\tag{4.9}\]</span></span></p>
+</div>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(m = \max_{j \ne i} b_j\)</span> be the highest competing bid.</p>
+<p><em>Case <span class="math inline">\(b_i &lt; \theta_i\)</span> (underbidding).</em> If <span class="math inline">\(m &lt; b_i\)</span> or <span class="math inline">\(m \ge \theta_i\)</span>, then bid <span class="math inline">\(b_i\)</span> and bid <span class="math inline">\(\theta_i\)</span> produce the same outcome (winning at price <span class="math inline">\(m\)</span> in the first sub-case, losing in the second), so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) = v_i(\theta_i,
+b_{-i}; \theta_i)\)</span>. But if <span class="math inline">\(b_i \le m &lt; \theta_i\)</span>, then bidding <span class="math inline">\(b_i\)</span> loses (or ties at a bad price) whereas bidding <span class="math inline">\(\theta_i\)</span> wins at price <span class="math inline">\(m &lt; \theta_i\)</span> for a strict gain, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
+<p><em>Case <span class="math inline">\(b_i &gt; \theta_i\)</span> (overbidding).</em> If <span class="math inline">\(m \le \theta_i\)</span> or <span class="math inline">\(m &gt; b_i\)</span>, the two bids again give the same outcome. But if <span class="math inline">\(\theta_i &lt; m \le b_i\)</span>, then bidding <span class="math inline">\(b_i\)</span> wins at price <span class="math inline">\(m &gt; \theta_i\)</span> — a negative payoff — whereas bidding <span class="math inline">\(\theta_i\)</span> loses and gets <span class="math inline">\(0\)</span>, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
+<p>In all cases <a href="#eq-4-2p-weak" class="quarto-xref">Equation&nbsp;<span>4.8</span></a> holds, and the strict sub-cases establish <a href="#eq-4-2p-strict" class="quarto-xref">Equation&nbsp;<span>4.9</span></a>. Hence bidding one’s valuation is a <strong>weakly dominant strategy</strong>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Because <span class="math inline">\(s_i(\theta_i) = \theta_i\)</span> is a best response to <em>any</em> <span class="math inline">\(s_{-i}\)</span>, it is in particular a best response against equilibrium play: <span class="math display">\[
+\E_{\theta_{-i}}\big[v_i(\theta_i, s_{-i}(\theta_{-i}); \theta_i)\big]
+\ge \E_{\theta_{-i}}\big[v_i(b_i, s_{-i}(\theta_{-i}); \theta_i)\big]
+\quad \text{for all } b_i,
+\]</span> so <strong>bidding your value is a Bayesian Nash equilibrium</strong>. Three features deserve note. First, the equilibrium is <strong>distribution-free</strong>: a bidder need not know the distribution of opponents’ types, or even have any idea of their valuations, to know that truthful bidding is optimal. Second, in the private-value setting the result survives even if types are <strong>correlated</strong>, since weak dominance holds bid by bid. Third, the outcome is <strong>efficient</strong> — the highest-value bidder always wins.</p>
+<p><strong>English auction.</strong> Picture the “hands-up” version: the auctioneer raises the price continuously from <span class="math inline">\(0\)</span>, and each bidder keeps a hand up until the price exceeds her willingness to pay, at which point she drops out irrevocably. The auction ends when the second-to-last bidder drops out; the remaining bidder wins and pays the current price — which is the second-highest valuation. The English auction is therefore equivalent to the second-price auction (up to the minimum bid increment), and again bidding (dropping out at) one’s valuation is a BNE.</p>
+</section>
+<section id="sec-4-first-price" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-first-price">First-price and Dutch auctions</h3>
+<p>In the <strong>first-price</strong> auction the winner pays her <em>own</em> bid, so <span class="math display">\[
+v_i(b_i, b_{-i}; \theta_i) =
+\begin{cases}
+\dfrac{\theta_i - b_i}{|\{k : b_k = \max_j b_j\}|}, &amp; b_i = \max_j b_j,\\[3mm]
+0, &amp; b_i &lt; \max_j b_j.
+\end{cases}
+\]</span> Bidding one’s valuation is now a bad idea — it guarantees a payoff of <span class="math inline">\(0\)</span> — whereas bidding a little below the valuation earns a positive expected profit when one wins. So bidders <strong>shade</strong> their bids, and we look for a symmetric BNE in <strong>strictly increasing</strong> strategies, <span class="math inline">\(s_i(\theta_i) &lt; s_i(\theta_i')\)</span> whenever <span class="math inline">\(\theta_i &lt; \theta_i'\)</span>.</p>
+<p>Fix bidder <span class="math inline">\(i\)</span> of type <span class="math inline">\(\theta_i\)</span> facing increasing strategies <span class="math inline">\(s_{-i}\)</span>. Bidding <span class="math inline">\(b_i\)</span>, bidder <span class="math inline">\(i\)</span> is the sole winner iff <span class="math inline">\(s_j(\theta_j) &lt; b_i\)</span> for all <span class="math inline">\(j \ne i\)</span>, i.e.&nbsp;<span class="math inline">\(\theta_j &lt; s_j^{-1}(b_i)\)</span> (inverting the increasing <span class="math inline">\(s_j\)</span>). By independence the probability of winning is <span class="math display">\[
+\Prob\big(\theta_j &lt; s_j^{-1}(b_i)\ \forall j \ne i\big)
+= \prod_{j \ne i} F_j\big(s_j^{-1}(b_i)\big),
+\]</span> and ties have probability zero. The expected payoff of type <span class="math inline">\(\theta_i\)</span> from bid <span class="math inline">\(b_i\)</span> is therefore <span class="math display">\[
+\Big[\prod_{j \ne i} F_j\big(s_j^{-1}(b_i)\big)\Big]\,(\theta_i - b_i).
+\]</span> Assuming the <span class="math inline">\(s_j\)</span> are differentiable, the interior first-order condition evaluated at the equilibrium bid <span class="math inline">\(b_i = s_i(\theta_i)\)</span> is <span class="math display">\[
+-\prod_{j \ne i} F_j\big(s_j^{-1}(b_i)\big)
++ (\theta_i - b_i) \sum_{j \ne i}
+\left[\frac{f_j\big(s_j^{-1}(b_i)\big)}{s_j'\big(s_j^{-1}(b_i)\big)}
+\prod_{k \ne i, j} F_k\big(s_k^{-1}(b_i)\big)\right]
+\bigg|_{b_i = s_i(\theta_i)} = 0.
+\]</span></p>
+<p><strong>Symmetric case.</strong> Suppose all bidders draw from the same <span class="math inline">\(F\)</span> with density <span class="math inline">\(f\)</span> on <span class="math inline">\([\underline\theta, \overline\theta]\)</span>, and look for a symmetric equilibrium <span class="math inline">\(s_1 =
+\cdots = s_n = s\)</span>, so that <span class="math inline">\(s_j^{-1}(s(\theta)) = \theta\)</span>. Dropping subscripts, the first-order condition simplifies to <span class="math display">\[
+-F^{n-1}(\theta) + (n-1)\big(\theta - s(\theta)\big)
+\frac{f(\theta) F^{n-2}(\theta)}{s'(\theta)} = 0,
+\]</span> which rearranges into the linear ODE <span class="math display">\[
+F^{n-1}(\theta)\, s'(\theta) + (n-1) f(\theta) F^{n-2}(\theta)\, s(\theta)
+= (n-1)\theta f(\theta) F^{n-2}(\theta).
+\]</span> The left-hand side is precisely <span class="math inline">\(\frac{\mathrm d}{\mathrm d\theta}\big[F^{n-1}(\theta)
+s(\theta)\big]\)</span>, so integrating both sides and applying integration by parts to the right, <span class="math display">\[
+F^{n-1}(\theta) s(\theta)
+= \int_{\underline\theta}^{\theta} (n-1) x f(x) F^{n-2}(x)\,\mathrm dx + k
+= \theta F^{n-1}(\theta) - \int_{\underline\theta}^{\theta} F^{n-1}(x)\,\mathrm dx + k.
+\]</span> Since <span class="math inline">\(F(\underline\theta) = 0\)</span>, evaluating at <span class="math inline">\(\theta = \underline\theta\)</span> forces <span class="math inline">\(k = 0\)</span>, giving the <strong>symmetric first-price BNE</strong> <span id="eq-4-fpa-bid"><span class="math display">\[
+\boxed{\ s(\theta) = \theta - \frac{\displaystyle\int_{\underline\theta}^{\theta}
+F^{n-1}(x)\,\mathrm dx}{F^{n-1}(\theta)}.\ }
+\tag{4.10}\]</span></span> This <span class="math inline">\(s\)</span> is strictly increasing and differentiable, so the conjecture is self-consistent; each bidder bids strictly below her valuation (the subtracted term is positive), and because <span class="math inline">\(s\)</span> is increasing the highest-value bidder still wins — the outcome is efficient.</p>
+<p><strong>Uniform special case.</strong> If <span class="math inline">\(F\)</span> is uniform on <span class="math inline">\([0,1]\)</span>, then <span class="math inline">\(F^{n-1}(x) =
+x^{n-1}\)</span> and <span class="math display">\[
+s(\theta) = \theta - \frac{\theta^n / n}{\theta^{n-1}} = \frac{n-1}{n}\,\theta.
+\]</span> A bidder shades by the factor <span class="math inline">\((n-1)/n\)</span>, which approaches <span class="math inline">\(1\)</span> as the number of competitors grows — more rivals, less shading (<a href="#fig-4-fpa-bid" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>). One can verify optimality directly: given <span class="math inline">\(s_2 = \cdots = s_n = s\)</span>, the expected payoff of bidder 1 with valuation <span class="math inline">\(\theta_1\)</span> from a bid <span class="math inline">\(b_1\)</span> is <span class="math display">\[
+\begin{cases}
+0, &amp; b_1 \le 0,\\[2pt]
+\left(\dfrac{n b_1}{n-1}\right)^{n-1}(\theta_1 - b_1),
+&amp; b_1 \in \big(0, \tfrac{n-1}{n}\big),\\[6pt]
+\theta_1 - b_1, &amp; b_1 \ge \tfrac{n-1}{n},
+\end{cases}
+\]</span> which is maximised at <span class="math inline">\(b_1 = \frac{n-1}{n}\theta_1\)</span>.</p>
+<div id="fig-4-fpa-bid" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-fpa-bid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fpa-bid.svg" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-fpa-bid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: The symmetric uniform first-price bid function <span class="math inline">\(s(\theta)=\frac{n-1}{n}\theta\)</span> on <span class="math inline">\([0,1]\)</span>. Bidders shade below the truthful <span class="math inline">\(45^\circ\)</span> line by the factor <span class="math inline">\((n-1)/n\)</span>, which rises toward <span class="math inline">\(1\)</span> as the number of bidders grows.
+</figcaption>
+</figure>
+</div>
+<p><strong>Dutch auction.</strong> The Dutch (descending-price) auction is <strong>strategically equivalent</strong> to the first-price auction: a bidder’s only decision is the price at which to claim the object, which is exactly a sealed first-price bid. The two have the same normal form and hence the same set of BNE.</p>
+</section>
+<section id="sec-4-revenue" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-revenue">Revenue equivalence</h3>
+<p>We have two efficient auctions — second-price and first-price — with very different bidding behaviour. Remarkably, they raise the <strong>same expected revenue</strong> for the seller. We verify this in the symmetric uniform <span class="math inline">\([0,1]\)</span> case.</p>
+<p><strong>Second-price revenue.</strong> Every bidder bids her value, and the winner pays the second-highest value, so the seller’s revenue is the <strong>second-order statistic</strong> <span class="math inline">\(\theta_n^{[2]}\)</span> of <span class="math inline">\(\theta_1, \dots, \theta_n\)</span>. Its cdf is <span class="math display">\[
+F_n^{[2]}(x) = \Prob(\theta_n^{[2]} \le x)
+= \sum_{i=1}^n (1 - F(x)) F(x)^{n-1} + F(x)^n
+= n F^{n-1}(x) - (n-1) F^n(x),
+\]</span> the first sum being the probability that exactly one value exceeds <span class="math inline">\(x\)</span> and the last term the probability that none does. Its density is <span class="math display">\[
+f_n^{[2]}(x) = n(n-1) F^{n-2}(x) f(x) - n(n-1) F^{n-1}(x) f(x).
+\]</span> For the uniform distribution, <span class="math inline">\(F_n^{[2]}(x) = n x^{n-1} - (n-1) x^n\)</span> and <span class="math inline">\(f_n^{[2]}(x) = n(n-1) x^{n-2} - n(n-1) x^{n-1}\)</span>, so the seller’s expected revenue is <span class="math display">\[
+\E\big(\theta_n^{[2]}\big) = \int_0^1 x f_n^{[2]}(x)\,\mathrm dx
+= (n-1) - \frac{n(n-1)}{n+1} = \frac{n-1}{n+1}.
+\]</span></p>
+<p><strong>First-price revenue.</strong> Each bidder bids <span class="math inline">\(s(\theta) = \frac{n-1}{n}\theta\)</span>, so each bid is uniform on <span class="math inline">\([0, \frac{n-1}{n}]\)</span>, and the seller’s revenue is the highest bid <span class="math inline">\(b_n^{[1]} = \max\{b_1, \dots, b_n\}\)</span>. For <span class="math inline">\(x \in [0, \frac{n-1}{n}]\)</span>, <span class="math display">\[
+F_n^{[1]}(x) = \Prob(b_i \le x\ \forall i) = \left(\frac{nx}{n-1}\right)^n,
+\qquad
+f_n^{[1]}(x) = \frac{n^2}{n-1}\left(\frac{nx}{n-1}\right)^{n-1},
+\]</span> and the expected revenue is <span class="math display">\[
+\E\big(b_n^{[1]}\big) = \int_0^{\frac{n-1}{n}} x f_n^{[1]}(x)\,\mathrm dx
+= \frac{n-1}{n+1},
+\]</span> <strong>exactly the same</strong> as the second-price auction. This is not a coincidence but an instance of a general principle.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Revenue Equivalence Theorem.</strong> In the IPV setting, any auction satisfying the following four conditions yields the seller the same expected revenue: (i) each bidder’s type is drawn from a “well-behaved” distribution; (ii) bidders are risk neutral; (iii) the bidder with the highest type always wins; (iv) the bidder with the lowest possible type has expected payoff zero. The result was first found by Vickrey and generalised by Roger Myerson (Nobel Prize, 2007, for mechanism design and the revelation principle).</p>
+</div>
+</div>
+</div>
+<p>The first- and second-price auctions both satisfy (i)–(iv), which is why their expected revenues coincide at <span class="math inline">\(\frac{n-1}{n+1}\)</span>.</p>
+</section>
+<section id="sec-4-winners-curse" class="level3">
+<h3 class="anchored" data-anchor-id="sec-4-winners-curse">Common-value auctions and the winner’s curse</h3>
+<p>Finally, drop the private-value assumption. Two bidders compete in a first-price auction for an object whose value is the <strong>same</strong> for both but unknown to each. Each bidder receives a private signal <span class="math inline">\(t_i\)</span>, uniform and independent on <span class="math inline">\([0,1]\)</span>, and the common value is <span class="math display">\[
+v = t_1 + t_2.
+\]</span> We look for a symmetric strictly increasing BNE. Bidder <span class="math inline">\(i\)</span> of type <span class="math inline">\(t_i\)</span> bidding <span class="math inline">\(b_i\)</span> wins iff <span class="math inline">\(t_j &lt; s_j^{-1}(b_i)\)</span>, in which case the value is <span class="math inline">\(t_i + t_j\)</span>, so his expected payoff is <span class="math display">\[
+\int_0^{s_j^{-1}(b_i)} (t_i + t_j - b_i)\,\mathrm dt_j
+= (t_i - b_i)\, s_j^{-1}(b_i) + \tfrac12 \big[s_j^{-1}(b_i)\big]^2.
+\]</span> The first-order condition at <span class="math inline">\(b_i = s_i(t_i)\)</span>, for differentiable <span class="math inline">\(s_j\)</span>, is <span class="math display">\[
+-s_j^{-1}(b_i) + \frac{t_i - b_i}{s_j'\big(s_j^{-1}(b_i)\big)}
++ \frac{s_j^{-1}(b_i)}{s_j'\big(s_j^{-1}(b_i)\big)}
+\bigg|_{b_i = s_i(t_i)} = 0.
+\]</span> Imposing symmetry <span class="math inline">\(s_i = s_j = s\)</span> (so <span class="math inline">\(s_j^{-1}(s(t)) = t\)</span>) gives <span class="math inline">\(-t + \frac{t - s(t)}{s'(t)} + \frac{t}{s'(t)} = 0\)</span>, i.e. <span class="math display">\[
+t\, s'(t) + s(t) = 2t.
+\]</span> The left side is <span class="math inline">\(\frac{\mathrm d}{\mathrm dt}[t\, s(t)]\)</span>, so <span class="math inline">\(t\, s(t) = t^2 + k\)</span>, and <span class="math inline">\(k = 0\)</span> from <span class="math inline">\(t = 0\)</span>. The symmetric equilibrium is therefore <span class="math display">\[
+s_1(t) = s_2(t) = t.
+\]</span></p>
+<p><strong>The winner’s curse.</strong> In this equilibrium bidder 1 of type <span class="math inline">\(t_1\)</span> would, <em>before</em> bidding, estimate the value at <span class="math inline">\(t_1 + \E t_2 = t_1 + \tfrac12\)</span>, yet he bids only <span class="math inline">\(t_1\)</span>. The reason is that winning is itself informative. Conditional on winning, bidder 1 knows the opponent bid less, hence <span class="math inline">\(t_2 &lt; t_1\)</span>, so the value estimate <em>revised for the act of winning</em> is <span class="math display">\[
+t_1 + \E(t_2 \given t_2 &lt; t_1)
+= t_1 + \frac{\int_0^{t_1} t_2\,\mathrm dt_2}{\Prob(t_2 &lt; t_1)}
+= t_1 + \frac{t_1}{2} &lt; t_1 + \tfrac12.
+\]</span> Winning is “bad news” — it reveals that one was the more optimistic bidder and thus probably overestimated the object. This is the <strong>winner’s curse</strong>, a hallmark of common-value auctions, and a rational bidder must shade his bid to account for it. (Paul Milgrom and Robert Wilson received the Nobel Prize in 2020 for improvements to auction theory and the design of new auction formats.)</p>
+</section>
+</section>
+<section id="sec-4-summary" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="sec-4-summary"><span class="header-section-number">4.6</span> Chapter summary</h2>
+<ul>
+<li>A <strong>Bayesian game</strong> <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>
+<ol class="example" type="1">
+<li>models incomplete information through privately known <strong>types</strong>; Harsanyi’s device of a chance move by <strong>Nature</strong> turns it into an extensive-form game of imperfect information.</li>
+</ol></li>
+<li>Each player updates to a <strong>posterior belief</strong> <span class="math inline">\(\phi_i(\cdot \given \theta_i)\)</span> by Bayes’ rule; with independent types posteriors equal marginals, with correlated types they need not.</li>
+<li>A <strong>Bayesian Nash equilibrium</strong> (<a href="#def-4-bne" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>) requires <em>every type</em> of every player to best-respond; a profile is a BNE if and only if it is a Nash equilibrium of the equivalent extensive form (<a href="#thm-4-bne-ne" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>). Since only posteriors matter, one can even drop the common prior, allowing no-common-prior belief systems.</li>
+<li>Worked examples: <strong>Cournot with private cost</strong> (closed-form <span class="math inline">\(q_h^*, q_\ell^*,
+q_2^*\)</span>) and <strong>study groups</strong> (continuum of types, cutoff strategy, unique cutoff <span class="math inline">\(c^{1/3}\)</span>).</li>
+<li>Applications: <strong>adverse selection</strong> in the lemons market (only the poorest cars trade — Akerlof’s inefficiency), <strong>jury voting</strong> under unanimity (voting one’s signal is not a BNE; condition on being pivotal), and <strong>purification</strong> (a mixed equilibrium of Matching Pennies is the <span class="math inline">\(\eps \to 0\)</span> limit of pure BNE of perturbed games).</li>
+<li><strong>Auctions</strong>: in the second-price and English formats bidding your value is weakly dominant, a BNE, and efficient; in the first-price and Dutch formats bidders shade to <span class="math inline">\(s(\theta) = \theta - \int_{\underline\theta}^{\theta} F^{n-1}/F^{n-1}(\theta)\)</span>, which is <span class="math inline">\(\frac{n-1}{n}\theta\)</span> in the uniform case. All four standard formats raise the same expected revenue (<span class="math inline">\(\frac{n-1}{n+1}\)</span> for uniform <span class="math inline">\([0,1]\)</span>) — the <strong>Revenue Equivalence Theorem</strong>. In <strong>common-value</strong> auctions, winning is bad news: the <strong>winner’s curse</strong> forces additional shading.</li>
+</ul>
+<p>The next chapter combines sequential moves with incomplete information, refining Bayesian Nash equilibrium into <strong>perfect Bayesian equilibrium</strong> for dynamic games.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./03-dynamic-complete.html" class="pagination-link" aria-label="Dynamic Games with Complete Information">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Dynamic Games with Complete Information</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./05-dynamic-incomplete.html" class="pagination-link" aria-label="Dynamic Games with Incomplete Information">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Games with Incomplete Information</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

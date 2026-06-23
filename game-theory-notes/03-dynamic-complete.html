@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Dynamic Games with Complete Information – Game Theory</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./04-static-incomplete.html" rel="next">
+<link href="./02-static-complete.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03-dynamic-complete.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Dynamic Games with Complete Information</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Game Theory</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-static-complete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Static Games with Complete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-dynamic-complete.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Dynamic Games with Complete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-static-incomplete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Static Games with Incomplete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-incomplete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Games with Incomplete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation &amp; Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-extensive-form" id="toc-the-extensive-form" class="nav-link active" data-scroll-target="#the-extensive-form"><span class="header-section-number">3.1</span> The extensive form</a></li>
+  <li><a href="#strategies" id="toc-strategies" class="nav-link" data-scroll-target="#strategies"><span class="header-section-number">3.2</span> Strategies</a></li>
+  <li><a href="#nash-equilibrium" id="toc-nash-equilibrium" class="nav-link" data-scroll-target="#nash-equilibrium"><span class="header-section-number">3.3</span> Nash equilibrium</a></li>
+  <li><a href="#sequential-rationality" id="toc-sequential-rationality" class="nav-link" data-scroll-target="#sequential-rationality"><span class="header-section-number">3.4</span> Sequential rationality</a></li>
+  <li><a href="#subgame-perfect-equilibrium" id="toc-subgame-perfect-equilibrium" class="nav-link" data-scroll-target="#subgame-perfect-equilibrium"><span class="header-section-number">3.5</span> Subgame-perfect equilibrium</a></li>
+  <li><a href="#subgame-perfect-equilibrium-examples" id="toc-subgame-perfect-equilibrium-examples" class="nav-link" data-scroll-target="#subgame-perfect-equilibrium-examples"><span class="header-section-number">3.6</span> Subgame-perfect equilibrium: examples</a>
+  <ul class="collapse">
+  <li><a href="#the-voluntary-battle-of-the-sexes" id="toc-the-voluntary-battle-of-the-sexes" class="nav-link" data-scroll-target="#the-voluntary-battle-of-the-sexes">The voluntary Battle of the Sexes</a></li>
+  <li><a href="#stackelberg-competition" id="toc-stackelberg-competition" class="nav-link" data-scroll-target="#stackelberg-competition">Stackelberg competition</a></li>
+  <li><a href="#mutually-assured-destruction" id="toc-mutually-assured-destruction" class="nav-link" data-scroll-target="#mutually-assured-destruction">Mutually assured destruction</a></li>
+  </ul></li>
+  <li><a href="#repeated-games" id="toc-repeated-games" class="nav-link" data-scroll-target="#repeated-games"><span class="header-section-number">3.7</span> Repeated games</a>
+  <ul class="collapse">
+  <li><a href="#finitely-repeated-games" id="toc-finitely-repeated-games" class="nav-link" data-scroll-target="#finitely-repeated-games">Finitely repeated games</a></li>
+  <li><a href="#infinitely-repeated-games" id="toc-infinitely-repeated-games" class="nav-link" data-scroll-target="#infinitely-repeated-games">Infinitely repeated games</a></li>
+  </ul></li>
+  <li><a href="#strategic-bargaining" id="toc-strategic-bargaining" class="nav-link" data-scroll-target="#strategic-bargaining"><span class="header-section-number">3.8</span> Strategic bargaining</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">3.9</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-dynamic-complete" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Dynamic Games with Complete Information</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\BR}{\operatorname{BR}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,\vert\,}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sm}{\setminus}
+\newcommand{\defeq}{\equiv}
+\]</span></p>
+</div>
+<p>Most interesting strategic situations unfold over time: a chess match, a price war, a bargaining session, even an ordinary conversation. Players move in <strong>sequence</strong>, observe (some of) what has happened, and choose accordingly. The normal form of <a href="02-static-complete.html" class="quarto-xref"><span>Chapter 2</span></a> collapses all of this into a single simultaneous choice of a strategy and so cannot represent who moves when, who sees what, or which threats are believable. This chapter develops the <strong>extensive form</strong>, which records the full dynamic structure as a game tree, and then refines Nash equilibrium to respect that structure. The central lesson is that Nash equilibrium of an extensive game — defined through its normal-form representation — is too permissive: it tolerates <strong>non-credible threats</strong>. Demanding <strong>sequential rationality</strong> at every point in the tree, formalised as <strong>subgame-perfect equilibrium</strong>, removes them. We close the first half with two applications: Stackelberg’s first-mover advantage and the Cuban-missile-crisis game of mutually assured destruction.</p>
+<section id="the-extensive-form" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="the-extensive-form"><span class="header-section-number">3.1</span> The extensive form</h2>
+<p>A normal-form game tells us the strategies and payoffs but says nothing about timing or information. The extensive form supplies exactly that missing structure. It is built on a <strong>game tree</strong>: a set of nodes connected by a precedence relation, with players assigned to the nodes at which decisions are made and payoffs attached to the final outcomes.</p>
+<div id="def-3-extensive" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.1 (Game tree)</strong></span> A <strong>game tree</strong> is a set of nodes <span class="math inline">\(x \in X\)</span> together with a precedence relation <span class="math inline">\(x \succ x'\)</span>, read “<span class="math inline">\(x\)</span> <strong>precedes</strong> <span class="math inline">\(x'\)</span>.” Every node has exactly one immediate predecessor, except for one special node, the <strong>root</strong> (or <strong>initial node</strong>), which has none. Nodes that do not precede any other node are <strong>terminal nodes</strong>, collected in the set <span class="math inline">\(Z\)</span>; they are the final outcomes of play. Every non-terminal node <span class="math inline">\(x\)</span> is assigned to a player <span class="math inline">\(i(x)\)</span>, who chooses from an <strong>action set</strong> <span class="math inline">\(A_i(x)\)</span>; each action leads to a distinct successor node. Each terminal node <span class="math inline">\(z \in Z\)</span> carries a payoff <span class="math inline">\(v_i(z) \in \R\)</span> for every player <span class="math inline">\(i\)</span>. The game is <strong>finite</strong> if <span class="math inline">\(X\)</span> is a finite set.</p>
+</div>
+<p>Consider the <strong>trust game</strong> of <a href="#fig-3-trust" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>. Player <span class="math inline">\(1\)</span> moves first at the root: she may <strong>not trust</strong> (<span class="math inline">\(N\)</span>), ending the game at the payoff <span class="math inline">\((0,0)\)</span>, or <strong>trust</strong> (<span class="math inline">\(T\)</span>), passing the move to player <span class="math inline">\(2\)</span>. Player <span class="math inline">\(2\)</span> then either <strong>cooperates</strong> (<span class="math inline">\(C\)</span>), yielding <span class="math inline">\((1,1)\)</span>, or <strong>defects</strong> (<span class="math inline">\(D\)</span>), yielding <span class="math inline">\((-1,2)\)</span>. Reading the tree from the root to a terminal node traces out one complete play of the game.</p>
+<div id="fig-3-trust" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-trust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-trust.svg" class="img-fluid figure-img" style="width:55.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-trust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: The trust game.
+</figcaption>
+</figure>
+</div>
+<p>A second running example is the <strong>sequential-move Battle of the Sexes</strong> (<a href="#fig-3-bos-seq" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>). Player <span class="math inline">\(1\)</span> chooses <span class="math inline">\(O\)</span> or <span class="math inline">\(F\)</span>; player <span class="math inline">\(2\)</span> observes this choice and responds with <span class="math inline">\(o\)</span> or <span class="math inline">\(f\)</span>. The four terminal payoffs are <span class="math inline">\((O,o)=(2,1)\)</span>, <span class="math inline">\((O,f)=(0,0)\)</span>, <span class="math inline">\((F,o)=(0,0)\)</span> and <span class="math inline">\((F,f)=(1,2)\)</span>. Labelling the nodes makes the formal apparatus concrete: with <span class="math inline">\(X = \{x_0,x_1,x_2,x_3,x_4,x_5,x_6\}\)</span>, the root is <span class="math inline">\(x_0\)</span> and the terminal set is <span class="math inline">\(Z = \{x_3,x_4,x_5,x_6\}\)</span>; the assignment is <span class="math inline">\(i(x_0)=1\)</span> and <span class="math inline">\(i(x_1)=i(x_2)=2\)</span>; the action sets are <span class="math inline">\(A_1(x_0)=\{O,F\}\)</span> and <span class="math inline">\(A_2(x_1)=A_2(x_2)=\{o,f\}\)</span>; and the payoffs are <span class="math inline">\(v_1(x_3)=2,\,v_1(x_4)=0,\,v_1(x_5)=0,\,v_1(x_6)=1\)</span> for player <span class="math inline">\(1\)</span> and <span class="math inline">\(v_2(x_3)=1,\,v_2(x_4)=0,\,v_2(x_5)=0,\,v_2(x_6)=2\)</span> for player <span class="math inline">\(2\)</span>.</p>
+<div id="fig-3-bos-seq" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-bos-seq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-bos-seq.svg" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-bos-seq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: The sequential-move Battle of the Sexes.
+</figcaption>
+</figure>
+</div>
+<p>The tree can have more than two players and more than two moves per branch. <a href="#fig-3-threeplayer" class="quarto-xref">Figure&nbsp;<span>3.3</span></a> shows a three-player game of perfect information. Player <span class="math inline">\(1\)</span> moves at the root; her right branch ends immediately at <span class="math inline">\((2,0,-4)\)</span>, while her left branch hands the move to player <span class="math inline">\(2\)</span>. Player <span class="math inline">\(2\)</span>’s left branch reaches a node owned by player <span class="math inline">\(3\)</span> (with terminals <span class="math inline">\((1,7,4)\)</span> and <span class="math inline">\((3,0,3)\)</span>), and his right branch returns the move to player <span class="math inline">\(1\)</span> at a <em>second</em> decision node of hers (with terminals <span class="math inline">\((2,2,5)\)</span> and <span class="math inline">\((0,1,8)\)</span>). Payoffs are now triples <span class="math inline">\((v_1,v_2,v_3)\)</span>.</p>
+<div id="fig-3-threeplayer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-threeplayer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-threeplayer.svg" class="img-fluid figure-img" style="width:62.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-threeplayer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.3: A three-player game of perfect information; terminal payoffs are triples <span class="math inline">\((v_1,v_2,v_3)\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>So far each player, when called to move, has known exactly where in the tree she is. In general this need not be true: a player may be unable to distinguish among several of her decision nodes — for instance because she moves <em>simultaneously</em> with someone else and so cannot see their choice. <strong>Information sets</strong> encode precisely what a player can and cannot tell apart.</p>
+<div id="def-3-infoset" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.2 (Information sets)</strong></span> Each player <span class="math inline">\(i\)</span> has a collection <span class="math inline">\(H_i\)</span> of <strong>information sets</strong> <span class="math inline">\(h_i \in H_i\)</span> that partition the nodes at which <span class="math inline">\(i\)</span> moves, subject to:</p>
+<ol type="1">
+<li>if <span class="math inline">\(h_i = \{x\}\)</span> is a <strong>singleton</strong>, then <span class="math inline">\(i\)</span>, when moving at <span class="math inline">\(x\)</span>, knows he is at <span class="math inline">\(x\)</span>;</li>
+<li>if <span class="math inline">\(x \ne x'\)</span> and both <span class="math inline">\(x, x' \in h_i\)</span>, then <span class="math inline">\(i\)</span> cannot tell whether he is at <span class="math inline">\(x\)</span> or at <span class="math inline">\(x'\)</span>;</li>
+<li>if <span class="math inline">\(x \ne x'\)</span> and both <span class="math inline">\(x, x' \in h_i\)</span>, then <span class="math inline">\(A_i(x) = A_i(x')\)</span>.</li>
+</ol>
+</div>
+<p>Condition (3) is what makes the definition coherent: if the action sets at two indistinguishable nodes differed, the player could deduce his location simply by inspecting the menu of available actions, contradicting (2). We therefore write <span class="math inline">\(A_i(h_i)\)</span> for the common action set on an information set <span class="math inline">\(h_i\)</span>.</p>
+<p>The simultaneous-move Battle of the Sexes (<a href="#fig-3-bos-sim" class="quarto-xref">Figure&nbsp;<span>3.4</span></a>) uses this device to model simultaneity inside a tree. The tree is identical to <a href="#fig-3-bos-seq" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>, but player <span class="math inline">\(2\)</span>’s two nodes <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> now lie in a <em>single</em> information set <span class="math inline">\(h_2 = \{x_1, x_2\}\)</span>, drawn as a dashed line joining them: player <span class="math inline">\(2\)</span> must move without learning player <span class="math inline">\(1\)</span>’s choice. Here <span class="math inline">\(H_1 = \{h_1\}\)</span> with <span class="math inline">\(h_1 = \{x_0\}\)</span> and <span class="math inline">\(H_2 = \{h_2\}\)</span>.</p>
+<div id="fig-3-bos-sim" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-bos-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-bos-sim.svg" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-bos-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.4: The simultaneous-move Battle of the Sexes: player <span class="math inline">\(2\)</span>’s two nodes lie in one information set, so he cannot observe player <span class="math inline">\(1\)</span>’s move.
+</figcaption>
+</figure>
+</div>
+<p>This dashed-line device is fully general: <strong>every normal-form game can be represented as an extensive-form game.</strong> Rock–paper–scissors, for instance, is drawn as player <span class="math inline">\(1\)</span> choosing <span class="math inline">\(R\)</span>, <span class="math inline">\(P\)</span> or <span class="math inline">\(S\)</span>, followed by player <span class="math inline">\(2\)</span> choosing <span class="math inline">\(r\)</span>, <span class="math inline">\(p\)</span> or <span class="math inline">\(s\)</span> at a single information set spanning all three of player <span class="math inline">\(1\)</span>’s possible nodes — so player <span class="math inline">\(2\)</span> never learns player <span class="math inline">\(1\)</span>’s choice, exactly as in the simultaneous game.</p>
+<p>We maintain throughout a standing assumption that players never forget what they once knew.</p>
+<div id="def-3-perfectrecall" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.3 (Perfect recall)</strong></span> A game has <strong>perfect recall</strong> if no player ever forgets information he previously knew, including his own past actions. <em>We consider only games of perfect recall.</em></p>
+</div>
+<p>Games that violate perfect recall (a forgetful or “absent-minded” decision maker) are outside the scope of these notes. The remaining distinction concerns whether <em>anyone</em> is ever uncertain about the history of play.</p>
+<div id="def-3-perfectinfo" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.4 (Perfect and imperfect information)</strong></span> An extensive-form game is a game of <strong>perfect information</strong> if every information set is a singleton. It is a game of <strong>imperfect information</strong> if some information set contains more than one node.</p>
+</div>
+<p>The trust game, the sequential Battle of the Sexes and the three-player tree are all games of perfect information. The simultaneous Battle of the Sexes and the extensive form of rock–paper–scissors are games of imperfect information.</p>
+</section>
+<section id="strategies" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="strategies"><span class="header-section-number">3.2</span> Strategies</h2>
+<p>In a dynamic game a “strategy” must be a <strong>complete contingent plan</strong>: it has to specify what the player would do at <em>every</em> one of her information sets, including those that play may never actually reach. Only a plan this complete pins down what would happen along every branch and so lets us evaluate deviations.</p>
+<div id="def-3-pure" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.5 (Pure strategy)</strong></span> A <strong>pure strategy</strong> for player <span class="math inline">\(i\)</span> is a mapping <span class="math inline">\(s_i : H_i \to A_i\)</span>, where <span class="math inline">\(A_i \equiv \bigcup_{h_i \in H_i} A_i(h_i)\)</span>, assigning to each information set <span class="math inline">\(h_i\)</span> an available action <span class="math inline">\(s_i(h_i) \in A_i(h_i)\)</span>. The set of all such mappings is <span class="math inline">\(S_i\)</span>. A pure-strategy profile <span class="math inline">\(s = (s_1, \dots, s_n)\)</span> induces a unique terminal node <span class="math inline">\(z(s) \in Z\)</span>, the <strong>outcome</strong> of <span class="math inline">\(s\)</span>.</p>
+</div>
+<p>In the sequential Battle of the Sexes, player <span class="math inline">\(1\)</span> moves only at the root, so <span class="math inline">\(S_1 = \{O, F\}\)</span>. Player <span class="math inline">\(2\)</span> moves at two singleton information sets, so a pure strategy must say what to do after <span class="math inline">\(O\)</span> <em>and</em> what to do after <span class="math inline">\(F\)</span>; writing <span class="math inline">\(xy\)</span> for “play <span class="math inline">\(x\)</span> after <span class="math inline">\(O\)</span> and <span class="math inline">\(y\)</span> after <span class="math inline">\(F\)</span>,” we have <span class="math inline">\(S_2 = \{oo, of, fo, ff\}\)</span>. The requirement that a strategy specify play even at unreached information sets is not a technicality: in a three-player tree where player <span class="math inline">\(1\)</span>’s action <span class="math inline">\(L\)</span> leads to a <em>second</em> decision node of her own, a strategy for player <span class="math inline">\(1\)</span> must still prescribe a choice there (a plan such as “play <span class="math inline">\(L\)</span>, and play <span class="math inline">\(\ell'\)</span> at my second node”), even though choosing <span class="math inline">\(L\)</span> in fact makes that node moot.</p>
+<p>Players may also randomise. There are two natural ways to do so, and the distinction matters in dynamic games.</p>
+<div id="def-3-mixed" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.6 (Mixed strategy)</strong></span> A <strong>mixed strategy</strong> for player <span class="math inline">\(i\)</span> is a probability distribution over his pure strategies <span class="math inline">\(s_i \in S_i\)</span>.</p>
+</div>
+<div id="def-3-behavioral" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.7 (Behavioral strategy)</strong></span> A <strong>behavioral strategy</strong> <span class="math inline">\(\sigma_i\)</span> specifies, for each information set <span class="math inline">\(h_i \in H_i\)</span>, an <em>independent</em> probability distribution <span class="math inline">\(\sigma_i(h_i) \in \Delta A_i(h_i)\)</span> over the actions available there; <span class="math inline">\(\sigma_i(h_i)[a_i]\)</span> denotes the probability that <span class="math inline">\(i\)</span> plays <span class="math inline">\(a_i\)</span> at <span class="math inline">\(h_i\)</span>.</p>
+</div>
+<p>The conceptual difference is one of timing. A mixed strategy randomises <em>once</em>, before play begins, over entire contingent plans. A behavioral strategy randomises <em>as play unfolds</em>, drawing an action independently at each information set it reaches. For player <span class="math inline">\(2\)</span> in the sequential Battle of the Sexes, a mixed strategy such as <span class="math inline">\(\sigma_2 = \tfrac12 \,oo + \tfrac12 \, ff\)</span> flips a single coin to decide between the plans <span class="math inline">\(oo\)</span> and <span class="math inline">\(ff\)</span>; a behavioral strategy such as <span class="math inline">\(\sigma_2(O)[o]=\tfrac13,\ \sigma_2(F)[o]=\tfrac14\)</span> flips a separate coin at each node. The mixed-strategy space here is three-dimensional — the simplex <span class="math inline">\(\{(p_{oo},p_{of},p_{fo},p_{ff}) \in [0,1]^4 : \sum = 1\}\)</span> — while the behavioral-strategy space is only two-dimensional, parametrised by <span class="math inline">\((q_O, q_F) = (\sigma_2(O)[o], \sigma_2(F)[o])\)</span>. Despite this dimensional mismatch, the two representations are equivalent for the purposes that matter.</p>
+<div id="thm-3-kuhn" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.1 (Kuhn: realization equivalence)</strong></span> In a finite game of perfect recall, every mixed strategy has a <strong>realization-equivalent</strong> behavioral strategy, and conversely: the two induce the same probability distribution over terminal outcomes against any profile of opponents’ strategies. Hence any randomisation can be represented either way, and one may use whichever is convenient.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The general theorem is stated without proof; we exhibit the equivalence in both directions for player <span class="math inline">\(2\)</span> of the sequential Battle of the Sexes. Given a behavioral strategy <span class="math inline">\((q_O, q_F)\)</span>, set <span class="math display">\[
+p_{oo} = q_O q_F,\quad p_{of} = q_O(1-q_F),\quad p_{fo} = (1-q_O)q_F,\quad p_{ff} = (1-q_O)(1-q_F).
+\]</span> These are non-negative and sum to <span class="math inline">\(1\)</span>, and the marginal probabilities of acting in each subtree agree, since <span class="math inline">\(p_{oo}+p_{of} = q_O\)</span> and <span class="math inline">\(p_{oo}+p_{fo} = q_F\)</span>; so the mixed and behavioral strategies induce the same outcome distribution. Conversely, given a mixed strategy <span class="math inline">\((p_{oo},p_{of},p_{fo},p_{ff})\)</span>, the behavioral strategy <span class="math display">\[
+q_O = p_{oo} + p_{of}, \qquad q_F = p_{oo} + p_{fo}
+\]</span> reproduces the same play at each information set. The two maps are mutually consistent, establishing realization equivalence. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Realization equivalence lets us state solution concepts in whichever language is cleaner. Behavioral strategies will be the natural vehicle for sequential rationality below, because they let a player re-optimise information set by information set.</p>
+</section>
+<section id="nash-equilibrium" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="nash-equilibrium"><span class="header-section-number">3.3</span> Nash equilibrium</h2>
+<p>Because a pure-strategy profile <span class="math inline">\(s\)</span> pins down a unique outcome <span class="math inline">\(z(s)\)</span>, and a mixed or behavioral profile pins down a distribution over outcomes, an extensive game reduces to a normal-form game once we treat each player’s complete contingent plan as a single “strategy.”</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Normal-form representation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong>normal-form representation</strong> of an extensive-form game is the normal-form game <span class="math inline">\(\big(N, \{S_i\}, \{v_i(z(\cdot))\}\big)\)</span> whose players and strategy sets are those of the extensive game and whose payoff to player <span class="math inline">\(i\)</span> at a profile <span class="math inline">\(s\)</span> is <span class="math inline">\(v_i(z(s))\)</span>, the payoff at the outcome induced by <span class="math inline">\(s\)</span>.</p>
+</div>
+</div>
+<p>For the sequential Battle of the Sexes, with <span class="math inline">\(S_1 = \{O,F\}\)</span> and <span class="math inline">\(S_2 = \{oo, of, fo, ff\}\)</span>, the normal-form representation is the bimatrix</p>
+<div id="tbl-3-bos-seq" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-bos-seq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.1: Normal-form representation of the sequential Battle of the Sexes.
+</figcaption>
+<div aria-describedby="tbl-3-bos-seq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(oo\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(of\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(fo\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(ff\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(O\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(F\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,2\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Equilibrium of the extensive game is now defined by reference to this representation.</p>
+<div id="def-3-ne" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.8 (Nash equilibrium of an extensive game)</strong></span> A strategy profile <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> is a <strong>Nash equilibrium</strong> of an extensive-form game if it is a Nash equilibrium of the game’s normal-form representation.</p>
+</div>
+<p>Reading the bimatrix in <a href="#tbl-3-bos-seq" class="quarto-xref">Table&nbsp;<span>3.1</span></a>, there are exactly three pure-strategy Nash equilibria: <span class="math inline">\((O, oo)\)</span>, <span class="math inline">\((O, of)\)</span> and <span class="math inline">\((F, ff)\)</span>. It is instructive to see why a near-miss fails. The profile <span class="math inline">\((F, of)\)</span> induces the same outcome as <span class="math inline">\((F, ff)\)</span> — namely <span class="math inline">\(F\)</span> followed by <span class="math inline">\(f\)</span>, paying <span class="math inline">\((1,2)\)</span> — yet <span class="math inline">\((F, of)\)</span> is <em>not</em> a Nash equilibrium: given that player <span class="math inline">\(1\)</span> plays <span class="math inline">\(F\)</span>, player <span class="math inline">\(2\)</span>’s plan <span class="math inline">\(of\)</span> is fine on the realised branch, but the comparison that decides equilibrium is player <span class="math inline">\(1\)</span>’s, and against <span class="math inline">\(of\)</span> player <span class="math inline">\(1\)</span> strictly prefers <span class="math inline">\(O\)</span> (paying <span class="math inline">\(2\)</span>) to <span class="math inline">\(F\)</span> (paying <span class="math inline">\(1\)</span>). As in <a href="02-static-complete.html" class="quarto-xref"><span>Chapter 2</span></a>, equilibrium is a property of the <em>strategy profile</em>, not of the outcome it happens to deliver.</p>
+<p>This permissiveness is precisely the weakness we now confront. A Nash equilibrium of an extensive game requires each plan to be optimal <em>given the others</em>, but it judges optimality only by the resulting outcome — and the outcome is determined entirely by play <strong>on the path</strong> actually taken. Nothing forces a player’s prescribed behaviour at information sets that the equilibrium never reaches to be sensible. This is the door through which non-credible threats walk in.</p>
+</section>
+<section id="sequential-rationality" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="sequential-rationality"><span class="header-section-number">3.4</span> Sequential rationality</h2>
+<p>To talk about which information sets are reached we need a vocabulary.</p>
+<div id="def-3-path" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.9 (On and off the equilibrium path)</strong></span> Let <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> be a Nash equilibrium in behavioral strategies. An information set is <strong>on the equilibrium path</strong> if it is reached with positive probability under <span class="math inline">\(\sigma^*\)</span>; it is <strong>off the equilibrium path</strong> if it is never reached under <span class="math inline">\(\sigma^*\)</span>.</p>
+</div>
+<p>The pathology is sharpest in the <strong>chain-store game</strong> (<a href="#fig-3-chainstore" class="quarto-xref">Figure&nbsp;<span>3.5</span></a>). A potential entrant chooses to <strong>stay out</strong>, ending the game at <span class="math inline">\((0,4)\)</span>, or to <strong>enter</strong>, after which the incumbent monopolist chooses to <strong>fight</strong> a price war, paying <span class="math inline">\((-1,1)\)</span>, or to <strong>accommodate</strong>, paying <span class="math inline">\((1,2)\)</span>. The normal-form representation has two Nash equilibria: <span class="math inline">\((\text{Enter}, \text{Accommodate})\)</span> and <span class="math inline">\((\text{Stay out}, \text{Fight})\)</span>. The second is disturbing. It is sustained only by the incumbent’s <em>threat</em> to fight: anticipating a price war, the entrant stays out, so the threat is never tested. But the threat is <strong>not credible</strong>. If entry actually occurred, the incumbent compares fighting (<span class="math inline">\(1\)</span>) with accommodating (<span class="math inline">\(2\)</span>) and would strictly prefer to accommodate. The threat to fight is optimal only because, in equilibrium, the incumbent is never called upon to carry it out.</p>
+<div id="fig-3-chainstore" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-chainstore-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-chainstore.svg" class="img-fluid figure-img" style="width:55.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-chainstore-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.5: The chain-store entry game.
+</figcaption>
+</figure>
+</div>
+<p>The remedy is to insist that each player behave optimally at <em>every</em> information set, on or off the path — that the player be <strong>sequentially rational</strong>. In a finite game of perfect information this is implemented by <strong>backward induction</strong>: start at the decision nodes whose successors are all terminal, fix each such player’s optimal action there, fold those payoffs back up the tree, and repeat, working from the leaves toward the root. The actions retained constitute a <strong>backward-induction solution</strong>.</p>
+<p>In the chain-store game, backward induction first resolves the incumbent’s node — accommodate, since <span class="math inline">\(2 &gt; 1\)</span> — and then the entrant’s, who, foreseeing accommodation, enters since <span class="math inline">\(1 &gt; 0\)</span>. The unique backward-induction solution is <span class="math inline">\((\text{Enter}, \text{Accommodate})\)</span>, and the non-credible equilibrium is discarded. Applying the same procedure to the sequential Battle of the Sexes (<a href="#fig-3-bos-seq" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>): player <span class="math inline">\(2\)</span> plays <span class="math inline">\(o\)</span> after <span class="math inline">\(O\)</span> (since <span class="math inline">\(1 &gt; 0\)</span>) and <span class="math inline">\(f\)</span> after <span class="math inline">\(F\)</span> (since <span class="math inline">\(2 &gt; 0\)</span>), giving the plan <span class="math inline">\(of\)</span>; player <span class="math inline">\(1\)</span>, foreseeing this, chooses <span class="math inline">\(O\)</span> (since <span class="math inline">\(2 &gt; 1\)</span>). The unique backward-induction solution is <span class="math inline">\((O, of)\)</span> — one of the three Nash equilibria, while the other two, <span class="math inline">\((O, oo)\)</span> and <span class="math inline">\((F, ff)\)</span>, are eliminated.</p>
+<p>A more dramatic illustration is the <strong>centipede game</strong> (<a href="#fig-3-centipede" class="quarto-xref">Figure&nbsp;<span>3.6</span></a>). Players alternate; at each of four successive decision nodes the mover can <strong>continue</strong> (passing a growing pie across the table) or <strong>stop</strong> and take the current split. Continuing to the very end yields <span class="math inline">\((3,3)\)</span>, while the stopping payoffs are, in order, <span class="math inline">\(1\)</span>’s first stop <span class="math inline">\((1,1)\)</span>, <span class="math inline">\(2\)</span>’s first stop <span class="math inline">\((0,3)\)</span>, <span class="math inline">\(1\)</span>’s second stop <span class="math inline">\((2,2)\)</span> and <span class="math inline">\(2\)</span>’s second stop <span class="math inline">\((1,4)\)</span>.</p>
+<div id="fig-3-centipede" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-centipede-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-centipede.svg" class="img-fluid figure-img" style="width:85.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-centipede-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.6: The centipede game.
+</figcaption>
+</figure>
+</div>
+<p>Writing a player’s strategy as her actions at her two nodes, the normal-form representation is</p>
+<div id="tbl-3-centipede" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-centipede-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.2: Normal-form representation of the centipede game.
+</figcaption>
+<div aria-describedby="tbl-3-centipede-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(nn\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(nc\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(cn\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(cc\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(NN\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(NC\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,1\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(CN\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,2\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(CC\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,3\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>There are four pure Nash equilibria — <span class="math inline">\((NN, nn)\)</span>, <span class="math inline">\((NN, nc)\)</span>, <span class="math inline">\((NC, nn)\)</span> and <span class="math inline">\((NC, nc)\)</span> — all with the same outcome: player <span class="math inline">\(1\)</span> stops immediately at <span class="math inline">\((1,1)\)</span>. Backward induction is stark. At the last node player <span class="math inline">\(2\)</span> stops (<span class="math inline">\(4 &gt; 3\)</span>); foreseeing this, player <span class="math inline">\(1\)</span> stops at her second node (<span class="math inline">\(2 &gt; 1\)</span>); foreseeing that, player <span class="math inline">\(2\)</span> stops at his first node (<span class="math inline">\(3 &gt; 2\)</span>); foreseeing all of it, player <span class="math inline">\(1\)</span> stops at the very first node (<span class="math inline">\(1 &gt; 0\)</span>). The unique backward-induction solution is <span class="math inline">\((NN, nn)\)</span>: cooperation unravels completely, and the players walk away with <span class="math inline">\((1,1)\)</span> despite the available <span class="math inline">\((3,3)\)</span>.</p>
+<p>Backward induction delivers exactly what we want, and three theorems record its standing. The first connects it back to Nash equilibrium.</p>
+<div id="thm-3-bi-ne" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.2 (Backward-induction solutions are Nash equilibria)</strong></span> Every backward-induction solution is a Nash equilibrium in pure strategies.</p>
+</div>
+<p>This is a consequence of the equivalence with subgame-perfect equilibrium established below (<a href="#thm-3-spe-bi" class="quarto-xref">Theorem&nbsp;<span>3.5</span></a>), via the chain <span class="math inline">\(\text{(@thm-3-oneshot)} \Rightarrow \text{(@thm-3-spe-bi)} \Rightarrow \text{(@thm-3-bi-ne)}\)</span>; the source states it without a standalone proof. The next two results, both due to Kuhn, settle existence and uniqueness.</p>
+<div id="thm-3-bi-exists" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.3 (Kuhn: existence of a backward-induction solution)</strong></span> Every finite game of perfect information has a backward-induction solution, and hence a pure-strategy Nash equilibrium.</p>
+</div>
+<div id="thm-3-bi-unique" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.4 (Uniqueness of the backward-induction solution)</strong></span> Every finite game of perfect information has a <em>unique</em> backward-induction solution if no player is indifferent between any two terminal nodes.</p>
+</div>
+<p>Both are stated without proof; the procedure itself is constructive, which is the content of existence, and uniqueness follows because at each step the maximiser is unique exactly when the relevant payoffs are never tied. <a href="#thm-3-bi-exists" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a> has a striking corollary: chess, being a finite game of perfect information, has a backward-induction solution, so in principle it is “solved” — one of the players has a strategy guaranteeing at least a draw. That we cannot compute it reflects the size of the tree, not any gap in the theory.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Why credibility requires sequential rationality
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nash equilibrium asks only that strategies be mutually optimal <em>given the equilibrium path</em>. Off-path behaviour is unconstrained, so a player can profitably commit, on paper, to actions she would never actually take — the chain store’s threat to fight, player <span class="math inline">\(2\)</span>’s threat to play <span class="math inline">\(f\)</span> after <span class="math inline">\(O\)</span> in the Battle of the Sexes. Sequential rationality closes the loophole by demanding optimal play at every information set, reached or not. Backward induction enforces it directly in finite perfect-information games; the next section generalises it to games with information sets.</p>
+</div>
+</div>
+</section>
+<section id="subgame-perfect-equilibrium" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="subgame-perfect-equilibrium"><span class="header-section-number">3.5</span> Subgame-perfect equilibrium</h2>
+<p>Backward induction needs perfect information: with information sets we cannot in general “start at the bottom and fold up,” because a player may not know which of several nodes she is at. The generalisation replaces “node” with <strong>subgame</strong> — a self-contained portion of the tree that can be analysed in isolation — and requires the strategy profile to induce a Nash equilibrium in <em>every</em> subgame.</p>
+<div id="def-3-subgame" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.10 (Subgame)</strong></span> A (proper) <strong>subgame</strong> <span class="math inline">\(G\)</span> of an extensive-form game <span class="math inline">\(\Gamma\)</span> consists of a single non-terminal node together with all of its successors in <span class="math inline">\(\Gamma\)</span>, subject to the requirement that whenever a node <span class="math inline">\(x\)</span> belongs to <span class="math inline">\(G\)</span> and <span class="math inline">\(x'\)</span> lies in the same information set as <span class="math inline">\(x\)</span>, then <span class="math inline">\(x'\)</span> also belongs to <span class="math inline">\(G\)</span>. With its inherited information sets and payoffs, <span class="math inline">\(G\)</span> is itself a game tree. A node <span class="math inline">\(x\)</span> <strong>induces a subgame</strong> if and only if (i) <span class="math inline">\(x\)</span> is a singleton information set, and (ii) whenever two nodes share an information set and one is a successor of <span class="math inline">\(x\)</span>, the other is too. The whole game <span class="math inline">\(\Gamma\)</span> is itself a subgame; in a game of <em>perfect information</em>, every non-terminal node induces a subgame.</p>
+</div>
+<p>The closure condition is what keeps a subgame well-defined: we may not “cut into the middle” of an information set, because doing so would hand a player information — namely, which part of the set she is in — that the original game denied her. In the voluntary Battle of the Sexes below (<a href="#fig-3-vbos" class="quarto-xref">Figure&nbsp;<span>3.7</span></a>), the node where player <span class="math inline">\(1\)</span> chooses <span class="math inline">\(Y\)</span> versus <span class="math inline">\(N\)</span> induces a subgame (the whole game), and the node where she then chooses <span class="math inline">\(O\)</span> versus <span class="math inline">\(F\)</span> induces a subgame (the embedded simultaneous game); but neither of player <span class="math inline">\(2\)</span>’s nodes induces a subgame, because they share an information set, so cutting at one would separate it from its partner.</p>
+<div id="fig-3-vbos" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-vbos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-vbos.svg" class="img-fluid figure-img" style="width:58.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-vbos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.7: The voluntary Battle of the Sexes. Player <span class="math inline">\(1\)</span> first chooses to participate (<span class="math inline">\(Y\)</span>) or take the outside option (<span class="math inline">\(N\)</span>, worth <span class="math inline">\((1.5,1.5)\)</span>); after <span class="math inline">\(Y\)</span>, the two players play the simultaneous Battle of the Sexes, so player <span class="math inline">\(2\)</span>’s two nodes lie in one information set.
+</figcaption>
+</figure>
+</div>
+<div id="def-3-spe" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.11 (Subgame-perfect equilibrium)</strong></span> A behavioral strategy profile <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> is a <strong>subgame-perfect equilibrium (SPE)</strong> if, for every subgame <span class="math inline">\(G\)</span> of <span class="math inline">\(\Gamma\)</span>, the restriction of <span class="math inline">\(\sigma^*\)</span> to <span class="math inline">\(G\)</span> is a Nash equilibrium of <span class="math inline">\(G\)</span>. “Every subgame” includes those reached and those <em>not</em> reached under <span class="math inline">\(\sigma^*\)</span>. In particular, since <span class="math inline">\(\Gamma\)</span> is a subgame of itself, every SPE is a Nash equilibrium.</p>
+</div>
+<p>SPE is the refinement we sought: it demands mutual best responses both on and off the equilibrium path. In the chain-store game it strips out <span class="math inline">\((\text{Stay out}, \text{Fight})\)</span>, because the subgame following entry is the incumbent’s choice, and in that subgame “fight” is not a Nash equilibrium (accommodating pays more). Only <span class="math inline">\((\text{Enter}, \text{Accommodate})\)</span> survives. For finite perfect-information games the new concept reduces to the old.</p>
+<div id="thm-3-spe-bi" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.5 (SPE equals backward induction in finite perfect-information games)</strong></span> For finite games of perfect information, the set of pure-strategy subgame-perfect equilibria coincides with the set of backward-induction solutions.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>In a perfect-information game every non-terminal node induces a subgame, so SPE requires the strategy to be a Nash equilibrium starting from every node. Backward induction requires, at each node, that the prescribed action be optimal given the (already fixed) future play of all players. These are the same requirement node by node, so an SPE must be a backward-induction solution. The converse — that a backward-induction solution is an SPE — is delivered by the one-shot deviation principle (<a href="#thm-3-oneshot" class="quarto-xref">Theorem&nbsp;<span>3.6</span></a>) below. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Verifying that a profile is an SPE could in principle require checking, in every subgame, that no player wants to switch to <em>any</em> alternative continuation strategy — a daunting task in a large tree. The <strong>one-shot deviation principle</strong> reduces this to checking only the simplest possible deviations: changing the prescribed action at a single information set and conforming everywhere else.</p>
+<div id="def-3-osd" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.12 (One-shot deviation)</strong></span> A strategy <span class="math inline">\(s_i'\)</span> is a <strong>one-shot deviation</strong> from <span class="math inline">\(s_i\)</span> if it differs from <span class="math inline">\(s_i\)</span> at one and only one information set: there is a unique <span class="math inline">\(h_i \in H_i\)</span> with <span class="math inline">\(s_i'(h_i) \ne s_i(h_i)\)</span>, while <span class="math inline">\(s_i'(h_i') = s_i(h_i')\)</span> for every <span class="math inline">\(h_i' \ne h_i\)</span>. (Also called a one-step or one-stage deviation.)</p>
+</div>
+<div id="def-3-profitable-osd" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.13 (Profitable one-shot deviation)</strong></span> Given a profile <span class="math inline">\(s\)</span>, a strategy <span class="math inline">\(s_i'\)</span> is a <strong>profitable one-shot deviation</strong> if (i) <span class="math inline">\(s_i'\)</span> is a one-shot deviation from <span class="math inline">\(s_i\)</span> at some information set <span class="math inline">\(h_i\)</span>, and (ii) <span class="math inline">\(s_i'\)</span> is a profitable deviation from <span class="math inline">\(s_i\)</span> in the subgame induced by <span class="math inline">\(h_i\)</span>, given the opponents’ strategies <span class="math inline">\(s_{-i}\)</span>.</p>
+</div>
+<div id="thm-3-oneshot" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.6 (One-shot deviation principle)</strong></span> Consider a finite game of perfect information. A profile <span class="math inline">\(s\)</span> is a subgame-perfect equilibrium if and only if no player has a profitable one-shot deviation.</p>
+</div>
+<p>The principle is stated without a formal proof; the source records the implication chain <span class="math inline">\(\text{(@thm-3-oneshot)} \Rightarrow \text{(@thm-3-spe-bi)} \Rightarrow \text{(@thm-3-bi-ne)}\)</span>, and notes that variants of the principle hold in all the games studied in this course. The intuition is a telescoping argument: if no single-step change helps anywhere in the tree, then no finite combination of changes can help either, because any multi-step deviation can be decomposed into one-shot pieces, none of which improves the payoff. This is what makes SPE <em>checkable</em> in practice — one need only confirm, at each node, that the prescribed action beats every immediate alternative, holding fixed all future play.</p>
+</section>
+<section id="subgame-perfect-equilibrium-examples" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="subgame-perfect-equilibrium-examples"><span class="header-section-number">3.6</span> Subgame-perfect equilibrium: examples</h2>
+<section id="the-voluntary-battle-of-the-sexes" class="level3">
+<h3 class="anchored" data-anchor-id="the-voluntary-battle-of-the-sexes">The voluntary Battle of the Sexes</h3>
+<p>Return to the game of <a href="#fig-3-vbos" class="quarto-xref">Figure&nbsp;<span>3.7</span></a>, in which player <span class="math inline">\(1\)</span> first chooses whether to <strong>play</strong> (<span class="math inline">\(Y\)</span>) the Battle of the Sexes or take an <strong>outside option</strong> (<span class="math inline">\(N\)</span>) worth <span class="math inline">\((1.5, 1.5)\)</span>; after <span class="math inline">\(Y\)</span>, the two play the <em>simultaneous</em> Battle of the Sexes <span class="math inline">\((O,o)=(2,1)\)</span>, <span class="math inline">\((O,f)=(0,0)\)</span>, <span class="math inline">\((F,o)=(0,0)\)</span>, <span class="math inline">\((F,f)=(1,2)\)</span>. Player <span class="math inline">\(1\)</span>’s strategy specifies both the <span class="math inline">\(Y/N\)</span> choice and the action in the subgame, so <span class="math inline">\(S_1 = \{YO, YF, NO, NF\}\)</span> (e.g.&nbsp;<span class="math inline">\(NF\)</span> = “opt out, but play <span class="math inline">\(F\)</span> if the subgame were reached”); player <span class="math inline">\(2\)</span> chooses <span class="math inline">\(o\)</span> or <span class="math inline">\(f\)</span>. The normal form is</p>
+<div id="tbl-3-vbos" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-vbos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.3: The voluntary Battle of the Sexes in normal form.
+</figcaption>
+<div aria-describedby="tbl-3-vbos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(o\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(f\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(YO\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(YF\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,2\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(NO\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1.5,\,1.5\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.5,\,1.5\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(NF\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1.5,\,1.5\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.5,\,1.5\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Checking best responses gives <strong>three pure-strategy Nash equilibria</strong>: <span class="math inline">\((YO, o)\)</span>, <span class="math inline">\((NO, f)\)</span> and <span class="math inline">\((NF, f)\)</span>. But not all are subgame perfect. The only proper subgame is the simultaneous Battle of the Sexes reached after <span class="math inline">\(Y\)</span>, whose Nash equilibria are the two pure profiles <span class="math inline">\((O,o)\)</span> and <span class="math inline">\((F,f)\)</span> and the mixed profile <span class="math inline">\(\big(\tfrac23 O + \tfrac13 F,\ \tfrac13 o + \tfrac23 f\big)\)</span>. Subgame perfection demands that the continuation play <em>be</em> one of these:</p>
+<ul>
+<li>If the subgame plays <span class="math inline">\((O,o)\)</span>, player <span class="math inline">\(1\)</span> earns <span class="math inline">\(2 &gt; 1.5\)</span>, so she plays <span class="math inline">\(Y\)</span>: the SPE is <span class="math inline">\((YO, o)\)</span>.</li>
+<li>If the subgame plays <span class="math inline">\((F,f)\)</span>, player <span class="math inline">\(1\)</span> earns <span class="math inline">\(1 &lt; 1.5\)</span>, so she opts out: the SPE is <span class="math inline">\((NF, f)\)</span>.</li>
+<li>The Nash equilibrium <span class="math inline">\((NO, f)\)</span> is <strong>not</strong> subgame perfect: its continuation <span class="math inline">\((O, f)\)</span> is not a Nash equilibrium of the subgame (given <span class="math inline">\(f\)</span>, player <span class="math inline">\(1\)</span> would switch to <span class="math inline">\(F\)</span>), so it rests on behaviour that is not sequentially rational off the equilibrium path.</li>
+</ul>
+<p>There is also a <strong>mixed-strategy SPE</strong>: play the mixed equilibrium <span class="math inline">\(\big(\tfrac23 O + \tfrac13 F,\ \tfrac13 o + \tfrac23 f\big)\)</span> in the subgame, which yields player <span class="math inline">\(1\)</span> only <span class="math inline">\(\tfrac23 &lt; 1.5\)</span>, so again she opts out. This is the dynamic counterpart of the mixed equilibrium from <a href="02-static-complete.html" class="quarto-xref"><span>Chapter 2</span></a>, now embedded as off-path continuation play. The example shows two things at once: subgame perfection genuinely refines Nash equilibrium (it discards <span class="math inline">\((NO,f)\)</span>), and a single game can have several subgame-perfect equilibria, pure and mixed.</p>
+</section>
+<section id="stackelberg-competition" class="level3">
+<h3 class="anchored" data-anchor-id="stackelberg-competition">Stackelberg competition</h3>
+<p>The Cournot duopoly of <a href="02-static-complete.html" class="quarto-xref"><span>Chapter 2</span></a> had firms choose quantities simultaneously. <strong>Stackelberg competition</strong> makes the moves sequential: firm <span class="math inline">\(1\)</span> (the leader) commits to a quantity <span class="math inline">\(q_1 \ge 0\)</span>, firm <span class="math inline">\(2\)</span> (the follower) observes it and then chooses <span class="math inline">\(q_2 \ge 0\)</span>. Inverse demand is <span class="math inline">\(P = 100 - Q\)</span> with <span class="math inline">\(Q = q_1 + q_2\)</span>, and each firm has constant marginal cost <span class="math inline">\(10\)</span>, so profits are <span class="math display">\[
+\pi_i(q_1, q_2) = (100 - q_1 - q_2)\,q_i - 10\,q_i .
+\]</span> This is an (infinite) game of perfect information: firm <span class="math inline">\(1\)</span>’s strategy is a number <span class="math inline">\(q_1 \in \R_+\)</span>, while firm <span class="math inline">\(2\)</span>’s strategy is a <em>function</em> <span class="math inline">\(q_2(\cdot) : \R_+ \to \R_+\)</span> specifying a response to each possible leader quantity. We solve it by backward induction.</p>
+<p>In the subgame following any <span class="math inline">\(q_1\)</span>, the follower solves <span class="math inline">\(\max_{q_2 \ge 0} (100 - q_1 - q_2)\,q_2 - 10\,q_2\)</span>. The first-order condition <span class="math inline">\(90 - q_1 - 2 q_2 = 0\)</span> gives the follower’s best response <span class="math display">\[
+q_2^*(q_1) = \frac{90 - q_1}{2} \qquad (\text{for } q_1 \le 90).
+\]</span> Anticipating this, the leader solves <span class="math display">\[
+\max_{q_1 \ge 0}\ \Big(100 - q_1 - \tfrac{90 - q_1}{2}\Big)\,q_1 - 10\,q_1 .
+\]</span> The first-order condition yields <span class="math inline">\(q_1^* = 45\)</span>, and then <span class="math inline">\(q_2^*(q_1^*) = \tfrac{90 - 45}{2} = 22.5\)</span>. The resulting profits are <span class="math display">\[
+\pi_1^* = 1012.5, \qquad \pi_2^* = 506.25 .
+\]</span> Compare the simultaneous Cournot outcome, <span class="math inline">\(q_1^* = q_2^* = 30\)</span> with <span class="math inline">\(\pi_1^* = \pi_2^* = 900\)</span>. The leader produces more and earns more, the follower less: there is a <strong>first-mover advantage</strong>. The source of the advantage is <em>commitment</em>. By moving first and visibly locking in a large quantity, the leader forces the follower to scale back, something a simultaneous mover could not credibly do.</p>
+<p>We may sketch the tree schematically (<a href="#fig-3-stackelberg" class="quarto-xref">Figure&nbsp;<span>3.8</span></a>): each player has a continuum of branches, drawn as a single representative edge labelled by the chosen quantity.</p>
+<p>It is worth noting that, as in the chain-store game, the extensive game has many Nash equilibria that are <em>not</em> subgame-perfect. Fix any <span class="math inline">\(\hat q_1 \ge 0\)</span> with <span class="math inline">\((100 - \hat q_1 - q_2^*(\hat q_1))\,\hat q_1 - 10\,\hat q_1 \ge 0\)</span>, and let firm <span class="math inline">\(2\)</span> adopt the rule “play <span class="math inline">\(q_2^*(\hat q_1)\)</span> if <span class="math inline">\(q_1 = \hat q_1\)</span>, and flood the market with <span class="math inline">\(q_2 = 90\)</span> otherwise.” Against this rule the leader’s best choice is <span class="math inline">\(\hat q_1\)</span>, so <span class="math inline">\((\hat q_1, \hat q_2(\cdot))\)</span> is a Nash equilibrium. But the threat to set <span class="math inline">\(q_2 = 90\)</span> — which drives the price down to <span class="math inline">\(10\)</span>, exactly marginal cost, wiping out all margin — is not credible: off the path it is not a best response, so the profile is not an SPE. Subgame perfection again selects the sensible outcome.</p>
+<div id="fig-3-stackelberg" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-stackelberg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-stackelberg.svg" class="img-fluid figure-img" style="width:50.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-stackelberg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.8: Stackelberg competition, drawn schematically: each continuous action is shown as a single representative branch.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="mutually-assured-destruction" class="level3">
+<h3 class="anchored" data-anchor-id="mutually-assured-destruction">Mutually assured destruction</h3>
+<p>The Cuban missile crisis of <span class="math inline">\(1962\)</span> can be stylised as a game of escalation between the United States (player <span class="math inline">\(1\)</span>) and the Soviet Union (player <span class="math inline">\(2\)</span>); see <a href="#fig-3-mad" class="quarto-xref">Figure&nbsp;<span>3.9</span></a>. Player <span class="math inline">\(1\)</span> first chooses to <strong>ignore</strong> (<span class="math inline">\(I\)</span>) the Soviet missiles, ending the game at <span class="math inline">\((0,0)\)</span>, or to <strong>escalate</strong> (<span class="math inline">\(E\)</span>). After <span class="math inline">\(E\)</span>, player <span class="math inline">\(2\)</span> chooses to <strong>back down</strong> (<span class="math inline">\(B\)</span>), paying <span class="math inline">\((10, -10)\)</span>, or to go <strong>nuclear</strong> (<span class="math inline">\(N\)</span>). After <span class="math inline">\(N\)</span> the two superpowers play a simultaneous brinkmanship subgame: each may <strong>retreat</strong> (<span class="math inline">\(R\)</span> for player <span class="math inline">\(1\)</span>, <span class="math inline">\(r\)</span> for player <span class="math inline">\(2\)</span>) or trigger <strong>doomsday</strong> (<span class="math inline">\(D\)</span>, <span class="math inline">\(d\)</span>). If both retreat the payoff is <span class="math inline">\((-5,-5)\)</span>; if <em>either</em> chooses doomsday the payoff is the catastrophe <span class="math inline">\((-100, -100)\)</span>.</p>
+<div id="fig-3-mad" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-mad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-3-mad.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-mad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.9: Mutually assured destruction (Cuba, 1962). The two nodes after <span class="math inline">\((E,N)\)</span> form one information set: the simultaneous brinkmanship subgame.
+</figcaption>
+</figure>
+</div>
+<p>The inner simultaneous subgame has the bimatrix</p>
+<div id="tbl-3-mad" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-mad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.4: The brinkmanship subgame after <span class="math inline">\((E,N)\)</span>.
+</figcaption>
+<div aria-describedby="tbl-3-mad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(r\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(d\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(R\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-5,\,-5\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-100,\,-100\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(D\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-100,\,-100\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-100,\,-100\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>This subgame has <strong>two</strong> pure Nash equilibria, and each generates a distinct SPE of the whole game.</p>
+<ul>
+<li>If the subgame plays <span class="math inline">\((R, r)\)</span>, paying <span class="math inline">\((-5,-5)\)</span>: working backward, after <span class="math inline">\(E\)</span> player <span class="math inline">\(2\)</span> prefers <span class="math inline">\(N\)</span> (giving <span class="math inline">\(-5\)</span>) to <span class="math inline">\(B\)</span> (giving <span class="math inline">\(-10\)</span>); and at the root player <span class="math inline">\(1\)</span> prefers <span class="math inline">\(I\)</span> (giving <span class="math inline">\(0\)</span>) to <span class="math inline">\(E\)</span> (giving <span class="math inline">\(-5\)</span>). The resulting SPE is <span class="math inline">\((IR,\ Nr)\)</span> — player <span class="math inline">\(1\)</span> plays <span class="math inline">\(I\)</span>, then <span class="math inline">\(R\)</span>; player <span class="math inline">\(2\)</span> plays <span class="math inline">\(N\)</span>, then <span class="math inline">\(r\)</span>.</li>
+<li>If the subgame plays <span class="math inline">\((D, d)\)</span>, paying <span class="math inline">\((-100,-100)\)</span>: after <span class="math inline">\(E\)</span> player <span class="math inline">\(2\)</span> now prefers <span class="math inline">\(B\)</span> (giving <span class="math inline">\(-10\)</span>) to <span class="math inline">\(N\)</span> (giving <span class="math inline">\(-100\)</span>); and at the root player <span class="math inline">\(1\)</span> prefers <span class="math inline">\(E\)</span> (giving <span class="math inline">\(10\)</span>) to <span class="math inline">\(I\)</span> (giving <span class="math inline">\(0\)</span>). The resulting SPE is <span class="math inline">\((ED,\ Bd)\)</span> — player <span class="math inline">\(1\)</span> plays <span class="math inline">\(E\)</span>, then <span class="math inline">\(D\)</span>; player <span class="math inline">\(2\)</span> plays <span class="math inline">\(B\)</span>, then <span class="math inline">\(d\)</span>.</li>
+</ul>
+<p>So there are two pure-strategy subgame-perfect equilibria, <span class="math inline">\((IR, Nr)\)</span> and <span class="math inline">\((ED, Bd)\)</span>, corresponding to the two equilibria of the brinkmanship subgame. The multiplicity is the substantive point: which equilibrium prevails depends on what each side believes the other would do at the brink, and a credible <em>commitment</em> to doomsday (<span class="math inline">\(D, d\)</span>) — however terrifying — deters escalation and yields the more peaceful path <span class="math inline">\((ED, Bd)\)</span>, in which player <span class="math inline">\(1\)</span> escalates and player <span class="math inline">\(2\)</span> backs down. This is the logic of deterrence by mutually assured destruction.</p>
+</section>
+</section>
+<section id="repeated-games" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="repeated-games"><span class="header-section-number">3.7</span> Repeated games</h2>
+<p>Many of the most interesting strategic situations are not one-shot encounters but ongoing relationships: firms that compete in the same market quarter after quarter, neighbours who trade favours, countries that bargain repeatedly. The basic question is whether the shadow of the future can sustain cooperation that is impossible in a single play. <strong>Repeated games</strong> give the formal answer.</p>
+<p>Fix a normal-form game <span class="math inline">\(G = (N, \{A_i\}, \{v_i\})\)</span> — the <strong>stage game</strong> — and play it <span class="math inline">\(T\)</span> times, where <span class="math inline">\(T\)</span> is either a finite number or <span class="math inline">\(T = \infty\)</span>. In each period <span class="math inline">\(t\)</span> the players choose an action profile <span class="math inline">\(a^t = (a_1^t, \dots, a_n^t) \in A\)</span>, where <span class="math inline">\(A = A_1 \times \cdots \times A_n\)</span> is the set of stage action profiles, and <span class="math inline">\(v_i(a^t)\)</span> is <span class="math inline">\(i\)</span>’s <strong>stage payoff</strong> in period <span class="math inline">\(t\)</span>. Crucially, the players observe the entire past before moving: the game is one of perfect information at the level of action profiles, even when the stage game itself has simultaneous moves.</p>
+<p><strong>Discounting.</strong> Players value a euro today more than a euro tomorrow, so future stage payoffs are weighted by a <strong>discount factor</strong> <span class="math inline">\(\delta\)</span>. For a finitely repeated game <span class="math inline">\(\delta \in (0,1]\)</span>; for an infinitely repeated game <span class="math inline">\(\delta \in
+(0,1)\)</span> (so that the infinite sum converges). Player <span class="math inline">\(i\)</span>’s payoff for the whole repeated game is the <strong>discounted sum</strong> of stage payoffs, <span class="math display">\[
+v_i = \sum_{t=1}^{T} \delta^{t-1}\, v_i^{t},
+\]</span> where <span class="math inline">\(v_i^t = v_i(a^t)\)</span>. In the infinite-horizon case it is conventional to use the <strong>average discounted payoff</strong>, which simply rescales by <span class="math inline">\((1-\delta)\)</span>: <span class="math display">\[
+v_i \;\equiv\; (1-\delta) \sum_{t=1}^{\infty} \delta^{t-1}\, v_i^{t}.
+\]</span> The normalisation is convenient because if a fixed profile <span class="math inline">\(a\)</span> is played in every period, then <span class="math inline">\((1-\delta)\sum_{t\ge1}\delta^{t-1} v_i(a) = v_i(a)\)</span>: the average discounted payoff of “always <span class="math inline">\(a\)</span>” is just the one-period payoff <span class="math inline">\(v_i(a)\)</span>, so repeated-game payoffs live on the same scale as stage payoffs.</p>
+<p><strong>Histories and strategies.</strong> What a player can condition on is the record of what has happened. A <strong>history</strong> at the start of period <span class="math inline">\(t\)</span> is the list of past action profiles <span class="math inline">\(h_t = (a^1, \dots, a^t) \in A^t =: H_t\)</span>, with the empty history <span class="math inline">\(H_0 = \{\varnothing\}\)</span> describing the initial node. A (pure) <strong>strategy</strong> for player <span class="math inline">\(i\)</span> is a map from histories to actions, <span class="math display">\[
+s_i : \bigcup_{t=0}^{T-1} H_t \to A_i ,
+\]</span> equivalently a list <span class="math inline">\((s_i^1, s_i^2, \dots)\)</span> with <span class="math inline">\(s_i^t : H_{t-1} \to A_i\)</span> telling <span class="math inline">\(i\)</span> what to play in period <span class="math inline">\(t\)</span> as a function of everything observed so far. A strategy is therefore a complete contingent plan, and the solution concept we carry over is subgame-perfect equilibrium (<a href="#def-3-spe" class="quarto-xref">Definition&nbsp;<span>3.11</span></a>): the profile must induce a Nash equilibrium in every subgame, i.e.&nbsp;after every history.</p>
+<section id="finitely-repeated-games" class="level3">
+<h3 class="anchored" data-anchor-id="finitely-repeated-games">Finitely repeated games</h3>
+<p>When the horizon is finite, backward induction starts from the last period. There the future is empty, so each player simply plays the stage game — and an SPE must therefore prescribe a stage Nash equilibrium at the end.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Lemma 3.1 (last-period play).</strong> Suppose <span class="math inline">\(s\)</span> is an SPE of a finitely repeated game. In the last period, after any history, <span class="math inline">\(s\)</span> must play a stage Nash equilibrium. (After different histories, different stage equilibria may be played.)</p>
+</div>
+</div>
+<p>This is the engine of the next theorem, which records two facts: repeating any single stage equilibrium is always an SPE, and if the stage game has a <em>unique</em> Nash equilibrium then that repetition is the <em>only</em> SPE — so a finite horizon buys no extra cooperation when the stage game is “solved”.</p>
+<div id="thm-3-finiterep" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.7 (Repetition of a stage equilibrium)</strong></span> Consider a finitely repeated game. If <span class="math inline">\(a^* = (a_1^*, \dots, a_n^*)\)</span> is a Nash equilibrium of the stage game, then the profile <span class="math inline">\(s\)</span> that plays <span class="math inline">\(a^*\)</span> after every history is an SPE of the repeated game, for any <span class="math inline">\(\delta \in (0,1]\)</span>. If, in addition, <span class="math inline">\(a^*\)</span> is the <strong>unique</strong> stage Nash equilibrium, then this profile is the <strong>unique</strong> SPE.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><em>Part 1: <span class="math inline">\(s\)</span> is an SPE.</em> We verify directly. Consider any history <span class="math inline">\(h = (\tilde a^1, \dots, \tilde a^{t-1})\)</span> reached at the start of period <span class="math inline">\(t \in \{1, \dots, T\}\)</span>. In the subgame following <span class="math inline">\(h\)</span>, holding the opponents’ strategies fixed at “always <span class="math inline">\(a_{-i}^*\)</span>”, player <span class="math inline">\(i\)</span>’s payoff from any strategy is <span class="math display">\[
+\sum_{\tau=1}^{t-1} \delta^{\tau-1} v_i(\tilde a^\tau)
+\;+\; \sum_{\tau=t}^{T} \delta^{\tau-1} v_i(a_i^\tau, a_{-i}^*).
+\]</span> The first sum is sunk. Because <span class="math inline">\(a_i^*\)</span> maximises <span class="math inline">\(i\)</span>’s stage payoff when the opponents play <span class="math inline">\(a_{-i}^*\)</span>, choosing <span class="math inline">\(a_i^\tau = a_i^*\)</span> in every remaining period maximises each term of the second sum. Hence playing <span class="math inline">\(s_i\)</span> is optimal in this subgame, and <span class="math inline">\(s\)</span> is an SPE.</p>
+<p><em>Part 2: uniqueness when <span class="math inline">\(a^*\)</span> is unique.</em> Take any SPE <span class="math inline">\(\tilde s\)</span> and consider a history <span class="math inline">\(h = (\tilde a^1, \dots, \tilde a^{T-1})\)</span> at the start of the <strong>last</strong> period. The subgame is a simultaneous-move game with strategy spaces <span class="math inline">\(A_i\)</span> and payoffs <span class="math display">\[
+\hat v_i(a) = \sum_{\tau=1}^{T-1} \delta^{\tau-1} v_i(\tilde a^\tau)
+\;+\; \delta^{T-1} v_i(a),
+\]</span> which differs from the stage game only by the sunk constant and a positive scale <span class="math inline">\(\delta^{T-1}\)</span>; the two are strategically equivalent. Since <span class="math inline">\(\tilde s\)</span> is an SPE it plays a Nash equilibrium here, which must be the unique stage equilibrium: <span class="math inline">\(\tilde
+s_i^T(h) = a_i^*\)</span> for all <span class="math inline">\(i\)</span> and all <span class="math inline">\(h \in H_{T-1}\)</span>.</p>
+<p><em>Induction step.</em> Suppose <span class="math inline">\(\tilde s\)</span> plays <span class="math inline">\(a^*\)</span> in every period <span class="math inline">\(t = k, k+1,
+\dots, T\)</span> after every history; we show the same for period <span class="math inline">\(t = k-1\)</span>. Fix any history <span class="math inline">\(h = (\tilde a^1, \dots, \tilde a^{t-1}) \in H_{t-1}\)</span>. Because <span class="math inline">\(\tilde s\)</span> is an SPE there is no profitable deviation after <span class="math inline">\(h\)</span>, so each <span class="math inline">\(\tilde s_i^t(h)\)</span> solves <span class="math display">\[
+\max_{a_i \in A_i}\; \sum_{\tau=1}^{t-1} \delta^{\tau-1} v_i(\tilde a^\tau)
+\;+\; \delta^{t-1} v_i(a_i, \tilde s_{-i}^t(h))
+\;+\; \sum_{\tau=t+1}^{T} \delta^{\tau-1} v_i(a^*).
+\]</span> The first and last sums do not depend on <span class="math inline">\(a_i\)</span>, so this is equivalent to <span class="math inline">\(\max_{a_i} v_i(a_i, \tilde s_{-i}^t(h))\)</span>. Thus <span class="math inline">\(\tilde s^t(h)\)</span> is a stage Nash equilibrium and equals <span class="math inline">\(a^*\)</span> by uniqueness. By induction <span class="math inline">\(\tilde s\)</span> plays <span class="math inline">\(a^*\)</span> after every history, so it is the profile <span class="math inline">\(s\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>So repetition by itself is powerless against a uniquely-solved stage game such as the Prisoner’s Dilemma: with a finite horizon the only SPE is to defect every period.</p>
+<p><strong>Cooperation through multiple stage equilibria.</strong> The picture changes once the stage game has <em>more than one</em> Nash equilibrium, because then the players can use the choice among them as a system of rewards and punishments. Consider the <strong>augmented partnership game</strong>, in which each player can put in <strong>effort</strong> (<span class="math inline">\(E\)</span>), <strong>shirk</strong> (<span class="math inline">\(S\)</span>), or take a mutually destructive <strong>punishment</strong> action (<span class="math inline">\(P\)</span>):</p>
+<div id="tbl-3-augmented" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-augmented-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.5: The augmented partnership game.
+</figcaption>
+<div aria-describedby="tbl-3-augmented-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(E\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(S\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(E\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-3,\,-3\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(S\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,-1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-3,\,-3\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(P\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-3,\,-3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-3,\,-3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-2,\,-2\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>This game has <strong>two</strong> pure stage Nash equilibria, <span class="math inline">\(SS\)</span> (payoff <span class="math inline">\(0,0\)</span>) and <span class="math inline">\(PP\)</span> (payoff <span class="math inline">\(-2,-2\)</span>); the cooperative profile <span class="math inline">\(EE\)</span> (payoff <span class="math inline">\(2,2\)</span>) is not an equilibrium, since each player would deviate to <span class="math inline">\(S\)</span>. By <a href="#thm-3-finiterep" class="quarto-xref">Theorem&nbsp;<span>3.7</span></a> applied to the last period, <span class="math inline">\(EE\)</span> can never be played in the final period after any history. But over two periods cooperation can arise in the <em>first</em> period, sustained by a carrot-and-stick continuation: <span class="math display">\[
+s_i^1 = E, \qquad s_i^2(h) =
+\begin{cases} S &amp; \text{if } h = EE, \\ P &amp; \text{if } h \ne EE. \end{cases}
+\]</span> The carrot is the good equilibrium <span class="math inline">\(SS\)</span> (payoff <span class="math inline">\(0\)</span>) played as a reward for cooperation; the stick is the bad equilibrium <span class="math inline">\(PP\)</span> (payoff <span class="math inline">\(-2 &lt; 0\)</span>) triggered by any first-period deviation. Both continuations are stage equilibria, so the second period is incentive-compatible regardless. The only question is whether <span class="math inline">\(E\)</span> beats a first-period deviation. Comparing player 1’s options, given the prescribed continuation:</p>
+<ul>
+<li>Play <span class="math inline">\(E\)</span>: <span class="math inline">\(v_1(EE) + \delta\, v_1(SS) = 2 + \delta\cdot 0 = 2\)</span>.</li>
+<li>Deviate to <span class="math inline">\(S\)</span>: <span class="math inline">\(v_1(SE) + \delta\, v_1(PP) = 3 + \delta\cdot(-2) = 3 - 2\delta\)</span>.</li>
+<li>Deviate to <span class="math inline">\(P\)</span>: <span class="math inline">\(v_1(PE) + \delta\, v_1(PP) = -3 - 2\delta\)</span>.</li>
+</ul>
+<p>The action <span class="math inline">\(E\)</span> is optimal iff <span class="math inline">\(2 \ge 3 - 2\delta\)</span>, i.e.&nbsp;<span class="math inline">\(\delta \ge \tfrac12\)</span> (the <span class="math inline">\(P\)</span> deviation is never tempting). By symmetry the same holds for player 2.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>The shadow of the future
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For <span class="math inline">\(\delta \ge \tfrac12\)</span>, the profile above is an SPE with <strong>cooperation <span class="math inline">\(EE\)</span> on the equilibrium path</strong> of the first period. Patience matters: only when the future weighs at least half as much as the present is the one-period gain from cheating (<span class="math inline">\(3\)</span> vs <span class="math inline">\(2\)</span>) outweighed by the loss of switching from the carrot <span class="math inline">\(SS\)</span> to the stick <span class="math inline">\(PP\)</span>. The twice-repeated <em>unaugmented</em> partnership game (<a href="#fig-3-twicerep" class="quarto-xref">Figure&nbsp;<span>3.10</span></a>) has no such room — its stage game has the unique equilibrium <span class="math inline">\(SS\)</span>, so by <a href="#thm-3-finiterep" class="quarto-xref">Theorem&nbsp;<span>3.7</span></a> its only SPE plays <span class="math inline">\(S\)</span> after every history, with outcome path <span class="math inline">\((SS, SS)\)</span> for every <span class="math inline">\(\delta\)</span>.</p>
+</div>
+</div>
+<div id="fig-3-twicerep" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-twicerep-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/twicerep.svg" class="img-fluid figure-img" style="width:68.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-twicerep-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.10: Skeleton of the twice-repeated partnership game: the stage game (<span class="math inline">\(E\)</span> versus <span class="math inline">\(S\)</span>, played simultaneously) is replayed after each of the four first-period outcomes, giving a two-level tree.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="infinitely-repeated-games" class="level3">
+<h3 class="anchored" data-anchor-id="infinitely-repeated-games">Infinitely repeated games</h3>
+<p>With an infinite horizon there is no last period to anchor backward induction, but the structure is in some ways simpler: every subgame looks exactly like the whole game. Indeed, after any history <span class="math inline">\(h\)</span> of length <span class="math inline">\(t\)</span> the continuation game is itself an infinitely repeated <span class="math inline">\(G\)</span>, and the continuation payoff differs from a fresh start’s only by the discount factor <span class="math inline">\(\delta^{t}\)</span>. This self-similarity gives a clean characterisation.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Lemma 3.2 (SPE characterisation).</strong> Consider a profile <span class="math inline">\(s\)</span> in an infinitely repeated game. Then <span class="math inline">\(s\)</span> is an SPE <strong>if and only if</strong> the continuation play of <span class="math inline">\(s\)</span> after any history <span class="math inline">\(h\)</span> is itself a Nash equilibrium of the original repeated game.</p>
+</div>
+</div>
+<p>The justification is exactly the self-similarity just described: a subgame of an infinitely repeated game is equivalent (up to a <span class="math inline">\(\delta^{t}\)</span> factor) to the whole repeated game, so “Nash in every subgame” reduces to “every continuation is Nash in the repeated game”. With this in hand, the analogue of the finite-horizon repetition result is immediate.</p>
+<div id="thm-3-inftyrep" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.8 (Repetition of a stage equilibrium, infinite horizon)</strong></span> Consider an infinitely repeated game. If <span class="math inline">\(a = (a_1, \dots, a_n)\)</span> is a stage Nash equilibrium, then the profile <span class="math inline">\(s\)</span> that plays <span class="math inline">\(a\)</span> after every history is an SPE, for any <span class="math inline">\(\delta \in (0,1)\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By Lemma 3.2 it suffices to show that <span class="math inline">\(s\)</span> is a Nash equilibrium of the repeated game. Given <span class="math inline">\(s_{-i}\)</span> (which always plays <span class="math inline">\(a_{-i}\)</span>), always playing <span class="math inline">\(a_i\)</span> is optimal for <span class="math inline">\(i\)</span>, because <span class="math inline">\(a_i\)</span> maximises <span class="math inline">\(i\)</span>’s stage payoff against <span class="math inline">\(a_{-i}\)</span> in every single period, hence maximises the discounted sum term by term. The argument does not depend on <span class="math inline">\(\delta\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p><strong>Grim trigger and the Prisoner’s Dilemma.</strong> Unlike the finite case, an infinite horizon <em>can</em> sustain cooperation even when the stage equilibrium is unique, because the threat of permanent reversion to the bad equilibrium never runs out of periods. The canonical device is the <strong>grim-trigger</strong> strategy: cooperate as long as everyone has always cooperated, and switch forever to the stage equilibrium the instant anyone deviates. In the partnership game (stage payoffs as in <a href="#tbl-3-augmented" class="quarto-xref">Table&nbsp;<span>3.5</span></a> restricted to <span class="math inline">\(\{E,S\}\)</span>, with unique equilibrium <span class="math inline">\(SS\)</span>), grim trigger is <span class="math display">\[
+s_i^t(h) =
+\begin{cases}
+E &amp; \text{if } h = \varnothing \text{ or } h = (EE, \dots, EE) \in H_{t-1}, \\
+S &amp; \text{otherwise.}
+\end{cases}
+\]</span> Using average discounted payoffs, compare player <span class="math inline">\(i\)</span>’s options at the empty history:</p>
+<ul>
+<li>Cooperate (<span class="math inline">\(E\)</span> forever along the path): <span class="math inline">\(v_i(EE) = 2\)</span>.</li>
+<li>Deviate once to <span class="math inline">\(S\)</span>, triggering <span class="math inline">\(SS\)</span> forever after: <span class="math inline">\((1-\delta) v_i(SE) + \delta\, v_i(SS) = (1-\delta)\cdot 3 + \delta\cdot 0 = 3(1-\delta)\)</span>.</li>
+</ul>
+<p>There is no profitable one-shot deviation iff <span class="math inline">\(2 \ge 3(1-\delta)\)</span>, i.e. <span class="math inline">\(\delta \ge \tfrac13\)</span>. After any history of the form <span class="math inline">\((EE,\dots,EE)\)</span> the continuation is <span class="math inline">\(s\)</span> itself, giving the same condition; after any history containing an <span class="math inline">\(S\)</span>, the continuation simply repeats the stage equilibrium <span class="math inline">\(SS\)</span>, which is an SPE by <a href="#thm-3-inftyrep" class="quarto-xref">Theorem&nbsp;<span>3.8</span></a> for every <span class="math inline">\(\delta\)</span>. Hence grim trigger is an SPE iff <span class="math inline">\(\delta \ge \tfrac13\)</span>, sustaining cooperation <span class="math inline">\(EE\)</span> forever.</p>
+<p>The same logic delivers a general sustainability theorem: any action profile that strictly Pareto-improves on a stage equilibrium can be supported in an SPE once players are patient enough.</p>
+<div id="thm-3-folk" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.9 (Sustaining a cooperative path)</strong></span> Consider an infinitely repeated game. Suppose <span class="math inline">\(a^* = (a_1^*, \dots, a_n^*)\)</span> is a stage Nash equilibrium, and there is an action profile <span class="math inline">\(a = (a_1, \dots, a_n)\)</span> giving <strong>every</strong> player a strictly higher stage payoff than <span class="math inline">\(a^*\)</span>. Then there exists <span class="math inline">\(\bar\delta \in (0,1)\)</span> such that for every <span class="math inline">\(\delta \ge \bar\delta\)</span> there is an SPE whose outcome path is the repeated play of <span class="math inline">\(a\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(M \equiv \max_{i,\,a'} v_i(a')\)</span> be the largest stage payoff over all players and all action profiles, and consider the trigger profile <span class="math display">\[
+s_i^t(h) =
+\begin{cases}
+a_i &amp; \text{if } h = \varnothing \text{ or } h = (a, \dots, a) \in H_{t-1}, \\
+a_i^* &amp; \text{otherwise,}
+\end{cases}
+\qquad t \ge 1.
+\]</span> We check for profitable one-shot deviations after every history.</p>
+<p><em>Period 1.</em> If <span class="math inline">\(i\)</span> plays <span class="math inline">\(a_i\)</span>, the average discounted payoff is <span class="math inline">\(v_i(a)\)</span>. If <span class="math inline">\(i\)</span> deviates to some <span class="math inline">\(a_i' \ne a_i\)</span>, then (since the deviation triggers reversion to <span class="math inline">\(a^*\)</span> forever) the payoff is <span class="math display">\[
+(1-\delta) v_i(a_i', a_{-i}) + \delta\, v_i(a^*) \;\le\; (1-\delta) M + \delta\, v_i(a^*).
+\]</span> There is no profitable one-shot deviation in period 1 provided <span class="math inline">\(v_i(a) \ge (1-\delta) M + \delta\, v_i(a^*)\)</span>, which rearranges to <span class="math display">\[
+\delta \ge \delta_i \equiv \frac{M - v_i(a)}{M - v_i(a^*)} \in [0,1),
+\]</span> the membership in <span class="math inline">\([0,1)\)</span> holding because <span class="math inline">\(v_i(a) &gt; v_i(a^*)\)</span>. Set <span class="math inline">\(\bar\delta \equiv \max_i \delta_i\)</span>. Then for <span class="math inline">\(\delta \in [\bar\delta, 1)\)</span> no player has a profitable one-shot deviation in period 1.</p>
+<p><em>History <span class="math inline">\(h = (a, \dots, a)\)</span>.</em> The continuation play is exactly <span class="math inline">\(s\)</span> again, so the period-1 argument applies verbatim: no profitable one-shot deviation for <span class="math inline">\(\delta \in [\bar\delta, 1)\)</span>.</p>
+<p><em>History <span class="math inline">\(h \ne (a, \dots, a)\)</span>.</em> The continuation play is the repeated play of the stage equilibrium <span class="math inline">\(a^*\)</span> after every further history, which is an SPE of the subgame by <a href="#thm-3-inftyrep" class="quarto-xref">Theorem&nbsp;<span>3.8</span></a>; hence no profitable one-shot deviation, for any <span class="math inline">\(\delta\)</span>.</p>
+<p>So for <span class="math inline">\(\delta \in [\bar\delta, 1)\)</span> there is no profitable one-shot deviation after any history, and by the one-shot deviation principle (<a href="#thm-3-oneshot" class="quarto-xref">Theorem&nbsp;<span>3.6</span></a>) the profile is an SPE. <span class="math inline">\(\square\)</span></p>
+</div>
+<p><strong>Cournot collusion.</strong> A celebrated application is tacit collusion among Cournot competitors. Take the duopoly with inverse demand <span class="math inline">\(P(Q) = \max\{100 - Q,\, 0\}\)</span>, <span class="math inline">\(Q = q_1 + q_2\)</span>, and constant marginal cost <span class="math inline">\(c_1 = c_2 = 10\)</span>, played each period with discount <span class="math inline">\(\delta \in (0,1)\)</span>. Two benchmarks frame the analysis:</p>
+<ul>
+<li><strong>Collusion (monopoly split).</strong> Maximising joint profit <span class="math inline">\(\max_Q [P(Q) - 10]Q\)</span> gives the monopoly quantity <span class="math inline">\(Q^* = 45\)</span>; splitting it equally, each firm produces <span class="math inline">\(q^c = 22.5\)</span> and earns <span class="math inline">\(45 \times 22.5 = 1012.5\)</span> per period.</li>
+<li><strong>Stage Nash equilibrium (Cournot).</strong> The static equilibrium is <span class="math inline">\(q^e = 30\)</span> for each firm, earning <span class="math inline">\(30 \times 30 = 900\)</span> per period.</li>
+</ul>
+<p>Consider the trigger profile: produce the collusive <span class="math inline">\(q_i^c\)</span> as long as both firms have always done so, and revert forever to the Cournot <span class="math inline">\(q_i^e\)</span> otherwise. By <a href="#thm-3-inftyrep" class="quarto-xref">Theorem&nbsp;<span>3.8</span></a> the reversion phase is an SPE; the binding constraint is again the first period. The most tempting one-shot deviation is the static best response to the partner’s <span class="math inline">\(q^c = 22.5\)</span>, namely <span class="math inline">\(q_i = (90 - 22.5)/2 = 33.75\)</span>, which yields the one-period profit <span class="math display">\[
+(100 - 33.75 - 22.5 - 10)\cdot 33.75 = 33.75 \times 33.75 = 1139.0625 .
+\]</span> There is no profitable deviation iff staying collusive beats deviating-then-being- punished, in average discounted terms: <span class="math display">\[
+1012.5 \;\ge\; (1-\delta)\cdot 1139.0625 + \delta\cdot 900 .
+\]</span> Rearranging, <span class="math inline">\(1012.5 - 900 = (1-\delta)(1139.0625 - 900)\)</span>, i.e. <span class="math inline">\(112.5 = (1-\delta)\cdot 239.0625\)</span>, so <span class="math inline">\(1 - \delta = 0.4706\ldots\)</span> and <span class="math display">\[
+\delta \;\ge\; \bar\delta \approx 0.5294 ,
+\]</span> which the slides round to <span class="math inline">\(\delta \ge 0.53\)</span>. For <span class="math inline">\(\delta\)</span> above this threshold the collusive trigger profile is an SPE, and the firms sustain the monopoly outcome period after period — collusion that the law forbids but that patient repetition makes self-enforcing.</p>
+</section>
+</section>
+<section id="strategic-bargaining" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="strategic-bargaining"><span class="header-section-number">3.8</span> Strategic bargaining</h2>
+<p>How is a fixed surplus divided when the parties can make and reject offers over time? The <strong>alternating-offer</strong> model gives a sharp, dynamic answer. A pie of size <span class="math inline">\(1\)</span> is to be split; the players alternate making proposals, with player 1 proposing in odd rounds and player 2 in even rounds, and the proposer’s share is listed first. A proposal <span class="math inline">\((x, 1-x)\)</span> with <span class="math inline">\(x \in [0,1]\)</span> is either accepted — ending the game — or rejected, in which case play passes to the next round. Delay is costly: agreement on <span class="math inline">\((x, 1-x)\)</span> reached in round <span class="math inline">\(t\)</span> is worth <span class="math inline">\(\delta^{t-1} x\)</span> to player 1 and <span class="math inline">\(\delta^{t-1}(1-x)\)</span> to player 2, with discount <span class="math inline">\(\delta \in (0,1)\)</span>. This is a game of perfect information, so we solve it by backward induction.</p>
+<p><strong><span class="math inline">\(T = 1\)</span>: the ultimatum game.</strong> With a single round, player 1 makes a take-it-or-leave-it offer; rejection destroys the pie, leaving both with <span class="math inline">\(0\)</span>. For any <span class="math inline">\(x &lt; 1\)</span>, player 2 strictly prefers to accept (getting <span class="math inline">\(1 - x &gt; 0\)</span>); at <span class="math inline">\(x = 1\)</span> she is indifferent. The unique SPE has <strong>player 1 propose <span class="math inline">\((1, 0)\)</span> and player 2 accept every proposal</strong> — including the knife-edge <span class="math inline">\((1,0)\)</span>, since the alternative of accepting all offers <em>except</em> <span class="math inline">\((1,0)\)</span> leaves player 1 with no best response (he would want to offer the largest <span class="math inline">\(x &lt; 1\)</span>, which does not exist). The unique SPE outcome is <span class="math inline">\((1, 0)\)</span>: the proposer takes the entire pie. Many other Nash equilibria exist (e.g.&nbsp;player 2 threatens to accept only one specific offer), but they rest on incredible threats.</p>
+<p><strong><span class="math inline">\(T = 2\)</span>.</strong> Now if player 2 rejects the round-1 offer, she becomes the proposer in round 2 and — facing the deadline — can claim the whole (discounted) pie, worth <span class="math inline">\(\delta\)</span> to her. So in round 1 she accepts <span class="math inline">\((x, 1-x)\)</span> iff <span class="math inline">\(1 - x \ge \delta\)</span> (accepting when indifferent, again because otherwise player 1 has no optimum). Player 1 therefore offers the smallest share that secures acceptance, <span class="math inline">\(1 - x =
+\delta\)</span>, proposing <strong><span class="math inline">\((1-\delta, \delta)\)</span></strong>. This is the unique SPE: agreement is immediate, with equilibrium payoff <span class="math inline">\((1-\delta, \delta)\)</span>. The threat of becoming next period’s dictator hands player 2 a share <span class="math inline">\(\delta\)</span>, which grows toward <span class="math inline">\(\tfrac12\)</span> as <span class="math inline">\(\delta \to 1\)</span>.</p>
+<div id="fig-3-bargain-t2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-bargain-t2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/bargain-t2.svg" class="img-fluid figure-img" style="width:58.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-bargain-t2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.11: The alternating-offer game with deadline <span class="math inline">\(T=2\)</span>. Player 1 offers <span class="math inline">\(x\)</span>; player 2 accepts (payoff <span class="math inline">\((x,1-x)\)</span>) or rejects and counter-offers; player 1 then accepts (payoff <span class="math inline">\((\delta x, \delta(1-x))\)</span>) or rejects, destroying the pie (<span class="math inline">\((0,0)\)</span>).
+</figcaption>
+</figure>
+</div>
+<p><strong><span class="math inline">\(T = 3\)</span>.</strong> If round 1 is rejected, the remaining two rounds are exactly the <span class="math inline">\(T=2\)</span> game with the roles swapped and one period of discounting applied, giving continuation payoffs <span class="math inline">\((\delta^2,\, \delta(1-\delta))\)</span>. Player 2’s round-1 continuation value is thus <span class="math inline">\(\delta(1-\delta)\)</span>, so she accepts any <span class="math inline">\((x,1-x)\)</span> with <span class="math inline">\(1 - x \ge \delta(1-\delta)\)</span>, and player 1 proposes <span class="math display">\[
+\big(\, 1 - \delta(1-\delta),\; \delta(1-\delta) \,\big).
+\]</span></p>
+<p><strong><span class="math inline">\(T = 4\)</span>.</strong> One more layer of backward induction nests the discount once more, and player 1 proposes <span class="math display">\[
+\big(\, 1 - \delta\big(1 - \delta(1-\delta)\big),\; \delta\big(1 - \delta(1-\delta)\big) \,\big).
+\]</span> The pattern is a nested, alternating-sign geometric series — each extra round of horizon adds another term <span class="math inline">\(\pm\delta^{k}\)</span> — and longer finite deadlines continue analogously.</p>
+<p><strong>Rubinstein’s infinite-horizon model.</strong> Letting <span class="math inline">\(T = \infty\)</span> removes the deadline and, remarkably, restores a <em>unique</em> prediction. The game is stationary: every subgame in which player 1 proposes looks identical, as does every subgame in which player 2 proposes. This suggests a <strong>stationary SPE</strong> in which player 1 always offers <span class="math inline">\((x^*, 1-x^*)\)</span>, player 2 always offers <span class="math inline">\((y^*, 1-y^*)\)</span> (player 1’s share listed first, so player 2 keeps <span class="math inline">\(1-y^*\)</span>), and each accepts exactly when offered at least their stationary continuation value. For the proposer’s offer to be optimal, the responder must be made just indifferent between accepting now and rejecting to become tomorrow’s proposer:</p>
+<ul>
+<li>Player 2 is indifferent at her offered share <span class="math inline">\(1 - x^*\)</span>: <span class="math inline">\(1 - x^* = \delta(1 - y^*)\)</span>.</li>
+<li>Player 1 is indifferent at his offered share <span class="math inline">\(y^*\)</span>: <span class="math inline">\(y^* = \delta x^*\)</span>.</li>
+</ul>
+<p>Substituting <span class="math inline">\(y^* = \delta x^*\)</span> into the first equation gives <span class="math inline">\(1 - x^* = \delta - \delta^2 x^*\)</span>, hence <span class="math inline">\(1 - \delta = x^*(1 - \delta^2)\)</span> and <span id="eq-3-rubinstein"><span class="math display">\[
+x^* = \frac{1-\delta}{1-\delta^2} = \frac{1}{1+\delta}, \qquad
+y^* = \frac{\delta}{1+\delta}.
+\tag{3.1}\]</span></span> Agreement is immediate and the first proposer, player 1, secures <span class="math inline">\(x^* = 1/(1+\delta)\)</span>. As <span class="math inline">\(\delta \to 1\)</span> the split approaches <span class="math inline">\((\tfrac12, \tfrac12)\)</span>: when players are patient, the first-mover advantage vanishes.</p>
+<p>The truly striking fact is that this stationary equilibrium is the <em>unique</em> SPE.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Uniqueness via payoff bounds
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let <span class="math inline">\(G_i\)</span> be the set of all SPE payoffs to player <span class="math inline">\(i\)</span> across subgames in which player <span class="math inline">\(i\)</span> proposes first, and write <span class="math inline">\(M_i = \sup G_i\)</span>, <span class="math inline">\(m_i = \inf G_i\)</span>. We bound these four numbers and squeeze them to a point.</p>
+<p><strong>Claim A: <span class="math inline">\(m_i \ge 1 - \delta M_j\)</span> for <span class="math inline">\(i \ne j\)</span>.</strong> Take <span class="math inline">\(i=1\)</span>, <span class="math inline">\(j=2\)</span>. In a subgame where player 1 proposes, if player 2 rejects she becomes the proposer in a subgame worth at most <span class="math inline">\(\delta M_2\)</span> to her. So she accepts any offer giving her strictly more than <span class="math inline">\(\delta M_2\)</span>, which lets player 1 secure <span class="math inline">\(1 - \delta M_2 -
+\varepsilon\)</span> for any <span class="math inline">\(\varepsilon &gt; 0\)</span>. Hence <span class="math inline">\(m_1 \ge 1 - \delta M_2\)</span>.</p>
+<p><strong>Claim B: <span class="math inline">\(M_i \le 1 - \delta m_j\)</span> for <span class="math inline">\(i \ne j\)</span>.</strong> Again <span class="math inline">\(i=1\)</span>, <span class="math inline">\(j=2\)</span>. If player 2 rejects, she gets at least <span class="math inline">\(\delta m_2\)</span>, so she rejects any offer giving her strictly less than <span class="math inline">\(\delta m_2\)</span>. If player 1’s offer is accepted he gets at most <span class="math inline">\(1 - \delta m_2\)</span>; if it is rejected he gets at most <span class="math inline">\(\delta(1 - m_2) \le 1 -
+\delta m_2\)</span>. Hence <span class="math inline">\(M_1 \le 1 - \delta m_2\)</span>.</p>
+<p><strong>Squeeze.</strong> Combining the two claims (and their symmetric counterparts), <span class="math display">\[
+m_i \ge 1 - \delta M_j \ge 1 - \delta(1 - \delta m_i) \;\Longrightarrow\; m_i \ge \tfrac{1}{1+\delta},
+\]</span> <span class="math display">\[
+M_i \le 1 - \delta m_j \le 1 - \delta(1 - \delta M_i) \;\Longrightarrow\; M_i \le \tfrac{1}{1+\delta}.
+\]</span> Since <span class="math inline">\(m_i \le M_i\)</span> always, both equal <span class="math inline">\(\tfrac{1}{1+\delta}\)</span>: the SPE payoff to the first proposer is uniquely <span class="math inline">\(1/(1+\delta)\)</span>, the stationary value.</p>
+<p><strong>Unique strategies.</strong> In any SPE where player 1 proposes, if no agreement is reached in round 1 then player 1 gets at most <span class="math inline">\(1 - M_2 = \delta M_1 &lt; M_1\)</span>, so to attain <span class="math inline">\(M_1\)</span> agreement must be immediate: player 1 offers <span class="math inline">\((M_1, 1-M_1)\)</span> and player 2 accepts, rejecting anything that gives her strictly less than <span class="math inline">\(1 - M_1 = \delta M_2\)</span> and accepting anything strictly more. The symmetric argument pins down player 2’s proposing subgames. Therefore the stationary SPE is the <strong>unique</strong> SPE. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+<p>A combinatorial cousin, the <strong>pirate game</strong> — <span class="math inline">\(n\)</span> pirates dividing <span class="math inline">\(100\)</span> coins by successive proposals, where a proposer is thrown overboard if at least half vote against him — is left as a bonus exercise; it is solved by the same backward reasoning, starting from the two-pirate endgame.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">3.9</span> Chapter summary</h2>
+<ul>
+<li>A <strong>repeated game</strong> plays a stage game <span class="math inline">\(G\)</span> either <span class="math inline">\(T &lt; \infty\)</span> or <span class="math inline">\(\infty\)</span> times; payoffs are the <strong>discounted sum</strong> <span class="math inline">\(\sum_t \delta^{t-1} v_i^t\)</span>, conventionally rescaled to the <strong>average discounted payoff</strong> <span class="math inline">\((1-\delta)\sum_t \delta^{t-1}
+v_i^t\)</span> in the infinite case. Strategies map <strong>histories</strong> to actions, and the solution concept is SPE.</li>
+<li><strong>Finitely repeated games:</strong> an SPE must play a stage equilibrium in the last period (Lemma 3.1); repeating any stage equilibrium is an SPE, and if the stage equilibrium is unique it is the <em>only</em> SPE (<a href="#thm-3-finiterep" class="quarto-xref">Theorem&nbsp;<span>3.7</span></a>). Repetition alone buys no cooperation.</li>
+<li>With <strong>multiple stage equilibria</strong> (augmented partnership game), a carrot-and- stick continuation sustains cooperation <span class="math inline">\(EE\)</span> in the first period when <span class="math inline">\(\delta \ge \tfrac12\)</span>.</li>
+<li><strong>Infinitely repeated games:</strong> every subgame is equivalent to the whole game (Lemma 3.2), so continuation play must itself be a repeated-game equilibrium. Repeating a stage equilibrium is always an SPE (<a href="#thm-3-inftyrep" class="quarto-xref">Theorem&nbsp;<span>3.8</span></a>).</li>
+<li><strong>Grim trigger</strong> sustains cooperation even with a unique stage equilibrium when players are patient: the Prisoner’s Dilemma cooperates for <span class="math inline">\(\delta \ge \tfrac13\)</span>. More generally, any strictly Pareto-improving profile is sustainable for <span class="math inline">\(\delta \ge \bar\delta\)</span> (<a href="#thm-3-folk" class="quarto-xref">Theorem&nbsp;<span>3.9</span></a>). <strong>Cournot collusion</strong> (<span class="math inline">\(q^c = 22.5\)</span>, profit <span class="math inline">\(1012.5\)</span> versus Cournot <span class="math inline">\(q^e = 30\)</span>, profit <span class="math inline">\(900\)</span>) is self-enforcing for <span class="math inline">\(\delta \ge \bar\delta \approx 0.5294\)</span>.</li>
+<li><strong>Strategic bargaining:</strong> the ultimatum game (<span class="math inline">\(T=1\)</span>) gives the proposer everything, <span class="math inline">\((1,0)\)</span>; finite alternating offers yield a nested geometric pattern (<span class="math inline">\(T=2\)</span>: <span class="math inline">\((1-\delta, \delta)\)</span>; <span class="math inline">\(T=3\)</span>: <span class="math inline">\((1-\delta(1-\delta), \delta(1-\delta))\)</span>). <strong>Rubinstein’s</strong> infinite-horizon game has the unique SPE <span class="math inline">\(\big(\tfrac{1}{1+\delta}, \tfrac{\delta}{1+\delta}\big)\)</span> (<a href="#eq-3-rubinstein" class="quarto-xref">Equation&nbsp;<span>3.1</span></a>), with immediate agreement; uniqueness follows from squeezing the sup/inf payoff bounds to <span class="math inline">\(M_i = m_i = 1/(1+\delta)\)</span>. As <span class="math inline">\(\delta \to 1\)</span> the split tends to <span class="math inline">\((\tfrac12, \tfrac12)\)</span>.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./02-static-complete.html" class="pagination-link" aria-label="Static Games with Complete Information">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Static Games with Complete Information</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./04-static-incomplete.html" class="pagination-link" aria-label="Static Games with Incomplete Information">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Static Games with Incomplete Information</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

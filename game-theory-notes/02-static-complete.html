@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Static Games with Complete Information – Game Theory</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-dynamic-complete.html" rel="next">
+<link href="./01-introduction.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02-static-complete.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Static Games with Complete Information</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Game Theory</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-static-complete.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Static Games with Complete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-dynamic-complete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Dynamic Games with Complete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-static-incomplete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Static Games with Incomplete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-incomplete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Games with Incomplete Information</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation &amp; Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#normal-form-games" id="toc-normal-form-games" class="nav-link active" data-scroll-target="#normal-form-games"><span class="header-section-number">2.1</span> Normal-form games</a>
+  <ul class="collapse">
+  <li><a href="#three-examples" id="toc-three-examples" class="nav-link" data-scroll-target="#three-examples">Three examples</a></li>
+  </ul></li>
+  <li><a href="#dominance" id="toc-dominance" class="nav-link" data-scroll-target="#dominance"><span class="header-section-number">2.2</span> Dominance</a></li>
+  <li><a href="#iterated-elimination-of-strictly-dominated-strategies" id="toc-iterated-elimination-of-strictly-dominated-strategies" class="nav-link" data-scroll-target="#iterated-elimination-of-strictly-dominated-strategies"><span class="header-section-number">2.3</span> Iterated elimination of strictly dominated strategies</a>
+  <ul class="collapse">
+  <li><a href="#sec-2-cournot-iesds" id="toc-sec-2-cournot-iesds" class="nav-link" data-scroll-target="#sec-2-cournot-iesds">IESDS in the Cournot duopoly</a></li>
+  </ul></li>
+  <li><a href="#best-response" id="toc-best-response" class="nav-link" data-scroll-target="#best-response"><span class="header-section-number">2.4</span> Best response</a></li>
+  <li><a href="#nash-equilibrium" id="toc-nash-equilibrium" class="nav-link" data-scroll-target="#nash-equilibrium"><span class="header-section-number">2.5</span> Nash equilibrium</a></li>
+  <li><a href="#sec-2-applications" id="toc-sec-2-applications" class="nav-link" data-scroll-target="#sec-2-applications"><span class="header-section-number">2.6</span> Applications</a>
+  <ul class="collapse">
+  <li><a href="#coordination-and-two-kinds-of-societies" id="toc-coordination-and-two-kinds-of-societies" class="nav-link" data-scroll-target="#coordination-and-two-kinds-of-societies">Coordination and “two kinds of societies”</a></li>
+  <li><a href="#sec-2-cournot" id="toc-sec-2-cournot" class="nav-link" data-scroll-target="#sec-2-cournot">Cournot competition</a></li>
+  <li><a href="#bertrand-competition" id="toc-bertrand-competition" class="nav-link" data-scroll-target="#bertrand-competition">Bertrand competition</a></li>
+  <li><a href="#electoral-competition-and-the-median-voter" id="toc-electoral-competition-and-the-median-voter" class="nav-link" data-scroll-target="#electoral-competition-and-the-median-voter">Electoral competition and the median voter</a></li>
+  </ul></li>
+  <li><a href="#mixed-strategies" id="toc-mixed-strategies" class="nav-link" data-scroll-target="#mixed-strategies"><span class="header-section-number">2.7</span> Mixed strategies</a></li>
+  <li><a href="#mixed-strategy-nash-equilibrium" id="toc-mixed-strategy-nash-equilibrium" class="nav-link" data-scroll-target="#mixed-strategy-nash-equilibrium"><span class="header-section-number">2.8</span> Mixed-strategy Nash equilibrium</a></li>
+  <li><a href="#existence-of-equilibrium" id="toc-existence-of-equilibrium" class="nav-link" data-scroll-target="#existence-of-equilibrium"><span class="header-section-number">2.9</span> Existence of equilibrium</a></li>
+  <li><a href="#dominance-and-iesds-revisited" id="toc-dominance-and-iesds-revisited" class="nav-link" data-scroll-target="#dominance-and-iesds-revisited"><span class="header-section-number">2.10</span> Dominance and IESDS, revisited</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">2.11</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-static-complete" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Static Games with Complete Information</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\BR}{\operatorname{BR}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,\vert\,}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sm}{\setminus}
+\newcommand{\defeq}{\equiv}
+\]</span></p>
+</div>
+<p>This chapter develops the workhorse model of game theory: the <strong>normal-form game</strong>, in which players choose once and simultaneously, and everything about the game is common knowledge. We build up the central solution concept — <strong>Nash equilibrium</strong> — through a sequence of weaker ideas (dominance, iterated elimination, best response), then put it to work on Cournot, Bertrand and electoral competition, and finally extend it to <strong>mixed strategies</strong> so that an equilibrium is guaranteed to exist.</p>
+<section id="normal-form-games" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="normal-form-games"><span class="header-section-number">2.1</span> Normal-form games</h2>
+<div id="def-2-normalform" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.1 (Normal-form game)</strong></span> A <strong>normal-form game</strong> consists of three ingredients:</p>
+<ol type="1">
+<li>a finite <strong>set of players</strong> <span class="math inline">\(N = \{1, 2, \dots, n\}\)</span>;</li>
+<li>for each player <span class="math inline">\(i\)</span>, a <strong>strategy space</strong> <span class="math inline">\(S_i\)</span> — the set of strategies available to <span class="math inline">\(i\)</span>;</li>
+<li>for each player <span class="math inline">\(i\)</span>, a <strong>payoff function</strong> <span class="math inline">\(v_i : S_1 \times \cdots \times S_n \to \R\)</span>.</li>
+</ol>
+<p>We write the game as the triple <span class="math inline">\(\Gamma = \big(N, \{S_i\}_{i=1}^n, \{v_i\}_{i=1}^n\big)\)</span>.</p>
+</div>
+<p>An element <span class="math inline">\(s_i \in S_i\)</span> is a <strong>strategy</strong>; a vector <span class="math inline">\(s = (s_1, \dots, s_n) \in S_1 \times \cdots \times S_n\)</span> is a <strong>strategy profile</strong>. The game is <strong>finite</strong> if every <span class="math inline">\(S_i\)</span> has finitely many elements.</p>
+<p>It is convenient to single out one player and bundle the rest. Fixing player <span class="math inline">\(i\)</span>, write <span class="math display">\[
+s_{-i} \defeq (s_1, \dots, s_{i-1}, s_{i+1}, \dots, s_n), \qquad
+S_{-i} \defeq \textstyle\prod_{j \ne i} S_j ,
+\]</span> so that a profile decomposes as <span class="math inline">\(s = (s_i, s_{-i})\)</span> and a payoff as <span class="math inline">\(v_i(s_i, s_{-i})\)</span>. Read <span class="math inline">\(s_{-i}\)</span> as “what everyone other than <span class="math inline">\(i\)</span> does”.</p>
+<p>A two-player finite game is displayed as a <strong>bimatrix</strong>: player 1 chooses the row, player 2 the column, and each cell lists <span class="math inline">\((\text{payoff to } 1, \text{payoff to } 2)\)</span>.</p>
+<section id="three-examples" class="level3">
+<h3 class="anchored" data-anchor-id="three-examples">Three examples</h3>
+<p><strong>The Prisoner’s Dilemma.</strong> Two suspects are interrogated separately. Each can <strong>deny</strong> (<span class="math inline">\(D\)</span>) or <strong>confess</strong> (<span class="math inline">\(C\)</span>). If both deny they get 2 years each; if one confesses while the other denies, the confessor gets 1 year and the denier 5; if both confess, 4 years each. Payoffs are minus the years served.</p>
+<div id="tbl-2-pd" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-pd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.1: The Prisoner’s Dilemma (rows = suspect 1, columns = suspect 2).
+</figcaption>
+<div aria-describedby="tbl-2-pd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(D\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(D\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-2,\,-2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-5,\,-1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(C\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,-5\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-4,\,-4\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><strong>Rock–paper–scissors.</strong> Each player picks <span class="math inline">\(R\)</span>, <span class="math inline">\(P\)</span> or <span class="math inline">\(S\)</span>; the loser pays the winner $1, ties pay nothing. This is a <strong>zero-sum</strong> game (the payoffs in every cell sum to zero).</p>
+<div id="tbl-2-rps" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-rps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.2: Rock–paper–scissors.
+</figcaption>
+<div aria-describedby="tbl-2-rps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(R\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(S\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(R\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,-1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(P\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,-1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,1\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(S\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(-1,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,-1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><strong>Voting on a new agenda.</strong> Three voters <span class="math inline">\(N=\{1,2,3\}\)</span> each choose <span class="math inline">\(Y\)</span> (yes), <span class="math inline">\(N\)</span> (no) or <span class="math inline">\(A\)</span> (abstain). A new policy passes under majority rule iff strictly more than half of those who <em>vote</em> (do not abstain) choose <span class="math inline">\(Y\)</span>. Relative to the status quo (payoff <span class="math inline">\(0\)</span> to all), the new policy is worth <span class="math inline">\(+1\)</span> to voters 1 and 2 and <span class="math inline">\(-1\)</span> to voter 3. This is a three-player game, so it takes three bimatrices (one per choice of voter 3) to display — a first hint that the matrix representation does not scale.</p>
+</section>
+</section>
+<section id="dominance" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="dominance"><span class="header-section-number">2.2</span> Dominance</h2>
+<p>The most basic principle is that a rational player never plays a strategy that is always worse than some alternative.</p>
+<div id="def-2-dominated" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.2 (Strictly dominated strategy)</strong></span> A strategy <span class="math inline">\(s_i' \in S_i\)</span> is <strong>strictly dominated</strong> by <span class="math inline">\(s_i \in S_i\)</span> if it does strictly worse no matter what the opponents do: <span class="math display">\[
+v_i(s_i, s_{-i}) &gt; v_i(s_i', s_{-i}) \qquad \text{for all } s_{-i} \in S_{-i}.
+\]</span></p>
+</div>
+<div id="def-2-dominant" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.3 (Strictly dominant strategy)</strong></span> A strategy <span class="math inline">\(s_i \in S_i\)</span> is <strong>strictly dominant</strong> for player <span class="math inline">\(i\)</span> if it strictly dominates every other strategy: for all <span class="math inline">\(s_i' \ne s_i\)</span>, <span class="math display">\[
+v_i(s_i, s_{-i}) &gt; v_i(s_i', s_{-i}) \qquad \text{for all } s_{-i} \in S_{-i}.
+\]</span></p>
+</div>
+<div id="def-2-dse" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.4 (Strictly dominant strategy equilibrium)</strong></span> A profile <span class="math inline">\(s \in S\)</span> is a <strong>strictly dominant strategy equilibrium</strong> if <span class="math inline">\(s_i\)</span> is a strictly dominant strategy for <em>every</em> player <span class="math inline">\(i\)</span>.</p>
+</div>
+<p>In the Prisoner’s Dilemma, confessing strictly dominates denying for each suspect: whatever the other does, confessing shaves a year off the sentence. So <span class="math inline">\((C,C)\)</span> is a strictly dominant strategy equilibrium — a remarkably sharp prediction that requires only that each player be rational, with no assumption about beliefs.</p>
+<div id="lem-2-dominant-unique" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 2.1 (Uniqueness of a dominant strategy)</strong></span> If player <span class="math inline">\(i\)</span> has a strictly dominant strategy, it is unique.</p>
+</div>
+<div id="prp-2-dse-unique" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.1 (Uniqueness of the dominant-strategy equilibrium)</strong></span> If a game has a strictly dominant strategy equilibrium <span class="math inline">\(s\)</span>, then <span class="math inline">\(s\)</span> is its unique dominant strategy equilibrium.</p>
+</div>
+<p>Both follow immediately from the strict inequalities in the definitions (if two strategies were each dominant, each would have to strictly beat the other — a contradiction), and the slides leave them as quick exercises.</p>
+<p>The dominant-strategy prediction can be collectively self-defeating.</p>
+<div id="def-2-pareto" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.5 (Pareto dominance and Pareto optimality)</strong></span> A profile <span class="math inline">\(s\)</span> <strong>Pareto dominates</strong> <span class="math inline">\(s'\)</span> if <span class="math inline">\(v_i(s) \ge v_i(s')\)</span> for all <span class="math inline">\(i\)</span>, with strict inequality for at least one <span class="math inline">\(i\)</span>. A profile is <strong>Pareto optimal</strong> (or <strong>Pareto efficient</strong>) if no other profile Pareto dominates it.</p>
+</div>
+<p>In the Prisoner’s Dilemma the equilibrium <span class="math inline">\((C,C)\)</span> pays <span class="math inline">\((-4,-4)\)</span>, yet <span class="math inline">\((D,D)\)</span> pays <span class="math inline">\((-2,-2)\)</span> and Pareto dominates it. Rational individual behaviour leads to a collectively worse outcome — the defining tension of the game, and the reason it is the canonical model of why cooperation is hard to sustain.</p>
+</section>
+<section id="iterated-elimination-of-strictly-dominated-strategies" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="iterated-elimination-of-strictly-dominated-strategies"><span class="header-section-number">2.3</span> Iterated elimination of strictly dominated strategies</h2>
+<p>Most games have no dominant strategy. But we can still apply the logic of dominance <em>repeatedly</em>: if I am rational I delete my dominated strategies; if I know you are rational I can delete yours; if I know that you know that I am rational I can delete more of mine; and so on. The “and so on” needs a name.</p>
+<div id="def-2-ck" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.6 (Common knowledge)</strong></span> An event <span class="math inline">\(E\)</span> is <strong>common knowledge</strong> if everyone knows <span class="math inline">\(E\)</span>, everyone knows that everyone knows <span class="math inline">\(E\)</span>, everyone knows that everyone knows that everyone knows <span class="math inline">\(E\)</span>, and so on <em>ad infinitum</em>.</p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The IESDS procedure
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Set <span class="math inline">\(S_i^0 = S_i\)</span> for every player. Given the reduced game with strategy sets <span class="math inline">\(\{S_i^k\}\)</span>: if some player has a strictly dominated strategy in this reduced game, delete (at least) those strategies to obtain <span class="math inline">\(\{S_i^{k+1}\}\)</span>; if no player has a strictly dominated strategy, stop. A strategy in <span class="math inline">\(S_i^* = \bigcap_{k\ge 0} S_i^k\)</span> is said to <strong>survive iterated elimination of strictly dominated strategies (IESDS)</strong>, and a surviving profile is called an <strong>iterated-elimination equilibrium</strong>.</p>
+</div>
+</div>
+<p>Consider the game</p>
+<div id="tbl-2-iesds" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-iesds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.3: An IESDS example.
+</figcaption>
+<div aria-describedby="tbl-2-iesds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(L\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(R\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(U\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(4,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(5,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(6,\,2\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(M\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(8,\,4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,6\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(D\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(9,\,6\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2,\,8\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>For player 2, <span class="math inline">\(C\)</span> is strictly dominated (by <span class="math inline">\(R\)</span>, say); delete it. In the resulting <span class="math inline">\(3\times2\)</span> game, <span class="math inline">\(M\)</span> and <span class="math inline">\(D\)</span> become strictly dominated for player 1 by <span class="math inline">\(U\)</span>; delete them. Now player 2 prefers <span class="math inline">\(L\)</span> to <span class="math inline">\(R\)</span>; delete <span class="math inline">\(R\)</span>. Only <span class="math inline">\((U,L)\)</span> survives. The prediction is unique — but note what it rests on: not just that both players are rational, but that this is <em>common knowledge</em>. The third deletion uses “player 2 knows that player 1 knows that player 2 is rational.”</p>
+<div id="prp-2-dse-survives" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.2 (Dominant equilibria survive IESDS)</strong></span> If <span class="math inline">\(s\)</span> is a strictly dominant strategy equilibrium, then for every player <span class="math inline">\(s_i\)</span> is the <em>unique</em> survivor of IESDS.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For each player <span class="math inline">\(i\)</span>, every other strategy <span class="math inline">\(s_i' \ne s_i\)</span> is strictly dominated by <span class="math inline">\(s_i\)</span> (that is what dominance means), so all of them are deleted in the very first round, leaving <span class="math inline">\(s_i\)</span> alone. <span class="math inline">\(\square\)</span></p>
+</div>
+<p><strong>Order independence.</strong> For a <strong>finite</strong> game the procedure terminates, and the surviving set <span class="math inline">\(S^*\)</span> does <em>not</em> depend on the order in which dominated strategies are removed — it is enough that <em>some</em> dominated strategy be deleted each round. For <strong>infinite</strong> games the process may not terminate, and to keep the answer order-independent one insists that <em>all</em> currently-dominated strategies be deleted in each round.</p>
+<section id="sec-2-cournot-iesds" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-cournot-iesds">IESDS in the Cournot duopoly</h3>
+<p>Two firms choose quantities <span class="math inline">\(q_1, q_2 \ge 0\)</span>. The market price is <span class="math inline">\(P(Q) = \max\{100 - Q, 0\}\)</span> with <span class="math inline">\(Q = q_1 + q_2\)</span>, and each firm has constant marginal cost <span class="math inline">\(10\)</span>, so <span class="math display">\[
+v_i(q_i, q_j) = \max\{100 - q_i - q_j,\, 0\}\, q_i - 10\, q_i .
+\]</span> Let <span class="math inline">\(\phi(q) = \tfrac{90 - q}{2}\)</span> be a firm’s profit-maximising quantity when its rival produces <span class="math inline">\(q\)</span>. IESDS shrinks the strategy space step by step:</p>
+<ul>
+<li>Any <span class="math inline">\(q_i &gt; 45\)</span> is strictly dominated by <span class="math inline">\(q_i = 45\)</span>, so <span class="math inline">\(S^1 = [0, 45]\)</span>.</li>
+<li>Given <span class="math inline">\(q_j \in [0,45]\)</span>, the best reply lies in <span class="math inline">\([22.5, 45]\)</span>, and any <span class="math inline">\(q_i &lt; 22.5\)</span> is now strictly dominated by <span class="math inline">\(22.5\)</span>, so <span class="math inline">\(S^2 = [22.5, 45]\)</span>.</li>
+<li>Iterating, <span class="math inline">\(S^3 = [22.5, 33.75]\)</span>, <span class="math inline">\(S^4 = [28.125, 33.75]\)</span>, and so on.</li>
+</ul>
+<p>The endpoints are successive iterates of <span class="math inline">\(\phi\)</span> starting from <span class="math inline">\(0\)</span>, and since <span class="math inline">\(\phi^{(k)}(0) \to 30\)</span>, the intervals collapse: <span class="math inline">\(S_i^* = \bigcap_{k} S_i^k = \{30\}\)</span> (<a href="#fig-2-cournot-iesds" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>). IESDS alone pins down the Cournot quantity <span class="math inline">\(q_1 = q_2 = 30\)</span> — no equilibrium concept required yet.</p>
+<div id="fig-2-cournot-iesds" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-cournot-iesds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/cournot-iesds.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-cournot-iesds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: IESDS in the Cournot duopoly: the surviving interval <span class="math inline">\([\underline q^{\,k}, \overline q^{\,k}]\)</span> shrinks to the single point <span class="math inline">\(q=30\)</span> as the bounds chase the best-reply map <span class="math inline">\(\phi(q)=(90-q)/2\)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="best-response" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="best-response"><span class="header-section-number">2.4</span> Best response</h2>
+<div id="def-2-br" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.7 (Best response)</strong></span> A strategy <span class="math inline">\(s_i \in S_i\)</span> is a <strong>best response</strong> to <span class="math inline">\(s_{-i} \in S_{-i}\)</span> if <span class="math display">\[
+v_i(s_i, s_{-i}) \ge v_i(s_i', s_{-i}) \qquad \text{for all } s_i' \in S_i .
+\]</span></p>
+</div>
+<p>Dominance and best response are two sides of the same coin.</p>
+<div id="prp-2-dom-not-br" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.3 (Dominated strategies are never best responses)</strong></span> If <span class="math inline">\(s_i\)</span> is strictly dominated, then it is not a best response to any <span class="math inline">\(s_{-i}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Suppose <span class="math inline">\(s_i\)</span> is strictly dominated by <span class="math inline">\(s_i'\)</span>. Then for every <span class="math inline">\(s_{-i}\)</span> we have <span class="math inline">\(v_i(s_i', s_{-i}) &gt; v_i(s_i, s_{-i})\)</span>, so <span class="math inline">\(s_i\)</span> fails to maximise <span class="math inline">\(i\)</span>’s payoff against any <span class="math inline">\(s_{-i}\)</span> and is never a best response. <span class="math inline">\(\square\)</span></p>
+</div>
+<div id="prp-2-dominant-br" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.4 (Dominant strategies are the unique best response)</strong></span> If <span class="math inline">\(s_i\)</span> is strictly dominant, it is the unique best response to every <span class="math inline">\(s_{-i}\)</span>.</p>
+</div>
+<p>This is immediate from the definitions. A subtler fact ties best response to the survivors of IESDS, and it is the first place where finiteness does real work.</p>
+<div id="prp-2-iesds-br" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.5 (The IESDS survivor is a best response)</strong></span> In a <strong>finite</strong> game, if <span class="math inline">\(s^*\)</span> is the unique profile surviving IESDS, then <span class="math inline">\(s_i^*\)</span> is the unique best response to <span class="math inline">\(s_{-i}^*\)</span> for every player <span class="math inline">\(i\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(i\)</span> and suppose, for contradiction, that <span class="math inline">\(s_i^*\)</span> is <em>not</em> a best response to <span class="math inline">\(s_{-i}^*\)</span>. Then some <span class="math inline">\(s_i^1\)</span> does strictly better: <span class="math inline">\(v_i(s_i^1, s_{-i}^*) &gt; v_i(s_i^*, s_{-i}^*)\)</span>. Since <span class="math inline">\(s_i^*\)</span> survives but <span class="math inline">\(s_i^1\)</span> does not, <span class="math inline">\(s_i^1\)</span> was deleted in some round — and a strategy is deleted only when strictly dominated, hence (against the surviving <span class="math inline">\(s_{-i}^*\)</span>) there is some <span class="math inline">\(s_i^2\)</span> with <span class="math inline">\(v_i(s_i^2, s_{-i}^*) &gt; v_i(s_i^1, s_{-i}^*)\)</span>. But <span class="math inline">\(s_i^2\)</span> is also deleted, so there is <span class="math inline">\(s_i^3\)</span> beating it, and so on without end. This produces infinitely many distinct strategies, contradicting finiteness. Hence <span class="math inline">\(s_i^*\)</span> is a best response; that it is the <em>unique</em> best response follows from <a href="#prp-2-dom-not-br" class="quarto-xref">Proposition&nbsp;<span>2.3</span></a>. <span class="math inline">\(\square\)</span></p>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The finiteness assumption is indispensable. The infinite chain <span class="math inline">\(s_i^1, s_i^2, \dots\)</span> is only a contradiction because <span class="math inline">\(S_i\)</span> is finite; for infinite games the conclusion can fail (a counterexample is left to the problem set).</p>
+</div>
+</div>
+<p>When a strategy is the best response to several opponent profiles, it is cleaner to track the whole set of best responses as a function of <span class="math inline">\(s_{-i}\)</span>. The <strong>best response correspondence</strong> <span class="math inline">\(\BR_i : S_{-i} \rightrightarrows S_i\)</span> is <span class="math display">\[
+\BR_i(s_{-i}) = \{\, s_i \in S_i : s_i \text{ is a best response to } s_{-i} \,\}.
+\]</span> A <strong>correspondence</strong> is a set-valued map; we need it because a player may have several equally good replies.</p>
+</section>
+<section id="nash-equilibrium" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="nash-equilibrium"><span class="header-section-number">2.5</span> Nash equilibrium</h2>
+<div id="def-2-nash" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.8 (Nash equilibrium)</strong></span> A profile <span class="math inline">\(s^* = (s_1^*, \dots, s_n^*)\)</span> is a <strong>Nash equilibrium</strong> if every player is best-responding to the others: for each <span class="math inline">\(i\)</span>, <span class="math display">\[
+v_i(s_i^*, s_{-i}^*) \ge v_i(s_i, s_{-i}^*) \qquad \text{for all } s_i \in S_i,
+\]</span> equivalently <span class="math inline">\(s_i^* \in \BR_i(s_{-i}^*)\)</span> for all <span class="math inline">\(i\)</span>.</p>
+</div>
+<div id="def-2-deviation" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.9 (Profitable deviation)</strong></span> Given a profile <span class="math inline">\(s\)</span>, player <span class="math inline">\(i\)</span> has a <strong>profitable deviation</strong> if some <span class="math inline">\(s_i'\)</span> gives <span class="math inline">\(v_i(s_i', s_{-i}) &gt; v_i(s_i, s_{-i})\)</span>.</p>
+</div>
+<p>So a profile is a Nash equilibrium <strong>if and only if no player has a profitable deviation</strong> — the form in which equilibrium is usually checked. Conceptually, a Nash equilibrium combines two requirements:</p>
+<ul>
+<li><strong>rationality</strong> — each player chooses a best response to their belief about what the others do; and</li>
+<li><strong>consistency of beliefs</strong> — those beliefs are correct, i.e.&nbsp;each player correctly anticipates the others’ equilibrium strategies.</li>
+</ul>
+<p>The concept is named for John Nash (Nobel Prize, 1994). It is the central prediction of non-cooperative game theory, and it relates cleanly to the earlier concepts.</p>
+<div id="prp-2-dse-nash" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.6 (A dominant equilibrium is the unique Nash equilibrium)</strong></span> A strictly dominant strategy equilibrium is the unique Nash equilibrium.</p>
+</div>
+<div id="prp-2-iesds-nash" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.7 (The IESDS survivor is the unique Nash equilibrium)</strong></span> In a finite game, if <span class="math inline">\(s^*\)</span> is the unique survivor of IESDS, it is the unique Nash equilibrium.</p>
+</div>
+<div id="prp-2-nash-survives" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.8 (Nash equilibria survive IESDS)</strong></span> Every Nash equilibrium survives IESDS.</p>
+</div>
+<p><a href="#prp-2-dse-nash" class="quarto-xref">Proposition&nbsp;<span>2.6</span></a> follows from <a href="#prp-2-dominant-br" class="quarto-xref">Proposition&nbsp;<span>2.4</span></a>; <a href="#prp-2-nash-survives" class="quarto-xref">Proposition&nbsp;<span>2.8</span></a> follows from <a href="#prp-2-dom-not-br" class="quarto-xref">Proposition&nbsp;<span>2.3</span></a> (an equilibrium strategy is a best response, hence never dominated, hence never deleted); and <a href="#prp-2-iesds-nash" class="quarto-xref">Proposition&nbsp;<span>2.7</span></a> combines <a href="#prp-2-iesds-br" class="quarto-xref">Proposition&nbsp;<span>2.5</span></a> with <a href="#prp-2-nash-survives" class="quarto-xref">Proposition&nbsp;<span>2.8</span></a>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Equilibrium is about strategies, not payoffs
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Consider the variant of Battle of the Sexes with payoffs <span class="math inline">\((O,O)=(2,1)\)</span>, <span class="math inline">\((O,F)=(0,0)\)</span>, <span class="math inline">\((F,O)=(2,1)\)</span>, <span class="math inline">\((F,F)=(1,2)\)</span>. The profiles <span class="math inline">\((O,O)\)</span> and <span class="math inline">\((F,O)\)</span> give the <em>same</em> payoff <span class="math inline">\((2,1)\)</span>, yet <span class="math inline">\((O,O)\)</span> is a Nash equilibrium while <span class="math inline">\((F,O)\)</span> is not: at <span class="math inline">\((F,O)\)</span>, player 2 — facing <span class="math inline">\(F\)</span> — strictly prefers <span class="math inline">\(F\)</span> to <span class="math inline">\(O\)</span> and deviates. Equilibrium is a property of the <em>strategy profile</em> and the incentives it creates, not of the payoff it happens to deliver.</p>
+</div>
+</div>
+</section>
+<section id="sec-2-applications" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="sec-2-applications"><span class="header-section-number">2.6</span> Applications</h2>
+<section id="coordination-and-two-kinds-of-societies" class="level3">
+<h3 class="anchored" data-anchor-id="coordination-and-two-kinds-of-societies">Coordination and “two kinds of societies”</h3>
+<p>Not every game has a unique equilibrium, and the multiplicity can be economically meaningful. In the <strong>Stag Hunt</strong>, two hunters each choose to hunt <strong>stag</strong> (<span class="math inline">\(S\)</span>, which requires cooperation) or <strong>hare</strong> (<span class="math inline">\(H\)</span>, which one can catch alone):</p>
+<div id="tbl-2-staghunt" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-staghunt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.4: The Stag Hunt.
+</figcaption>
+<div aria-describedby="tbl-2-staghunt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(S\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(H\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(S\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(5,\,5\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,3\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(H\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,3\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Both <span class="math inline">\((S,S)\)</span> and <span class="math inline">\((H,H)\)</span> are Nash equilibria. The cooperative equilibrium <span class="math inline">\((S,S)\)</span> Pareto dominates <span class="math inline">\((H,H)\)</span>, yet <span class="math inline">\((H,H)\)</span> can persist purely through pessimistic, self-fulfilling beliefs: if each expects the other to hunt hare, hunting hare is optimal. Two societies with identical fundamentals can settle into very different equilibria — a parable for why “norms of behaviour” matter. The <strong>driving game</strong> (both drive <span class="math inline">\(L\)</span> or both drive <span class="math inline">\(R\)</span>, each a Nash equilibrium) makes the same point about social conventions.</p>
+</section>
+<section id="sec-2-cournot" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-cournot">Cournot competition</h3>
+<p>Generalise the duopoly of <a href="#sec-2-cournot-iesds" class="quarto-xref"><span>Section 2.3.1</span></a>. Inverse demand is <span class="math inline">\(P(Q) = \max\{a - bQ, 0\}\)</span> and firm <span class="math inline">\(i\)</span> has constant marginal cost <span class="math inline">\(c_i &lt; a\)</span>, so <span class="math display">\[
+v_i(q_i, q_j) = \max\{a - b(q_i + q_j),\, 0\}\, q_i - c_i q_i .
+\]</span> For a rival quantity <span class="math inline">\(q_j &lt; (a - c_i)/b\)</span>, the first-order condition <span class="math inline">\(a - 2 b q_i - b q_j - c_i = 0\)</span> gives the <strong>best-response function</strong> <span class="math display">\[
+\BR_i(q_j) = \max\!\left\{ \frac{a - b q_j - c_i}{2 b},\; 0 \right\}.
+\]</span> A profile <span class="math inline">\((q_1^*, q_2^*)\)</span> is a Nash equilibrium exactly when each firm is on its best-response curve. Solving the pair of linear equations, and watching for the non-negativity constraints, gives three regimes according to the signs of <span class="math inline">\(a - 2c_1 + c_2\)</span> and <span class="math inline">\(a - 2c_2 + c_1\)</span>:</p>
+<ul>
+<li><strong>Interior</strong> (both expressions positive): <span class="math display">\[
+q_1^* = \frac{a - 2c_1 + c_2}{3b}, \qquad q_2^* = \frac{a - 2c_2 + c_1}{3b}.
+\]</span></li>
+<li><strong>One firm monopolises</strong>: if firm 2’s cost is so high that <span class="math inline">\(a - 2c_2 + c_1 &lt; 0\)</span>, then <span class="math inline">\(q_2^* = 0\)</span> and <span class="math inline">\(q_1^* = (a - c_1)/(2b)\)</span> (and symmetrically with the roles reversed).</li>
+</ul>
+<p>Geometrically the two best-response lines slope downward and cross once (<a href="#fig-2-cournot-br" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>). In the symmetric case <span class="math inline">\(c_1 = c_2 = c\)</span> the equilibrium is <span class="math inline">\(q_1^* = q_2^* = (a - c)/(3b)\)</span>; with <span class="math inline">\(a=100, b=1, c=10\)</span> this is the quantity <span class="math inline">\(30\)</span> we already found by IESDS.</p>
+<div id="fig-2-cournot-br" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-cournot-br-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/cournot-br.svg" class="img-fluid figure-img" style="width:62.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-cournot-br-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: Cournot best responses. The two downward-sloping best-response lines <span class="math inline">\(q_1=\BR_1(q_2)\)</span> and <span class="math inline">\(q_2=\BR_2(q_1)\)</span> intersect at the unique interior Nash equilibrium <span class="math inline">\((q_1^*,q_2^*)\)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="bertrand-competition" class="level3">
+<h3 class="anchored" data-anchor-id="bertrand-competition">Bertrand competition</h3>
+<p>Now firms compete in <strong>prices</strong> rather than quantities. With identical marginal cost <span class="math inline">\(c\)</span>, demand <span class="math inline">\(Q(p) = \max\{a - p, 0\}\)</span>, and the lower-priced firm capturing the whole market (ties split it), <span class="math display">\[
+v_i(p_i, p_j) =
+\begin{cases}
+Q(p_i)(p_i - c), &amp; p_i &lt; p_j,\\[2pt]
+\tfrac12 Q(p_i)(p_i - c), &amp; p_i = p_j,\\[2pt]
+0, &amp; p_i &gt; p_j .
+\end{cases}
+\]</span> The unique Nash equilibrium is <span class="math inline">\(p_1^* = p_2^* = c\)</span>: <strong>price equals marginal cost</strong>, the competitive outcome, with just two firms. The argument is by elimination — any common price above <span class="math inline">\(c\)</span> invites a tiny undercut that steals the whole market, and below <span class="math inline">\(c\)</span> both firms lose money. Tellingly, the best-response correspondence is <em>empty</em> on the range <span class="math inline">\(c &lt; p_j \le p^m\)</span> (the firm wants to undercut to <span class="math inline">\(p_j - \eps\)</span>, but there is no smallest such price), which is exactly why one must argue by elimination rather than by intersecting best-response curves.</p>
+<p>With <strong>asymmetric</strong> costs <span class="math inline">\(c_1 &lt; c_2\)</span> the best-response correspondences never meet, and <strong>no pure-strategy Nash equilibrium exists</strong>: the low-cost firm always wants to sit just below the other’s price, so no profile is stable.</p>
+</section>
+<section id="electoral-competition-and-the-median-voter" class="level3">
+<h3 class="anchored" data-anchor-id="electoral-competition-and-the-median-voter">Electoral competition and the median voter</h3>
+<p>Two office-seeking candidates each choose a platform on a one-dimensional spectrum of policies <span class="math inline">\(\{-50, \dots, 0, \dots, 50\}\)</span>. Each citizen votes for the nearer platform (splitting if indifferent), majority rule decides, and each candidate prefers winning to tying to losing. The unique Nash equilibrium has <strong>both candidates choose the median platform <span class="math inline">\(0\)</span></strong>: given that the opponent is at the median, any other platform loses, while matching ties. This is the discrete <strong>Hotelling</strong> model and its conclusion is the</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Median Voter Theorem.</strong> When voters are arrayed on a single dimension and each prefers platforms nearer to their ideal point, the platform located at the median voter beats any other platform in a majority vote. Electoral competition drives both candidates to the centre.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="mixed-strategies" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="mixed-strategies"><span class="header-section-number">2.7</span> Mixed strategies</h2>
+<p>Rock–paper–scissors and matching pennies have <em>no</em> Nash equilibrium in the strategies considered so far — whatever you do, your opponent would want to respond in a way that makes you want to change. The fix is to let players <strong>randomise</strong>.</p>
+<div id="def-2-mixed" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.10 (Mixed strategy)</strong></span> Let <span class="math inline">\(S_i = \{s_{i1}, \dots, s_{im}\}\)</span> be finite. A <strong>mixed strategy</strong> is a probability distribution <span class="math inline">\(\sigma_i\)</span> over <span class="math inline">\(S_i\)</span> — an element of the <strong>simplex</strong> <span class="math inline">\(\Delta S_i = \big\{ \sigma_i : S_i \to [0,1] \,\big|\, \sum_{s_i \in S_i} \sigma_i(s_i) = 1 \big\}\)</span>. A pure strategy is the degenerate mixed strategy putting probability <span class="math inline">\(1\)</span> on a single action.</p>
+</div>
+<div id="def-2-support" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.11 (Support)</strong></span> The <strong>support</strong> of <span class="math inline">\(\sigma_i\)</span> is the set of pure strategies it plays with positive probability, <span class="math inline">\(\operatorname{supp}\sigma_i = \{ s_i : \sigma_i(s_i) &gt; 0 \}\)</span>.</p>
+</div>
+<p>Players are <strong>expected-utility maximisers</strong>, so they evaluate a mixed profile by its expected payoff. If each player randomises independently, the profile <span class="math inline">\(s = (s_1, \dots, s_n)\)</span> occurs with probability <span class="math inline">\(\prod_j \sigma_j(s_j)\)</span>, and <span class="math display">\[
+v_i(\sigma) = \sum_{s \in S} \Big( \prod_{j=1}^n \sigma_j(s_j) \Big) v_i(s)
+            = \sum_{s_i \in S_i} \sigma_i(s_i)\, v_i(s_i, \sigma_{-i}) .
+\]</span> The second form — a weighted average of the expected payoffs to <span class="math inline">\(i\)</span>’s <em>pure</em> strategies — is the one we use constantly below.</p>
+</section>
+<section id="mixed-strategy-nash-equilibrium" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="mixed-strategy-nash-equilibrium"><span class="header-section-number">2.8</span> Mixed-strategy Nash equilibrium</h2>
+<div id="def-2-mixed-br" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.12 (Best response in mixed strategies)</strong></span> <span class="math inline">\(\sigma_i\)</span> is a best response to <span class="math inline">\(\sigma_{-i}\)</span> if <span class="math inline">\(v_i(\sigma_i, \sigma_{-i}) \ge v_i(s_i, \sigma_{-i})\)</span> for every pure <span class="math inline">\(s_i \in S_i\)</span>. (Checking against pure strategies suffices: a mixture of weakly-worse pure strategies is weakly worse.)</p>
+</div>
+<p>The key computational tool is the following characterisation of when a mixture is optimal.</p>
+<div id="lem-2-indifference" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 2.2 (Indifference principle)</strong></span> A mixed strategy <span class="math inline">\(\sigma_i\)</span> is a best response to <span class="math inline">\(\sigma_{-i}\)</span> <strong>if and only if</strong> every pure strategy in <span class="math inline">\(\operatorname{supp}\sigma_i\)</span> is itself a best response to <span class="math inline">\(\sigma_{-i}\)</span>. In particular, player <span class="math inline">\(i\)</span> is <strong>indifferent</strong> among all pure strategies in the support.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><em>(If.)</em> Suppose every <span class="math inline">\(s_i \in \operatorname{supp}\sigma_i\)</span> is a best response, so <span class="math inline">\(v_i(s_i, \sigma_{-i}) \ge v_i(s_i', \sigma_{-i})\)</span> for all <span class="math inline">\(s_i'\)</span>. Averaging over the support with weights <span class="math inline">\(\sigma_i(s_i)\)</span>, <span class="math display">\[
+v_i(\sigma_i, \sigma_{-i}) = \sum_{s_i \in \operatorname{supp}\sigma_i} \sigma_i(s_i)\, v_i(s_i, \sigma_{-i})
+\ge \sum_{s_i \in \operatorname{supp}\sigma_i} \sigma_i(s_i)\, v_i(s_i', \sigma_{-i}) = v_i(s_i', \sigma_{-i}),
+\]</span> so <span class="math inline">\(\sigma_i\)</span> is a best response.</p>
+<p><em>(Only if.)</em> Suppose <span class="math inline">\(\sigma_i\)</span> is a best response but some <span class="math inline">\(s_i\)</span> in its support is <em>not</em>. Let <span class="math inline">\(\hat s_i\)</span> be a best response, so <span class="math inline">\(v_i(\hat s_i, \sigma_{-i}) &gt; v_i(s_i, \sigma_{-i})\)</span> while <span class="math inline">\(v_i(\hat s_i, \sigma_{-i}) \ge v_i(s_i', \sigma_{-i})\)</span> for all <span class="math inline">\(s_i'\)</span>. Then, averaging over the support, <span class="math display">\[
+v_i(\hat s_i, \sigma_{-i}) = \sum_{s_i' \in \operatorname{supp}\sigma_i} \sigma_i(s_i')\, v_i(\hat s_i, \sigma_{-i})
+&gt; \sum_{s_i' \in \operatorname{supp}\sigma_i} \sigma_i(s_i')\, v_i(s_i', \sigma_{-i}) = v_i(\sigma_i, \sigma_{-i}),
+\]</span> the strict inequality coming from the dominated term <span class="math inline">\(s_i\)</span>. This contradicts <span class="math inline">\(\sigma_i\)</span> being a best response. Hence every support strategy is a best response, and they all attain the same maximal value — the indifference condition. <span class="math inline">\(\square\)</span></p>
+</div>
+<div id="def-2-msne" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.13 (Mixed-strategy Nash equilibrium)</strong></span> A mixed profile <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> is a <strong>Nash equilibrium</strong> if each <span class="math inline">\(\sigma_i^*\)</span> is a best response to <span class="math inline">\(\sigma_{-i}^*\)</span>.</p>
+</div>
+<p>A practical consequence of <a href="#lem-2-indifference" class="quarto-xref">Lemma&nbsp;<span>2.2</span></a>: if a player genuinely mixes in equilibrium, the <em>opponent’s</em> probabilities must be tuned so as to make that player indifferent over their support. This is the “make-your-opponent- indifferent” recipe.</p>
+<p><strong>Matching pennies.</strong> With <span class="math inline">\(\sigma_1(H) = p\)</span> and <span class="math inline">\(\sigma_2(H) = q\)</span>, player 1 is indifferent between <span class="math inline">\(H\)</span> and <span class="math inline">\(T\)</span> only when <span class="math inline">\(q = \tfrac12\)</span>, and player 2 is indifferent only when <span class="math inline">\(p = \tfrac12\)</span>. The best-response correspondences (<a href="#fig-2-mp-br" class="quarto-xref">Figure&nbsp;<span>2.3</span></a>) are step functions that meet at the single point <span class="math inline">\((p,q) = (\tfrac12, \tfrac12)\)</span>: the unique equilibrium has each player mixing <span class="math inline">\(\tfrac12 H + \tfrac12 T\)</span>.</p>
+<div id="fig-2-mp-br" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-mp-br-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/mp-br.svg" class="img-fluid figure-img" style="width:52.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-mp-br-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: Matching pennies. Player 1’s best-response correspondence (jumping at <span class="math inline">\(q=\tfrac12\)</span>) and player 2’s (jumping at <span class="math inline">\(p=\tfrac12\)</span>) meet only at <span class="math inline">\((\tfrac12,\tfrac12)\)</span>.
+</figcaption>
+</figure>
+</div>
+<p><strong>Rock–paper–scissors.</strong> A support argument rules out any equilibrium in which a player uses only one or two of the three actions; both players must randomise over all three. Indifference then forces the uniform mixture: the unique equilibrium is <span class="math inline">\(\big(\tfrac13, \tfrac13, \tfrac13\big)\)</span> for each player.</p>
+<p><strong>Battle of the Sexes.</strong> Beyond the two pure equilibria <span class="math inline">\((O,O)\)</span> and <span class="math inline">\((F,F)\)</span>, there is a mixed equilibrium. Writing <span class="math inline">\(\sigma_1(O)=p\)</span>, <span class="math inline">\(\sigma_2(O)=q\)</span>: player 1’s indifference <span class="math inline">\(2q = 1-q\)</span> gives <span class="math inline">\(q = \tfrac13\)</span>, and player 2’s indifference <span class="math inline">\(p = 2(1-p)\)</span> gives <span class="math inline">\(p = \tfrac23\)</span>. The mixed equilibrium is <span class="math inline">\(\big(\tfrac23 O + \tfrac13 F,\ \tfrac13 O + \tfrac23 F\big)\)</span> — note that the players coordinate <em>less</em> often here than at either pure equilibrium.</p>
+</section>
+<section id="existence-of-equilibrium" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="existence-of-equilibrium"><span class="header-section-number">2.9</span> Existence of equilibrium</h2>
+<p>Allowing mixed strategies is exactly what is needed to guarantee that an equilibrium always exists.</p>
+<div id="thm-2-existence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.1 (Nash, 1950)</strong></span> Every finite normal-form game has a Nash equilibrium, possibly in mixed strategies.</p>
+</div>
+<p>This is why we bothered with mixed strategies: matching pennies and rock–paper–scissors have no pure equilibrium, but the theorem assures us they have a mixed one — and we found it. (The proof, via Kakutani’s fixed-point theorem, is beyond our scope.)</p>
+</section>
+<section id="dominance-and-iesds-revisited" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="dominance-and-iesds-revisited"><span class="header-section-number">2.10</span> Dominance and IESDS, revisited</h2>
+<p>A pure strategy can fail to be dominated by any other <em>pure</em> strategy yet still be dominated by a <em>mixture</em>.</p>
+<div id="def-2-mixdom" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.14 (Dominance by a mixed strategy)</strong></span> A pure strategy <span class="math inline">\(s_i\)</span> is <strong>strictly dominated by the mixed strategy</strong> <span class="math inline">\(\sigma_i \in \Delta S_i\)</span> if <span id="eq-2-mixdom"><span class="math display">\[
+v_i(\sigma_i, s_{-i}) &gt; v_i(s_i, s_{-i}) \qquad \text{for all } s_{-i} \in S_{-i}.
+\tag{2.1}\]</span></span></p>
+</div>
+<p>It makes no difference whether we test against the opponents’ pure profiles or all their mixtures: condition <a href="#eq-2-mixdom" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> is equivalent to <span class="math inline">\(v_i(\sigma_i, \sigma_{-i}) &gt; v_i(s_i, \sigma_{-i})\)</span> for all <span class="math inline">\(\sigma_{-i} \in \Delta S_{-i}\)</span>, because the latter is just a convex average of the former.</p>
+<p>For example, in</p>
+<div id="tbl-2-mixdom" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-mixdom-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.5: A game requiring dominance by mixtures.
+</figcaption>
+<div aria-describedby="tbl-2-mixdom-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;"><span class="math inline">\(L\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(R\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(U\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(5,\,1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1,\,0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong><span class="math inline">\(M\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3,\,5\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong><span class="math inline">\(D\)</span></strong></td>
+<td style="text-align: center;"><span class="math inline">\(4,\,3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4,\,4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0,\,3\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>no column is dominated by another column, but <span class="math inline">\(L\)</span> is strictly dominated by <span class="math inline">\(\tfrac12 C + \tfrac12 R\)</span>; deleting <span class="math inline">\(L\)</span>, then <span class="math inline">\(U\)</span> (now dominated by <span class="math inline">\(\tfrac12 M + \tfrac12 R\)</span>), leaves the <span class="math inline">\(\{M,D\}\times\{C,R\}\)</span> subgame, whose equilibria are <span class="math inline">\((M,R)\)</span>, <span class="math inline">\((D,C)\)</span> and the mixture <span class="math inline">\(\big(\tfrac16 M + \tfrac56 D,\ \tfrac37 C + \tfrac47 R\big)\)</span>.</p>
+<p>That this deletion is legitimate — that it removes no equilibrium — is the content of the final result.</p>
+<div id="prp-2-iesds-reduce" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.9 (IESDS preserves the equilibrium set)</strong></span> In a finite game, <span class="math inline">\(\sigma^*\)</span> is a Nash equilibrium of the original game if and only if it is a Nash equilibrium of the reduced game obtained by IESDS (allowing deletion by mixed strategies).</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><em>(If.)</em> Let <span class="math inline">\(\sigma^*\)</span> be an equilibrium of the reduced game and suppose it is not one of the original. Then some player <span class="math inline">\(i\)</span> has a profitable deviation <span class="math inline">\(s_i^1\)</span>, which must have been deleted (it is not in the reduced game). A deleted strategy is strictly dominated against the surviving opponents, so some <span class="math inline">\(s_i^2\)</span> beats <span class="math inline">\(s_i^1\)</span> against <span class="math inline">\(\sigma_{-i}^*\)</span>; but <span class="math inline">\(s_i^2\)</span> is also deleted, so some <span class="math inline">\(s_i^3\)</span> beats it, and so on — infinitely many distinct strategies, contradicting finiteness.</p>
+<p><em>(Only if.)</em> No pure strategy in the support of an equilibrium mixed strategy is ever strictly dominated: if <span class="math inline">\(s_i \in \operatorname{supp}\sigma_i^*\)</span> were dominated by some <span class="math inline">\(\sigma_i\)</span>, then averaging over <span class="math inline">\(\sigma_{-i}^*\)</span> would give <span class="math inline">\(v_i(\sigma_i, \sigma_{-i}^*) &gt; v_i(s_i, \sigma_{-i}^*)\)</span>, contradicting that <span class="math inline">\(s_i\)</span> is a best response (<a href="#lem-2-indifference" class="quarto-xref">Lemma&nbsp;<span>2.2</span></a>). So IESDS never deletes a support strategy, and <span class="math inline">\(\sigma^*\)</span> remains an equilibrium of the reduced game. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>This is genuinely useful: IESDS first shrinks a large game, and <a href="#prp-2-iesds-reduce" class="quarto-xref">Proposition&nbsp;<span>2.9</span></a> guarantees that hunting for equilibria in the small reduced game loses nothing.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="2.11">
+<h2 data-number="2.11" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">2.11</span> Chapter summary</h2>
+<ul>
+<li>A <strong>normal-form game</strong> <span class="math inline">\(\Gamma = (N, \{S_i\}, \{v_i\})\)</span> specifies players, strategies and payoffs; two-player games are displayed as bimatrices.</li>
+<li><strong>Dominance</strong> gives the sharpest predictions where it applies: a rational player never plays a strictly dominated strategy, and the Prisoner’s Dilemma is solved by dominance alone — though its equilibrium is not Pareto optimal.</li>
+<li><strong>IESDS</strong> iterates this logic under <em>common knowledge of rationality</em>; for finite games the result is order-independent.</li>
+<li>A <strong>Nash equilibrium</strong> is a profile in which everyone best-responds to everyone else — rationality plus correct beliefs. It nests the earlier concepts: dominant and IESDS solutions are Nash, and every Nash equilibrium survives IESDS.</li>
+<li>Applications: <strong>Cournot</strong> (interior equilibrium <span class="math inline">\((a-2c_i+c_j)/3b\)</span>), <strong>Bertrand</strong> (price <span class="math inline">\(=\)</span> marginal cost; <em>no</em> equilibrium under asymmetric costs), and the <strong>median voter theorem</strong> in electoral competition.</li>
+<li>Allowing <strong>mixed strategies</strong>, every finite game has an equilibrium (<a href="#thm-2-existence" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>); they are computed via the <strong>indifference principle</strong> (<a href="#lem-2-indifference" class="quarto-xref">Lemma&nbsp;<span>2.2</span></a>).</li>
+<li>IESDS by mixtures preserves the full set of equilibria (<a href="#prp-2-iesds-reduce" class="quarto-xref">Proposition&nbsp;<span>2.9</span></a>).</li>
+</ul>
+<p>The next chapter lets players move in <strong>sequence</strong>, which both enriches the strategy space and exposes a weakness of Nash equilibrium — its tolerance of non-credible threats.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01-introduction.html" class="pagination-link" aria-label="Introduction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03-dynamic-complete.html" class="pagination-link" aria-label="Dynamic Games with Complete Information">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Dynamic Games with Complete Information</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
