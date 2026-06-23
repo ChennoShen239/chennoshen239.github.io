@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+
+<title>Introduction – Dynamic Optimization</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./01-static-optimization.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00-introduction.html">Introduction</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Dynamic Optimization</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00-introduction.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-static-optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Continuous-Time Dynamic Optimization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-calculus-of-variations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-optimal-control.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Dynamic Programming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-intro-origin" id="toc-sec-intro-origin" class="nav-link active" data-scroll-target="#sec-intro-origin">The origin of optimization problems</a>
+  <ul class="collapse">
+  <li><a href="#rationality" id="toc-rationality" class="nav-link" data-scroll-target="#rationality">Rationality</a></li>
+  <li><a href="#the-five-steps-of-a-rational-agent" id="toc-the-five-steps-of-a-rational-agent" class="nav-link" data-scroll-target="#the-five-steps-of-a-rational-agent">The five steps of a rational agent</a></li>
+  <li><a href="#an-order-on-the-choice-set" id="toc-an-order-on-the-choice-set" class="nav-link" data-scroll-target="#an-order-on-the-choice-set">An order on the choice set</a></li>
+  <li><a href="#the-pareto-order-and-incomparability" id="toc-the-pareto-order-and-incomparability" class="nav-link" data-scroll-target="#the-pareto-order-and-incomparability">The Pareto order and incomparability</a></li>
+  <li><a href="#preferences-a-complete-order" id="toc-preferences-a-complete-order" class="nav-link" data-scroll-target="#preferences-a-complete-order">Preferences: a complete order</a></li>
+  <li><a href="#from-the-order-to-a-numerical-objective" id="toc-from-the-order-to-a-numerical-objective" class="nav-link" data-scroll-target="#from-the-order-to-a-numerical-objective">From the order to a numerical objective</a></li>
+  </ul></li>
+  <li><a href="#sec-intro-classification" id="toc-sec-intro-classification" class="nav-link" data-scroll-target="#sec-intro-classification">Classification of optimization problems</a></li>
+  <li><a href="#sec-intro-statement" id="toc-sec-intro-statement" class="nav-link" data-scroll-target="#sec-intro-statement">Mathematical statement</a>
+  <ul class="collapse">
+  <li><a href="#the-standard-form" id="toc-the-standard-form" class="nav-link" data-scroll-target="#the-standard-form">The standard form</a></li>
+  <li><a href="#the-three-canonical-dynamic-problems" id="toc-the-three-canonical-dynamic-problems" class="nav-link" data-scroll-target="#the-three-canonical-dynamic-problems">The three canonical dynamic problems</a></li>
+  <li><a href="#the-unifying-bridge" id="toc-the-unifying-bridge" class="nav-link" data-scroll-target="#the-unifying-bridge">The unifying bridge</a></li>
+  </ul></li>
+  <li><a href="#sec-intro-examples" id="toc-sec-intro-examples" class="nav-link" data-scroll-target="#sec-intro-examples">A few examples</a>
+  <ul class="collapse">
+  <li><a href="#static-and-combinatorial-examples" id="toc-static-and-combinatorial-examples" class="nav-link" data-scroll-target="#static-and-combinatorial-examples">Static and combinatorial examples</a></li>
+  <li><a href="#continuous-time-dynamic-examples" id="toc-continuous-time-dynamic-examples" class="nav-link" data-scroll-target="#continuous-time-dynamic-examples">Continuous-time dynamic examples</a></li>
+  <li><a href="#discrete-time-dynamic-example" id="toc-discrete-time-dynamic-example" class="nav-link" data-scroll-target="#discrete-time-dynamic-example">Discrete-time dynamic example</a></li>
+  <li><a href="#the-brachistochrone-where-the-subject-began" id="toc-the-brachistochrone-where-the-subject-began" class="nav-link" data-scroll-target="#the-brachistochrone-where-the-subject-began">The brachistochrone: where the subject began</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-intro" class="quarto-section-identifier">Introduction</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Every living being is, at every moment, <em>doing something</em> — eating, resting, talking, travelling, working, investing. Behind each of these acts lies a choice, and behind each choice lies the silent presumption that the chooser had a reason to prefer it to the alternatives. <strong>Optimization</strong> is the mathematics of that presumption: it studies how an agent who can rank the available courses of action picks a best one. This book is about the <em>dynamic</em> case — when the act is not once-and-for-all but stretches over time, when today’s choice reshapes tomorrow’s options, and when “best” must be reckoned over a whole path rather than a single instant.</p>
+<p>This introductory chapter does three things. First (<a href="#sec-intro-origin" class="quarto-xref"><span>The origin of optimization problems</span></a>) it traces where an optimization problem comes from — from the notion of rationality, through an order on the set of choices, to a numerical objective whose maximization encodes that order. Second (<a href="#sec-intro-classification" class="quarto-xref"><span>Classification of optimization problems</span></a> and <a href="#sec-intro-statement" class="quarto-xref"><span>Mathematical statement</span></a>) it classifies optimization problems and fixes the standard mathematical statement, culminating in the <strong>three canonical dynamic problems</strong> — the calculus of variations, optimal control, and dynamic programming — together with their central tools and the bridge that unifies them. Third (<a href="#sec-intro-examples" class="quarto-xref"><span>A few examples</span></a>) it sets up a handful of motivating examples — the knapsack, consumer choice, resource extraction, cake-eating, and the brachistochrone — <em>as optimization problems</em>, deferring their solutions to the method chapters they motivate.</p>
+<p>This is a framing chapter. Its job is to orient, not to prove; the rigour begins in earnest in <a href="./01-static-optimization.html">Static Optimization</a> and never lets up thereafter.</p>
+<section id="sec-intro-origin" class="level2">
+<h2 class="anchored" data-anchor-id="sec-intro-origin">The origin of optimization problems</h2>
+<section id="rationality" class="level3">
+<h3 class="anchored" data-anchor-id="rationality">Rationality</h3>
+<p>What determines a person’s behaviour? The factors split into the <em>external</em> (coercion, example, the pull of the crowd) and the <em>internal</em> (instinct, habit, experience, character, belief, knowledge, taste). Among the internal factors one — <strong>rationality</strong> — is the one economics builds on, and the one that makes optimization possible. We adopt a deliberately narrow working definition: rationality is the capacity for <em>logical inference and precise computation</em>; it is a mode of thought that prizes rigorous deduction over intuition, hearsay, or the worship of forces one does not understand. In this sense rationality is, as von Mises argued at length in <em>Human Action</em> <span class="citation" data-cites="vonmises1949">(<a href="references.html#ref-vonmises1949" role="doc-biblioref">Mises 1949</a>)</span>, the defining feature of deliberate human conduct, and one of the twin pillars of modern science (the other being the discipline of experiment).</p>
+<p>It helps to distinguish two grades of rationality.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Complete versus bounded rationality.</strong> An agent has <strong>complete rationality</strong> if, facing a situation, they can <em>survey every feasible course of action and select the most advantageous one</em> and carry it out. An agent has <strong>bounded rationality</strong> if they <em>want</em> to choose the most advantageous action but their powers of inference and computation fall short of identifying it. Real agents are boundedly rational; the theory of optimization idealizes them as completely rational and then studies how far the idealization can be pushed.</p>
+</div>
+</div>
+</div>
+<p>Two words in that definition deserve scrutiny: <em>advantageous</em> and <em>most</em>.</p>
+<ul>
+<li><p>The “advantage” (the <em>gain</em>, the <em>good</em>) need not be selfish. Under a given moral framework, every action has a well-defined worth, and that worth may incorporate altruism — concern for others’ welfare — without ceasing to be a sharp, quantifiable standard. A purely self-regarding agent is the special case in which “advantage” means private benefit alone. So long as the worth of each action is unambiguous, the rational-agent method applies, even to the analysis of moral behaviour. In physics and engineering the “advantage” is sharper still and carries no ethical content: there the <em>subject</em> of the problem recedes — nature itself is the optimizer, and physics keeps discovering how relentlessly nature extremizes.</p></li>
+<li><p>The word “most” is the deep one: it presupposes that <em>all</em> the feasible actions have been arranged in an <strong>order</strong>, so that a top element can be spoken of. Making that order precise is the real content of setting up an optimization problem, and it occupies the rest of this section.</p></li>
+</ul>
+</section>
+<section id="the-five-steps-of-a-rational-agent" class="level3">
+<h3 class="anchored" data-anchor-id="the-five-steps-of-a-rational-agent">The five steps of a rational agent</h3>
+<p>Faced with a matter to settle, a completely rational agent proceeds through five steps:</p>
+<ol type="1">
+<li><strong>Frame</strong> the matter — state clearly what is to be decided.</li>
+<li><strong>Enumerate</strong> all courses of action available to the agent; collect them into a set, the <em>choice set</em> <span class="math inline">\(X\)</span>.</li>
+<li><strong>Order</strong> <span class="math inline">\(X\)</span> — install on it a relation <span class="math inline">\(\preceq\)</span>, read “is no better than” (the course writes this as <span class="math inline">\(\le\)</span> and reads it “is inferior to”).</li>
+<li><strong>Optimize</strong> — find a <span class="math inline">\(\preceq\)</span>-greatest element of <span class="math inline">\(X\)</span>.</li>
+<li><strong>Execute</strong> it.</li>
+</ol>
+<p>If step 1 fails — if the matter cannot even be framed — nothing else can begin; and the <em>way</em> a matter is framed strongly conditions everything downstream. To <strong>model</strong> a real situation is precisely to turn a vague “matter” into a definite “problem”, i.e.&nbsp;to perform steps 1–3 explicitly. This book concentrates almost entirely on <strong>step 4</strong>: given the problem, find the optimum — and chiefly the <em>exact</em> (analytic) optimum, or, where no closed form exists, the <em>qualitative</em> properties of the optimum (existence, uniqueness, monotonicity, asymptotic behaviour). We do not pursue numerical algorithms for approximate solutions.</p>
+</section>
+<section id="an-order-on-the-choice-set" class="level3">
+<h3 class="anchored" data-anchor-id="an-order-on-the-choice-set">An order on the choice set</h3>
+<p>The heart of the construction is the order installed in step 3. We make it precise.</p>
+<div id="def-preorder" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1 (Preorder (the course’s “order”))</strong></span> A binary relation <span class="math inline">\(\preceq\)</span> on a set <span class="math inline">\(X\)</span> is a <strong>preorder</strong> (the course simply calls it an <em>order</em>) if it is</p>
+<ul>
+<li><strong>reflexive:</strong> <span class="math inline">\(x\preceq x\)</span> for every <span class="math inline">\(x\in X\)</span>;</li>
+<li><strong>transitive:</strong> if <span class="math inline">\(x_1\preceq x_2\)</span> and <span class="math inline">\(x_2\preceq x_3\)</span> then <span class="math inline">\(x_1\preceq x_3\)</span>.</li>
+</ul>
+<p>We read <span class="math inline">\(x_1\preceq x_2\)</span> as “<span class="math inline">\(x_1\)</span> is no better than <span class="math inline">\(x_2\)</span>” (equivalently <span class="math inline">\(x_2\succeq x_1\)</span>, “<span class="math inline">\(x_2\)</span> is at least as good as <span class="math inline">\(x_1\)</span>”). If <span class="math inline">\(x\preceq y\)</span> and <span class="math inline">\(y\preceq x\)</span> we say <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are <strong>indifferent</strong>, written <span class="math inline">\(x\sim y\)</span>. If <span class="math inline">\(x\preceq y\)</span> but not <span class="math inline">\(y\preceq x\)</span> we write <span class="math inline">\(x\prec y\)</span> and say <span class="math inline">\(x\)</span> is <strong>strictly inferior</strong> to <span class="math inline">\(y\)</span>.</p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>On the symbol <span class="math inline">\(\preceq\)</span> versus <span class="math inline">\(\le\)</span>.</strong> The course writes the abstract order with the ordinary inequality sign <span class="math inline">\(\le\)</span> on the choice set <span class="math inline">\(\aleph\)</span>. To avoid collision with the numerical <span class="math inline">\(\le\)</span> on <span class="math inline">\(\mathbb{R}\)</span> — which appears the moment we introduce a real-valued objective — we write the <em>abstract</em> order as <span class="math inline">\(\preceq\)</span> and reserve <span class="math inline">\(\le\)</span> for numbers. The choice set itself we write <span class="math inline">\(X\)</span>, not <span class="math inline">\(\aleph\)</span> (see <a href="./notation.html">notation</a>).</p>
+</div>
+</div>
+</div>
+<div id="def-optimum" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2 (Optimal element)</strong></span> An element <span class="math inline">\(x^\ast\in X\)</span> is <strong>optimal</strong> for <span class="math inline">\(\preceq\)</span> if no element strictly dominates it: there is no <span class="math inline">\(x\in X\)</span> with <span class="math inline">\(x^\ast\prec x\)</span>. Equivalently, <span class="math inline">\(x^\ast\)</span> is a <span class="math inline">\(\preceq\)</span>-maximal element of <span class="math inline">\(X\)</span>.</p>
+</div>
+<p>Reflexivity and transitivity are exactly the structure needed to make “no better than” behave like a comparison, but they stop short of guaranteeing that <em>any two</em> elements can be compared at all. That gap is the source of two genuinely different regimes.</p>
+</section>
+<section id="the-pareto-order-and-incomparability" class="level3">
+<h3 class="anchored" data-anchor-id="the-pareto-order-and-incomparability">The Pareto order and incomparability</h3>
+<p>A preorder under which some pairs are <strong>incomparable</strong> — neither <span class="math inline">\(x\preceq y\)</span> nor <span class="math inline">\(y\preceq x\)</span> — is called a <strong>partial order</strong>, and in economics the most important partial order is the <strong>Pareto order</strong>. It arises whenever a choice carries several incommensurable dimensions of value. The classic construction: each course of action <span class="math inline">\(x\)</span> is scored by a vector of attributes <span class="math inline">\((x^1,\dots,x^n)\in\mathbb{R}^n\)</span>, and we declare</p>
+<p><span id="eq-pareto"><span class="math display">\[
+(x^1,\dots,x^n)\ \preceq_{\mathrm{P}}\ (y^1,\dots,y^n)
+\quad\Longleftrightarrow\quad
+x^i\le y^i\ \text{ for every } i=1,\dots,n .
+\tag{1}\]</span></span></p>
+<p>This is the <em>product order</em>: a course is Pareto-better only if it is at least as good on <em>every</em> attribute. Two courses that each beat the other on some attribute are incomparable. A <span class="math inline">\(\preceq_{\mathrm{P}}\)</span>-optimal element — one that cannot be improved in any dimension without being worsened in another — is called <strong>Pareto optimal</strong>. A Pareto optimum need not exist, and when it exists it need not be unique.</p>
+<div id="exm-mate-choice" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1 (Choosing among incomparable options)</strong></span> Suppose one must rank a set <span class="math inline">\(X\)</span> of candidates, scoring each by <em>character</em> and <em>competence</em>, <span class="math inline">\(f(x)=(f^1(x),f^2(x))\in\mathbb{R}^2\)</span>. The natural order on <span class="math inline">\(\mathbb{R}^2\)</span> is the Pareto order 1: candidate <span class="math inline">\(x\)</span> is unambiguously worse than <span class="math inline">\(y\)</span> only if <span class="math inline">\(y\)</span> is at least as good in both character and competence. Two candidates, one of finer character and the other of greater competence, are <em>incomparable</em> under <span class="math inline">\(\preceq_{\mathrm{P}}\)</span>. Since one must finally pick a single candidate, an incomplete order will not do; one is forced to <em>complete</em> it — typically by a <strong>weighted sum</strong> <span class="math inline">\(\theta_1 f^1(x)+\theta_2 f^2(x)\)</span> that trades the two attributes off against each other at fixed rates <span class="math inline">\(\theta_1,\theta_2&gt;0\)</span>. Whenever the attributes are commensurable, this collapses the partial order to a complete one and a best element reappears.</p>
+</div>
+</section>
+<section id="preferences-a-complete-order" class="level3">
+<h3 class="anchored" data-anchor-id="preferences-a-complete-order">Preferences: a complete order</h3>
+<p>Adjoin to a preorder one more axiom and the incomparable pairs disappear.</p>
+<div id="def-preference" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3 (Complete order (preference))</strong></span> A preorder <span class="math inline">\(\preceq\)</span> on <span class="math inline">\(X\)</span> is a <strong>complete order</strong> (a <strong>total</strong> order, an economic <strong>preference</strong>) if it is</p>
+<ul>
+<li><strong>complete:</strong> for every <span class="math inline">\(x,y\in X\)</span>, <span class="math inline">\(x\preceq y\)</span> or <span class="math inline">\(y\preceq x\)</span> (every pair is comparable).</li>
+</ul>
+<p>Under a complete order any two courses of action can be ranked, so — on a finite or suitably well-behaved <span class="math inline">\(X\)</span> — a best element exists.</p>
+</div>
+<p>The methodological counsel that follows is simple: <em>complete the order whenever you can.</em> A complete order is what makes the phrase “the most advantageous action” meaningful and the optimization problem well posed. Sometimes, though, completion is genuinely impossible — when each attribute has an irreducible meaning that admits no rate of substitution against the others, no weighted sum is legitimate, and one must rest content with the Pareto order and its Pareto optima.</p>
+</section>
+<section id="from-the-order-to-a-numerical-objective" class="level3">
+<h3 class="anchored" data-anchor-id="from-the-order-to-a-numerical-objective">From the order to a numerical objective</h3>
+<p>How does one <em>install</em> a complete order on <span class="math inline">\(X\)</span> in practice? Almost always by <strong>evaluating</strong> the options — assigning each a value and inheriting the order of the values. Formally, one chooses a <strong>value set</strong> <span class="math inline">\(Y\)</span> that already carries a natural order <span class="math inline">\(\le_Y\)</span>, and a map</p>
+<p><span id="eq-Fmap"><span class="math display">\[
+f : X \longrightarrow Y ,
+\tag{2}\]</span></span></p>
+<p>the <strong>objective</strong>, which <em>pulls back</em> the order on <span class="math inline">\(Y\)</span> to an order on <span class="math inline">\(X\)</span>:</p>
+<p><span id="eq-induced-order"><span class="math display">\[
+x_1 \preceq x_2 \quad\Longleftrightarrow\quad f(x_1)\le_Y f(x_2).
+\tag{3}\]</span></span></p>
+<div class="callout callout-style-simple callout-tip">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>The map induces the order.</strong> Equation <a href="#eq-induced-order" class="quarto-xref">Equation&nbsp;<span>3</span></a> is the workhorse of the whole subject. Comparing courses of action <em>directly</em> is hard; comparing the <em>numbers</em> (or vectors) they produce is easy, because <span class="math inline">\(Y\)</span> comes pre-ordered. The art of modelling is to find an <span class="math inline">\(f\)</span> whose order <a href="#eq-induced-order" class="quarto-xref">Equation&nbsp;<span>3</span></a> faithfully reproduces the agent’s true ranking.</p>
+</div>
+</div>
+</div>
+<p>Two cases recur:</p>
+<ul>
+<li><p><strong><span class="math inline">\(Y=\mathbb{R}\)</span></strong> (a single real-valued objective). The order <span class="math inline">\(\le_Y\)</span> is the usual order on the line — automatically complete — so <span class="math inline">\(f:X\to\mathbb{R}\)</span> delivers a complete order for free, and “find the best <span class="math inline">\(x\)</span>” becomes “maximize <span class="math inline">\(f\)</span>”. This is the case the whole book treats.</p></li>
+<li><p><strong><span class="math inline">\(Y=\mathbb{R}^n\)</span>, <span class="math inline">\(n&gt;1\)</span></strong> (a vector-valued objective), with <span class="math inline">\(\le_Y\)</span> the Pareto order</p>
+<ol class="example" type="1">
+<li>Now <span class="math inline">\(f\)</span> induces only a partial order; the problem is <strong>multi-objective</strong>, and one either accepts Pareto optimality or completes the order by a weighted sum, as in</li>
+<li></li>
+</ol></li>
+</ul>
+<p>We will see in <a href="#sec-intro-statement" class="quarto-xref"><span>Mathematical statement</span></a> that maximizing <span class="math inline">\(f\)</span> is the standard <em>form</em> of every optimization problem in this book; the construction just given is <em>why</em> that form captures rational choice.</p>
+</section>
+</section>
+<section id="sec-intro-classification" class="level2">
+<h2 class="anchored" data-anchor-id="sec-intro-classification">Classification of optimization problems</h2>
+<p>The same abstract problem <span class="math inline">\(\max_{x\in X}f(x)\)</span> wears many guises. Four cross-cutting distinctions organize them; this book lives in particular cells of the resulting grid.</p>
+<p><strong>(i) Static versus dynamic — does time enter?</strong> If an action is taken once and its consequences for the <em>future</em> may be ignored, the problem is <strong>static</strong>: one chooses a single point <span class="math inline">\(x\in X\)</span> and is done. If instead the action’s effect on the future cannot be neglected — or, more sharply, if one must choose a <em>whole sequence or path</em> of actions whose cumulative effect is what matters — the problem is <strong>dynamic</strong>: the unknown is itself a sequence <span class="math inline">\((x_0,x_1,\dots)\)</span> or a function of time <span class="math inline">\(x(\cdot)\)</span>. The dividing line is <em>not</em> whether time appears in the formulas but whether the <em>coupling</em> of present action to future consequence is strong enough to matter. “What is good in the short run need not be good in the long run” is the slogan of the dynamic regime, and the reason it demands its own methods.</p>
+<p><strong>(ii) Discrete versus continuous time.</strong> A dynamic problem is <strong>discrete-time</strong> when decisions are made at a sequence of isolated instants <span class="math inline">\(t=0,1,2,\dots\)</span> (the unknown is a sequence), and <strong>continuous-time</strong> when decisions are made throughout an interval <span class="math inline">\([0,T]\)</span>, possibly with <span class="math inline">\(T=\infty\)</span> (the unknown is a path <span class="math inline">\(x:[0,T]\to\mathbb{R}^n\)</span>). The two are not cosmetic variants: the discrete problem is governed by <em>difference</em> equations and recursions, the continuous one by <em>differential</em> equations, and their natural tools differ accordingly.</p>
+<p><strong>(iii) Deterministic versus stochastic.</strong> When the agent’s environment is known with certainty, the problem is <strong>deterministic</strong>. When randomness intervenes — the law of motion or the payoff is buffeted by chance — the problem is <strong>stochastic</strong>, the objective becomes an <em>expected</em> value, and the tools acquire probabilistic content (conditional expectations, Itô calculus).</p>
+<p><strong>(iv) By the type of decision variable.</strong> When the decision variable ranges over a <em>discrete</em> set the problem is <strong>combinatorial</strong>, a family that includes <strong>integer programming</strong> and <strong>0–1 programming</strong> (binary choices). When the decision variable ranges over a <em>continuum</em> the problem is the smooth optimization of calculus, and carries no special name.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Where this book sits.</strong> The course — and this reconstruction — develops <em>continuous-variable</em> dynamic optimization, mostly <em>deterministic</em>. The calculus of variations and optimal control are treated in <strong>continuous time only</strong>; dynamic programming is treated in <strong>both discrete and continuous time</strong>, and is where the stochastic case enters. Static optimization is included as a <em>foundation and a foil</em> (<a href="#sec-intro-statement" class="quarto-xref"><span>Mathematical statement</span></a>), and the qualitative theory of ordinary differential equations as the <em>prerequisite</em> for everything continuous-time. Combinatorial problems such as the knapsack (<a href="05-dynamic-programming.html#exm-knapsack" class="quarto-xref">Example&nbsp;<span>6.4</span></a>) appear only to motivate; we do not develop their algorithmics.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-intro-statement" class="level2">
+<h2 class="anchored" data-anchor-id="sec-intro-statement">Mathematical statement</h2>
+<section id="the-standard-form" class="level3">
+<h3 class="anchored" data-anchor-id="the-standard-form">The standard form</h3>
+<p>Every optimization problem in this book is written in the <strong>standard form</strong></p>
+<p><span id="eq-standard-form"><span class="math display">\[
+\max_{x\in X} f(x),
+\qquad\text{equivalently}\qquad
+\max_x\ f(x)\ \ \text{s.t.}\ \ x\in X ,
+\tag{4}\]</span></span></p>
+<p>where “s.t.” abbreviates <em>subject to</em>. The ingredients have fixed names:</p>
+<ul>
+<li><span class="math inline">\(X\)</span> is the <strong>feasible set</strong> (the choice set, the admissible decisions);</li>
+<li><span class="math inline">\(x\)</span> is the <strong>decision variable</strong> (optimization variable);</li>
+<li><span class="math inline">\(f\)</span> is the <strong>objective</strong>, and <span class="math inline">\(\max\)</span> means the greatest value of <span class="math inline">\(f\)</span> under the order on its codomain.</li>
+</ul>
+<p>When the codomain of <span class="math inline">\(f\)</span> is <span class="math inline">\(Y=\mathbb{R}\)</span> the problem is <strong>single-objective</strong>; the order is the complete order of the real line and a maximum is a genuine maximum. When <span class="math inline">\(Y=\mathbb{R}^n\)</span> with <span class="math inline">\(n&gt;1\)</span> the problem is <strong>multi-objective</strong>, the order is Pareto, and “max” means a Pareto optimum. <em>This book treats only the single-objective case, <span class="math inline">\(Y=\mathbb{R}\)</span>.</em></p>
+<div class="callout callout-style-simple callout-tip">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Decision variables versus parameters.</strong> Writing the decision variable <em>underneath</em> the <span class="math inline">\(\max\)</span> is not decoration — it declares which symbols are being chosen and which are held fixed. Every symbol <em>not</em> under the <span class="math inline">\(\max\)</span> is a <strong>parameter</strong>: a constant for the purposes of this problem, though one may later ask how the optimum responds to it (comparative statics). The distinction is consequential. Compare <span class="math display">\[
+\max_{x}\ \theta x-x^2 \quad\text{s.t.}\quad x\in[0,\theta]
+\qquad\text{versus}\qquad
+\max_{(x,\theta)}\ \theta x-x^2 \quad\text{s.t.}\quad x\in[0,\theta],\ \theta\in[0,1].
+\]</span> In the first, <span class="math inline">\(\theta\)</span> is a fixed parameter and the optimizer chooses only <span class="math inline">\(x\)</span> (obtaining a value <span class="math inline">\(V(\theta)\)</span> that depends on <span class="math inline">\(\theta\)</span>); in the second, <span class="math inline">\(\theta\)</span> is <em>also</em> chosen. The two are different problems. They are related, however, by the <strong>nested-maximization identity</strong> <span id="eq-nested-max"><span class="math display">\[
+\max_{(x,\theta)}f(x,\theta)
+=\max_{\theta}\Bigl(\max_{x}f(x,\theta)\Bigr)
+=\max_{x}\Bigl(\max_{\theta}f(x,\theta)\Bigr),
+\tag{5}\]</span></span> which says a joint maximum may be found by optimizing the variables in either order, one block at a time. This iterated-optimization identity is, in embryo, the principle behind dynamic programming.</p>
+</div>
+</div>
+</div>
+<p>In the <strong>static</strong> problems of <a href="./01-static-optimization.html">Chapter 1</a> the feasible set is a subset of Euclidean space carved out by constraints, <span class="math inline">\(X=\{x\in\mathbb{R}^n: g(x)\ge 0,\ h(x)=0\}\)</span>, and <span class="math inline">\(f:X\to\mathbb{R}\)</span> is an ordinary function. In the <strong>dynamic</strong> problems the feasible set is a subset of a <em>function space</em> — paths <span class="math inline">\(x(\cdot)\)</span> in <span class="math inline">\(C^1[0,T]\)</span> in continuous time, sequences in continuous time, sequences <span class="math inline">\((x_t)\)</span> in discrete time — and the objective is a <strong>functional</strong>: an integral <span class="math inline">\(\int_0^T(\cdots)\,\mathrm{d}t\)</span> in continuous time or a sum <span class="math inline">\(\sum_t(\cdots)\)</span> in discrete time. The decision variable is then an entire function or sequence, which is exactly what makes dynamic optimization harder than static: one is choosing not a number but a curve.</p>
+</section>
+<section id="the-three-canonical-dynamic-problems" class="level3">
+<h3 class="anchored" data-anchor-id="the-three-canonical-dynamic-problems">The three canonical dynamic problems</h3>
+<p>The continuous-time dynamic-optimization problems that economics needs are solved by three methods, each with its own standard problem and its own central tool. They form the spine of this book.</p>
+<div id="tbl-three-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-three-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: The three methods of dynamic optimization, their standard problems, and their central tools.
+</figcaption>
+<div aria-describedby="tbl-three-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Standard problem</th>
+<th>Central tool</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Calculus of variations</strong></td>
+<td><span class="math inline">\(\displaystyle\max\int_0^T F(t,x,\dot x)\,\mathrm{d}t\)</span>, <span class="math inline">\(\ x(0)=x_0\)</span></td>
+<td><strong>Euler equation</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Optimal control</strong></td>
+<td><span class="math inline">\(\displaystyle\max\int_0^T f(t,x,u)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=g(t,x,u)\)</span>, <span class="math inline">\(\ x(0)=x_0\)</span></td>
+<td><strong>Pontryagin’s maximum principle</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Dynamic programming</strong></td>
+<td><span class="math inline">\(\displaystyle\max\sum_{t=0}^{T}\beta^t\,\pi(t,x_t,u_t)\)</span> s.t. <span class="math inline">\(x_{t+1}=f(t,x_t,u_t)\)</span>, <span class="math inline">\(\ x_0\)</span> given</td>
+<td><strong>Bellman / HJB equation</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Read the table as three answers to one question — “which path is best?” — that differ in <em>what is chosen</em> and <em>how the dynamics are written</em>.</p>
+<p><strong>Calculus of variations.</strong> The unknown is the path <span class="math inline">\(x(\cdot)\)</span> itself; its rate of change <span class="math inline">\(\dot x\)</span> enters the integrand <span class="math inline">\(F(t,x,\dot x)\)</span> directly. With <span class="math inline">\(F\)</span> twice differentiable, <span class="math inline">\(T\)</span> a positive number or <span class="math inline">\(\infty\)</span>, and <span class="math inline">\(x_0\)</span> a constant, the necessary condition for optimality is the <strong>Euler equation</strong> <span id="eq-intro-euler"><span class="math display">\[
+F_x = \frac{\mathrm{d}}{\mathrm{d}t}F_{\dot x},
+\tag{6}\]</span></span> a (generally second-order) differential equation for the optimal path. This is the subject of <a href="./03-calculus-of-variations.html">Chapter 3</a>.</p>
+<p><strong>Optimal control.</strong> Here one separates the <strong>state</strong> <span class="math inline">\(x\)</span> (what the system <em>is</em>) from the <strong>control</strong> <span class="math inline">\(u\)</span> (the lever the agent <em>pulls</em>), linked by a <strong>state equation</strong> (law of motion) <span class="math inline">\(\dot x=g(t,x,u)\)</span>; the agent chooses <span class="math inline">\(u(\cdot)\)</span> and the state responds. The running payoff is <span class="math inline">\(f(t,x,u)\)</span>. The necessary condition is <strong>Pontryagin’s maximum principle</strong> <span class="citation" data-cites="pontryagin1962">(<a href="references.html#ref-pontryagin1962" role="doc-biblioref">Pontryagin et al. 1962</a>)</span>, organized around the <strong>Hamiltonian</strong> <span id="eq-intro-hamiltonian"><span class="math display">\[
+H(t,x,u,\lambda)=f(t,x,u)+\lambda\,g(t,x,u),
+\tag{7}\]</span></span> in which the multiplier <span class="math inline">\(\lambda\)</span> on the state equation — the <strong>costate</strong> — is the <em>shadow price</em> of the state. The maximum principle says the optimal control maximizes <span class="math inline">\(H\)</span> pointwise while the costate obeys its own differential equation <span class="math inline">\(\dot\lambda=-H_x\)</span>. This is <a href="./04-optimal-control.html">Chapter 4</a>. The calculus of variations is the special case <span class="math inline">\(g(t,x,u)=u\)</span>, <span class="math inline">\(\dot x=u\)</span> — i.e.&nbsp;the control <em>is</em> the velocity — so optimal control strictly generalizes it.</p>
+<p><strong>Dynamic programming.</strong> Written here in <strong>discrete time</strong>, the agent maximizes a discounted sum of per-period payoffs <span class="math inline">\(\pi(t,x_t,u_t)\)</span> subject to a transition <span class="math inline">\(x_{t+1}=f(t,x_t,u_t)\)</span>, with the <strong>discount factor</strong> <span class="math inline">\(\beta=\tfrac{1}{1+\rho}\in(0,1)\)</span>. The central tool is the <strong>Bellman equation</strong> <span class="citation" data-cites="bellman1957">(<a href="references.html#ref-bellman1957" role="doc-biblioref">Bellman 1957</a>)</span>, the recursion <span id="eq-intro-bellman"><span class="math display">\[
+V_t(x)=\max_{u}\bigl\{\pi(t,x,u)+\beta\,V_{t+1}\bigl(f(t,x,u)\bigr)\bigr\},
+\tag{8}\]</span></span> for the <strong>value function</strong> <span class="math inline">\(V\)</span> — the optimized objective seen as a function of the current state. Its continuous-time analogue is the <strong>Hamilton–Jacobi–Bellman (HJB)</strong> partial differential equation. This is <a href="./05-dynamic-programming.html">Chapter 5</a>.</p>
+<div class="callout callout-style-simple callout-important">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>The discount trap (flagged once, honoured everywhere).</strong> The continuous-time objectives carry a discount <strong>rate</strong> <span class="math inline">\(\rho&gt;0\)</span> inside <span class="math inline">\(e^{-\rho t}\)</span>; the discrete-time Bellman objective carries a discount <strong>factor</strong> <span class="math inline">\(\beta\in(0,1)\)</span>. The two are linked through the rate <span class="math inline">\(\rho\)</span>: per-period compounding gives <span class="math inline">\(\beta=1/(1+\rho)\)</span>, and continuous compounding gives <span class="math inline">\(\beta=e^{-\rho}\)</span>, the two agreeing to first order (<span class="math inline">\(e^{-\rho}=1-\rho+O(\rho^2)\)</span> and <span class="math inline">\(1/(1+\rho)=1-\rho+O(\rho^2)\)</span>). We take <span class="math inline">\(\beta=1/(1+\rho)\)</span> as the canonical factor (per <a href="./notation.html">notation</a>). The course overloads the single symbol <span class="math inline">\(\rho\)</span> for both rate and factor; throughout these notes <span class="math inline">\(\rho\)</span> is <em>always</em> the continuous rate and <span class="math inline">\(\beta\)</span> is <em>always</em> the discrete factor.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="the-unifying-bridge" class="level3">
+<h3 class="anchored" data-anchor-id="the-unifying-bridge">The unifying bridge</h3>
+<p>The three methods are three faces of one theory. The optimal-control and dynamic-programming formulations describe the <em>same</em> optimal path, and the link between them is exact and illuminating:</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Costate <span class="math inline">\(=\)</span> gradient of the value function.</strong> Pontryagin’s costate <span class="math inline">\(\lambda(t)\)</span> equals the gradient of Bellman’s value function evaluated along the optimal path, <span id="eq-intro-bridge"><span class="math display">\[
+\lambda(t)=V_x\bigl(t,x^\ast(t)\bigr).
+\tag{9}\]</span></span> Both quantities are <em>the same shadow price</em> of the state: the marginal value, at the optimum, of an extra unit of the state variable. Read this way, the maximum principle’s costate equation <span class="math inline">\(\dot\lambda=-H_x\)</span> and the HJB equation are two encodings of the same economics, and the Hamiltonian <a href="#eq-intro-hamiltonian" class="quarto-xref">Equation&nbsp;<span>7</span></a> is the HJB equation’s maximand. We develop <a href="#eq-intro-bridge" class="quarto-xref">Equation&nbsp;<span>9</span></a> carefully once both machines are built; for now it is the promise that the three chapters tell one story.</p>
+</div>
+</div>
+</div>
+<p>A second bridge runs to the <em>static</em> theory of <a href="./01-static-optimization.html">Chapter 1</a>. The Hamiltonian and the Bellman maximand are each maximized by a <strong>first-order (KKT-type) condition</strong> in the control, so at every instant a dynamic problem hides a static one. The costate and the value-function gradient are the dynamic descendants of the static Lagrange multiplier and envelope derivative. This is why we begin with static optimization and the qualitative theory of ODEs before turning to the dynamic machinery: the former supplies the optimization grammar, the latter the language in which continuous-time optima are written.</p>
+</section>
+</section>
+<section id="sec-intro-examples" class="level2">
+<h2 class="anchored" data-anchor-id="sec-intro-examples">A few examples</h2>
+<p>We close by <em>posing</em> — not solving — several problems that recur as test cases throughout the book. Each is stated cleanly in the standard form <a href="#eq-standard-form" class="quarto-xref">Equation&nbsp;<span>4</span></a>, with a pointer to the chapter where its method is developed. The aim is to populate the abstractions above with concrete decision variables, feasible sets, and objectives.</p>
+<section id="static-and-combinatorial-examples" class="level3">
+<h3 class="anchored" data-anchor-id="static-and-combinatorial-examples">Static and combinatorial examples</h3>
+<div id="exm-knapsack" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2 (The knapsack problem (combinatorial))</strong></span> A traveller with a knapsack of capacity <span class="math inline">\(W\)</span> faces <span class="math inline">\(n\)</span> stones of weights <span class="math inline">\(\omega_1,\dots,\omega_n\)</span> and values <span class="math inline">\(v_1,\dots,v_n\)</span>, and must choose which to carry to maximize total value. With a binary decision variable <span class="math inline">\(x_i\in\{0,1\}\)</span> (carry stone <span class="math inline">\(i\)</span>, or not), the problem is <span class="math display">\[
+\max_{(x_1,\dots,x_n)}\ \sum_{i=1}^{n} v_i\,x_i
+\qquad\text{s.t.}\qquad
+\sum_{i=1}^{n}\omega_i\,x_i\le W,\quad x_i\in\{0,1\}\ \ (i=1,\dots,n).
+\]</span> This is a <strong>0–1 (binary) program</strong>: the decision variable is a vector of bits, the feasible set is combinatorial, and the methods of smooth calculus do not apply directly. We list it to mark the boundary of this book’s scope (continuous variables); its natural home is integer programming and — when stages are introduced — the <em>discrete</em> dynamic programming of <a href="./05-dynamic-programming.html">Chapter 5</a>.</p>
+</div>
+<div id="exm-consumer" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3 (The consumer’s problem (static, continuous))</strong></span> An agent with budget <span class="math inline">\(C&gt;0\)</span> buys quantities <span class="math inline">\(x_1,\dots,x_n\)</span> of <span class="math inline">\(n\)</span> goods at prices <span class="math inline">\(p_1,\dots,p_n&gt;0\)</span> to maximize utility <span class="math inline">\(U(x_1,\dots,x_n)\)</span>: <span class="math display">\[
+\max_{(x_1,\dots,x_n)}\ U(x_1,\dots,x_n)
+\qquad\text{s.t.}\qquad
+p_1 x_1+\cdots+p_n x_n\le C,\quad x_1\ge 0,\dots,x_n\ge 0 .
+\]</span> The decision variable is a continuous consumption bundle; the feasible set is the budget simplex (a polytope cut out by one inequality constraint and <span class="math inline">\(n\)</span> non-negativity constraints). This is the prototypical <em>static, constrained, continuous</em> problem, solved by the Kuhn–Tucker conditions of <a href="./01-static-optimization.html">Chapter 1</a>.</p>
+</div>
+</section>
+<section id="continuous-time-dynamic-examples" class="level3">
+<h3 class="anchored" data-anchor-id="continuous-time-dynamic-examples">Continuous-time dynamic examples</h3>
+<div id="exm-extraction" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4 (Optimal resource extraction (continuous-time, optimal control))</strong></span> An owner holds the rights to a mineral deposit for <span class="math inline">\(T\)</span> years. Let <span class="math inline">\(x(t)\)</span> be the stock remaining at time <span class="math inline">\(t\)</span> and <span class="math inline">\(y(t)\ge 0\)</span> the extraction rate, so the stock depletes according to <span class="math inline">\(\dot x=-y\)</span>. The product sells at price <span class="math inline">\(p(t)\)</span> in a competitive market; extracting at rate <span class="math inline">\(y\)</span> from a stock <span class="math inline">\(x\)</span> costs <span class="math inline">\(c(x,y)\)</span> per unit time; the discount rate is <span class="math inline">\(\rho&gt;0\)</span> and the initial stock is <span class="math inline">\(x(0)=x_0\)</span>. The owner solves <span class="math display">\[
+\max_{y(\cdot)}\ \int_0^T e^{-\rho t}\bigl[\,p(t)\,y - c(x,y)\,\bigr]\,\mathrm{d}t
+\qquad\text{s.t.}\qquad
+\dot x=-y,\quad x(0)=x_0,\quad y\ge 0,
+\]</span> which is a textbook <strong>optimal-control</strong> problem with state <span class="math inline">\(x\)</span> (the stock) and control <span class="math inline">\(y\)</span> (the extraction rate). Eliminating the control via <span class="math inline">\(y=-\dot x\)</span> turns it into the equivalent <strong>variational</strong> problem <span class="math display">\[
+\min_{x(\cdot)}\ \int_0^T e^{-\rho t}\bigl[\,p(t)\,\dot x + c(x,-\dot x)\,\bigr]\,\mathrm{d}t
+\qquad\text{s.t.}\qquad x(0)=x_0 ,
+\]</span> a concrete instance of the equivalence “calculus of variations <span class="math inline">\(=\)</span> optimal control with <span class="math inline">\(\dot x=u\)</span>” noted after <a href="#eq-intro-hamiltonian" class="quarto-xref">Equation&nbsp;<span>7</span></a>. Its solution — Hotelling’s rule, that the resource’s marginal value rises at the discount rate — is derived in <a href="./03-calculus-of-variations.html">Chapter 3</a> and revisited with the maximum principle in <a href="./04-optimal-control.html">Chapter 4</a>.</p>
+</div>
+<p>A notational convention used throughout the dynamic chapters and already visible above: a time-dependent quantity is written <span class="math inline">\(x\)</span> rather than <span class="math inline">\(x(t)\)</span> when no confusion results, and a dot denotes the time derivative, <span class="math inline">\(\dot x=\mathrm{d}x/\mathrm{d}t\)</span>.</p>
+</section>
+<section id="discrete-time-dynamic-example" class="level3">
+<h3 class="anchored" data-anchor-id="discrete-time-dynamic-example">Discrete-time dynamic example</h3>
+<div id="exm-cake" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5 (The cake-eating problem (discrete-time, dynamic programming))</strong></span> A consumer owns a cake of size <span class="math inline">\(1\)</span> and, each period <span class="math inline">\(t=0,1,2,\dots\)</span>, eats an amount <span class="math inline">\(c_t\ge 0\)</span>, enjoying instantaneous utility <span class="math inline">\(u(c_t)\)</span>; total utility is the discounted sum of flow utilities, with discount factor <span class="math inline">\(\beta\in(0,1)\)</span>. Writing <span class="math inline">\(x_t\)</span> for the cake remaining at the start of period <span class="math inline">\(t\)</span> (so <span class="math inline">\(x_0=1\)</span> and <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>), the consumer solves <span class="math display">\[
+\max_{(c_t)_{t\ge 0}}\ \sum_{t=0}^{\infty}\beta^{t}\,u(c_t)
+\qquad\text{s.t.}\qquad
+x_{t+1}=x_t-c_t,\quad 0\le c_t\le x_t,\quad x_0=1 .
+\]</span> This is the canonical <strong>dynamic-programming</strong> problem: state <span class="math inline">\(x_t\)</span> (cake remaining), control <span class="math inline">\(c_t\)</span> (amount eaten), transition <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, discounted-sum objective. It is the simplest non-trivial test of the Bellman equation <a href="#eq-intro-bellman" class="quarto-xref">Equation&nbsp;<span>8</span></a> and is solved in <a href="./05-dynamic-programming.html">Chapter 5</a>.</p>
+<p>The course originally writes the discount factor as <span class="math inline">\(\rho\in(0,1)\)</span>; per the discount-trap convention we write it <span class="math inline">\(\beta\)</span>, reserving <span class="math inline">\(\rho\)</span> for the continuous-time <em>rate</em>.</p>
+</div>
+</section>
+<section id="the-brachistochrone-where-the-subject-began" class="level3">
+<h3 class="anchored" data-anchor-id="the-brachistochrone-where-the-subject-began">The brachistochrone: where the subject began</h3>
+<div id="exm-brachistochrone" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6 (The brachistochrone (the founding problem of the calculus of variations))</strong></span> In a vertical plane, fix two points <span class="math inline">\(O\)</span> (the origin) and <span class="math inline">\(A=(p,q)\)</span> that share neither a horizontal nor a vertical line, with <span class="math inline">\(O\)</span> above <span class="math inline">\(A\)</span>. Along <em>which</em> frictionless track does a bead, released from rest at <span class="math inline">\(O\)</span> and pulled by gravity, slide to <span class="math inline">\(A\)</span> in the <em>shortest time</em>? With the <span class="math inline">\(y\)</span>-axis pointing downward and the curve written <span class="math inline">\(y=y(x)\)</span>, energy conservation <span class="math inline">\(\tfrac12 m v^2=m g y\)</span> gives the speed <span class="math inline">\(v=\sqrt{2gy}\)</span>, and since an element of arc <span class="math inline">\(\mathrm{d}s=\sqrt{1+y'^2}\,\mathrm{d}x\)</span> is traversed in time <span class="math inline">\(\mathrm{d}t=\mathrm{d}s/v\)</span>, the total descent time is the functional <span class="math display">\[
+T[y]=\int_0^p \frac{\sqrt{1+y'^2}}{\sqrt{2gy}}\,\mathrm{d}x .
+\]</span> Dropping the constant <span class="math inline">\(\sqrt{2g}\)</span>, the <strong>brachistochrone problem</strong> is the variational problem <span class="math display">\[
+\min_{y(\cdot)}\ \int_0^p \sqrt{\frac{1+y'^2}{y}}\,\mathrm{d}x
+\qquad\text{s.t.}\qquad y(0)=0,\ \ y(p)=q .
+\]</span> Galileo (1630) conjectured a circular arc; Johann Bernoulli (1696), Jacob Bernoulli, Leibniz, Newton, and l’Hôpital independently found the true answer — a <strong>cycloid</strong>, with parametric form <span class="math inline">\(x=a(\theta-\sin\theta)\)</span>, <span class="math inline">\(y=a(1-\cos\theta)\)</span>, the curve traced by a point on a rolling wheel. Johann Bernoulli’s ingenious solution treated the descent as light refracting through ever-finer horizontal strata, in each of which the bead moves in a straight line at constant speed; the optimal angle in each stratum obeys Snell’s law <span class="math inline">\(\sin\alpha/v=\text{const}\)</span>, exactly the optical extremal principle of Fermat. Jacob Bernoulli’s solution, by contrast, introduced the method of <em>varying the whole curve</em> — the embryo of the <strong>calculus of variations</strong> — and led to the same governing differential equation <span class="math inline">\(y\bigl(1+y'^2\bigr)=A\)</span>, whose solution is the cycloid. It was Euler who, building on these solutions, forged the general method and the milestone result that bears his name, the <strong>Euler equation</strong> <a href="#eq-intro-euler" class="quarto-xref">Equation&nbsp;<span>6</span></a>. We solve the brachistochrone in <a href="./03-calculus-of-variations.html">Chapter 3</a>.</p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>A historical aside.</strong> The cycloid is also the <strong>tautochrone</strong> (isochrone) — the curve along which a bead reaches the lowest point in a time <em>independent of its starting height</em>. That a single curve solves both problems was shown by Abel, who reduced the tautochrone to an integral equation and cracked it with the Laplace transform and the convolution theorem. The brachistochrone thus stands at the crossroads of mechanics, optics, and analysis, and is rightly called the opening problem of dynamic optimization.</p>
+</div>
+</div>
+</div>
+<p>These examples make a single methodological point visible. A <strong>static</strong> optimization problem asks for a best <em>number</em> (or vector); a <strong>dynamic</strong> problem asks for a best <em>function</em> — a whole path. That is why dynamic optimization is so much harder, and why it needs the dedicated machinery of the chapters ahead. And because every continuous-time method below ultimately reduces optimality to a <em>differential equation</em> — the Euler equation, the costate equation, the HJB equation — the prerequisite for all of them is a working command of ordinary differential equations. We therefore supply, after static optimization, a self-contained chapter on the qualitative theory of ODEs (<a href="./02-odes.html">Chapter 2</a>) before opening the dynamic theory proper.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-bellman1957" class="csl-entry" role="listitem">
+Bellman, Richard. 1957. <em>Dynamic Programming</em>. Princeton, NJ: Princeton University Press.
+</div>
+<div id="ref-vonmises1949" class="csl-entry" role="listitem">
+Mises, Ludwig von. 1949. <em>Human Action: A Treatise on Economics</em>. New Haven, CT: Yale University Press.
+</div>
+<div id="ref-pontryagin1962" class="csl-entry" role="listitem">
+Pontryagin, L. S., V. G. Boltyanskii, R. V. Gamkrelidze, and E. F. Mishchenko. 1962. <em>The Mathematical Theory of Optimal Processes</em>. New York: Interscience Publishers.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./01-static-optimization.html" class="pagination-link" aria-label="Static Optimization">
+        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

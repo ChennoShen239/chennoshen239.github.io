@@ -1,0 +1,9 @@
+/* Design tokens matching chennoshen239.github.io (plain CSS — referenced by theme.scss rules). */
+:root{
+  --ink:#16181d; --text:#2a2f38; --muted:#4f5763;
+  --red:#94070a; --red-2:#7a0608; --tint:rgba(148,7,10,.06);
+  --line:rgba(22,24,29,.12); --line-2:rgba(22,24,29,.22);
+  --sans:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --body:'Spectral',Georgia,'Times New Roman',serif;
+  --ease:cubic-bezier(.2,.6,.2,1);
+}

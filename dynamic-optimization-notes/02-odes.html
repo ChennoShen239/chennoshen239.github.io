@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+
+<title>2&nbsp; Ordinary Differential Equations – Dynamic Optimization</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-calculus-of-variations.html" rel="next">
+<link href="./01-static-optimization.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-static-optimization.html">Foundations</a></li><li class="breadcrumb-item"><a href="./02-odes.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Dynamic Optimization</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-static-optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-odes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Continuous-Time Dynamic Optimization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-calculus-of-variations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-optimal-control.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Dynamic Programming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-elementary" id="toc-sec-elementary" class="nav-link active" data-scroll-target="#sec-elementary"><span class="header-section-number">2.1</span> Elementary solution methods</a>
+  <ul class="collapse">
+  <li><a href="#sec-first-order" id="toc-sec-first-order" class="nav-link" data-scroll-target="#sec-first-order">First-order equations</a></li>
+  <li><a href="#sec-second-order" id="toc-sec-second-order" class="nav-link" data-scroll-target="#sec-second-order">Second-order linear equations</a></li>
+  <li><a href="#sec-implicit" id="toc-sec-implicit" class="nav-link" data-scroll-target="#sec-implicit">Implicit equations and the Clairaut equation</a></li>
+  </ul></li>
+  <li><a href="#sec-fundamental" id="toc-sec-fundamental" class="nav-link" data-scroll-target="#sec-fundamental"><span class="header-section-number">2.2</span> Fundamental questions</a>
+  <ul class="collapse">
+  <li><a href="#sec-existence" id="toc-sec-existence" class="nav-link" data-scroll-target="#sec-existence">Existence and uniqueness</a></li>
+  <li><a href="#sec-dependence" id="toc-sec-dependence" class="nav-link" data-scroll-target="#sec-dependence">Continuous dependence on parameters</a></li>
+  <li><a href="#sec-singular" id="toc-sec-singular" class="nav-link" data-scroll-target="#sec-singular">Singular solutions and the C-discriminant</a></li>
+  </ul></li>
+  <li><a href="#sec-qualitative" id="toc-sec-qualitative" class="nav-link" data-scroll-target="#sec-qualitative"><span class="header-section-number">2.3</span> Qualitative (geometric) theory</a>
+  <ul class="collapse">
+  <li><a href="#sec-stability" id="toc-sec-stability" class="nav-link" data-scroll-target="#sec-stability">Stability</a></li>
+  <li><a href="#sec-dynamical" id="toc-sec-dynamical" class="nav-link" data-scroll-target="#sec-dynamical">Dynamical systems</a></li>
+  <li><a href="#sec-bifurcations" id="toc-sec-bifurcations" class="nav-link" data-scroll-target="#sec-bifurcations">Bifurcations</a></li>
+  </ul></li>
+  <li><a href="#sec-odes-problems" id="toc-sec-odes-problems" class="nav-link" data-scroll-target="#sec-odes-problems"><span class="header-section-number">2.4</span> Problems</a></li>
+  <li><a href="#sec-odes-solutions" id="toc-sec-odes-solutions" class="nav-link" data-scroll-target="#sec-odes-solutions"><span class="header-section-number">2.5</span> Selected solutions</a>
+  <ul class="collapse">
+  <li><a href="#problem-2" id="toc-problem-2" class="nav-link" data-scroll-target="#problem-2">Problem 2</a></li>
+  <li><a href="#problem-5" id="toc-problem-5" class="nav-link" data-scroll-target="#problem-5">Problem 5</a></li>
+  <li><a href="#problem-9-a-saddle-and-its-saddle-paths" id="toc-problem-9-a-saddle-and-its-saddle-paths" class="nav-link" data-scroll-target="#problem-9-a-saddle-and-its-saddle-paths">Problem 9 (a saddle and its saddle paths)</a></li>
+  <li><a href="#problem-10-predatorprey-phase-diagram" id="toc-problem-10-predatorprey-phase-diagram" class="nav-link" data-scroll-target="#problem-10-predatorprey-phase-diagram">Problem 10 (predator–prey phase diagram)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-static-optimization.html">Foundations</a></li><li class="breadcrumb-item"><a href="./02-odes.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Dynamic optimization is, at bottom, the optimization of <em>trajectories</em>, and a trajectory is the solution of a differential equation. Before we can ask which path is best — the business of the later chapters — we must understand what paths are even available: how an ordinary differential equation (ODE) constrains motion, when it pins motion down uniquely, and what its solutions look like when we cannot write them down. This chapter assembles that toolkit.</p>
+<p>An <strong>ordinary differential equation</strong> is an equation involving an unknown function and its derivatives,</p>
+<p><span id="eq-general-ode"><span class="math display">\[
+F\bigl(t,\,x,\,\dot x,\,\dots,\,x^{(n)}\bigr)=0,
+\tag{2.1}\]</span></span></p>
+<p>where <span class="math inline">\(x=x(t)\)</span> is a function of <span class="math inline">\(t\in\mathbb{R}\)</span> and <span class="math inline">\(\dot x=\mathrm{d}x/\mathrm{d}t\)</span>. The <strong>order</strong> of <a href="#eq-general-ode" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> is the order <span class="math inline">\(n\)</span> of the highest derivative appearing. A <strong>solution</strong> is a function <span class="math inline">\(x(t)\)</span> that satisfies the equation identically on some interval. A solution carrying <span class="math inline">\(n\)</span> free constants — as many as the order — is the <strong>general solution</strong>; fixing the constants by side data (an <strong>initial condition</strong> <span class="math inline">\(x(t_0)=x_0\)</span>, say) selects a <strong>particular solution</strong>. The graph of any solution in the <span class="math inline">\(t\)</span>–<span class="math inline">\(x\)</span> plane is an <strong>integral curve</strong>, and the general solution traces a whole <em>family</em> of integral curves.</p>
+<p>The chapter splits into three movements, mirroring three questions one can ask of <a href="#eq-general-ode" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>.</p>
+<ul>
+<li><strong>Can we solve it explicitly?</strong> (<a href="#sec-elementary" class="quarto-xref"><span>Section 2.1</span></a>) For a short list of structured first- and second-order equations the answer is yes, by <em>elementary integration</em> — reduce the equation, step by step, to a form one can integrate directly. Most equations resist this, but the solvable cases recur constantly and supply intuition.</li>
+<li><strong>Does a solution exist, and is it unique?</strong> (<a href="#sec-fundamental" class="quarto-xref"><span>Section 2.2</span></a>) Even when we cannot solve, we can often prove that a unique solution exists and depends continuously on the data — the Picard–Lindelöf theory — and we can locate the exceptional <em>singular solutions</em> where uniqueness fails.</li>
+<li><strong>What do solutions look like?</strong> (<a href="#sec-qualitative" class="quarto-xref"><span>Section 2.3</span></a>) The <strong>qualitative</strong> or geometric theory reads the shape of the solution family off the equation itself — stability, phase portraits, the trace–determinant classification of equilibria, linearization of nonlinear systems, and bifurcations. This is the part that matters most for dynamic optimization, because the optimality conditions of later chapters are themselves differential systems whose <em>phase diagrams</em> we will need to read.</li>
+</ul>
+<p>Economic models thread through all three: the logistic law of population growth, the Solow growth model and its Golden Rule, and the Lotka–Volterra predator–prey system.</p>
+<section id="sec-elementary" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="sec-elementary"><span class="header-section-number">2.1</span> Elementary solution methods</h2>
+<p>We collect the equations that yield to <em>elementary integration</em>: a finite sequence of algebraic rearrangements and integrations reducing the problem to the trivial equation <span class="math inline">\(\dot x=f(t)\)</span>, whose solution is <span class="math inline">\(x(t)=\int f(t)\,\mathrm{d}t+C\)</span>. Only a small minority of equations are solvable this way, but they are the ones we meet again and again.</p>
+<section id="sec-first-order" class="level3">
+<h3 class="anchored" data-anchor-id="sec-first-order">First-order equations</h3>
+<p>A <strong>first-order</strong> equation in solved (explicit) form is</p>
+<p><span id="eq-first-order"><span class="math display">\[
+\dot x=f(t,x).
+\tag{2.2}\]</span></span></p>
+<p>When the right-hand side is free of <span class="math inline">\(t\)</span>, <span class="math inline">\(\dot x=f(x)\)</span>, the equation is <strong>autonomous</strong>: the law of motion depends only on the <em>state</em>, not on the clock. Autonomous equations are the backbone of the qualitative theory in <a href="#sec-qualitative" class="quarto-xref"><span>Section 2.3</span></a>. We work through five structured families.</p>
+<section id="sec-separable" class="level4">
+<h4 class="anchored" data-anchor-id="sec-separable">Separable equations</h4>
+<p>A <strong>separable</strong> equation has the form</p>
+<p><span id="eq-separable"><span class="math display">\[
+\dot x=f(t)\,g(x).
+\tag{2.3}\]</span></span></p>
+<p>If <span class="math inline">\(g(x_0)=0\)</span> for some <span class="math inline">\(x_0\)</span>, then the constant <span class="math inline">\(x\equiv x_0\)</span> is a solution. Away from the zeros of <span class="math inline">\(g\)</span>, divide and integrate:</p>
+<p><span id="eq-separable-int"><span class="math display">\[
+\frac{1}{g(x)}\,\mathrm{d}x=f(t)\,\mathrm{d}t
+\quad\Longrightarrow\quad
+\int\frac{1}{g(x)}\,\mathrm{d}x=\int f(t)\,\mathrm{d}t+C,
+\tag{2.4}\]</span></span></p>
+<p>giving the general solution implicitly.</p>
+<div id="exm-separable-basic" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.1 (A separable equation with two branches)</strong></span> For <span class="math inline">\(\dot x=t/x\)</span> we have <span class="math inline">\(x\,\mathrm{d}x=t\,\mathrm{d}t\)</span>, hence <span class="math inline">\(x^2=t^2+C\)</span>. This implicit relation splits into two <em>branches</em>, <span class="math inline">\(x=\sqrt{t^2+C}\)</span> and <span class="math inline">\(x=-\sqrt{t^2+C}\)</span>, with in general different natural domains. The initial condition <span class="math inline">\(x(0)=1\)</span> selects the first branch, <span class="math inline">\(x=\sqrt{t^2+1}\)</span>, which is defined on all of <span class="math inline">\(\mathbb{R}\)</span>; by contrast <span class="math inline">\(x=\sqrt{t^2-1}\)</span> would live only on <span class="math inline">\((-\infty,-1]\cup[1,\infty)\)</span>. A single implicit solution can thus harbor several genuinely distinct integral curves with distinct domains.</p>
+</div>
+<div id="exm-separable-arctan" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.2 (An initial-value problem with finite domain)</strong></span> For <span class="math inline">\(\dot x=1+x^2\)</span>, <span class="math inline">\(x(0)=0\)</span>: separating gives <span class="math inline">\(\mathrm{d}x/(1+x^2)=\mathrm{d}t\)</span>, so <span class="math inline">\(x=\tan(t+C)\)</span>, and <span class="math inline">\(x(0)=0\)</span> forces <span class="math inline">\(C=0\)</span>. The solution <span class="math inline">\(x=\tan t\)</span> is defined only on <span class="math inline">\((-\tfrac\pi2,\tfrac\pi2)\)</span> — even though the right-hand side <span class="math inline">\(1+x^2\)</span> is perfectly smooth everywhere. The integral curve runs off to infinity at the ends of its interval. Existence “in the large” is not guaranteed by smoothness of <span class="math inline">\(f\)</span>; this example recurs in <a href="#sec-existence" class="quarto-xref"><span>Section 2.2.1</span></a>.</p>
+</div>
+<p>The leading economic application of a separable equation is the logistic law of growth.</p>
+<div id="exm-logistic" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.3 (The Verhulst–Pearl (logistic) model)</strong></span> Let <span class="math inline">\(x(t)\)</span> be the size of a population in a region with finite resources, governed by</p>
+<p><span id="eq-logistic"><span class="math display">\[
+\dot x=r\,x\Bigl(1-\frac{x}{K}\Bigr),\qquad x\ge 0,
+\tag{2.5}\]</span></span></p>
+<p>where <span class="math inline">\(r&gt;0\)</span> is the <strong>intrinsic growth rate</strong> and <span class="math inline">\(K&gt;0\)</span> the <strong>carrying capacity</strong>. The constants <span class="math inline">\(x\equiv 0\)</span> and <span class="math inline">\(x\equiv K\)</span> are equilibrium solutions. For <span class="math inline">\(0&lt;x_0&lt;K\)</span> or <span class="math inline">\(x_0&gt;K\)</span>, set <span class="math inline">\(y=x/K\)</span>, so <span class="math inline">\(\dot y=r\,y(1-y)\)</span>; separating and using partial fractions, <span class="math display">\[
+\int\frac{\mathrm{d}y}{y(1-y)}=\int r\,\mathrm{d}t
+\quad\Longrightarrow\quad
+\ln\Bigl|\frac{y}{1-y}\Bigr|=rt+c.
+\]</span> Solving for <span class="math inline">\(y\)</span> and undoing the substitution, <span id="eq-logistic-soln"><span class="math display">\[
+x(t)=\frac{K}{1\pm e^{c-rt}},
+\tag{2.6}\]</span></span> with <span class="math inline">\(c\)</span> and the sign fixed by <span class="math inline">\(x(0)\)</span>. As <span class="math inline">\(t\to\infty\)</span>, <span class="math inline">\(x(t)\to K\)</span> monotonically from either side: the population settles at carrying capacity. The S-shaped curve <span class="math inline">\(1/(1+e^{\alpha+\beta x})\)</span> is the <strong>logistic function</strong>; we re-derive the convergence of <a href="#eq-logistic-soln" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> <em>without solving</em> — by reading the phase line — in <a href="#sec-one-dim" class="quarto-xref"><span>Section 2.3.2.1</span></a>.</p>
+</div>
+</section>
+<section id="sec-homogeneous" class="level4">
+<h4 class="anchored" data-anchor-id="sec-homogeneous">Homogeneous equations</h4>
+<p>An equation is <strong>homogeneous</strong> when its right-hand side depends on <span class="math inline">\(t,x\)</span> only through the ratio <span class="math inline">\(x/t\)</span>:</p>
+<p><span id="eq-homogeneous"><span class="math display">\[
+\dot x=f\Bigl(\frac{x}{t}\Bigr).
+\tag{2.7}\]</span></span></p>
+<p>The substitution <span class="math inline">\(u=x/t\)</span>, i.e.&nbsp;<span class="math inline">\(x=ut\)</span>, turns it separable: from <span class="math inline">\(\dot x=\dot u\,t+u\)</span> we get <span class="math inline">\(\dot u\,t+u=f(u)\)</span>, hence</p>
+<p><span id="eq-homogeneous-sep"><span class="math display">\[
+\frac{\mathrm{d}u}{f(u)-u}=\frac{\mathrm{d}t}{t},
+\tag{2.8}\]</span></span></p>
+<p>which integrates; then back-substitute <span class="math inline">\(u=x/t\)</span>.</p>
+<div id="exm-homogeneous" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.4 (A homogeneous equation)</strong></span> For <span class="math inline">\(\dot x=(x-t)/(x+t)\)</span>, set <span class="math inline">\(u=x/t\)</span>: <span class="math inline">\(\dot u\,t+u=(u-1)/(u+1)\)</span>, so <span class="math inline">\(\dot u\,t=-(u^2+1)/(u+1)\)</span> and <span class="math display">\[
+\int\frac{u+1}{u^2+1}\,\mathrm{d}u=-\int\frac{\mathrm{d}t}{t}+C,
+\]</span> giving <span class="math inline">\(\tfrac12\ln(u^2+1)+\arctan u=-\ln|t|+C\)</span>. In the original variables, <span class="math display">\[
+\ln\bigl(x^2+t^2\bigr)+2\arctan\!\Bigl(\frac{x}{t}\Bigr)=C.
+\]</span> The solution is implicit and, like <a href="#exm-separable-basic" class="quarto-xref">Example&nbsp;<span>2.1</span></a>, multivalued. With <span class="math inline">\(x(1)=1\)</span> one finds <span class="math inline">\(C=\ln 2+\tfrac\pi2\)</span>.</p>
+</div>
+<p>A near-homogeneous equation of the form <span class="math inline">\(\dot x=f\bigl((a_1x+b_1t+c_1)/(a_2x+b_2t+c_2)\bigr)\)</span> with <span class="math inline">\(\bigl|\begin{smallmatrix}a_1&amp;b_1\\a_2&amp;b_2\end{smallmatrix}\bigr|\ne 0\)</span> is made homogeneous by translating the origin to the intersection of the two lines: put <span class="math inline">\(x=u+\alpha\)</span>, <span class="math inline">\(t=s+\beta\)</span> with <span class="math inline">\((\alpha,\beta)\)</span> solving <span class="math inline">\(a_1\alpha+b_1\beta+c_1=0\)</span>, <span class="math inline">\(a_2\alpha+b_2\beta+c_2=0\)</span>. The constants cancel and one is left with <span class="math inline">\(\mathrm{d}u/\mathrm{d}s=f\bigl((a_1u+b_1s)/(a_2u+b_2s)\bigr)\)</span>, homogeneous in <span class="math inline">\((u,s)\)</span>.</p>
+</section>
+<section id="sec-exact" class="level4">
+<h4 class="anchored" data-anchor-id="sec-exact">Exact equations and integrating factors</h4>
+<p>Write a first-order equation in differential form,</p>
+<p><span id="eq-exact-form"><span class="math display">\[
+M(t,x)\,\mathrm{d}t+N(t,x)\,\mathrm{d}x=0.
+\tag{2.9}\]</span></span></p>
+<p>It is <strong>exact</strong> if the left side is the total differential of some potential <span class="math inline">\(U(t,x)\)</span>, i.e. <span class="math inline">\(\mathrm{d}U=M\,\mathrm{d}t+N\,\mathrm{d}x\)</span>, for then <a href="#eq-exact-form" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> reads <span class="math inline">\(\mathrm{d}U=0\)</span> and the general solution is the implicit level set <span class="math inline">\(U(t,x)=C\)</span>.</p>
+<div id="thm-exactness" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.1 (Exactness criterion)</strong></span> Suppose <span class="math inline">\(M,N\)</span> are continuously differentiable on a simply-connected region. Then <a href="#eq-exact-form" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> is exact if and only if <span id="eq-exact-criterion"><span class="math display">\[
+\frac{\partial M}{\partial x}=\frac{\partial N}{\partial t}.
+\tag{2.10}\]</span></span> When it holds, a potential is <span id="eq-potential"><span class="math display">\[
+U(t,x)=\int_{t_0}^{t}M(s,x)\,\mathrm{d}s+\int_{x_0}^{x}N(t_0,y)\,\mathrm{d}y,
+\tag{2.11}\]</span></span> and the general solution is <span class="math inline">\(U(t,x)=C\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Necessity: if <span class="math inline">\(\mathrm{d}U=M\,\mathrm{d}t+N\,\mathrm{d}x\)</span> then <span class="math inline">\(M=U_t\)</span> and <span class="math inline">\(N=U_x\)</span>, so <span class="math inline">\(M_x=U_{tx}=U_{xt}=N_t\)</span> by equality of mixed partials. Sufficiency: define <span class="math inline">\(U\)</span> by <a href="#eq-potential" class="quarto-xref">Equation&nbsp;<span>2.11</span></a>. Then <span class="math inline">\(U_t=M(t,x)\)</span> directly by the fundamental theorem of calculus applied to the first integral (the second integral is <span class="math inline">\(t\)</span>-independent). For <span class="math inline">\(U_x\)</span>, differentiate under the integral sign, <span class="math display">\[
+U_x=\int_{t_0}^{t}M_x(s,x)\,\mathrm{d}s+N(t_0,x)
+=\int_{t_0}^{t}N_t(s,x)\,\mathrm{d}s+N(t_0,x)=N(t,x),
+\]</span> using <a href="#eq-exact-criterion" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> in the middle step and the fundamental theorem in the last. Hence <span class="math inline">\(\mathrm{d}U=M\,\mathrm{d}t+N\,\mathrm{d}x\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="exm-exact" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.5 (An exact equation)</strong></span> Consider <span class="math inline">\(2tx\,\mathrm{d}t+(t^2+x)\,\mathrm{d}x=0\)</span>. Here <span class="math inline">\(M_x=2t=N_t\)</span>, so it is exact. Building the potential from <a href="#eq-potential" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> gives <span class="math inline">\(U=t^2x+\tfrac12 x^2\)</span>, so the general solution is <span class="math inline">\(x^2+2t^2x=C\)</span>. With <span class="math inline">\(x(0)=1\)</span> this is <span class="math inline">\(x^2+2t^2x=1\)</span>, i.e.&nbsp;<span class="math inline">\(x=\sqrt{t^4+1}-t^2\)</span>.</p>
+</div>
+<p>When <a href="#eq-exact-criterion" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> fails, one may still seek an <strong>integrating factor</strong> <span class="math inline">\(\mu(t,x)\)</span> rendering <span class="math inline">\(\mu M\,\mathrm{d}t+\mu N\,\mathrm{d}x=0\)</span> exact. The exactness condition <span class="math inline">\((\mu M)_x=(\mu N)_t\)</span> is in general a partial differential equation for <span class="math inline">\(\mu\)</span> — harder than the original problem — but two special cases are tractable.</p>
+<div id="prp-integrating-factor" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.1 (Integrating factors depending on one variable)</strong></span> &nbsp;</p>
+<ol type="i">
+<li>If <span class="math inline">\(\dfrac{1}{N}\bigl(M_x-N_t\bigr)\)</span> depends on <span class="math inline">\(t\)</span> alone, then a <span class="math inline">\(t\)</span>-only integrating factor exists: <span id="eq-mu-t"><span class="math display">\[
+\mu(t)=\exp\!\Bigl(\int\frac{1}{N}\bigl(M_x-N_t\bigr)\,\mathrm{d}t\Bigr).
+\tag{2.12}\]</span></span></li>
+<li>If <span class="math inline">\(\dfrac{1}{M}\bigl(N_t-M_x\bigr)\)</span> depends on <span class="math inline">\(x\)</span> alone, then an <span class="math inline">\(x\)</span>-only integrating factor exists: <span id="eq-mu-x"><span class="math display">\[
+\mu(x)=\exp\!\Bigl(\int\frac{1}{M}\bigl(N_t-M_x\bigr)\,\mathrm{d}x\Bigr).
+\tag{2.13}\]</span></span></li>
+</ol>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For (i) seek <span class="math inline">\(\mu=\mu(t)\)</span>. Exactness <span class="math inline">\((\mu M)_x=(\mu N)_t\)</span> expands to <span class="math inline">\(\mu M_x=\dot\mu\,N+\mu N_t\)</span>, i.e.&nbsp;<span class="math inline">\(\mu\bigl(M_x-N_t\bigr)=\dot\mu\,N\)</span>, so <span class="math inline">\(\dot\mu/\mu=\bigl(M_x-N_t\bigr)/N\)</span>. The right side being a function of <span class="math inline">\(t\)</span> alone makes this a separable ODE for <span class="math inline">\(\mu\)</span>, integrating to <a href="#eq-mu-t" class="quarto-xref">Equation&nbsp;<span>2.12</span></a>. Case (ii) is symmetric, exchanging the roles of <span class="math inline">\(t\)</span> and <span class="math inline">\(x\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="exm-integrating-factor" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.6 (An integrating factor in <span class="math inline">\(t\)</span>)</strong></span> For <span class="math inline">\((t^2+x^2+t)\,\mathrm{d}t+tx\,\mathrm{d}x=0\)</span>, we have <span class="math inline">\(M_x=2x\)</span>, <span class="math inline">\(N_t=x\)</span>, so <span class="math inline">\(\frac1N(M_x-N_t)=\frac{x}{tx}=\frac1t\)</span>, a function of <span class="math inline">\(t\)</span> alone. Hence <span class="math inline">\(\mu=\exp\!\int\frac{\mathrm{d}t}{t}=t\)</span>. Multiplying through, <span class="math inline">\((t^3+tx^2+t^2)\,\mathrm{d}t+t^2x\,\mathrm{d}x=0\)</span> is exact and equals <span class="math inline">\(\mathrm{d}\bigl(\tfrac{t^4}{4}+\tfrac{x^2t^2}{2}+\tfrac{t^3}{3}\bigr)\)</span>, so the general solution is <span class="math inline">\(\tfrac{t^4}{4}+\tfrac{x^2t^2}{2}+\tfrac{t^3}{3}=C\)</span>.</p>
+</div>
+</section>
+<section id="sec-linear-bernoulli" class="level4">
+<h4 class="anchored" data-anchor-id="sec-linear-bernoulli">Linear and Bernoulli equations</h4>
+<p>The <strong>first-order linear</strong> equation is</p>
+<p><span id="eq-linear-first"><span class="math display">\[
+\dot x+p(t)\,x=f(t).
+\tag{2.14}\]</span></span></p>
+<p>It is <strong>homogeneous</strong> if <span class="math inline">\(f\equiv 0\)</span>, and the associated homogeneous equation <span class="math inline">\(\dot x+p(t)x=0\)</span> is separable, with solution <span class="math inline">\(x=C\exp\!\bigl(-\int p\bigr)\)</span>. The general theory of linear equations — that the difference of any two solutions of <a href="#eq-linear-first" class="quarto-xref">Equation&nbsp;<span>2.14</span></a> solves the homogeneous equation, so the general solution is “a particular solution plus the homogeneous family” — applies. The cleanest route is an integrating factor: multiply <a href="#eq-linear-first" class="quarto-xref">Equation&nbsp;<span>2.14</span></a> by <span class="math inline">\(\varphi(t)=\exp\!\bigl(\int_{t_0}^t
+p(s)\,\mathrm{d}s\bigr)\)</span>. Because <span class="math inline">\(\dot\varphi=p\,\varphi\)</span>, the left side collapses to a derivative, <span class="math display">\[
+\frac{\mathrm{d}}{\mathrm{d}t}\bigl(\varphi\,x\bigr)=\varphi\,\dot x+\varphi\,p\,x=\varphi\,f,
+\]</span> so integrating gives the <strong>variation-of-constants formula</strong></p>
+<p><span id="eq-linear-soln"><span class="math display">\[
+x(t)=\frac{1}{\varphi(t)}\Bigl(\int_{t_0}^{t}\varphi(s)\,f(s)\,\mathrm{d}s+C\Bigr),
+\qquad \varphi(t)=\exp\!\Bigl(\int_{t_0}^{t}p(s)\,\mathrm{d}s\Bigr).
+\tag{2.15}\]</span></span></p>
+<p>It is the <em>method</em> — integrating factor or, equivalently, varying the constant <span class="math inline">\(C\to C(t)\)</span> in the homogeneous solution — that matters, not the formula.</p>
+<div id="exm-linear" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.7 (A linear equation)</strong></span> For <span class="math inline">\(\dot x-x\cos t=2\cos t\)</span>, <span class="math inline">\(x(0)=0\)</span>: here <span class="math inline">\(p=-\cos t\)</span>, so <span class="math inline">\(\varphi=e^{-\sin t}\)</span>. Then <span class="math inline">\(\frac{\mathrm{d}}{\mathrm{d}t}\bigl(x e^{-\sin t}\bigr)=2\cos t\,e^{-\sin t}\)</span>, and integrating from <span class="math inline">\(0\)</span>, <span class="math inline">\(x e^{-\sin t}=2\bigl[1-e^{-\sin t}\bigr]\)</span>, i.e.&nbsp;<span class="math inline">\(x=2\bigl(e^{\sin t}-1\bigr)\)</span>.</p>
+</div>
+<p>The <strong>Bernoulli equation</strong> <span class="math inline">\(\dot x+p(t)x=f(t)x^n\)</span> (<span class="math inline">\(n\ne 0,1\)</span>) reduces to linear form: divide by <span class="math inline">\(x^n\)</span> and set <span class="math inline">\(y=x^{1-n}\)</span>. Since <span class="math inline">\(\dot y=(1-n)x^{-n}\dot x\)</span>, the equation becomes <span class="math inline">\(\tfrac{1}{1-n}\dot y+p(t)y=f(t)\)</span>, a linear equation <a href="#eq-linear-first" class="quarto-xref">Equation&nbsp;<span>2.14</span></a> in <span class="math inline">\(y\)</span>, solved by <a href="#eq-linear-soln" class="quarto-xref">Equation&nbsp;<span>2.15</span></a>.</p>
+</section>
+<section id="sec-linear-systems" class="level4">
+<h4 class="anchored" data-anchor-id="sec-linear-systems">Two-dimensional constant-coefficient linear systems</h4>
+<p>A <strong>linear system</strong> is <span class="math inline">\(\dot x=A(t)\,x+b(t)\)</span> with <span class="math inline">\(A(t)\)</span> an <span class="math inline">\(n\times n\)</span> matrix function and <span class="math inline">\(b(t)\)</span> an <span class="math inline">\(n\)</span>-vector. We focus on the <strong>constant-coefficient homogeneous</strong> planar case,</p>
+<p><span id="eq-linear-system"><span class="math display">\[
+\dot x=A\,x,\qquad A\in\mathbb{R}^{2\times 2}.
+\tag{2.16}\]</span></span></p>
+<p>We first record the general structure, then build the explicit solution from the <strong>matrix exponential</strong>.</p>
+<div id="def-fundamental" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.1 (Linear independence and fundamental matrix)</strong></span> Vector functions <span class="math inline">\(x_1(t),\dots,x_m(t)\)</span> are <strong>linearly dependent</strong> if there are constants <span class="math inline">\(\alpha_1,\dots,\alpha_m\)</span>, not all zero, with <span class="math inline">\(\sum_k\alpha_k x_k(t)=0\)</span> for all <span class="math inline">\(t\)</span>; otherwise they are <strong>linearly independent</strong>. A <strong>fundamental matrix</strong> of <span class="math inline">\(\dot x=A(t)x\)</span> is a matrix <span class="math inline">\(X(t)\)</span> whose columns are <span class="math inline">\(n\)</span> linearly independent solutions; the general solution is then <span class="math inline">\(x=X(t)c\)</span>, <span class="math inline">\(c\in\mathbb{R}^n\)</span>.</p>
+</div>
+<div id="thm-fundamental" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.2 (Existence and structure of fundamental matrices)</strong></span> For <span class="math inline">\(\dot x=A(t)x\)</span> with <span class="math inline">\(A(\cdot)\)</span> continuous there exist <span class="math inline">\(n\)</span> linearly independent solutions, and every solution is a linear combination of them. If <span class="math inline">\(X\)</span> is one fundamental matrix, the set of all fundamental matrices is exactly <span class="math inline">\(\{XP:\det P\ne 0\}\)</span>. A fundamental matrix itself solves the matrix equation <span class="math inline">\(\dot X=A(t)X\)</span>.</p>
+</div>
+<p>For the constant-coefficient case the fundamental matrix is an explicit exponential. Motivated by the scalar case <span class="math inline">\(\dot x=ax\)</span> with solution <span class="math inline">\(e^{at}=\sum_{k\ge 0}(at)^k/k!\)</span>, define for a square matrix <span class="math inline">\(B\)</span> the <strong>matrix exponential</strong></p>
+<p><span id="eq-matrix-exp"><span class="math display">\[
+e^{B}:=\sum_{k=0}^{\infty}\frac{B^{k}}{k!},
+\tag{2.17}\]</span></span></p>
+<p>a series that converges entrywise for every <span class="math inline">\(B\)</span>.</p>
+<div id="prp-matexp" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.2 (Properties of the matrix exponential)</strong></span> Let <span class="math inline">\(O,I\)</span> denote the zero and identity matrices. Then:</p>
+<ol type="i">
+<li><p><span class="math inline">\(e^{B}\)</span> is invertible with <span class="math inline">\(\bigl(e^{B}\bigr)^{-1}=e^{-B}\)</span>;</p></li>
+<li><p><span class="math inline">\(e^{It}=e^{t}I\)</span> for <span class="math inline">\(t\in\mathbb{R}\)</span>;</p></li>
+<li><p>if <span class="math inline">\(B=\operatorname{diag}(B_1,\dots,B_k)\)</span> is block-diagonal, so is <span class="math inline">\(e^{B}=\operatorname{diag}(e^{B_1},\dots,e^{B_k})\)</span>;</p></li>
+<li><p><span class="math inline">\(e^{B+C}=e^{B}e^{C}\)</span> whenever <span class="math inline">\(BC=CB\)</span>;</p></li>
+<li><p><span class="math inline">\(e^{P^{-1}BP}=P^{-1}e^{B}P\)</span> for any invertible <span class="math inline">\(P\)</span>;</p></li>
+<li><p><span class="math inline">\(\dfrac{\mathrm{d}}{\mathrm{d}t}\,e^{Bt}=B\,e^{Bt}\)</span> for all <span class="math inline">\(t\in\mathbb{R}\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>(ii), (iii), (v) are immediate from the series (in (v), <span class="math inline">\(\bigl(P^{-1}BP\bigr)^k=P^{-1}B^kP\)</span>). For (iv), expand <span class="math inline">\(e^{B+C}\)</span> by the binomial theorem term by term; commutativity <span class="math inline">\(BC=CB\)</span> is exactly what licenses <span class="math inline">\(\sum_k(B+C)^k/k!=\bigl(\sum_i B^i/i!\bigr)\bigl(\sum_j C^j/j!\bigr)\)</span>. Then (i) follows from (iv) with <span class="math inline">\(C=-B\)</span> (which commutes with <span class="math inline">\(B\)</span>): <span class="math inline">\(e^{B}e^{-B}=e^{O}=I\)</span>. For (vi), differentiate the series term by term (justified by uniform convergence on compacts), <span class="math display">\[
+\frac{\mathrm{d}}{\mathrm{d}t}\sum_{k=0}^{\infty}\frac{B^{k}t^{k}}{k!}
+=\sum_{k=1}^{\infty}\frac{B^{k}t^{k-1}}{(k-1)!}
+=B\sum_{k=1}^{\infty}\frac{(Bt)^{k-1}}{(k-1)!}=B\,e^{Bt}. \quad\blacksquare
+\]</span></p>
+</div>
+<p>Property (vi) says precisely that <span class="math inline">\(X(t)=e^{At}\)</span> is a fundamental matrix of <a href="#eq-linear-system" class="quarto-xref">Equation&nbsp;<span>2.16</span></a>: it solves <span class="math inline">\(\dot X=AX\)</span> and is invertible by (i). The general solution is <span class="math inline">\(x(t)=e^{At}c\)</span>, and with <span class="math inline">\(x(0)=x_0\)</span> we get <span class="math inline">\(x(t)=e^{At}x_0\)</span>. It remains to compute <span class="math inline">\(e^{At}\)</span>, which we do through the <strong>Jordan form</strong>. Over <span class="math inline">\(\mathbb{C}\)</span>, any <span class="math inline">\(2\times 2\)</span> matrix <span class="math inline">\(A\)</span> is similar to one of two Jordan types, <span class="math display">\[
+J=\begin{pmatrix}\lambda_1&amp;0\\0&amp;\lambda_2\end{pmatrix}
+\quad\text{or}\quad
+J=\begin{pmatrix}\lambda&amp;1\\0&amp;\lambda\end{pmatrix},
+\qquad P^{-1}AP=J,
+\]</span> where <span class="math inline">\(\lambda_1,\lambda_2\)</span> (or <span class="math inline">\(\lambda\)</span>) are the eigenvalues of <span class="math inline">\(A\)</span>. By (v), <span class="math inline">\(e^{At}=P\,e^{Jt}P^{-1}\)</span>, so <span class="math inline">\(P\,e^{Jt}\)</span> is also a fundamental matrix. The two cases give the two canonical solution forms.</p>
+<p><strong>Case (I): distinct eigenvalues <span class="math inline">\(\lambda_1\ne\lambda_2\)</span>.</strong> Write <span class="math inline">\(P=(\xi_1,\xi_2)\)</span> in columns. From <span class="math inline">\(AP=PJ\)</span> and the diagonal <span class="math inline">\(J\)</span>, <span class="math display">\[
+(A\xi_1,A\xi_2)=(\xi_1,\xi_2)\begin{pmatrix}\lambda_1&amp;0\\0&amp;\lambda_2\end{pmatrix}
+=(\lambda_1\xi_1,\lambda_2\xi_2),
+\]</span> so <span class="math inline">\(A\xi_j=\lambda_j\xi_j\)</span>: the columns of <span class="math inline">\(P\)</span> are eigenvectors. Since <span class="math inline">\(e^{Jt}=\operatorname{diag}(e^{\lambda_1 t},e^{\lambda_2 t})\)</span>, <span class="math display">\[
+P\,e^{Jt}=\bigl(e^{\lambda_1 t}\xi_1,\;e^{\lambda_2 t}\xi_2\bigr),
+\]</span> so a fundamental system is</p>
+<p><span id="eq-fund-distinct"><span class="math display">\[
+e^{\lambda_1 t}\,\xi_1,\qquad e^{\lambda_2 t}\,\xi_2,
+\tag{2.18}\]</span></span></p>
+<p>with <span class="math inline">\(\xi_1,\xi_2\)</span> the eigenvectors. If <span class="math inline">\(\lambda_1,\lambda_2\)</span> are a complex-conjugate pair, the solutions <a href="#eq-fund-distinct" class="quarto-xref">Equation&nbsp;<span>2.18</span></a> are complex conjugates; taking real and imaginary parts of <span class="math inline">\(e^{\lambda_1 t}\xi_1\)</span> yields two real solutions, which form a real fundamental system.</p>
+<p><strong>Case (II): repeated eigenvalue <span class="math inline">\(\lambda_1=\lambda_2=:\lambda\)</span>.</strong> Write <span class="math inline">\(J=\lambda I+\varepsilon\)</span> with <span class="math inline">\(\varepsilon=\bigl(\begin{smallmatrix}0&amp;1\\0&amp;0\end{smallmatrix}\bigr)\)</span>, which is nilpotent, <span class="math inline">\(\varepsilon^2=O\)</span>. Since <span class="math inline">\(\lambda I\)</span> and <span class="math inline">\(\varepsilon\)</span> commute, (iv) gives <span class="math inline">\(e^{Jt}=e^{\lambda t}e^{\varepsilon t}=e^{\lambda t}(I+\varepsilon t)\)</span>, and then <span id="eq-fund-repeated"><span class="math display">\[
+e^{At}=P\,e^{\lambda t}(I+\varepsilon t)\,P^{-1}
+=e^{\lambda t}\bigl(I+(A-\lambda I)t\bigr),
+\tag{2.19}\]</span></span> using <span class="math inline">\(P\varepsilon P^{-1}=A-\lambda I\)</span>. The two columns of <a href="#eq-fund-repeated" class="quarto-xref">Equation&nbsp;<span>2.19</span></a> form a fundamental system.</p>
+<p>For the <strong>inhomogeneous</strong> system <span class="math inline">\(\dot x=Ax+b\)</span> with constant <span class="math inline">\(b\)</span> and invertible <span class="math inline">\(A\)</span>, a particular solution is the constant <span class="math inline">\(x=-A^{-1}b\)</span> (it kills <span class="math inline">\(\dot x\)</span> and solves <span class="math inline">\(Ax+b=0\)</span>). The general solution is this plus the homogeneous family. Alternatively, <strong>variation of parameters</strong>: with <span class="math inline">\(X(t)\)</span> a fundamental matrix of <span class="math inline">\(\dot x=Ax\)</span>, seek <span class="math inline">\(x=X(t)c(t)\)</span>. Substituting, <span class="math inline">\(\dot X c+X\dot c=AXc+b=\dot X c+b\)</span>, so <span class="math inline">\(\dot c=X^{-1}b\)</span>, which integrates to give <span class="math inline">\(c(t)\)</span>.</p>
+<div id="exm-system-distinct" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.8 (A system with distinct real eigenvalues)</strong></span> Solve <span class="math inline">\(\dot x=2x+y\)</span>, <span class="math inline">\(\dot y=y\)</span>. The matrix <span class="math inline">\(A=\bigl(\begin{smallmatrix}2&amp;1\\0&amp;1\end{smallmatrix}\bigr)\)</span> has eigenvalues <span class="math inline">\(\lambda_1=1\)</span>, <span class="math inline">\(\lambda_2=2\)</span>. For <span class="math inline">\(\lambda_1=1\)</span>: <span class="math inline">\((A-I)\xi=0\)</span> reads <span class="math inline">\(x_1+x_2=0\)</span>, so <span class="math inline">\(\xi_1=\bigl(\begin{smallmatrix}-1\\1\end{smallmatrix}\bigr)\)</span>. For <span class="math inline">\(\lambda_2=2\)</span>: <span class="math inline">\((A-2I)\xi=0\)</span> reads <span class="math inline">\(x_2=0\)</span>, so <span class="math inline">\(\xi_2=\bigl(\begin{smallmatrix}1\\0\end{smallmatrix}\bigr)\)</span>. By <a href="#eq-fund-distinct" class="quarto-xref">Equation&nbsp;<span>2.18</span></a> the general solution is <span class="math display">\[
+\begin{pmatrix}x\\y\end{pmatrix}
+=c_1 e^{t}\begin{pmatrix}-1\\1\end{pmatrix}+c_2 e^{2t}\begin{pmatrix}1\\0\end{pmatrix}
+=\begin{pmatrix}-c_1 e^{t}+c_2 e^{2t}\\ c_1 e^{t}\end{pmatrix}.
+\]</span> (One can also solve directly: <span class="math inline">\(\dot y=y\)</span> gives <span class="math inline">\(y=c_1 e^{t}\)</span>, then <span class="math inline">\(\dot x=2x+c_1 e^{t}\)</span> is linear, recovering the same answer.)</p>
+</div>
+<div id="exm-system-center" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.9 (A system with imaginary eigenvalues)</strong></span> Solve <span class="math inline">\(\dot x=y\)</span>, <span class="math inline">\(\dot y=-x\)</span>. Here <span class="math inline">\(A=\bigl(\begin{smallmatrix}0&amp;1\\-1&amp;0\end{smallmatrix}\bigr)\)</span> with <span class="math inline">\(\det(A-\lambda I)=\lambda^2+1=0\)</span>, so <span class="math inline">\(\lambda=\pm i\)</span>. For <span class="math inline">\(\lambda=i\)</span> the eigenvector solves <span class="math inline">\(-ix_1+x_2=0\)</span>, giving <span class="math inline">\(\xi=\bigl(\begin{smallmatrix}1\\i\end{smallmatrix}\bigr)\)</span>. Then <span class="math display">\[
+e^{it}\begin{pmatrix}1\\i\end{pmatrix}
+=\begin{pmatrix}\cos t\\-\sin t\end{pmatrix}+i\begin{pmatrix}\sin t\\\cos t\end{pmatrix},
+\]</span> whose real and imaginary parts form a real fundamental system; the general solution is <span class="math display">\[
+\begin{pmatrix}x\\y\end{pmatrix}
+=c_1\begin{pmatrix}\cos t\\-\sin t\end{pmatrix}+c_2\begin{pmatrix}\sin t\\\cos t\end{pmatrix}.
+\]</span> Each trajectory satisfies <span class="math inline">\(x^2+y^2=C\)</span>: multiplying the equations, <span class="math inline">\(x\dot x+y\dot y=0\)</span>, so <span class="math inline">\(\tfrac{\mathrm{d}}{\mathrm{d}t}(x^2+y^2)=0\)</span>. The orbits are circles about the origin — a <strong>center</strong> (<a href="#sec-planar" class="quarto-xref"><span>Section 2.3.2.2</span></a>).</p>
+</div>
+<div id="exm-system-repeated" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.10 (A defective (repeated-eigenvalue) system)</strong></span> Solve <span class="math inline">\(\dot x=x+y\)</span>, <span class="math inline">\(\dot y=y\)</span>. The matrix <span class="math inline">\(A=\bigl(\begin{smallmatrix}1&amp;1\\0&amp;1\end{smallmatrix}\bigr)\)</span> has the double eigenvalue <span class="math inline">\(\lambda=1\)</span> with only one independent eigenvector <span class="math inline">\(\bigl(\begin{smallmatrix}1\\0\end{smallmatrix}\bigr)\)</span>. By <a href="#eq-fund-repeated" class="quarto-xref">Equation&nbsp;<span>2.19</span></a> a fundamental system is <span class="math inline">\(e^{t}\bigl(\begin{smallmatrix}1\\0\end{smallmatrix}\bigr)\)</span> and <span class="math inline">\(e^{t}\bigl(\begin{smallmatrix}t\\1\end{smallmatrix}\bigr)\)</span>, so <span class="math display">\[
+x=(c_1+c_2 t)e^{t},\qquad y=c_2 e^{t}.
+\]</span></p>
+</div>
+</section>
+</section>
+<section id="sec-second-order" class="level3">
+<h3 class="anchored" data-anchor-id="sec-second-order">Second-order linear equations</h3>
+<p>A <strong>second-order linear</strong> equation is <span class="math inline">\(\ddot x+p(t)\dot x+q(t)x=r(t)\)</span>; it is <strong>homogeneous</strong> when <span class="math inline">\(r\equiv 0\)</span>. As with first-order linear equations, the difference of any two solutions solves the homogeneous equation, so a particular solution plus the homogeneous family is the general solution. We treat the <strong>constant-coefficient homogeneous</strong> case</p>
+<p><span id="eq-second-order"><span class="math display">\[
+\ddot x+p\,\dot x+q\,x=0.
+\tag{2.20}\]</span></span></p>
+<p>Setting <span class="math inline">\(y=\dot x\)</span> turns <a href="#eq-second-order" class="quarto-xref">Equation&nbsp;<span>2.20</span></a> into the planar system <span class="math inline">\(\dot x=y\)</span>, <span class="math inline">\(\dot y=-qx-py\)</span>, with matrix <span class="math inline">\(\bigl(\begin{smallmatrix}0&amp;1\\-q&amp;-p\end{smallmatrix}\bigr)\)</span> whose characteristic equation is <span class="math inline">\(\lambda^2+p\lambda+q=0\)</span>. So <a href="#eq-second-order" class="quarto-xref">Equation&nbsp;<span>2.20</span></a> reduces to <a href="#sec-linear-systems" class="quarto-xref"><span>Section 2.1.1.5</span></a>. Directly, the <strong>trial solution</strong> <span class="math inline">\(x=e^{rt}\)</span> substituted into <a href="#eq-second-order" class="quarto-xref">Equation&nbsp;<span>2.20</span></a> gives <span class="math inline">\(e^{rt}(r^2+pr+q)=0\)</span>, so <span class="math inline">\(r\)</span> must solve the <strong>characteristic equation</strong></p>
+<p><span id="eq-characteristic"><span class="math display">\[
+r^2+pr+q=0.
+\tag{2.21}\]</span></span></p>
+<p>Let <span class="math inline">\(r_1,r_2\)</span> be its roots. Three cases arise.</p>
+<p><strong>Case I — distinct real roots <span class="math inline">\(r_1\ne r_2\)</span>.</strong> A fundamental system is <span class="math inline">\(e^{r_1 t},e^{r_2 t}\)</span> and the general solution is <span class="math inline">\(x=c_1 e^{r_1 t}+c_2 e^{r_2 t}\)</span>.</p>
+<p><strong>Case II — complex-conjugate roots <span class="math inline">\(r_{1,2}=a\pm ib\)</span>, <span class="math inline">\(b\ne 0\)</span>.</strong> The complex solutions <span class="math inline">\(e^{(a\pm ib)t}=e^{at}(\cos bt\pm i\sin bt)\)</span> have real and imaginary parts <span class="math inline">\(e^{at}\cos bt\)</span> and <span class="math inline">\(e^{at}\sin bt\)</span>, which form a real fundamental system; the general solution is <span class="math inline">\(x=e^{at}(c_1\cos bt+c_2\sin bt)\)</span>.</p>
+<p><strong>Case III — repeated real root <span class="math inline">\(r_1=r_2=r=-p/2\)</span>.</strong> Then <span class="math inline">\(e^{rt}\)</span> is one solution; a second is <span class="math inline">\(te^{rt}\)</span>. Indeed, substituting <span class="math inline">\(x=te^{rt}\)</span> into <a href="#eq-second-order" class="quarto-xref">Equation&nbsp;<span>2.20</span></a>, <span class="math display">\[
+(te^{rt})''+p(te^{rt})'+q(te^{rt})
+=e^{rt}\bigl[(2r+r^2 t)+p(1+rt)+qt\bigr]
+=e^{rt}\bigl[(2r+p)+(r^2+pr+q)t\bigr]=0,
+\]</span> both brackets vanishing (<span class="math inline">\(r=-p/2\)</span> kills the first, the characteristic equation the second). So the general solution is <span class="math inline">\(x=e^{rt}(c_1+c_2 t)\)</span>.</p>
+<div id="exm-second-order" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.11 (An inhomogeneous second-order equation)</strong></span> Solve <span class="math inline">\(\ddot x+x=1\)</span>. A particular solution is the constant <span class="math inline">\(x=1\)</span>. The homogeneous equation <span class="math inline">\(\ddot x+x=0\)</span> has characteristic roots <span class="math inline">\(\pm i\)</span> (Case II with <span class="math inline">\(a=0,b=1\)</span>), so its general solution is <span class="math inline">\(c_1\cos t+c_2\sin t\)</span>. Hence <span class="math inline">\(x=1+c_1\cos t+c_2\sin t\)</span>.</p>
+</div>
+</section>
+<section id="sec-implicit" class="level3">
+<h3 class="anchored" data-anchor-id="sec-implicit">Implicit equations and the Clairaut equation</h3>
+<p>A first-order <strong>implicit</strong> equation <span class="math inline">\(F(\dot x,x,t)=0\)</span> cannot always be solved for <span class="math inline">\(\dot x\)</span>. Several structured cases nonetheless yield.</p>
+<p><strong>Factoring into explicit equations.</strong> If <span class="math inline">\(F\)</span> factors, solve each factor.</p>
+<div id="exm-implicit-factor" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.12 (A factorable implicit equation)</strong></span> For <span class="math inline">\(\dot x^2-(x+t)\dot x+xt=0\)</span>, factor as <span class="math inline">\((\dot x-x)(\dot x-t)=0\)</span>. The two explicit equations <span class="math inline">\(\dot x=x\)</span> and <span class="math inline">\(\dot x=t\)</span> give <span class="math inline">\(x=ce^{t}\)</span> and <span class="math inline">\(x=t^2/2+C\)</span>. With <span class="math inline">\(x(0)=1\)</span> there are <em>two</em> solutions, <span class="math inline">\(x=e^{t}\)</span> and <span class="math inline">\(x=t^2/2+1\)</span> — a failure of uniqueness already visible at the level of elementary solution methods, foreshadowing <a href="#sec-singular" class="quarto-xref"><span>Section 2.2.3</span></a>.</p>
+</div>
+<p><strong>Solving for <span class="math inline">\(x\)</span> and differentiating (the <span class="math inline">\(p\)</span>-substitution).</strong> If the equation can be solved for <span class="math inline">\(x\)</span>, set <span class="math inline">\(p=\dot x\)</span> and differentiate in <span class="math inline">\(t\)</span>.</p>
+<div id="exm-implicit-p" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.13 (The <span class="math inline">\(p\)</span>-substitution)</strong></span> For <span class="math inline">\(x=\dot x^2-t\dot x+t^2/2\)</span>, put <span class="math inline">\(p=\dot x\)</span>, so <span class="math inline">\(x=p^2-pt+t^2/2\)</span>. Differentiating in <span class="math inline">\(t\)</span> and using <span class="math inline">\(\dot x=p\)</span>, <span class="math inline">\(p=2p\dot p-\dot p\,t-p+t\)</span>, i.e.&nbsp;<span class="math inline">\((2p-t)(\dot p-1)=0\)</span>. The branch <span class="math inline">\(\dot p=1\)</span> gives <span class="math inline">\(p=t+c\)</span>, hence <span class="math inline">\(x=t^2/2+ct+C_1\)</span>; the branch <span class="math inline">\(p=t/2\)</span> fixes <span class="math inline">\(x=t^2/4\)</span> algebraically, with no integration constant — a single curve, a <strong>singular solution</strong> not contained in the general family.</p>
+</div>
+<p><strong>Parametrizing when <span class="math inline">\(F(\dot x,x)=0\)</span> or <span class="math inline">\(F(\dot x,t)=0\)</span>.</strong> Introduce a parameter for <span class="math inline">\(\dot x\)</span>.</p>
+<div id="exm-implicit-param" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.14 (A parametric solution)</strong></span> For <span class="math inline">\(t\sqrt{1+\dot x^2}=\dot x\)</span>, set <span class="math inline">\(\dot x=\tan\theta\)</span>; then <span class="math inline">\(t=\sin\theta\)</span>, and <span class="math inline">\(\mathrm{d}x=\dot x\,\mathrm{d}t=\tan\theta\cos\theta\,\mathrm{d}\theta=\sin\theta\,\mathrm{d}\theta\)</span>, so <span class="math inline">\(x=-\cos\theta+C\)</span>. Eliminating <span class="math inline">\(\theta\)</span> via <span class="math inline">\(\sin^2\theta+\cos^2\theta=1\)</span> gives <span class="math inline">\((x-C)^2+t^2=1\)</span>: the integral curves are unit circles.</p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Hyperbolic functions.</strong> Implicit equations involving <span class="math inline">\(\dot x^2\)</span> often resolve through the hyperbolic functions <span class="math inline">\(\cosh x=\tfrac12(e^x+e^{-x})\)</span> and <span class="math inline">\(\sinh x=\tfrac12(e^x-e^{-x})\)</span>, which satisfy <span class="math inline">\(\cosh^2 x=1+\sinh^2 x\)</span>, <span class="math inline">\((\cosh x)'=\sinh x\)</span>, <span class="math inline">\((\sinh x)'=\cosh x\)</span>. For example <span class="math inline">\(x^2=\dot x^2+1\)</span> has two singular solutions <span class="math inline">\(x=\pm 1\)</span> and, on <span class="math inline">\(x&gt;1\)</span>, the substitution <span class="math inline">\(x=\cosh\theta\)</span> yields <span class="math inline">\(\dot\theta=\pm 1\)</span> and the general family <span class="math inline">\(x=\pm\cosh(t+C)\)</span>.</p>
+</div>
+</div>
+</div>
+<p>A celebrated implicit equation is the <strong>Clairaut equation</strong></p>
+<p><span id="eq-clairaut"><span class="math display">\[
+x=t\,\dot x+f(\dot x),\qquad f''\ne 0.
+\tag{2.22}\]</span></span></p>
+<div id="thm-clairaut" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.3 (Clairaut: a linear family plus an envelope)</strong></span> The Clairaut equation <a href="#eq-clairaut" class="quarto-xref">Equation&nbsp;<span>2.22</span></a> has the one-parameter family of straight-line solutions <span id="eq-clairaut-general"><span class="math display">\[
+x=Ct+f(C),\qquad C\in\mathbb{R},
+\tag{2.23}\]</span></span> together with a single <strong>singular solution</strong> — the envelope of that family — given parametrically by <span id="eq-clairaut-singular"><span class="math display">\[
+t=-f'(C),\qquad x=-Cf'(C)+f(C).
+\tag{2.24}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Set <span class="math inline">\(u=\dot x\)</span>, so <span class="math inline">\(x=tu+f(u)\)</span>. Differentiate in <span class="math inline">\(t\)</span> and use <span class="math inline">\(\dot x=u\)</span>: <span class="math inline">\(u=u+t\dot u+f'(u)\dot u\)</span>, i.e.&nbsp;<span class="math inline">\(\bigl(t+f'(u)\bigr)\dot u=0\)</span>. Either <span class="math inline">\(\dot u=0\)</span>, giving <span class="math inline">\(u=C\)</span> constant and the line family <a href="#eq-clairaut-general" class="quarto-xref">Equation&nbsp;<span>2.23</span></a>; or <span class="math inline">\(t+f'(u)=0\)</span>. Since <span class="math inline">\(f''\ne 0\)</span> has constant sign (by the intermediate-value property of derivatives), <span class="math inline">\(f'\)</span> is strictly monotone, so <span class="math inline">\(t=-f'(u)\)</span> inverts to <span class="math inline">\(u=p(t)\)</span>; substituting into <span class="math inline">\(x=tu+f(u)\)</span> gives the singular solution, which in the <span class="math inline">\(C\)</span>-parametrization (writing <span class="math inline">\(u=C\)</span>) is exactly <a href="#eq-clairaut-singular" class="quarto-xref">Equation&nbsp;<span>2.24</span></a>. That this curve is the envelope of <a href="#eq-clairaut-general" class="quarto-xref">Equation&nbsp;<span>2.23</span></a> — and hence a <em>singular</em> integral curve, tangent to every line in the family — is verified in <a href="#sec-singular" class="quarto-xref"><span>Section 2.2.3</span></a> via the <span class="math inline">\(C\)</span>-discriminant. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+</section>
+<section id="sec-fundamental" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="sec-fundamental"><span class="header-section-number">2.2</span> Fundamental questions</h2>
+<p>We turn from solving to <em>theory</em>: existence, uniqueness, dependence on data, and the breakdown of uniqueness at singular solutions. These questions matter because the optimality systems of dynamic optimization are rarely solvable in closed form, yet we still need to know their solutions exist, are unique, and respond predictably to parameters.</p>
+<section id="sec-existence" class="level3">
+<h3 class="anchored" data-anchor-id="sec-existence">Existence and uniqueness</h3>
+<div id="thm-picard" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.4 (Picard–Lindelöf existence and uniqueness)</strong></span> Consider the <span class="math inline">\(n\)</span>-dimensional initial-value problem <span id="eq-ivp"><span class="math display">\[
+\dot x=F(t,x),\qquad x(t_0)=x_0,
+\tag{2.25}\]</span></span> with <span class="math inline">\((t_0,x_0)\)</span> in a region <span class="math inline">\(G\subseteq\mathbb{R}^{1+n}\)</span>.</p>
+<ol type="i">
+<li><p>If <span class="math inline">\(F\)</span> is continuous on <span class="math inline">\(G\)</span>, the problem <a href="#eq-ivp" class="quarto-xref">Equation&nbsp;<span>2.25</span></a> has a solution.</p></li>
+<li><p>If in addition <span class="math inline">\(F\)</span> satisfies a <strong>local Lipschitz condition</strong> in <span class="math inline">\(x\)</span> — for each <span class="math inline">\((t^\ast,x^\ast)\in G\)</span> there exist <span class="math inline">\(\delta&gt;0\)</span> and <span class="math inline">\(C\)</span> with <span id="eq-lipschitz"><span class="math display">\[
+\bigl\|F(t,x)-F(t,x')\bigr\|\le C\,\bigl\|x-x'\bigr\|
+\tag{2.26}\]</span></span> whenever <span class="math inline">\(|t-t^\ast|&lt;\delta\)</span>, <span class="math inline">\(\|x-x^\ast\|&lt;\delta\)</span>, <span class="math inline">\(\|x'-x^\ast\|&lt;\delta\)</span> — then the solution is <strong>unique</strong>, and its integral curve extends until it reaches the boundary of <span class="math inline">\(G\)</span>.</p></li>
+</ol>
+</div>
+<p>A sufficient and easily-checked condition for the Lipschitz property is that <span class="math inline">\(F\)</span> have continuous partial derivatives in <span class="math inline">\(x\)</span>: by the mean value theorem the partials bound the difference quotient locally.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Sketch of the proof (Picard iteration).</strong> Integrating <a href="#eq-ivp" class="quarto-xref">Equation&nbsp;<span>2.25</span></a> turns it into the fixed-point equation <span class="math display">\[
+x(t)=x_0+\int_{t_0}^{t}F\bigl(s,x(s)\bigr)\,\mathrm{d}s=:(\mathcal{T}x)(t).
+\]</span> On a short interval <span class="math inline">\(|t-t_0|\le h\)</span> the operator <span class="math inline">\(\mathcal{T}\)</span> maps a suitable closed ball of continuous functions into itself, and the Lipschitz bound <a href="#eq-lipschitz" class="quarto-xref">Equation&nbsp;<span>2.26</span></a> makes it a <strong>contraction</strong>: <span class="math inline">\(\|\mathcal{T}x-\mathcal{T}y\|\le Ch\,\|x-y\|\)</span> with <span class="math inline">\(Ch&lt;1\)</span> for <span class="math inline">\(h\)</span> small. By the Banach fixed-point theorem <span class="math inline">\(\mathcal{T}\)</span> has a unique fixed point, the limit of the <strong>Picard iterates</strong> <span class="math inline">\(x_{k+1}=\mathcal{T}x_k\)</span> started from <span class="math inline">\(x_0(t)\equiv x_0\)</span>. The fixed point is the unique local solution; a continuation argument extends it to the boundary of <span class="math inline">\(G\)</span>. Continuity of <span class="math inline">\(F\)</span> alone (no Lipschitz) still yields a solution by a compactness argument (Peano), but uniqueness can fail — see <a href="#sec-singular" class="quarto-xref"><span>Section 2.2.3</span></a>.</p>
+</div>
+</div>
+</div>
+<div id="exm-existence-arctan" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.15 (Smoothness gives uniqueness but not global existence)</strong></span> For <span class="math inline">\(\dot x=1+x^2\)</span>, <span class="math inline">\(x(0)=0\)</span> (cf. <a href="#exm-separable-arctan" class="quarto-xref">Example&nbsp;<span>2.2</span></a>), <span class="math inline">\(F=1+x^2\)</span> is <span class="math inline">\(C^1\)</span> on all of <span class="math inline">\(\mathbb{R}^2\)</span>, so by <a href="#thm-picard" class="quarto-xref">Theorem&nbsp;<span>2.4</span></a> the solution <span class="math inline">\(x=\tan t\)</span> is unique and extends to the boundary of <span class="math inline">\(\mathbb{R}^2\)</span> — which, here, it reaches in <em>finite time</em> as <span class="math inline">\(t\to\pm\tfrac\pi2\)</span>, where <span class="math inline">\(|x|\to\infty\)</span>. “Extends to the boundary” does not mean “exists for all <span class="math inline">\(t\)</span>”: the solution can escape to infinity.</p>
+</div>
+<div id="exm-existence-blowup" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.16 (Reaching the boundary by blow-up)</strong></span> For <span class="math inline">\(\dot x=x^2-1\)</span>, <span class="math inline">\(x(0)=3\)</span>: separating, <span class="math inline">\(2\,\mathrm{d}t=\bigl(\tfrac{1}{x-1}-\tfrac{1}{x+1}\bigr)\mathrm{d}x\)</span>, so <span class="math inline">\(\tfrac{x-1}{x+1}=ce^{2t}\)</span> with <span class="math inline">\(c=\tfrac12\)</span> from <span class="math inline">\(x(0)=3\)</span>, giving <span class="math inline">\(x=\dfrac{2+e^{2t}}{2-e^{2t}}\)</span>. Forward in time the solution exists only on <span class="math inline">\([0,\tfrac12\ln 2)\)</span>, blowing up as <span class="math inline">\(t\to\tfrac12\ln 2\)</span> where the denominator vanishes.</p>
+</div>
+</section>
+<section id="sec-dependence" class="level3">
+<h3 class="anchored" data-anchor-id="sec-dependence">Continuous dependence on parameters</h3>
+<div id="thm-continuous-dependence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.5 (Continuous dependence)</strong></span> Consider <span class="math inline">\(\dot x=F(t,x,\theta)\)</span>, <span class="math inline">\(x(0)=\varphi(\theta)\)</span>, with <span class="math inline">\(F,\varphi\)</span> smooth and a scalar parameter <span class="math inline">\(\theta\)</span>. If for some <span class="math inline">\(\theta_0\)</span> the solution <span class="math inline">\(x(t,\theta_0)\)</span> extends to <span class="math inline">\([0,T]\)</span>, then there is <span class="math inline">\(\delta&gt;0\)</span> such that <span class="math inline">\(x(t,\theta)\)</span> extends to <span class="math inline">\([0,T]\)</span> for all <span class="math inline">\(\theta\in(\theta_0-\delta,\theta_0+\delta)\)</span>, the map <span class="math inline">\((t,\theta)\mapsto x(t,\theta)\)</span> is smooth on <span class="math inline">\([0,T]\times(\theta_0-\delta,\theta_0+\delta)\)</span>, and in particular <span class="math display">\[
+\lim_{\theta\to\theta_0}x(t,\theta)=x(t,\theta_0),\qquad t\in[0,T].
+\]</span> This property is called <strong>continuous dependence on the parameter</strong>.</p>
+</div>
+<div id="exm-dependence" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.17 (A parameter affecting the maximal interval)</strong></span> For <span class="math inline">\(\dot x=x^2+a^2\)</span>, <span class="math inline">\(x(0)=0\)</span> with <span class="math inline">\(a&gt;0\)</span>: the solution is <span class="math inline">\(x(t,a)=a\tan(at)\)</span>, defined on <span class="math inline">\([0,\tfrac{\pi}{2a})\)</span>. To extend it to a prescribed <span class="math inline">\(T&gt;0\)</span> one needs <span class="math inline">\(a&lt;\tfrac{\pi}{2T}\)</span>. For each fixed <span class="math inline">\(a\in(0,\tfrac{\pi}{2T})\)</span>, the solution depends continuously on the parameter: <span class="math inline">\(\lim_{b\to a}x(t,b)=x(t,a)\)</span> on <span class="math inline">\([0,T]\)</span>. The maximal interval itself shrinks as <span class="math inline">\(a\)</span> grows.</p>
+</div>
+<p>A useful companion is the <strong>comparison principle</strong>: a faster vector field stays ahead.</p>
+<div id="prp-comparison" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 2.3 (A comparison principle)</strong></span> Let <span class="math inline">\(f\)</span> be smooth and let <span class="math inline">\(x,y\)</span> be differentiable on <span class="math inline">\([0,\infty)\)</span> with <span class="math inline">\(x(0)=y(0)=a\)</span> and <span class="math display">\[
+\dot x=f(x),\qquad \dot y\le f(y),\qquad t\ge 0.
+\]</span> Then <span class="math inline">\(x(t)\ge y(t)\)</span> for all <span class="math inline">\(t\ge 0\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(T&gt;0\)</span>. For <span class="math inline">\(\varepsilon&gt;0\)</span> consider the perturbed problem <span class="math inline">\(\dot z=f(z)+\varepsilon\)</span>, <span class="math inline">\(z(0)=a\)</span>. At <span class="math inline">\(\varepsilon=0\)</span> this is the equation for <span class="math inline">\(x\)</span>, which extends to <span class="math inline">\(T\)</span>; by continuous dependence (<a href="#thm-continuous-dependence" class="quarto-xref">Theorem&nbsp;<span>2.5</span></a>) there is <span class="math inline">\(m&gt;0\)</span> such that for <span class="math inline">\(\varepsilon\in(0,m)\)</span> the solution <span class="math inline">\(z(t,\varepsilon)\)</span> extends to <span class="math inline">\(T\)</span> and <span class="math inline">\(z(T,\varepsilon)\to x(T)\)</span> as <span class="math inline">\(\varepsilon\to 0\)</span>. It suffices to show <span class="math inline">\(z(T,\varepsilon)\ge y(T)\)</span>. Suppose not, that <span class="math inline">\(z(T,\varepsilon)&lt;y(T)\)</span>. Let <span class="math inline">\(T_0=T-\sup\{\delta\ge 0:z(t,\varepsilon)&lt;y(t)\ \forall t\in(T-\delta,T]\}\)</span>; by continuity <span class="math inline">\(z(T_0,\varepsilon)=y(T_0)\)</span> and <span class="math inline">\(z&lt;y\)</span> on <span class="math inline">\((T_0,T]\)</span>. But then <span class="math display">\[
+\dot z(T_0,\varepsilon)=f\bigl(z(T_0,\varepsilon)\bigr)+\varepsilon
+=f\bigl(y(T_0)\bigr)+\varepsilon&gt;f\bigl(y(T_0)\bigr)\ge\dot y(T_0),
+\]</span> so <span class="math inline">\(z\)</span> exceeds <span class="math inline">\(y\)</span> just to the right of <span class="math inline">\(T_0\)</span>, contradicting <span class="math inline">\(z&lt;y\)</span> there. Hence <span class="math inline">\(z(T,\varepsilon)\ge y(T)\)</span>, and letting <span class="math inline">\(\varepsilon\to 0\)</span> gives <span class="math inline">\(x(T)\ge y(T)\)</span>. As <span class="math inline">\(T\)</span> was arbitrary, the claim holds. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+<section id="sec-singular" class="level3">
+<h3 class="anchored" data-anchor-id="sec-singular">Singular solutions and the C-discriminant</h3>
+<p>A <strong>singular solution</strong> is a particular solution at every point of which uniqueness fails — through each point of its integral curve passes another integral curve. Geometrically the singular integral curve is the <strong>envelope</strong> of the general family of integral curves: a curve tangent at each of its points to some member of the family.</p>
+<div id="exm-singular-sqrt" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.18 (A singular solution)</strong></span> The equation <span class="math inline">\(\dot x=2\sqrt{x}\)</span> has general solution <span class="math inline">\(x=(t+C)^2\)</span>. But <span class="math inline">\(x\equiv 0\)</span> is also a solution, <em>not</em> contained in the general family. Along <span class="math inline">\(x\equiv 0\)</span> (the <span class="math inline">\(t\)</span>-axis) every point is also touched by a parabola <span class="math inline">\(x=(t+C)^2\)</span>, so uniqueness fails there: <span class="math inline">\(x\equiv 0\)</span> is singular. The Lipschitz condition breaks down because <span class="math inline">\(\partial_x(2\sqrt x)=1/\sqrt x\to\infty\)</span> as <span class="math inline">\(x\to 0\)</span>.</p>
+</div>
+<p>The envelope of a curve family is found from the <strong><span class="math inline">\(C\)</span>-discriminant</strong>.</p>
+<div id="thm-c-discriminant" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.6 (The C-discriminant locates envelopes)</strong></span> If the family <span class="math inline">\((C):\ \Phi(t,x,C)=0\)</span> has an envelope, the envelope satisfies the system <span id="eq-c-discriminant"><span class="math display">\[
+\Phi(t,x,C)=0,\qquad \Phi_C(t,x,C)=0.
+\tag{2.27}\]</span></span> Conversely, if <a href="#eq-c-discriminant" class="quarto-xref">Equation&nbsp;<span>2.27</span></a> determines a smooth curve <span class="math inline">\(\Gamma:\ t=\varphi(C),x=\psi(C)\)</span> with <span class="math inline">\(|\varphi'(C)|+|\psi'(C)|\ne 0\)</span> and <span class="math inline">\(|\Phi_t(\varphi,\psi,C)|+|\Phi_x(\varphi,\psi,C)|\ne 0\)</span>, then <span class="math inline">\(\Gamma\)</span> is the envelope.</p>
+</div>
+<p>For the <strong>Clairaut equation</strong> <a href="#eq-clairaut" class="quarto-xref">Equation&nbsp;<span>2.22</span></a> this pins down the singular solution promised in <a href="#thm-clairaut" class="quarto-xref">Theorem&nbsp;<span>2.3</span></a>. The general family is <span class="math inline">\(\Phi(t,x,C)=x-Ct-f(C)=0\)</span>; then <span class="math inline">\(\Phi_C=-t-f'(C)=0\)</span> gives <span class="math inline">\(t=-f'(C)\)</span>, and substituting back yields <span class="math inline">\(x=-Cf'(C)+f(C)\)</span>, exactly <a href="#eq-clairaut-singular" class="quarto-xref">Equation&nbsp;<span>2.24</span></a>. One checks the non-degeneracy: <span class="math inline">\(\Phi_x=1\ne 0\)</span> and <span class="math inline">\(\varphi'(C)=-f''(C)\ne 0\)</span>, so the discriminant curve is a genuine envelope. The Clairaut equation thus has <em>one</em> singular solution, the envelope of its line family.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Where singular solutions can hide.</strong> For an explicit equation <span class="math inline">\(\dot x=f(t,x)\)</span> with <span class="math inline">\(f\)</span> smooth, a singular solution can occur only where <span class="math inline">\(f_x\)</span> is <em>unbounded</em>, since wherever <span class="math inline">\(f_x\)</span> is bounded the Lipschitz condition holds and uniqueness rules out singular solutions. Two illustrations.</p>
+<ul>
+<li><span class="math inline">\(\dot x=\sqrt{t^2-x^2}\)</span>: here <span class="math inline">\(f_x=-x/\sqrt{t^2-x^2}\)</span> blows up on the boundary lines <span class="math inline">\(x=\pm t\)</span> of the domain <span class="math inline">\(\{|t|\ge|x|\}\)</span>, but those lines are <em>not</em> solutions, so the equation has <strong>no</strong> singular solution.</li>
+<li><span class="math inline">\(\dot x=\sqrt{1-x^2}\)</span>: here <span class="math inline">\(f_x=-x/\sqrt{1-x^2}\)</span> blows up on <span class="math inline">\(x=\pm 1\)</span>, which <em>are</em> solutions. The general solution is <span class="math inline">\(x=\sin(t+C)\)</span>, and every such sine curve is tangent to the lines <span class="math inline">\(x=\pm 1\)</span>; these two lines are the singular solutions (and the only ones).</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-qualitative" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="sec-qualitative"><span class="header-section-number">2.3</span> Qualitative (geometric) theory</h2>
+<p>When an equation cannot be solved explicitly — the typical case — we study the <em>geometry</em> of its solution family directly. This <strong>qualitative theory</strong> asks: are equilibria stable? what does the flow look like in the phase plane? how does the picture change as a parameter varies? These are the questions dynamic optimization inherits, because optimal paths are characterized by differential systems whose phase portraits encode the economics.</p>
+<section id="sec-stability" class="level3">
+<h3 class="anchored" data-anchor-id="sec-stability">Stability</h3>
+<p>Throughout assume <span class="math inline">\(\dot x=F(t,x)\)</span> has a unique solution through each initial point, defined on all of <span class="math inline">\((-\infty,\infty)\)</span>.</p>
+<div id="def-stability" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.2 (Stability, asymptotic stability, global asymptotic stability)</strong></span> A solution <span class="math inline">\(x=\phi(t)\)</span> of <span class="math inline">\(\dot x=F(t,x)\)</span> is:</p>
+<ul>
+<li><strong>stable</strong> if for every <span class="math inline">\(\varepsilon&gt;0\)</span> and every <span class="math inline">\(t_0\)</span> there is <span class="math inline">\(\delta=\delta(\varepsilon,t_0)&gt;0\)</span> such that <span class="math inline">\(\|x_0-\phi(t_0)\|&lt;\delta\)</span> implies the solution with <span class="math inline">\(x(t_0)=x_0\)</span> satisfies <span class="math inline">\(\|x(t)-\phi(t)\|&lt;\varepsilon\)</span> for all <span class="math inline">\(t&gt;t_0\)</span> (nearby solutions stay nearby);</li>
+<li><strong>asymptotically stable</strong> if it is stable and, in addition, <span class="math inline">\(\lim_{t\to\infty}\|x(t)-\phi(t)\|=0\)</span> (nearby solutions converge to it);</li>
+<li><strong>globally asymptotically stable</strong> if it is asymptotically stable and <em>every</em> solution, from any initial point, satisfies <span class="math inline">\(\lim_{t\to\infty}\|x(t)-\phi(t)\|=0\)</span>.</li>
+</ul>
+<p>A solution that is not stable is <strong>unstable</strong>.</p>
+</div>
+<p>A <strong>steady state</strong> (equilibrium, rest point) is a point <span class="math inline">\(\bar x\)</span> with <span class="math inline">\(F(t,\bar x)=0\)</span> for all <span class="math inline">\(t\)</span>; the constant function <span class="math inline">\(x\equiv\bar x\)</span> is then a solution. Steady states are solutions, so the stability vocabulary applies to them, and they are the organizing centers of the phase portrait. The Lyapunov definitions above are the ones used throughout the book; a steady state inherits “stable / asymptotically stable / globally asymptotically stable” from the constant solution that sits on it.</p>
+</section>
+<section id="sec-dynamical" class="level3">
+<h3 class="anchored" data-anchor-id="sec-dynamical">Dynamical systems</h3>
+<p>An autonomous system <span class="math inline">\(\dot x=F(x)\)</span> on <span class="math inline">\(\mathbb{R}^n\)</span> is a <strong>dynamical system</strong>. The space <span class="math inline">\(\mathbb{R}^n\)</span> of states is the <strong>phase space</strong>; the image of a solution in phase space is an <strong>orbit</strong> (trajectory); the collection of all orbits is the <strong>phase portrait</strong>.</p>
+<p>Autonomy gives the phase portrait two structural features. First, <strong>time-translation invariance</strong>: if <span class="math inline">\(x(t)\)</span> is a solution so is <span class="math inline">\(x(t+\tau)\)</span> for every <span class="math inline">\(\tau\)</span>, because the law of motion does not see the clock. Two integral curves that are time-shifts of each other project to the <em>same</em> orbit; thus one orbit corresponds to infinitely many solutions. Second, <strong>orbits do not cross</strong>: through each phase point passes exactly one orbit, for otherwise two solutions would share an initial condition, violating uniqueness (<a href="#thm-picard" class="quarto-xref">Theorem&nbsp;<span>2.4</span></a>).</p>
+<p>Orbits split into types. A <strong>fixed point</strong> (singular point, equilibrium) is a zero <span class="math inline">\(x_0\)</span> of <span class="math inline">\(F\)</span>, <span class="math inline">\(F(x_0)=0\)</span>; a non-fixed point is <strong>regular</strong>. A fixed point is <strong>isolated</strong> if a neighborhood contains no other. For <span class="math inline">\(\dot x=F(x)\)</span>, a fixed point <span class="math inline">\(x^\ast\)</span> is <strong>elementary</strong> if the Jacobian <span class="math inline">\((DF)_{x^\ast}\)</span> is nonsingular, and <strong>hyperbolic</strong> if every eigenvalue of <span class="math inline">\((DF)_{x^\ast}\)</span> has nonzero real part; hyperbolic fixed points are elementary. A <strong>closed orbit</strong> is the orbit of a periodic solution <span class="math inline">\(x(t+T)=x(t)\)</span>; an isolated closed orbit is a <strong>limit cycle</strong>. A <strong>connecting orbit</strong> runs from one fixed point to another, <span class="math inline">\(x(t)\to x_1\)</span> as <span class="math inline">\(t\to-\infty\)</span> and <span class="math inline">\(x(t)\to x_2\)</span> as <span class="math inline">\(t\to+\infty\)</span>; it is <strong>homoclinic</strong> if <span class="math inline">\(x_1=x_2\)</span> and <strong>heteroclinic</strong> otherwise.</p>
+<section id="sec-one-dim" class="level4">
+<h4 class="anchored" data-anchor-id="sec-one-dim">One-dimensional systems</h4>
+<p>For a scalar autonomous system <span class="math inline">\(\dot x=f(x)\)</span>, the entire phase portrait lives on a line — the <strong>phase line</strong>. Plot <span class="math inline">\(f\)</span> against <span class="math inline">\(x\)</span>; its zeros are the fixed points, and the sign of <span class="math inline">\(f\)</span> between them gives the direction of motion (right where <span class="math inline">\(f&gt;0\)</span>, left where <span class="math inline">\(f&lt;0\)</span>). Stability is read off the <em>slope</em> at a fixed point: if <span class="math inline">\(f\)</span> decreases through <span class="math inline">\(x^\ast\)</span> (so <span class="math inline">\(f'(x^\ast)&lt;0\)</span>), the flow on both sides points toward <span class="math inline">\(x^\ast\)</span> and it is asymptotically stable; if <span class="math inline">\(f\)</span> increases through <span class="math inline">\(x^\ast\)</span> (so <span class="math inline">\(f'(x^\ast)&gt;0\)</span>), the flow points away and <span class="math inline">\(x^\ast\)</span> is unstable.</p>
+<div id="exm-logistic-phaseline" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.19 (The logistic model from the phase line)</strong></span> Return to the logistic equation <a href="#eq-logistic" class="quarto-xref">Equation&nbsp;<span>2.5</span></a>, <span class="math inline">\(\dot x=f(x)=rx(1-x/K)\)</span>, without solving it. On <span class="math inline">\([0,\infty)\)</span> the only zeros of <span class="math inline">\(f\)</span> are <span class="math inline">\(x=0\)</span> and <span class="math inline">\(x=K\)</span>. Since <span class="math inline">\(f'(x)=r(1-2x/K)\)</span>, we have <span class="math inline">\(f'(0)=r&gt;0\)</span> and <span class="math inline">\(f'(K)=-r&lt;0\)</span>. Therefore <span class="math inline">\(x=0\)</span> is <strong>unstable</strong> and <span class="math inline">\(x=K\)</span> is <strong>asymptotically stable</strong>; indeed <span class="math inline">\(x=K\)</span> is <em>globally</em> asymptotically stable on <span class="math inline">\((0,\infty)\)</span>, since <span class="math inline">\(f&gt;0\)</span> on <span class="math inline">\((0,K)\)</span> and <span class="math inline">\(f&lt;0\)</span> on <span class="math inline">\((K,\infty)\)</span> drive every positive trajectory to <span class="math inline">\(K\)</span>. We recover the conclusion of <a href="#exm-logistic" class="quarto-xref">Example&nbsp;<span>2.3</span></a> — the population converges to carrying capacity — purely qualitatively, with no integration.</p>
+</div>
+<p>The marquee economic application is the Solow growth model, an autonomous scalar law of capital accumulation.</p>
+<div id="exm-solow" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.20 (The Solow growth model and the Golden Rule)</strong></span> Treat the economy as a single representative producer holding capital <span class="math inline">\(k\)</span>, using a technology <span class="math inline">\(f\)</span> to produce output <span class="math inline">\(f(k)\)</span>, consuming a fraction and saving the rest for reinvestment. With constant <strong>saving rate</strong> <span class="math inline">\(s\in[0,1]\)</span> and <strong>depreciation rate</strong> <span class="math inline">\(\delta&gt;0\)</span>, capital evolves by the <strong>Solow equation</strong> <span id="eq-solow"><span class="math display">\[
+\dot k=s\,f(k)-\delta\,k,
+\tag{2.28}\]</span></span> a one-dimensional dynamical system. Assume <span class="math inline">\(f\)</span> is smooth, increasing, strictly concave, with <span class="math inline">\(f(0)=0\)</span>, <span class="math inline">\(f'(0)=\infty\)</span>, <span class="math inline">\(f'(\infty)=0\)</span> (the <strong>Inada conditions</strong>) <span class="citation" data-cites="acemoglu2009">(<a href="references.html#ref-acemoglu2009" role="doc-biblioref">Acemoglu 2009</a>)</span>.</p>
+<p><em>Steady state.</em> The fixed points of <a href="#eq-solow" class="quarto-xref">Equation&nbsp;<span>2.28</span></a> are <span class="math inline">\(k=0\)</span> and the positive <span class="math inline">\(k^\ast\)</span> solving <span id="eq-solow-ss"><span class="math display">\[
+s\,f(k^\ast)=\delta\,k^\ast.
+\tag{2.29}\]</span></span> Since <span class="math inline">\(sf\)</span> is concave with infinite initial slope and <span class="math inline">\(\delta k\)</span> is a ray, the two curves cross once for <span class="math inline">\(k&gt;0\)</span>; that crossing is <span class="math inline">\(k^\ast\)</span>. The derivative of the right side of <a href="#eq-solow" class="quarto-xref">Equation&nbsp;<span>2.28</span></a> at <span class="math inline">\(k^\ast\)</span> is <span class="math inline">\(sf'(k^\ast)-\delta\)</span>, and concavity (with the Inada slope conditions) makes it negative, so <span class="math inline">\(k^\ast\)</span> is <strong>asymptotically stable</strong> while <span class="math inline">\(k=0\)</span> is unstable: from any <span class="math inline">\(k_0&gt;0\)</span>, capital converges to <span class="math inline">\(k^\ast\)</span>. (The assumption <span class="math inline">\(\delta&gt;0\)</span> is essential. If <span class="math inline">\(\delta=0\)</span> the only fixed point is <span class="math inline">\(k=0\)</span> and capital grows without bound.) As <a href="#fig-solow" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> shows, <span class="math inline">\(k^\ast\)</span> sits where the saving curve <span class="math inline">\(sf(k)\)</span> meets the depreciation ray <span class="math inline">\(\delta k\)</span>.</p>
+<p><em>Golden Rule.</em> Steady-state consumption is <span class="math inline">\(c=f(k^\ast)-\delta k^\ast\)</span>. Different saving rates <span class="math inline">\(s\in[0,1]\)</span> index different steady states <span class="math inline">\(k^\ast\)</span>, so we may ask which <span class="math inline">\(s\)</span> maximizes steady-state consumption. Maximizing <span class="math inline">\(c(k)=f(k)-\delta k\)</span> over <span class="math inline">\(k&gt;0\)</span> gives the first-order condition <span id="eq-golden-rule"><span class="math display">\[
+f'(k_G)=\delta,
+\tag{2.30}\]</span></span> the <strong>Golden Rule</strong> capital stock <span class="math inline">\(k_G\)</span> — output’s marginal product equals depreciation. The implied saving rate is <span id="eq-golden-saving"><span class="math display">\[
+s_G=\frac{\delta\,k_G}{f(k_G)}.
+\tag{2.31}\]</span></span> For the <strong>Cobb–Douglas</strong> technology <span class="math inline">\(f(k)=k^\alpha\)</span>, <span class="math inline">\(\alpha\in(0,1)\)</span>: <a href="#eq-golden-rule" class="quarto-xref">Equation&nbsp;<span>2.30</span></a> reads <span class="math inline">\(\alpha k_G^{\alpha-1}=\delta\)</span>, so <span class="math inline">\(k_G=(\alpha/\delta)^{1/(1-\alpha)}\)</span>, and <span class="math inline">\(s_G=\delta k_G/k_G^{\alpha}=\delta k_G^{1-\alpha}=\delta\cdot(\alpha/\delta)=\alpha\)</span>. The Golden Rule saving rate equals the capital share <span class="math inline">\(\alpha\)</span>. <a href="#fig-solow" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> marks <span class="math inline">\(k_G\)</span> at the point where the vertical gap between output <span class="math inline">\(f(k)\)</span> and depreciation <span class="math inline">\(\delta k\)</span> — steady-state consumption — is widest.</p>
+</div>
+<div id="fig-solow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-solow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-solow.svg" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-solow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: The Solow diagram for <span class="math inline">\(f(k)=k^\alpha\)</span> with <span class="math inline">\(\alpha=\tfrac13\)</span>, <span class="math inline">\(\delta=0.1\)</span>, <span class="math inline">\(s=0.3\)</span>. The steady state <span class="math inline">\(k^\ast\)</span> (blue) sits where saving <span class="math inline">\(s f(k)\)</span> meets depreciation <span class="math inline">\(\delta k\)</span>, i.e.&nbsp;where <a href="#eq-solow-ss" class="quarto-xref">Equation&nbsp;<span>2.29</span></a> holds; it is asymptotically stable. The Golden Rule stock <span class="math inline">\(k_G\)</span> (accent) maximizes the gap <span class="math inline">\(c=f(k)-\delta k\)</span> between the output curve and the depreciation ray, the point where <span class="math inline">\(f'(k_G)=\delta\)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-planar" class="level4">
+<h4 class="anchored" data-anchor-id="sec-planar">Planar systems</h4>
+<p>For a planar dynamical system <span class="math inline">\(\dot x=F(x)\)</span> on <span class="math inline">\(\mathbb{R}^2\)</span> (with <span class="math inline">\(F\)</span> smooth) the phase portrait is genuinely two-dimensional, and its structure is governed by the fixed points. Near a <em>regular</em> point the flow is locally a smooth family of near-parallel curves — topologically a bundle of parallel lines — so the interesting structure concentrates at the fixed points, where the velocity vanishes and the direction of motion is undefined. We first classify <strong>linear</strong> systems completely, then transfer the classification to nonlinear systems by linearization.</p>
+<section id="sec-planar-linear" class="level5">
+<h5 class="anchored" data-anchor-id="sec-planar-linear">Linear systems</h5>
+<p>Consider the planar linear system</p>
+<p><span id="eq-planar-linear"><span class="math display">\[
+\dot x=ax+by,\qquad \dot y=cx+dy,
+\qquad A=\begin{pmatrix}a&amp;b\\c&amp;d\end{pmatrix},
+\tag{2.32}\]</span></span></p>
+<p>writing <span class="math inline">\(z=(x,y)^\top\)</span> so the system is <span class="math inline">\(\dot z=Az\)</span>. Assume <span class="math inline">\(\det A\ne 0\)</span>, so the origin is the unique fixed point and is elementary. Similar matrices <span class="math inline">\(A=P^{-1}BP\)</span> give topologically equivalent portraits — the change of variables <span class="math inline">\(w=Pz\)</span> conjugates <span class="math inline">\(\dot z=Az\)</span> to <span class="math inline">\(\dot w=Bw\)</span> — so it suffices to classify the <strong>real canonical forms</strong>. Reading off the explicit solutions of <a href="#sec-linear-systems" class="quarto-xref"><span>Section 2.1.1.5</span></a> for each canonical <span class="math inline">\(A\)</span> yields the gallery in <a href="#fig-phase-gallery" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>.</p>
+<p><strong>(1) Real distinct eigenvalues <span class="math inline">\(\lambda\ne\mu\)</span></strong>, <span class="math inline">\(A=\bigl(\begin{smallmatrix}\lambda&amp;0\\0&amp;\mu\end{smallmatrix}\bigr)\)</span>. Solutions <span class="math inline">\(x=c_1 e^{\lambda t}\)</span>, <span class="math inline">\(y=c_2 e^{\mu t}\)</span>.</p>
+<ul>
+<li><span class="math inline">\(\lambda,\mu&lt;0\)</span>: <strong>stable node</strong> — all trajectories approach the origin (a <em>sink</em>).</li>
+<li><span class="math inline">\(\lambda,\mu&gt;0\)</span>: <strong>unstable node</strong> — all trajectories leave the origin (a <em>source</em>).</li>
+<li>opposite signs: <strong>saddle</strong> — trajectories approach along one eigendirection and depart along the other.</li>
+</ul>
+<p><strong>(2) Equal eigenvalues, diagonalizable</strong>, <span class="math inline">\(A=\bigl(\begin{smallmatrix}\lambda&amp;0\\0&amp;\lambda\end{smallmatrix}\bigr)=\lambda I\)</span>. Every direction is invariant; trajectories are rays. This is a <strong>star node</strong> (proper node) — stable if <span class="math inline">\(\lambda&lt;0\)</span>, unstable if <span class="math inline">\(\lambda&gt;0\)</span>.</p>
+<p><strong>(3) Equal eigenvalues, defective</strong>, <span class="math inline">\(A=\bigl(\begin{smallmatrix}\lambda&amp;0\\1&amp;\lambda\end{smallmatrix}\bigr)\)</span>. By <a href="#eq-fund-repeated" class="quarto-xref">Equation&nbsp;<span>2.19</span></a> solutions carry a <span class="math inline">\(te^{\lambda t}\)</span> term. This is a <strong>degenerate node</strong> (improper node, one-way node) — stable if <span class="math inline">\(\lambda&lt;0\)</span>, unstable if <span class="math inline">\(\lambda&gt;0\)</span>.</p>
+<p><strong>(4) Complex eigenvalues <span class="math inline">\(\alpha\pm i\beta\)</span>, <span class="math inline">\(\beta\ne 0\)</span></strong>, <span class="math inline">\(A=\bigl(\begin{smallmatrix}\alpha&amp;\beta\\-\beta&amp;\alpha\end{smallmatrix}\bigr)\)</span>. Solutions are <span class="math inline">\(e^{\alpha t}\)</span> times rotations.</p>
+<ul>
+<li><span class="math inline">\(\alpha&lt;0\)</span>: <strong>stable focus</strong> (spiral sink) — trajectories spiral inward.</li>
+<li><span class="math inline">\(\alpha&gt;0\)</span>: <strong>unstable focus</strong> (spiral source) — trajectories spiral outward.</li>
+<li><span class="math inline">\(\alpha=0\)</span>: <strong>center</strong> — trajectories are closed orbits (ellipses).</li>
+</ul>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Sinks, sources, and the stability summary.</strong> A fixed point is a <strong>sink</strong> if every nearby orbit flows into it, a <strong>source</strong> if every nearby orbit flows out. Stable nodes and stable foci are sinks; unstable nodes and foci are sources; saddles and centers are neither. For a linear elementary fixed point: it is asymptotically stable iff both eigenvalues have <em>negative</em> real part; stable (but not asymptotically) iff the eigenvalues are purely imaginary — the center; unstable otherwise.</p>
+</div>
+</div>
+</div>
+<div id="fig-phase-gallery" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-phase-gallery-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-phase-gallery.svg" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-phase-gallery-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: Gallery of linear phase portraits. Trace <span class="math inline">\(\tau=\operatorname{tr}A\)</span> and determinant <span class="math inline">\(\Delta=\det A\)</span> sort every linear equilibrium into a few geometric types: stable/unstable node, saddle, stable focus, center, and star node. The accent lines are the <strong>special lines</strong> (eigenvector directions) discussed below.
+</figcaption>
+</figure>
+</div>
+<p>We now derive the classification from the <strong>trace</strong> and <strong>determinant</strong> of <span class="math inline">\(A\)</span>. The characteristic equation of <a href="#eq-planar-linear" class="quarto-xref">Equation&nbsp;<span>2.32</span></a> is <span id="eq-char-trace-det"><span class="math display">\[
+\lambda^2-\tau\lambda+\Delta=0,
+\qquad \tau=\operatorname{tr}A=a+d,\quad \Delta=\det A=ad-bc,
+\tag{2.33}\]</span></span> with eigenvalues <span id="eq-eigenvalues-trace-det"><span class="math display">\[
+\lambda_{1,2}=\frac{\tau\pm\sqrt{\tau^2-4\Delta}}{2}.
+\tag{2.34}\]</span></span></p>
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Notation.</strong> We use <span class="math inline">\(\tau=\operatorname{tr}A\)</span> and <span class="math inline">\(\Delta=\det A\)</span> with discriminant <span class="math inline">\(\tau^2-4\Delta\)</span>, the field-standard convention. The course writes the trace <span class="math inline">\(\sigma\)</span> and the determinant <span class="math inline">\(\tau\)</span> (so its discriminant is <span class="math inline">\(\sigma^2-4\tau\)</span>); the roles are swapped relative to our <span class="math inline">\(\tau,\Delta\)</span>.</p>
+</div>
+</div>
+</div>
+<div id="thm-trace-det" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.7 (Trace–determinant classification)</strong></span> For the planar linear system <a href="#eq-planar-linear" class="quarto-xref">Equation&nbsp;<span>2.32</span></a> with <span class="math inline">\(\Delta\ne 0\)</span>, the type of the origin is fixed by <span class="math inline">\((\tau,\Delta)\)</span> and the discriminant <span class="math inline">\(\tau^2-4\Delta\)</span>:</p>
+<ul>
+<li><strong><span class="math inline">\(\Delta&lt;0\)</span>:</strong> the eigenvalues are real of opposite sign — a <strong>saddle</strong> (unstable).</li>
+<li><strong><span class="math inline">\(\Delta&gt;0\)</span>, <span class="math inline">\(\tau^2-4\Delta&gt;0\)</span>:</strong> real eigenvalues of the same sign — a <strong>node</strong>, stable if <span class="math inline">\(\tau&lt;0\)</span>, unstable if <span class="math inline">\(\tau&gt;0\)</span>.</li>
+<li><strong><span class="math inline">\(\Delta&gt;0\)</span>, <span class="math inline">\(\tau^2-4\Delta&lt;0\)</span>:</strong> complex eigenvalues — a <strong>focus</strong>, stable if <span class="math inline">\(\tau&lt;0\)</span>, unstable if <span class="math inline">\(\tau&gt;0\)</span>; and a <strong>center</strong> if <span class="math inline">\(\tau=0\)</span>.</li>
+<li><strong><span class="math inline">\(\Delta&gt;0\)</span>, <span class="math inline">\(\tau^2-4\Delta=0\)</span>:</strong> repeated real eigenvalue — a <strong>degenerate</strong> or <strong>star node</strong>, stable if <span class="math inline">\(\tau&lt;0\)</span>, unstable if <span class="math inline">\(\tau&gt;0\)</span>.</li>
+</ul>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The two eigenvalues <a href="#eq-eigenvalues-trace-det" class="quarto-xref">Equation&nbsp;<span>2.34</span></a> satisfy <span class="math inline">\(\lambda_1\lambda_2=\Delta\)</span> and <span class="math inline">\(\lambda_1+\lambda_2=\tau\)</span>. If <span class="math inline">\(\Delta&lt;0\)</span> the product is negative, so the roots are real with opposite signs: a saddle. If <span class="math inline">\(\Delta&gt;0\)</span> the roots have the same sign or are complex conjugates, discriminated by <span class="math inline">\(\tau^2-4\Delta\)</span>. When <span class="math inline">\(\tau^2-4\Delta&gt;0\)</span> the roots are real and, sharing the sign of their sum, are both negative if <span class="math inline">\(\tau&lt;0\)</span> (stable node) and both positive if <span class="math inline">\(\tau&gt;0\)</span> (unstable node). When <span class="math inline">\(\tau^2-4\Delta&lt;0\)</span> the roots are <span class="math inline">\(\tfrac{\tau}{2}\pm i\tfrac{\sqrt{4\Delta-\tau^2}}{2}\)</span>, a complex pair with real part <span class="math inline">\(\tfrac\tau2\)</span>: a stable focus if <span class="math inline">\(\tau&lt;0\)</span>, unstable focus if <span class="math inline">\(\tau&gt;0\)</span>, and — when <span class="math inline">\(\tau=0\)</span> — purely imaginary roots giving a center. When <span class="math inline">\(\tau^2-4\Delta=0\)</span> the root <span class="math inline">\(\tau/2\)</span> is repeated; the matrix is a star node if diagonalizable and a degenerate node otherwise, stable or unstable as <span class="math inline">\(\tau\lessgtr 0\)</span>. Each type’s geometry is the explicit-solution picture of <a href="#fig-phase-gallery" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The classification is summarized in one picture, <a href="#fig-trace-det" class="quarto-xref">Figure&nbsp;<span>2.3</span></a>: the parabola <span class="math inline">\(\tau^2=4\Delta\)</span> separates real-eigenvalue (node) regions from complex-eigenvalue (focus) regions, the horizontal axis <span class="math inline">\(\Delta=0\)</span> bounds the saddle region below, and the positive <span class="math inline">\(\Delta\)</span>-axis (<span class="math inline">\(\tau=0\)</span>) is the center line.</p>
+<div id="fig-trace-det" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-trace-det-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-trace-det.svg" class="img-fluid figure-img" style="width:85.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-trace-det-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: Trace–determinant chart. Above the parabola <span class="math inline">\(\tau^2=4\Delta\)</span> the eigenvalues are complex (foci or centers); below it they are real (nodes). The region <span class="math inline">\(\Delta&lt;0\)</span> is the saddle region; the line <span class="math inline">\(\tau=0,\Delta&gt;0\)</span> carries the centers; the parabola itself carries the degenerate and star nodes.
+</figcaption>
+</figure>
+</div>
+<section id="sec-special-lines" class="level6">
+<h6 class="anchored" data-anchor-id="sec-special-lines">Special lines (eigenvector directions)</h6>
+<p>A recurring question is which equilibria have invariant straight lines through the origin — lines along which the flow stays — and how many. These are the <strong>special lines</strong>, and they coincide exactly with the eigenvector directions.</p>
+<div id="def-special-line" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.3 (Special line)</strong></span> For the linear system <span class="math inline">\(\dot x=Ax\)</span> (<span class="math inline">\(A\)</span> nonsingular, so the origin is the unique fixed point), a line through the origin is a <strong>special line</strong> if some orbit of the system lies on it.</p>
+</div>
+<div id="thm-special-lines" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.8 (Special lines are eigenvector lines)</strong></span> A line through the origin spanned by a nonzero vector <span class="math inline">\(\xi\)</span> is a special line of <span class="math inline">\(\dot x=Ax\)</span> if and only if <span class="math inline">\(\xi\)</span> is a (real) eigenvector of <span class="math inline">\(A\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Any line through the origin is <span class="math inline">\(\{x=\theta\xi:\theta\in\mathbb{R}\}\)</span> for a fixed nonzero <span class="math inline">\(\xi\)</span>. An orbit lies on this line iff there is a scalar function <span class="math inline">\(\theta(t)\)</span>, not identically zero, with <span class="math inline">\(x(t)=\theta(t)\xi\)</span> a solution: <span id="eq-special-line-eqn"><span class="math display">\[
+\frac{\mathrm{d}}{\mathrm{d}t}\bigl(\theta\xi\bigr)=A\bigl(\theta\xi\bigr).
+\tag{2.35}\]</span></span> Since <span class="math inline">\(\tfrac{\mathrm{d}}{\mathrm{d}t}(\theta\xi)=\dot\theta\,\xi\)</span> and <span class="math inline">\(A(\theta\xi)=\theta A\xi\)</span>, equation <a href="#eq-special-line-eqn" class="quarto-xref">Equation&nbsp;<span>2.35</span></a> is <span class="math inline">\(\theta A\xi=\dot\theta\,\xi\)</span>, i.e. <span id="eq-special-line-eigen"><span class="math display">\[
+A\xi=\frac{\dot\theta}{\theta}\,\xi.
+\tag{2.36}\]</span></span> (Here <span class="math inline">\(\theta(t)\ne 0\)</span> for all <span class="math inline">\(t\)</span>: if <span class="math inline">\(\theta\)</span> vanished at some instant the orbit would touch the origin, but <span class="math inline">\(x\equiv 0\)</span> is itself an orbit, and two orbits cannot meet without violating uniqueness.) Equation <a href="#eq-special-line-eigen" class="quarto-xref">Equation&nbsp;<span>2.36</span></a> holds iff there is a real constant <span class="math inline">\(\lambda\)</span> with <span class="math display">\[
+\frac{\dot\theta}{\theta}=\lambda,\qquad A\xi=\lambda\xi,
+\]</span> the first giving <span class="math inline">\(\theta=\theta_0 e^{\lambda t}\)</span>. The condition <span class="math inline">\(A\xi=\lambda\xi\)</span> says exactly that <span class="math inline">\(\lambda\)</span> is a real eigenvalue of <span class="math inline">\(A\)</span> and <span class="math inline">\(\xi\)</span> its eigenvector. Hence the line <span class="math inline">\(\{x=\theta\xi\}\)</span> is special iff <span class="math inline">\(\xi\)</span> is an eigenvector. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Two consequences. First, special lines exist only for <em>real</em> eigenvalues; a fixed point whose eigenvalues are complex (a focus or a center) has <strong>no</strong> special lines. Second, the <em>number</em> of special lines equals the number of independent real eigendirections. Cataloguing by type:</p>
+<ul>
+<li><strong>saddle</strong> and <strong>(two-way) node</strong> (real distinct eigenvalues): <strong>two</strong> special lines, one per eigenvector. For the saddle these are the stable and unstable manifolds; for the node, the fast and slow eigendirections.</li>
+<li><strong>degenerate (one-way) node</strong> (repeated eigenvalue, defective): <strong>one</strong> special line, along the single eigenvector.</li>
+<li><strong>star node</strong> (repeated eigenvalue, diagonalizable, <span class="math inline">\(A=\lambda I\)</span>): <strong>every</strong> line through the origin is special, since every nonzero vector is an eigenvector.</li>
+<li><strong>focus</strong> and <strong>center</strong> (complex eigenvalues): <strong>no</strong> special line.</li>
+</ul>
+<p>There is a quick computational route to the special lines that bypasses the eigenvectors. Seek a special line <span class="math inline">\(y=kx\)</span>. Since some orbit lies on it, substitute <span class="math inline">\(y=kx\)</span> into <a href="#eq-planar-linear" class="quarto-xref">Equation&nbsp;<span>2.32</span></a>: <span class="math inline">\(\dot x=(a+bk)x\)</span> and <span class="math inline">\(\dot y=k\dot x=(c+dk)x\)</span> along the line, so <span class="math inline">\(k(a+bk)=c+dk\)</span>, i.e. <span id="eq-special-line-quadratic"><span class="math display">\[
+bk^2+(a-d)k-c=0.
+\tag{2.37}\]</span></span> This quadratic in <span class="math inline">\(k\)</span> (possibly degenerate) has, generically, two distinct real roots (two special lines), or one real root (one line), or no real root (two complex roots — no special line); the star node is the degenerate identity case where <a href="#eq-special-line-quadratic" class="quarto-xref">Equation&nbsp;<span>2.37</span></a> holds for every <span class="math inline">\(k\)</span>. These four cases match the eigenstructure exactly.</p>
+</section>
+</section>
+<section id="sec-nonlinear" class="level5">
+<h5 class="anchored" data-anchor-id="sec-nonlinear">Nonlinear systems and linearization</h5>
+<p>A nonlinear planar system</p>
+<p><span id="eq-nonlinear-system"><span class="math display">\[
+\dot x=P(x,y),\qquad \dot y=Q(x,y)
+\tag{2.38}\]</span></span></p>
+<p>is studied near a fixed point <span class="math inline">\((x_0,y_0)\)</span> (where <span class="math inline">\(P=Q=0\)</span>) by <strong>linearization</strong>: its first-order Taylor approximation is the linear system</p>
+<p><span id="eq-linearization"><span class="math display">\[
+\dot x=a(x-x_0)+b(y-y_0),\qquad \dot y=c(x-x_0)+d(y-y_0),
+\tag{2.39}\]</span></span></p>
+<p>with Jacobian <span id="eq-jacobian"><span class="math display">\[
+A=\begin{pmatrix}P_x&amp;P_y\\Q_x&amp;Q_y\end{pmatrix}_{(x_0,y_0)}
+=\begin{pmatrix}a&amp;b\\c&amp;d\end{pmatrix}.
+\tag{2.40}\]</span></span> The hope is that the nonlinear flow near <span class="math inline">\((x_0,y_0)\)</span> looks like the linear flow <a href="#eq-linearization" class="quarto-xref">Equation&nbsp;<span>2.39</span></a>, classified by <a href="#thm-trace-det" class="quarto-xref">Theorem&nbsp;<span>2.7</span></a>. This is true for the robust (hyperbolic, non-borderline) types, by the following results.</p>
+<div id="thm-perron" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.9 (Perron’s theorems)</strong></span> Let <span class="math inline">\(P,Q\)</span> have continuous first partials near <span class="math inline">\((x_0,y_0)\)</span> and admit the expansions <span class="math inline">\(P=a(x-x_0)+b(y-y_0)+o(r)\)</span>, <span class="math inline">\(Q=c(x-x_0)+d(y-y_0)+o(r)\)</span>, where <span class="math inline">\(r=\sqrt{(x-x_0)^2+(y-y_0)^2}\)</span>.</p>
+<ol type="i">
+<li><p><em>(First theorem.)</em> If the linearization <a href="#eq-linearization" class="quarto-xref">Equation&nbsp;<span>2.39</span></a> has at the origin a <strong>node</strong> (nondegenerate, non-star), <strong>focus</strong>, or <strong>saddle</strong>, then <span class="math inline">\((x_0,y_0)\)</span> is a fixed point of the same type for the nonlinear system <a href="#eq-nonlinear-system" class="quarto-xref">Equation&nbsp;<span>2.38</span></a>.</p></li>
+<li><p><em>(Second theorem.)</em> If instead the expansions hold with remainder <span class="math inline">\(o(r^{1+\varepsilon})\)</span> for some <span class="math inline">\(\varepsilon&gt;0\)</span>, and the linearization has a <strong>degenerate</strong> or <strong>star (critical)</strong> node, then <span class="math inline">\((x_0,y_0)\)</span> is a degenerate or critical node of <a href="#eq-nonlinear-system" class="quarto-xref">Equation&nbsp;<span>2.38</span></a>.</p></li>
+</ol>
+</div>
+<p>The robust transfer is captured topologically by the Hartman–Grobman theorem.</p>
+<div id="thm-hartman-grobman" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.10 (Hartman–Grobman)</strong></span> Near a <strong>hyperbolic</strong> fixed point — one at which every eigenvalue of the Jacobian has nonzero real part — the phase portrait of the nonlinear system <a href="#eq-nonlinear-system" class="quarto-xref">Equation&nbsp;<span>2.38</span></a> is <strong>topologically equivalent</strong> to that of its linearization <a href="#eq-linearization" class="quarto-xref">Equation&nbsp;<span>2.39</span></a>: there is a local homeomorphism carrying orbits to orbits and preserving the direction of time.</p>
+</div>
+<p>The hyperbolicity proviso is exactly what excludes the <strong>center</strong> (<span class="math inline">\(\tau=0\)</span>, purely imaginary eigenvalues): there the linearization predicts closed orbits, but an arbitrarily small nonlinear perturbation can turn the center into a slow spiral (in or out). The center is the borderline case where linearization is <em>inconclusive</em> — a fact that drives the Hopf bifurcation in <a href="#sec-bifurcations" class="quarto-xref"><span>Section 2.3.3</span></a>.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Why saddles matter in economics.</strong> The saddle is the type to watch in dynamic optimization. To steer a system to a desired stable state one typically chooses a control that places the economy on the <em>one</em> trajectory — the stable manifold, or <strong>saddle path</strong> — that converges to the target. Phase diagrams of optimal-control and growth models (Ramsey, in the calculus-of-variations chapter) are saddle portraits: the equilibrium is reached only along the saddle path, and the planner’s job is to jump onto it. By contrast, if the target were a (globally) stable node, <em>any</em> behavior would drift there and the choice would not matter — which is rarely the interesting economic case.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-isocline" class="level5">
+<h5 class="anchored" data-anchor-id="sec-isocline">Phase-diagram (isocline) analysis</h5>
+<p>To draw the phase portrait of a system <span class="math inline">\(\dot x=f(x,y)\)</span>, <span class="math inline">\(\dot y=g(x,y)\)</span> without solving it, use the <strong>isocline method</strong>:</p>
+<ol type="1">
+<li>Draw the <strong>nullclines</strong> <span class="math inline">\(f(x,y)=0\)</span> (the locus where <span class="math inline">\(\dot x=0\)</span>) and <span class="math inline">\(g(x,y)=0\)</span> (where <span class="math inline">\(\dot y=0\)</span>). Their intersections are the fixed points.</li>
+<li>The nullclines partition the plane into regions; in each region the signs of <span class="math inline">\(\dot x\)</span> and <span class="math inline">\(\dot y\)</span> are constant, giving the direction of the velocity vector (NE, NW, SE, SW).</li>
+<li>Classify each fixed point by linearizing (<a href="#thm-perron" class="quarto-xref">Theorem&nbsp;<span>2.9</span></a>, <a href="#thm-hartman-grobman" class="quarto-xref">Theorem&nbsp;<span>2.10</span></a>) and assembling the regional flow into a global portrait.</li>
+</ol>
+<p>We illustrate on the predator–prey model, our headline planar application.</p>
+<div id="exm-lotka-volterra" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.21 (The Lotka–Volterra predator–prey model)</strong></span> Let <span class="math inline">\(x\)</span> be the prey population and <span class="math inline">\(y\)</span> the predator population, with <span id="eq-predator-prey"><span class="math display">\[
+\dot x=(A-By-\lambda x)\,x,\qquad \dot y=(Cx-D-\mu y)\,y,
+\tag{2.41}\]</span></span> where <span class="math inline">\(A,B,C,D&gt;0\)</span> and <span class="math inline">\(\lambda,\mu\ge 0\)</span> measure intraspecies crowding. Here <span class="math inline">\(A\)</span> is the prey’s intrinsic growth, <span class="math inline">\(B\)</span> the predation pressure on prey, <span class="math inline">\(C\)</span> the predator’s benefit from prey, <span class="math inline">\(D\)</span> the predator’s death rate. We take the classical case <span class="math inline">\(\lambda=\mu=0\)</span> (no crowding), the <strong>Lotka–Volterra</strong> system <span class="citation" data-cites="strogatz2018">(<a href="references.html#ref-strogatz2018" role="doc-biblioref">Strogatz 2018</a>)</span>: <span id="eq-lv-classical"><span class="math display">\[
+\dot x=(A-By)\,x,\qquad \dot y=(Cx-D)\,y.
+\tag{2.42}\]</span></span></p>
+<p><em>Fixed points.</em> Setting both rates to zero, the only fixed points are the origin <span class="math inline">\((0,0)\)</span> and the interior point <span id="eq-lv-fixed"><span class="math display">\[
+(x^\ast,y^\ast)=\Bigl(\frac{D}{C},\frac{A}{B}\Bigr).
+\tag{2.43}\]</span></span> The positive <span class="math inline">\(x\)</span>-axis and positive <span class="math inline">\(y\)</span>-axis are themselves orbits (on <span class="math inline">\(y=0\)</span>, <span class="math inline">\(\dot y=0\)</span>; on <span class="math inline">\(x=0\)</span>, <span class="math inline">\(\dot x=0\)</span>).</p>
+<p><em>A conserved quantity.</em> In the open first quadrant <span class="math inline">\(x,y&gt;0\)</span>, eliminate time by dividing the equations: <span class="math display">\[
+\frac{\mathrm{d}y}{\mathrm{d}x}=\frac{y(Cx-D)}{x(A-By)}
+\quad\Longrightarrow\quad
+\Bigl(C-\frac{D}{x}\Bigr)\mathrm{d}x+\Bigl(B-\frac{A}{y}\Bigr)\mathrm{d}y=0,
+\]</span> which is exact and integrates to the conserved quantity <span id="eq-lv-conserved"><span class="math display">\[
+H(x,y)=\bigl(Cx-D\ln x\bigr)+\bigl(By-A\ln y\bigr)=h.
+\tag{2.44}\]</span></span> Each level <span class="math inline">\(H=h\)</span> is an orbit. The function <span class="math inline">\(H=f(x)+g(y)\)</span> is smooth and strictly convex (its Hessian <span class="math inline">\(\operatorname{diag}(D/x^2,A/y^2)\)</span> is positive definite), so it has a unique interior minimum at its critical point — and <span class="math inline">\(f'(x)=C-D/x=0\)</span> at <span class="math inline">\(x=D/C=x^\ast\)</span>, <span class="math inline">\(g'(y)=B-A/y=0\)</span> at <span class="math inline">\(y=A/B=y^\ast\)</span>, exactly <a href="#eq-lv-fixed" class="quarto-xref">Equation&nbsp;<span>2.43</span></a>. Since <span class="math inline">\(f(x)\to\infty\)</span> as <span class="math inline">\(x\to 0^+\)</span> or <span class="math inline">\(x\to\infty\)</span> (and likewise <span class="math inline">\(g\)</span>), the level sets <span class="math inline">\(H=h\)</span> for <span class="math inline">\(h&gt;h^\ast:=H(x^\ast,y^\ast)\)</span> are <strong>closed curves</strong> encircling <span class="math inline">\((x^\ast,y^\ast)\)</span>.</p>
+<p><em>Direction of motion.</em> The nullclines <span class="math inline">\(x=x^\ast\)</span> and <span class="math inline">\(y=y^\ast\)</span> cut the first quadrant into four regions. In <span class="math inline">\(\{x&gt;x^\ast,y&gt;y^\ast\}\)</span>, <a href="#eq-lv-classical" class="quarto-xref">Equation&nbsp;<span>2.42</span></a> gives <span class="math inline">\(\dot x&lt;0,\dot y&gt;0\)</span> (velocity points NW); checking the other three regions the same way, the flow circulates <strong>counterclockwise</strong>. Hence the interior fixed point is a <strong>center</strong>: the populations cycle on closed orbits (<a href="#fig-lv" class="quarto-xref">Figure&nbsp;<span>2.4</span></a>). (The origin, by linearization, is a saddle — eigenvalues <span class="math inline">\(A&gt;0\)</span> and <span class="math inline">\(-D&lt;0\)</span>.)</p>
+<p><em>Average-value theorem.</em> Let <span class="math inline">\(T_h\)</span> be the period of the orbit <span class="math inline">\(H=h\)</span>. The time-averages of the two populations over one cycle equal the equilibrium values: <span id="eq-lv-average"><span class="math display">\[
+\bar x:=\frac{1}{T_h}\int_0^{T_h}x(t)\,\mathrm{d}t=x^\ast,
+\qquad
+\bar y:=\frac{1}{T_h}\int_0^{T_h}y(t)\,\mathrm{d}t=y^\ast.
+\tag{2.45}\]</span></span> Indeed from <a href="#eq-lv-classical" class="quarto-xref">Equation&nbsp;<span>2.42</span></a>, <span class="math inline">\(\dot x/x=A-By\)</span>, so integrating over one period and using <span class="math inline">\(x(T_h)=x(0)\)</span>, <span class="math display">\[
+0=\int_0^{T_h}\frac{\dot x}{x}\,\mathrm{d}t=\int_0^{T_h}(A-By)\,\mathrm{d}t
+=AT_h-B\!\int_0^{T_h}\!y\,\mathrm{d}t,
+\]</span> whence <span class="math inline">\(\bar y=A/B=y^\ast\)</span>; the symmetric computation with <span class="math inline">\(\dot y/y=Cx-D\)</span> gives <span class="math inline">\(\bar x=D/C=x^\ast\)</span>.</p>
+<p><em>The pesticide paradox.</em> Suppose both species are harvested at a common extra rate <span class="math inline">\(\varepsilon&gt;0\)</span>, turning <a href="#eq-lv-classical" class="quarto-xref">Equation&nbsp;<span>2.42</span></a> into <span class="math inline">\(\dot x=(A-\varepsilon-By)x\)</span>, <span class="math inline">\(\dot y=(Cx-D-\varepsilon)y\)</span>. By <a href="#eq-lv-average" class="quarto-xref">Equation&nbsp;<span>2.45</span></a> the new averages are <span class="math display">\[
+\bar x=\frac{D+\varepsilon}{C},\qquad \bar y=\frac{A-\varepsilon}{B}.
+\]</span> So uniform harvesting <strong>raises</strong> the average prey population and <strong>lowers</strong> the average predator population. Applied to a crop pest (<span class="math inline">\(x\)</span>) and its natural enemy (<span class="math inline">\(y\)</span>): spraying a broad pesticide that kills both raises the average number of <em>pests</em> and depresses their natural predator — the opposite of the intent. Biological control, sparing the predator, is the better policy <span class="citation" data-cites="strogatz2018">(<a href="references.html#ref-strogatz2018" role="doc-biblioref">Strogatz 2018</a>)</span>.</p>
+</div>
+<div id="fig-lv" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-lotka-volterra.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.4: Lotka–Volterra phase portrait, <a href="#eq-lv-classical" class="quarto-xref">Equation&nbsp;<span>2.42</span></a> with <span class="math inline">\(A=B=C=D=1\)</span> so <span class="math inline">\((x^\ast,y^\ast)=(1,1)\)</span>. The interior equilibrium is a center; the closed orbits are level sets of the conserved <span class="math inline">\(H\)</span> in <a href="#eq-lv-conserved" class="quarto-xref">Equation&nbsp;<span>2.44</span></a>, traversed counterclockwise. Predator and prey populations cycle indefinitely; the time-average over each cycle equals the equilibrium value.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+</section>
+<section id="sec-bifurcations" class="level3">
+<h3 class="anchored" data-anchor-id="sec-bifurcations">Bifurcations</h3>
+<p>A <strong>parametrized</strong> dynamical system <span class="math inline">\(\dot x=F(x,\varepsilon)\)</span> may change the <em>qualitative</em> shape of its phase portrait as the parameter <span class="math inline">\(\varepsilon\)</span> passes a critical value. Such a value is a <strong>bifurcation value</strong>: a value <span class="math inline">\(\varepsilon_0\)</span> at which the topological structure of the portrait changes (fixed points appear or disappear, or change stability, or a limit cycle is born). Away from bifurcation values the portrait is <strong>structurally stable</strong> — small parameter changes do not alter it topologically. Two prototypes capture the most common transitions.</p>
+<div id="exm-saddle-node" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.22 (Saddle-node bifurcation)</strong></span> Consider <span id="eq-saddle-node"><span class="math display">\[
+\dot x=x,\qquad \dot y=y^2-\varepsilon.
+\tag{2.46}\]</span></span> The <span class="math inline">\(y\)</span>-equation has fixed points <span class="math inline">\(y=\pm\sqrt{\varepsilon}\)</span> when <span class="math inline">\(\varepsilon&gt;0\)</span>, one fixed point <span class="math inline">\(y=0\)</span> when <span class="math inline">\(\varepsilon=0\)</span>, and <strong>none</strong> when <span class="math inline">\(\varepsilon&lt;0\)</span>. Combined with <span class="math inline">\(\dot x=x\)</span> (always unstable in <span class="math inline">\(x\)</span>): for <span class="math inline">\(\varepsilon&gt;0\)</span> there are two fixed points <span class="math inline">\((0,\sqrt\varepsilon)\)</span> (unstable node) and <span class="math inline">\((0,-\sqrt\varepsilon)\)</span> (saddle); at <span class="math inline">\(\varepsilon=0\)</span> they collide into a single degenerate “saddle-node”; for <span class="math inline">\(\varepsilon&lt;0\)</span> they annihilate and no fixed point remains. The bifurcation value is <span class="math inline">\(\varepsilon_0=0\)</span>: a saddle and a node are created out of nothing as <span class="math inline">\(\varepsilon\)</span> increases through <span class="math inline">\(0\)</span>. This is the <strong>saddle-node</strong> (fold) bifurcation, the generic mechanism by which fixed points appear and disappear (left panel of <a href="#fig-bifurcations" class="quarto-xref">Figure&nbsp;<span>2.5</span></a>).</p>
+</div>
+<div id="exm-hopf" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.23 (Hopf bifurcation)</strong></span> Consider <span id="eq-hopf"><span class="math display">\[
+\dot x=\varepsilon x-y-x(x^2+y^2),\qquad \dot y=x+\varepsilon y-y(x^2+y^2).
+\tag{2.47}\]</span></span> In polar coordinates <span class="math inline">\(x=r\cos\theta\)</span>, <span class="math inline">\(y=r\sin\theta\)</span> this decouples into <span id="eq-hopf-polar"><span class="math display">\[
+\dot r=r\bigl(\varepsilon-r^2\bigr),\qquad \dot\theta=1.
+\tag{2.48}\]</span></span> The angle advances steadily (<span class="math inline">\(\dot\theta=1\)</span>), so the dynamics reduce to the radial scalar equation. For <span class="math inline">\(\varepsilon\le 0\)</span>, <span class="math inline">\(\dot r=r(\varepsilon-r^2)&lt;0\)</span> for <span class="math inline">\(r&gt;0\)</span>: the origin is the only fixed point, a <strong>stable focus</strong>, with no closed orbit nearby. For <span class="math inline">\(\varepsilon&gt;0\)</span>, the origin becomes an <strong>unstable focus</strong> (<span class="math inline">\(\dot r&gt;0\)</span> for small <span class="math inline">\(r\)</span>), and a new fixed radius <span id="eq-limit-cycle"><span class="math display">\[
+r=\sqrt{\varepsilon}
+\tag{2.49}\]</span></span> appears where <span class="math inline">\(\dot r=0\)</span>: a <strong>stable limit cycle</strong> of amplitude <span class="math inline">\(\sqrt\varepsilon\)</span>. As <span class="math inline">\(\varepsilon\)</span> crosses <span class="math inline">\(0\)</span> the stable equilibrium loses stability and throws off a small-amplitude periodic orbit that grows like <span class="math inline">\(\sqrt\varepsilon\)</span>. This is the <strong>Hopf bifurcation</strong>, the generic birth of a limit cycle from an equilibrium (right panel of <a href="#fig-bifurcations" class="quarto-xref">Figure&nbsp;<span>2.5</span></a>). Note that linearization alone could not have predicted it: at <span class="math inline">\(\varepsilon=0\)</span> the linearization is a center, the borderline case where <a href="#thm-hartman-grobman" class="quarto-xref">Theorem&nbsp;<span>2.10</span></a> does not apply.</p>
+</div>
+<div id="fig-bifurcations" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bifurcations-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-bifurcations.svg" class="img-fluid figure-img" style="width:92.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bifurcations-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.5: Two prototype bifurcations; the portrait changes qualitatively at <span class="math inline">\(\varepsilon_0=0\)</span>. Left: saddle-node, <span class="math inline">\(\dot y=y^2-\varepsilon\)</span> — two equilibria <span class="math inline">\(y=\pm\sqrt\varepsilon\)</span> (one stable, one unstable) exist for <span class="math inline">\(\varepsilon&gt;0\)</span> and annihilate for <span class="math inline">\(\varepsilon&lt;0\)</span>. Right: Hopf, <span class="math inline">\(\dot r=r(\varepsilon-r^2)\)</span> — a stable limit cycle of amplitude <span class="math inline">\(r=\sqrt\varepsilon\)</span> is born as the focus loses stability.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-odes-problems" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="sec-odes-problems"><span class="header-section-number">2.4</span> Problems</h2>
+<p>The following are the chapter’s exercises; worked solutions to a selected, instructive subset follow in <a href="#sec-odes-solutions" class="quarto-xref"><span>Section 2.5</span></a>.</p>
+<ol type="1">
+<li><p>Solve each equation. (1) <span class="math inline">\((t^2-1)\dot x+2tx^2=0\)</span>, <span class="math inline">\(x(0)=1\)</span> (separable). (2) <span class="math inline">\(\dot x=\tfrac{x}{t}\bigl(\ln\tfrac{x}{t^2}+2\bigr)\)</span> (set <span class="math inline">\(u=xt^{-2}\)</span> to separate). (3) <span class="math inline">\((2t-4x+6)\,\mathrm{d}t+(t+x-3)\,\mathrm{d}x=0\)</span> (reduce to homogeneous). (4) <span class="math inline">\(t(\dot x-x)=e^{t}\)</span> (linear). (5) <span class="math inline">\(\dot x+x=x^2(\cos t-\sin t)\)</span> (Bernoulli). (6) <span class="math inline">\((1+x^2\sin 2t)\,\mathrm{d}t-x\cos 2t\,\mathrm{d}x=0\)</span> (exact). (7) <span class="math inline">\(x\,\mathrm{d}t+(tx^3+t\ln t)\,\mathrm{d}x=0\)</span> (find an integrating factor).</p></li>
+<li><p>Solve each system, classify its fixed point, find its special lines, and sketch the phase portrait. (1) <span class="math inline">\(\dot x=2x+y\)</span>, <span class="math inline">\(\dot y=x+2y\)</span>. (2) <span class="math inline">\(\dot x=x-y-1\)</span>, <span class="math inline">\(\dot y=x+y-3\)</span>. (3) <span class="math inline">\(\dot x=x+y\)</span>, <span class="math inline">\(\dot y=2x+2y\)</span>. (4) <span class="math inline">\(\dot x=2x-y\)</span>, <span class="math inline">\(\dot y=x\)</span>.</p></li>
+<li><p>Solve <span class="math inline">\(\dot x=y+2e^{t}\)</span>, <span class="math inline">\(\dot y=x+t^2\)</span> (first solve the associated homogeneous system, then use variation of parameters).</p></li>
+<li><p>Solve each implicit equation. (1) <span class="math inline">\(\dot x^2=x^2+2\)</span>. (2) <span class="math inline">\(x=\dot x^2+1\)</span>. (3) <span class="math inline">\(x^2=\dot x^2\)</span>. (4) <span class="math inline">\(x=(\dot x-1)e^{x}\)</span>. (5) <span class="math inline">\(x^2(\dot x^2+1)=1\)</span>. (6) <span class="math inline">\(\dot x^2-2x\dot x=x^2(t^2-1)\)</span>.</p></li>
+<li><p>Solve each second-order equation. (1) <span class="math inline">\(4x+\ddot x=1\)</span>. (2) <span class="math inline">\(\ddot x-x=1\)</span>. (3) <span class="math inline">\(\ddot x-2\dot x+x=1\)</span>. (4) <span class="math inline">\(\ddot x-2\dot x-3x=1\)</span>.</p></li>
+<li><p>Solve <span class="math inline">\(\dot x=-\sqrt{1-x^2}\)</span>, identifying all singular solutions.</p></li>
+<li><p>Solve and draw the phase portrait of <span class="math inline">\(\dot x=x^2-1\)</span>, <span class="math inline">\(\dot y=y\)</span>.</p></li>
+<li><p>Draw the phase portrait of each system. (1) <span class="math inline">\(\dot x=x+\lambda y\)</span>, <span class="math inline">\(\dot y=\lambda y\)</span>, <span class="math inline">\(\lambda\in\mathbb{R}\)</span>. (2) <span class="math inline">\(\dot x=x^2-y\)</span>, <span class="math inline">\(\dot y=x+y\)</span>.</p></li>
+<li><p>Prove that the origin is a saddle of <span class="math inline">\(\dot x=-x+2y\)</span>, <span class="math inline">\(\dot y=y\)</span>, and find its saddle paths (special lines).</p></li>
+<li><p>Carry out a phase-diagram analysis of the predator–prey model <span class="math inline">\(\dot x=\bigl(2-\tfrac23 y-x\bigr)x\)</span>, <span class="math inline">\(\dot y=\bigl(x-1-\tfrac13 y\bigr)y\)</span>.</p></li>
+</ol>
+</section>
+<section id="sec-odes-solutions" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="sec-odes-solutions"><span class="header-section-number">2.5</span> Selected solutions</h2>
+<section id="problem-2" class="level3">
+<h3 class="anchored" data-anchor-id="problem-2">Problem 2</h3>
+<p>We solve parts (1) and (4) in full and indicate the rest.</p>
+<p><strong>(1) <span class="math inline">\(\dot x=2x+y\)</span>, <span class="math inline">\(\dot y=x+2y\)</span>.</strong> The matrix <span class="math inline">\(A=\bigl(\begin{smallmatrix}2&amp;1\\1&amp;2\end{smallmatrix}\bigr)\)</span> has <span class="math inline">\(\tau=4\)</span>, <span class="math inline">\(\Delta=3\)</span>, discriminant <span class="math inline">\(\tau^2-4\Delta=4&gt;0\)</span> with <span class="math inline">\(\Delta&gt;0,\tau&gt;0\)</span>: by <a href="#thm-trace-det" class="quarto-xref">Theorem&nbsp;<span>2.7</span></a> an <strong>unstable node</strong>. Eigenvalues solve <span class="math inline">\(\lambda^2-4\lambda+3=0\)</span>, so <span class="math inline">\(\lambda_1=1,\lambda_2=3\)</span>. For <span class="math inline">\(\lambda_1=1\)</span>, <span class="math inline">\((A-I)\xi=0\)</span> gives <span class="math inline">\(x+y=0\)</span>, eigenvector <span class="math inline">\(\xi_1=\bigl(\begin{smallmatrix}1\\-1\end{smallmatrix}\bigr)\)</span>; for <span class="math inline">\(\lambda_2=3\)</span>, <span class="math inline">\(\xi_2=\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\)</span>. By <a href="#thm-special-lines" class="quarto-xref">Theorem&nbsp;<span>2.8</span></a> the <strong>two special lines</strong> are <span class="math inline">\(y=-x\)</span> (slow, <span class="math inline">\(\lambda=1\)</span>) and <span class="math inline">\(y=x\)</span> (fast, <span class="math inline">\(\lambda=3\)</span>). The general solution is <span class="math inline">\(z=c_1 e^{t}\bigl(\begin{smallmatrix}1\\-1\end{smallmatrix}\bigr)
++c_2 e^{3t}\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\)</span>; all trajectories leave the origin, tangent to the slow line <span class="math inline">\(y=-x\)</span>.</p>
+<p><strong>(4) <span class="math inline">\(\dot x=2x-y\)</span>, <span class="math inline">\(\dot y=x\)</span>.</strong> Here <span class="math inline">\(A=\bigl(\begin{smallmatrix}2&amp;-1\\1&amp;0\end{smallmatrix}\bigr)\)</span>, <span class="math inline">\(\tau=2\)</span>, <span class="math inline">\(\Delta=1\)</span>, discriminant <span class="math inline">\(\tau^2-4\Delta=0\)</span>: a <strong>degenerate node</strong> (repeated eigenvalue <span class="math inline">\(\lambda=1\)</span>), unstable since <span class="math inline">\(\tau&gt;0\)</span>. The single eigenvector solves <span class="math inline">\((A-I)\xi=0\)</span>, i.e.&nbsp;<span class="math inline">\(x-y=0\)</span>, so <span class="math inline">\(\xi=\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\)</span>: exactly <strong>one</strong> special line, <span class="math inline">\(y=x\)</span>. By <a href="#eq-fund-repeated" class="quarto-xref">Equation&nbsp;<span>2.19</span></a> the general solution carries a <span class="math inline">\(te^{t}\)</span> term and leaves the origin tangent to the single special line <span class="math inline">\(y=x\)</span> — there is no rotation (a degenerate node, not a focus).</p>
+<p>For (2), translate to the fixed point <span class="math inline">\((2,1)\)</span> (solve <span class="math inline">\(x-y-1=0\)</span>, <span class="math inline">\(x+y-3=0\)</span>); the matrix is <span class="math inline">\(\bigl(\begin{smallmatrix}1&amp;-1\\1&amp;1\end{smallmatrix}\bigr)\)</span> with <span class="math inline">\(\tau=2,\Delta=2\)</span>, discriminant <span class="math inline">\(-4&lt;0\)</span>: an <strong>unstable focus</strong> — no special lines (complex eigenvalues <span class="math inline">\(1\pm i\)</span>). For (3), <span class="math inline">\(A=\bigl(\begin{smallmatrix}1&amp;1\\2&amp;2\end{smallmatrix}\bigr)\)</span> has <span class="math inline">\(\Delta=0\)</span> (a whole line of fixed points along <span class="math inline">\(y=-x\)</span>), which falls outside the <span class="math inline">\(\Delta\ne 0\)</span> classification.</p>
+</section>
+<section id="problem-5" class="level3">
+<h3 class="anchored" data-anchor-id="problem-5">Problem 5</h3>
+<p>These are constant-coefficient linear equations (<a href="#sec-second-order" class="quarto-xref"><span>Section 2.1.2</span></a>); each has a constant particular solution plus the homogeneous family.</p>
+<p><strong>(1) <span class="math inline">\(\ddot x+4x=1\)</span>.</strong> Particular <span class="math inline">\(x_p=\tfrac14\)</span>; characteristic <span class="math inline">\(\lambda^2+4=0\)</span> gives <span class="math inline">\(\pm 2i\)</span> (Case II), so <span class="math inline">\(x=\tfrac14+c_1\cos 2t+c_2\sin 2t\)</span>.</p>
+<p><strong>(2) <span class="math inline">\(\ddot x-x=1\)</span>.</strong> Particular <span class="math inline">\(x_p=-1\)</span>; roots <span class="math inline">\(\pm 1\)</span> (Case I), so <span class="math inline">\(x=-1+c_1 e^{t}+c_2 e^{-t}\)</span>.</p>
+<p><strong>(3) <span class="math inline">\(\ddot x-2\dot x+x=1\)</span>.</strong> Particular <span class="math inline">\(x_p=1\)</span>; characteristic <span class="math inline">\(\lambda^2-2\lambda+1=(\lambda-1)^2\)</span> gives the repeated root <span class="math inline">\(1\)</span> (Case III), so <span class="math inline">\(x=1+(c_1+c_2 t)e^{t}\)</span>.</p>
+<p><strong>(4) <span class="math inline">\(\ddot x-2\dot x-3x=1\)</span>.</strong> Particular <span class="math inline">\(x_p=-\tfrac13\)</span>; roots of <span class="math inline">\(\lambda^2-2\lambda-3=0\)</span> are <span class="math inline">\(3,-1\)</span> (Case I), so <span class="math inline">\(x=-\tfrac13+c_1 e^{3t}+c_2 e^{-t}\)</span>.</p>
+</section>
+<section id="problem-9-a-saddle-and-its-saddle-paths" class="level3">
+<h3 class="anchored" data-anchor-id="problem-9-a-saddle-and-its-saddle-paths">Problem 9 (a saddle and its saddle paths)</h3>
+<p>For <span class="math inline">\(\dot x=-x+2y\)</span>, <span class="math inline">\(\dot y=y\)</span> the matrix is <span class="math inline">\(A=\bigl(\begin{smallmatrix}-1&amp;2\\0&amp;1\end{smallmatrix}\bigr)\)</span>, with <span class="math inline">\(\tau=0\)</span>, <span class="math inline">\(\Delta=-1&lt;0\)</span>. Since <span class="math inline">\(\Delta&lt;0\)</span>, <a href="#thm-trace-det" class="quarto-xref">Theorem&nbsp;<span>2.7</span></a> makes the origin a <strong>saddle</strong>. Eigenvalues solve <span class="math inline">\(\lambda^2-1=0\)</span>, so <span class="math inline">\(\lambda_1=-1\)</span> (stable) and <span class="math inline">\(\lambda_2=1\)</span> (unstable). For <span class="math inline">\(\lambda_1=-1\)</span>, <span class="math inline">\((A+I)\xi=0\)</span> reads <span class="math inline">\(2y=0\)</span> (from the first row <span class="math inline">\(0\cdot x+2y=0\)</span>), so <span class="math inline">\(y=0\)</span> and <span class="math inline">\(\xi_1=\bigl(\begin{smallmatrix}1\\0\end{smallmatrix}\bigr)\)</span>: the <strong>stable manifold</strong> is the <span class="math inline">\(x\)</span>-axis <span class="math inline">\(y=0\)</span>, the <em>saddle path</em> along which trajectories converge to the origin. For <span class="math inline">\(\lambda_2=1\)</span>, <span class="math inline">\((A-I)\xi=0\)</span> reads <span class="math inline">\(-2x+2y=0\)</span>, so <span class="math inline">\(y=x\)</span> and <span class="math inline">\(\xi_2=\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\)</span>: the <strong>unstable manifold</strong> is the line <span class="math inline">\(y=x\)</span>. These two eigenvector lines are the special lines of <a href="#thm-special-lines" class="quarto-xref">Theorem&nbsp;<span>2.8</span></a>; the convergent one, <span class="math inline">\(y=0\)</span>, is the saddle path.</p>
+</section>
+<section id="problem-10-predatorprey-phase-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="problem-10-predatorprey-phase-diagram">Problem 10 (predator–prey phase diagram)</h3>
+<p>For <span class="math inline">\(\dot x=\bigl(2-\tfrac23 y-x\bigr)x\)</span>, <span class="math inline">\(\dot y=\bigl(x-1-\tfrac13 y\bigr)y\)</span> in the first quadrant (<span class="math inline">\(x,y&gt;0\)</span>), apply the isocline method (<a href="#sec-isocline" class="quarto-xref"><span>Section 2.3.2.2.3</span></a>). The nontrivial <strong>nullclines</strong> are the lines <span class="math display">\[
+\dot x=0:\ x+\tfrac23 y=2,\qquad \dot y=0:\ x-\tfrac13 y=1.
+\]</span> Their intersection in the open quadrant solves <span class="math inline">\(x+\tfrac23 y=2\)</span> and <span class="math inline">\(x-\tfrac13 y=1\)</span>; subtracting, <span class="math inline">\(y=1\)</span>, then <span class="math inline">\(x=\tfrac43\)</span>. So the interior fixed point is <span class="math inline">\((x^\ast,y^\ast)=(\tfrac43,1)\)</span> (together with the boundary fixed points <span class="math inline">\((0,0)\)</span>, <span class="math inline">\((2,0)\)</span>, and <span class="math inline">\((0,3)\)</span>). Linearizing <a href="#eq-nonlinear-system" class="quarto-xref">Equation&nbsp;<span>2.38</span></a> at <span class="math inline">\((\tfrac43,1)\)</span>: with <span class="math inline">\(P=(2-\tfrac23 y-x)x\)</span>, <span class="math inline">\(Q=(x-1-\tfrac13 y)y\)</span>, <span class="math display">\[
+A=\begin{pmatrix}P_x&amp;P_y\\Q_x&amp;Q_y\end{pmatrix}_{(4/3,1)}
+=\begin{pmatrix}-x^\ast&amp;-\tfrac23 x^\ast\\ y^\ast&amp;-\tfrac13 y^\ast\end{pmatrix}
+=\begin{pmatrix}-\tfrac43&amp;-\tfrac89\\[2pt] 1&amp;-\tfrac13\end{pmatrix},
+\]</span> using <span class="math inline">\(P_x=2-\tfrac23 y-2x\)</span>, which at the fixed point reduces to <span class="math inline">\(-x^\ast\)</span> (since <span class="math inline">\(2-\tfrac23 y^\ast-x^\ast=0\)</span>), and <span class="math inline">\(Q_y=x-1-\tfrac23 y\)</span> reducing to <span class="math inline">\(-\tfrac13 y^\ast\)</span>. Then <span class="math inline">\(\tau=\operatorname{tr}A=-\tfrac43-\tfrac13=-\tfrac53&lt;0\)</span> and <span class="math inline">\(\Delta=\det A=(-\tfrac43)(-\tfrac13)-(-\tfrac89)(1)=\tfrac49+\tfrac89=\tfrac{12}{9}=\tfrac43&gt;0\)</span>, with discriminant <span class="math inline">\(\tau^2-4\Delta=\tfrac{25}{9}-\tfrac{16}{3}=\tfrac{25-48}{9}=-\tfrac{23}{9}&lt;0\)</span>. By <a href="#thm-trace-det" class="quarto-xref">Theorem&nbsp;<span>2.7</span></a> and <a href="#thm-perron" class="quarto-xref">Theorem&nbsp;<span>2.9</span></a> the interior equilibrium is a <strong>stable focus</strong>: predator and prey spiral inward to <span class="math inline">\((\tfrac43,1)\)</span>. The crowding terms (here both coefficients on <span class="math inline">\(x^2\)</span> and <span class="math inline">\(y^2\)</span> are nonzero) have converted the conservative Lotka–Volterra center of <a href="#exm-lotka-volterra" class="quarto-xref">Example&nbsp;<span>2.21</span></a> into a damped, asymptotically stable equilibrium — populations now settle rather than cycle forever.</p>
+<p>The remaining problems are left as practice: 1 applies the first-order recipes of <a href="#sec-first-order" class="quarto-xref"><span>Section 2.1.1</span></a> (separable, homogeneous, linear, Bernoulli, exact, integrating factor) directly; 3 combines <a href="#thm-fundamental" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> with variation of parameters; 4 and 6 are implicit / singular-solution problems of the kind in <a href="#sec-implicit" class="quarto-xref"><span>Section 2.1.3</span></a> and <a href="#sec-singular" class="quarto-xref"><span>Section 2.2.3</span></a>; 7–8 are phase portraits assembled by the isocline method of <a href="#sec-isocline" class="quarto-xref"><span>Section 2.3.2.2.3</span></a>.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-acemoglu2009" class="csl-entry" role="listitem">
+Acemoglu, Daron. 2009. <em>Introduction to Modern Economic Growth</em>. Princeton, NJ: Princeton University Press.
+</div>
+<div id="ref-strogatz2018" class="csl-entry" role="listitem">
+Strogatz, Steven H. 2018. <em>Nonlinear Dynamics and Chaos: With Applications to Physics, Biology, Chemistry, and Engineering</em>. 2nd ed. Boca Raton, FL: CRC Press.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01-static-optimization.html" class="pagination-link" aria-label="Static Optimization">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03-calculus-of-variations.html" class="pagination-link" aria-label="Calculus of Variations">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

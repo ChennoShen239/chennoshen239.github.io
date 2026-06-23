@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+
+<title>Notation – Dynamic Optimization</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./05-dynamic-programming.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./notation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./notation.html">Notation</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Dynamic Optimization</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-static-optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Continuous-Time Dynamic Optimization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-calculus-of-variations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-optimal-control.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Dynamic Programming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sets-spaces-and-general-symbols" id="toc-sets-spaces-and-general-symbols" class="nav-link active" data-scroll-target="#sets-spaces-and-general-symbols">Sets, spaces, and general symbols</a></li>
+  <li><a href="#static-optimization-ch.-1" id="toc-static-optimization-ch.-1" class="nav-link" data-scroll-target="#static-optimization-ch.-1">Static optimization (Ch. 1)</a></li>
+  <li><a href="#dynamics-and-odes-ch.-2" id="toc-dynamics-and-odes-ch.-2" class="nav-link" data-scroll-target="#dynamics-and-odes-ch.-2">Dynamics and ODEs (Ch. 2)</a></li>
+  <li><a href="#calculus-of-variations-ch.-3" id="toc-calculus-of-variations-ch.-3" class="nav-link" data-scroll-target="#calculus-of-variations-ch.-3">Calculus of variations (Ch. 3)</a></li>
+  <li><a href="#optimal-control-ch.-4" id="toc-optimal-control-ch.-4" class="nav-link" data-scroll-target="#optimal-control-ch.-4">Optimal control (Ch. 4)</a></li>
+  <li><a href="#dynamic-programming-ch.-5" id="toc-dynamic-programming-ch.-5" class="nav-link" data-scroll-target="#dynamic-programming-ch.-5">Dynamic programming (Ch. 5)</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./notation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./notation.html">Notation</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-notation" class="quarto-section-identifier">Notation</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This chapter is the master notation table for the whole book. The conventions here are field-standard and override the courseware wherever they differ; the <strong>“Course writes”</strong> column records each deviation so you can cross-reference Zhang Bo’s slides. The choice of notation policy is recorded in <code>docs/adr/0002-pragmatic-notation-standardization.md</code>, and the canonical <em>word</em> for each concept in <code>CONTEXT.md</code>.</p>
+<section id="sets-spaces-and-general-symbols" class="level2">
+<h2 class="anchored" data-anchor-id="sets-spaces-and-general-symbols">Sets, spaces, and general symbols</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Course writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\mathbb{R}, \mathbb{R}^n, \mathbb{R}_+\)</span></td>
+<td>reals, <span class="math inline">\(n\)</span>-space, non-negative reals</td>
+<td>same</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(X \subseteq \mathbb{R}^n\)</span></td>
+<td>feasible set / admissible decisions</td>
+<td><span class="math inline">\(\aleph\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(f:\mathbb{R}^n\to\mathbb{R}\)</span></td>
+<td>static objective</td>
+<td><span class="math inline">\(F\)</span>, with codomain <span class="math inline">\(\Im\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\nabla f,\ \nabla^2 f\)</span></td>
+<td>gradient, Hessian</td>
+<td>same</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\langle a,b\rangle,\ a^\top b\)</span></td>
+<td>inner product</td>
+<td>same</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(a \odot b\)</span></td>
+<td>componentwise (Hadamard) product</td>
+<td><span class="math inline">\(a\circ b\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(:=\)</span></td>
+<td>“is defined as”</td>
+<td><span class="math inline">\(\triangleq\)</span> / <span class="math inline">\(=\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="static-optimization-ch.-1" class="level2">
+<h2 class="anchored" data-anchor-id="static-optimization-ch.-1">Static optimization (Ch. 1)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Course writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(g(x)\ge 0\)</span></td>
+<td>inequality constraints (sign convention kept)</td>
+<td>same (<span class="math inline">\(g\ge 0\)</span>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(h(x)=0\)</span></td>
+<td>equality constraints</td>
+<td>same</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\lambda \ge 0\)</span></td>
+<td>KKT multipliers on <span class="math inline">\(g\)</span></td>
+<td><span class="math inline">\(\lambda\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mu\)</span></td>
+<td>multipliers on <span class="math inline">\(h\)</span></td>
+<td><span class="math inline">\(\mu\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\lambda_0\)</span></td>
+<td>Fritz–John multiplier on the objective</td>
+<td><span class="math inline">\(\lambda_0\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathcal{L}(x,\lambda,\mu)\)</span></td>
+<td>Lagrangian</td>
+<td><span class="math inline">\(L\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(V(\theta)\)</span></td>
+<td>value function of a parameter <span class="math inline">\(\theta\)</span> (envelope)</td>
+<td>same</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="dynamics-and-odes-ch.-2" class="level2">
+<h2 class="anchored" data-anchor-id="dynamics-and-odes-ch.-2">Dynamics and ODEs (Ch. 2)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Course writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\dot x = \mathrm{d}x/\mathrm{d}t\)</span></td>
+<td>time derivative</td>
+<td>same (also <span class="math inline">\(x'\)</span>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(A\)</span>, <span class="math inline">\(\lambda_i\)</span>, <span class="math inline">\(\xi_i\)</span></td>
+<td>system matrix, eigenvalues, eigenvectors</td>
+<td>same</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\tau=\operatorname{tr}A,\ \Delta=\det A\)</span></td>
+<td>trace and determinant (phase classification)</td>
+<td><span class="math inline">\(\sigma,\ \tau\)</span> (swapped!)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(e^{At}\)</span></td>
+<td>matrix exponential</td>
+<td>same</td>
+</tr>
+<tr class="odd">
+<td>steady state <span class="math inline">\(\bar x\)</span> (or <span class="math inline">\(x^\ast\)</span>)</td>
+<td>equilibrium of <span class="math inline">\(\dot x=F(x)\)</span></td>
+<td><span class="math inline">\(x^\ast\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>The course labels the trace <span class="math inline">\(\sigma\)</span> and the determinant <span class="math inline">\(\tau\)</span> in the planar-system classification. We use the more common <span class="math inline">\(\tau=\operatorname{tr}A\)</span> and <span class="math inline">\(\Delta=\det A\)</span> with discriminant <span class="math inline">\(\tau^2-4\Delta\)</span>. Watch this when comparing the <span class="math inline">\(\sigma\)</span>–<span class="math inline">\(\tau\)</span> diagrams.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="calculus-of-variations-ch.-3" class="level2">
+<h2 class="anchored" data-anchor-id="calculus-of-variations-ch.-3">Calculus of variations (Ch. 3)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Course writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(J[x]=\int_0^T F(t,x,\dot x)\,\mathrm{d}t\)</span></td>
+<td>variational objective (functional)</td>
+<td><span class="math inline">\(\int_0^T F\,\mathrm{d}t\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(F\)</span>, <span class="math inline">\(F_x\)</span>, <span class="math inline">\(F_{\dot x}\)</span></td>
+<td>integrand and its partials</td>
+<td>same</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathcal{A}\)</span></td>
+<td>class of admissible paths (a subset of <span class="math inline">\(C^1[0,T]\)</span>, not of <span class="math inline">\(\mathbb{R}^n\)</span>)</td>
+<td><span class="math inline">\(\aleph\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\delta J\)</span>, <span class="math inline">\(\delta x\)</span></td>
+<td>first variation, admissible variation</td>
+<td><span class="math inline">\(\delta V\)</span>, <span class="math inline">\(\delta x\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(T\)</span></td>
+<td>terminal time (free or fixed)</td>
+<td>same</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\rho\)</span></td>
+<td>continuous discount <strong>rate</strong> (<span class="math inline">\(e^{-\rho t}\)</span>)</td>
+<td><span class="math inline">\(r\)</span> or <span class="math inline">\(\rho\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\varphi,\psi\)</span></td>
+<td>terminal/boundary curves</td>
+<td><span class="math inline">\(\varphi,\psi\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="optimal-control-ch.-4" class="level2">
+<h2 class="anchored" data-anchor-id="optimal-control-ch.-4">Optimal control (Ch. 4)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Course writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(x\in\mathbb{R}^n\)</span>, <span class="math inline">\(u\in\mathbb{R}^m\)</span></td>
+<td>state, control</td>
+<td>same</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\dot x = g(t,x,u)\)</span></td>
+<td>state equation (law of motion)</td>
+<td><span class="math inline">\(\dot x=f(t,x,u)\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(f(t,x,u)\)</span></td>
+<td>running payoff</td>
+<td><span class="math inline">\(f\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(H=f+\lambda g\)</span></td>
+<td>(present-value) Hamiltonian</td>
+<td><span class="math inline">\(H\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\lambda\)</span></td>
+<td>costate = shadow price of the state</td>
+<td><span class="math inline">\(\lambda\)</span> (a.k.a. Hamilton multiplier)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathcal{H}=f+\mu g\)</span>, <span class="math inline">\(\mu=\lambda e^{\rho t}\)</span></td>
+<td>current-value Hamiltonian and costate</td>
+<td><span class="math inline">\(H_c\)</span>, <span class="math inline">\(\gamma\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\eta\)</span></td>
+<td>multiplier on an algebraic constraint</td>
+<td><span class="math inline">\(\theta\)</span> (clashes with the parameter <span class="math inline">\(\theta\)</span>)</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>The course reuses <span class="math inline">\(\theta\)</span> both for the multiplier on an algebraic constraint (§4.5) and for an exogenous parameter in comparative statics (§4.7). We write the <strong>multiplier as <span class="math inline">\(\eta\)</span></strong> and keep <span class="math inline">\(\theta\)</span> for the parameter.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="dynamic-programming-ch.-5" class="level2">
+<h2 class="anchored" data-anchor-id="dynamic-programming-ch.-5">Dynamic programming (Ch. 5)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Course writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(V(x)\)</span></td>
+<td>value function</td>
+<td><span class="math inline">\(V\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\pi_t(x,u)\)</span></td>
+<td>per-period payoff</td>
+<td><span class="math inline">\(\pi\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(x_{t+1}=f_t(x_t,u_t)\)</span></td>
+<td>transition</td>
+<td>same</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\Gamma_t(x)\)</span></td>
+<td>feasible-action correspondence</td>
+<td><span class="math inline">\(\Gamma\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\sigma\)</span>, <span class="math inline">\(\phi\)</span></td>
+<td>policy; stationary Markovian policy</td>
+<td><span class="math inline">\(\sigma\)</span>, <span class="math inline">\(\phi\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\beta=\dfrac{1}{1+\rho}\in(0,1)\)</span></td>
+<td>discrete discount <strong>factor</strong></td>
+<td><span class="math inline">\(\rho\)</span> (overloaded!)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(T\)</span></td>
+<td>Bellman operator</td>
+<td><span class="math inline">\(T\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbb{S}\)</span>, <span class="math inline">\(\mathbb{A}\)</span></td>
+<td>state space, action space</td>
+<td>same</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbb{E}_t[\cdot]\)</span></td>
+<td>conditional expectation given time-<span class="math inline">\(t\)</span> info</td>
+<td>same</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathrm{d}z\)</span>, Itô: <span class="math inline">\((\mathrm{d}z)^2=\mathrm{d}t\)</span></td>
+<td>Wiener increment</td>
+<td>same</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-simple callout-important">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>The discount trap.</strong> The course writes the discrete-time Bellman discount and the continuous-time discount with the <em>same</em> symbol <span class="math inline">\(\rho\)</span>, even though one is a factor in <span class="math inline">\((0,1)\)</span> and the other a rate in <span class="math inline">\((0,\infty)\)</span>. Throughout these notes: <strong><span class="math inline">\(\rho\)</span> is the continuous-time rate</strong> (<span class="math inline">\(e^{-\rho t}\)</span>, Ch. 3–4 and continuous DP) and <strong><span class="math inline">\(\beta=1/(1+\rho)\)</span> is the discrete-time factor</strong> (Ch. 5). Here <span class="math inline">\(\beta=1/(1+\rho)\)</span> is the per-period (simple) factor, whereas <span class="math inline">\(e^{-\rho}\)</span> is the continuous-compounding factor; the two agree only to first order, <span class="math inline">\(\beta=1-\rho+O(\rho^2)=e^{-\rho}+O(\rho^2)\)</span>, and the <span class="math inline">\(\rho\)</span> in each is a distinct object (a discrete per-period rate vs.&nbsp;a continuous-time rate).</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./05-dynamic-programming.html" class="pagination-link" aria-label="Dynamic Programming">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+
+<title>5&nbsp; Dynamic Programming – Dynamic Optimization</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./notation.html" rel="next">
+<link href="./04-optimal-control.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-dynamic-programming.html">Dynamic Programming</a></li><li class="breadcrumb-item"><a href="./05-dynamic-programming.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Dynamic Optimization</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-static-optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Continuous-Time Dynamic Optimization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-calculus-of-variations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-optimal-control.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Dynamic Programming</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-programming.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-dp-discrete" id="toc-sec-dp-discrete" class="nav-link active" data-scroll-target="#sec-dp-discrete"><span class="header-section-number">6</span> Discrete time</a>
+  <ul class="collapse">
+  <li><a href="#sec-dp-setup" id="toc-sec-dp-setup" class="nav-link" data-scroll-target="#sec-dp-setup"><span class="header-section-number">6.1</span> The dynamic-programming problem</a>
+  <ul class="collapse">
+  <li><a href="#policies-open--vs-closed-loop-markovian-stationary" id="toc-policies-open--vs-closed-loop-markovian-stationary" class="nav-link" data-scroll-target="#policies-open--vs-closed-loop-markovian-stationary">Policies: open- vs closed-loop, Markovian, stationary</a></li>
+  </ul></li>
+  <li><a href="#sec-bellman" id="toc-sec-bellman" class="nav-link" data-scroll-target="#sec-bellman"><span class="header-section-number">6.2</span> The principle of optimality and the Bellman equation</a></li>
+  <li><a href="#sec-finite" id="toc-sec-finite" class="nav-link" data-scroll-target="#sec-finite"><span class="header-section-number">6.3</span> Finite horizon</a>
+  <ul class="collapse">
+  <li><a href="#sec-backward" id="toc-sec-backward" class="nav-link" data-scroll-target="#sec-backward">Backward recursion</a></li>
+  <li><a href="#sec-forward" id="toc-sec-forward" class="nav-link" data-scroll-target="#sec-forward">Forward recursion</a></li>
+  </ul></li>
+  <li><a href="#sec-infinite" id="toc-sec-infinite" class="nav-link" data-scroll-target="#sec-infinite"><span class="header-section-number">6.4</span> Infinite horizon</a>
+  <ul class="collapse">
+  <li><a href="#sec-operator" id="toc-sec-operator" class="nav-link" data-scroll-target="#sec-operator">The Bellman operator</a></li>
+  <li><a href="#sec-verify-inf" id="toc-sec-verify-inf" class="nav-link" data-scroll-target="#sec-verify-inf">Verification theorems and TVC tails</a></li>
+  <li><a href="#sec-contraction" id="toc-sec-contraction" class="nav-link" data-scroll-target="#sec-contraction">Contraction mapping and uniqueness</a></li>
+  <li><a href="#sec-concavity" id="toc-sec-concavity" class="nav-link" data-scroll-target="#sec-concavity">Concavity of the value function</a></li>
+  <li><a href="#sec-dp-euler" id="toc-sec-dp-euler" class="nav-link" data-scroll-target="#sec-dp-euler">The dynamic-programming Euler equation</a></li>
+  <li><a href="#sec-inf-examples" id="toc-sec-inf-examples" class="nav-link" data-scroll-target="#sec-inf-examples">Worked infinite-horizon examples</a></li>
+  <li><a href="#sec-verify-omega" id="toc-sec-verify-omega" class="nav-link" data-scroll-target="#sec-verify-omega">Verification with the auxiliary function <span class="math inline">\(\omega\)</span></a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#sec-dp-continuous" id="toc-sec-dp-continuous" class="nav-link" data-scroll-target="#sec-dp-continuous"><span class="header-section-number">7</span> Continuous time</a>
+  <ul class="collapse">
+  <li><a href="#sec-hjb-finite" id="toc-sec-hjb-finite" class="nav-link" data-scroll-target="#sec-hjb-finite"><span class="header-section-number">7.1</span> Finite horizon: the HJB equation</a></li>
+  <li><a href="#sec-hjb-control" id="toc-sec-hjb-control" class="nav-link" data-scroll-target="#sec-hjb-control"><span class="header-section-number">7.2</span> Connection to the maximum principle</a></li>
+  <li><a href="#sec-hjb-infinite" id="toc-sec-hjb-infinite" class="nav-link" data-scroll-target="#sec-hjb-infinite"><span class="header-section-number">7.3</span> Infinite horizon: the autonomous HJB equation</a></li>
+  </ul></li>
+  <li><a href="#sec-dp-stochastic" id="toc-sec-dp-stochastic" class="nav-link" data-scroll-target="#sec-dp-stochastic"><span class="header-section-number">8</span> Stochastic dynamic programming</a>
+  <ul class="collapse">
+  <li><a href="#sec-stoch-discrete" id="toc-sec-stoch-discrete" class="nav-link" data-scroll-target="#sec-stoch-discrete"><span class="header-section-number">8.1</span> Discrete time</a>
+  <ul class="collapse">
+  <li><a href="#sec-random-horizon" id="toc-sec-random-horizon" class="nav-link" data-scroll-target="#sec-random-horizon">Random horizon</a></li>
+  <li><a href="#sec-random-horizon-cont" id="toc-sec-random-horizon-cont" class="nav-link" data-scroll-target="#sec-random-horizon-cont">Continuous-hazard horizon</a></li>
+  </ul></li>
+  <li><a href="#sec-stoch-continuous" id="toc-sec-stoch-continuous" class="nav-link" data-scroll-target="#sec-stoch-continuous"><span class="header-section-number">8.2</span> Continuous time: Brownian motion and Itô’s lemma</a>
+  <ul class="collapse">
+  <li><a href="#sec-stoch-hjb" id="toc-sec-stoch-hjb" class="nav-link" data-scroll-target="#sec-stoch-hjb">The stochastic HJB equation</a></li>
+  </ul></li>
+  <li><a href="#sec-merton" id="toc-sec-merton" class="nav-link" data-scroll-target="#sec-merton"><span class="header-section-number">8.3</span> The Merton portfolio problem</a></li>
+  </ul></li>
+  <li><a href="#sec-dp-problems" id="toc-sec-dp-problems" class="nav-link" data-scroll-target="#sec-dp-problems"><span class="header-section-number">9</span> Problems</a></li>
+  <li><a href="#sec-dp-solutions" id="toc-sec-dp-solutions" class="nav-link" data-scroll-target="#sec-dp-solutions"><span class="header-section-number">10</span> Selected solutions</a>
+  <ul class="collapse">
+  <li><a href="#problem-1" id="toc-problem-1" class="nav-link" data-scroll-target="#problem-1">Problem 1</a></li>
+  <li><a href="#problem-3-square-root-cake-eating-guess-and-verify" id="toc-problem-3-square-root-cake-eating-guess-and-verify" class="nav-link" data-scroll-target="#problem-3-square-root-cake-eating-guess-and-verify">Problem 3 (square-root cake-eating, guess-and-verify)</a></li>
+  <li><a href="#problem-4-no-solution" id="toc-problem-4-no-solution" class="nav-link" data-scroll-target="#problem-4-no-solution">Problem 4 (no solution)</a></li>
+  <li><a href="#problem-6-cobbdouglas-growth-convergence" id="toc-problem-6-cobbdouglas-growth-convergence" class="nav-link" data-scroll-target="#problem-6-cobbdouglas-growth-convergence">Problem 6 (Cobb–Douglas growth, convergence)</a></li>
+  <li><a href="#problem-7-no-solution-bounded-fixed-point" id="toc-problem-7-no-solution-bounded-fixed-point" class="nav-link" data-scroll-target="#problem-7-no-solution-bounded-fixed-point">Problem 7 (no solution; bounded fixed point)</a></li>
+  <li><a href="#problem-s1-merton" id="toc-problem-s1-merton" class="nav-link" data-scroll-target="#problem-s1-merton">Problem S1 (Merton)</a></li>
+  <li><a href="#problem-s3-dhss-exhaustible-resources-setup" id="toc-problem-s3-dhss-exhaustible-resources-setup" class="nav-link" data-scroll-target="#problem-s3-dhss-exhaustible-resources-setup">Problem S3 (DHSS exhaustible resources, setup)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-dynamic-programming.html">Dynamic Programming</a></li><li class="breadcrumb-item"><a href="./05-dynamic-programming.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Dynamic programming is the third method of the book, after the calculus of variations and optimal control. Where those methods perturb a whole path at once, dynamic programming — created by Richard Bellman in the 1950s <span class="citation" data-cites="bellman1957">(<a href="references.html#ref-bellman1957" role="doc-biblioref">Bellman 1957</a>)</span> — breaks the problem into a <em>nested family</em> of identical sub-problems and links neighbours by a recursion. The link is the <strong>principle of optimality</strong>: an optimal path, continued from any point it reaches, is itself optimal for the sub-problem starting there. Turned into an equation this is the <strong>Bellman equation</strong> (discrete time) or the <strong>Hamilton–Jacobi–Bellman (HJB) equation</strong> (continuous time), and the entire method consists in solving it.</p>
+<p>The pay-off is reach. Dynamic programming applies more widely than variational methods: it handles discrete <em>and</em> continuous time, deterministic <em>and</em> stochastic dynamics, and it turns naturally into an <em>algorithm</em> for the computer. The cost is a new object — the <strong>value function</strong> <span class="math inline">\(V\)</span>, the optimized objective seen as a function of the current state — and a new way of thinking, recursive rather than path-wise.</p>
+<p>Three threads organize the chapter:</p>
+<ul>
+<li>a <strong>discrete-time</strong> theory (<a href="#sec-dp-discrete" class="quarto-xref"><span>Chapter 6</span></a>), where the Bellman equation is an algebraic recursion; in finite horizon it is solved by backward (or forward) recursion, and in infinite horizon by the <strong>Bellman operator</strong> <span class="math inline">\(T\)</span>, whose unique fixed point — secured by the contraction-mapping theorem — is <span class="math inline">\(V\)</span>;</li>
+<li>a <strong>continuous-time</strong> theory (<a href="#sec-dp-continuous" class="quarto-xref"><span>Chapter 7</span></a>), where the HJB equation is a partial differential equation derived by shrinking a one-period Bellman equation, and which connects back to the maximum principle through <span class="math inline">\(V_x=\lambda\)</span>;</li>
+<li>a <strong>stochastic</strong> theory (<a href="#sec-dp-stochastic" class="quarto-xref"><span>Chapter 8</span></a>), where conditional expectations enter the Bellman equation and, in continuous time, <strong>Itô’s lemma</strong> adds a second-derivative term — the route to the <strong>Merton portfolio problem</strong>.</li>
+</ul>
+<div class="callout callout-style-simple callout-important">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>The discount trap (read first).</strong> The course writes the discrete-time per-period discount as <span class="math inline">\(\rho\)</span>. Throughout these notes that quantity is the <strong>discount factor</strong> <span class="math inline">\(\beta=\tfrac1{1+\rho}\in(0,1)\)</span>, reserving <span class="math inline">\(\rho\)</span> for the <em>continuous</em>-time discount <strong>rate</strong> in <span class="math inline">\(e^{-\rho t}\)</span>. So every discrete-time Bellman equation below carries <span class="math inline">\(\beta\in(0,1)\)</span>, and every continuous-time HJB equation carries <span class="math inline">\(\rho&gt;0\)</span>; they relate by <span class="math inline">\(\beta=e^{-\rho}\)</span> per unit time.</p>
+</div>
+</div>
+</div>
+<section id="sec-dp-discrete" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Discrete time</h1>
+<section id="sec-dp-setup" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="sec-dp-setup"><span class="header-section-number">6.1</span> The dynamic-programming problem</h2>
+<p>We watch a system at times <span class="math inline">\(t=0,1,\dots,T\)</span>, where the horizon <span class="math inline">\(T\)</span> is a positive integer or <span class="math inline">\(+\infty\)</span>. Its condition at time <span class="math inline">\(t\)</span> is summarized by a <strong>state</strong> <span class="math inline">\(x_t\)</span> lying in the <strong>state space</strong> <span class="math inline">\(\mathbb{S}\)</span>, a subset of a Euclidean space (typically <span class="math inline">\(\mathbb{S}=\mathbb{R}^n\)</span> or <span class="math inline">\(\mathbb{R}^n_+\)</span>). At each <span class="math inline">\(t\)</span> the decision-maker chooses an <strong>action</strong> <span class="math inline">\(u_t\)</span> from the <strong>action space</strong> <span class="math inline">\(\mathbb{A}\subseteq\mathbb{R}^m\)</span>, collecting a per-period payoff <span class="math inline">\(\pi_t(x_t,u_t)\)</span> and moving the state to next period according to the <strong>transition</strong> (law of motion)</p>
+<p><span id="eq-transition"><span class="math display">\[
+x_{t+1}=f_t(x_t,u_t).
+\tag{6.1}\]</span></span></p>
+<p>The actions available in state <span class="math inline">\(x\)</span> are constrained to a set <span class="math inline">\(\Gamma_t(x)\subseteq\mathbb{A}\)</span>; formally <span class="math inline">\(\Gamma_t:\mathbb{S}\rightrightarrows\mathbb{A}\)</span> is the <strong>feasible-action correspondence</strong>, a map from <span class="math inline">\(\mathbb{S}\)</span> into the power set of <span class="math inline">\(\mathbb{A}\)</span>. A standard one-dimensional example is <span class="math inline">\(\Gamma(x)=[a(x),b(x)]\)</span> with <span class="math inline">\(a\le b\)</span>. The functions <span class="math inline">\(\pi_t,f_t\)</span> are real-valued and given.</p>
+<p>The decision-maker maximizes the discounted sum of payoffs. Writing <span class="math inline">\(\beta\in(0,1)\)</span> for the discount factor, the <strong>dynamic-programming problem</strong> (P) is</p>
+<p><span id="eq-problemP"><span class="math display">\[
+\sup\ \sum_{t=0}^{T}\beta^{t}\,\pi_t(x_t,u_t)
+\qquad\text{s.t.}\quad
+x_{t+1}=f_t(x_t,u_t),\quad u_t\in\Gamma_t(x_t)\ \ \forall t,\quad x_0=x\in\mathbb{S}.
+\tag{6.2}\]</span></span></p>
+<div id="def-feasible-path" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.1 (Feasible path)</strong></span> A sequence <span class="math inline">\(\{x_t,u_t\}\)</span> is a <strong>feasible path</strong> if <span class="math inline">\(x_t\in\mathbb{S}\)</span>, <span class="math inline">\(u_t\in\Gamma_t(x_t)\)</span>, and <span class="math inline">\(x_{t+1}=f_t(x_t,u_t)\)</span> for all <span class="math inline">\(t\)</span>. When <span class="math inline">\(T=\infty\)</span> we require in addition that the series <span class="math inline">\(\sum_{t=0}^{\infty}\beta^{t}\pi_t(x_t,u_t)\)</span> exist (its positive or negative part is finite). A state path <span class="math inline">\((x_t)\)</span> is feasible if some control sequence makes <span class="math inline">\((x_t,u_t)\)</span> feasible; it <em>starts at</em> <span class="math inline">\(a\)</span> if <span class="math inline">\(x_0=a\)</span>.</p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Existence of the objective.</strong> A clean sufficient condition for the infinite-horizon series to exist is a growth bound: if there are <span class="math inline">\(a&gt;0\)</span> and <span class="math inline">\(\theta\in(0,\beta^{-1})\)</span> with <span class="math inline">\(\pi_t(x_t,u_t)\le a\theta^t\)</span> along every feasible path, then <span class="math inline">\(\sum_t\beta^t\pi_t^{+}\le a\sum_t(\beta\theta)^t&lt;\infty\)</span>, so the positive part is finite and the sum is well defined. We adopt as a <strong>standing assumption</strong> in the infinite-horizon case that <span class="math inline">\(\sum_t\beta^t\pi_t(x_t,u_t)\)</span> exists along every feasible path.</p>
+</div>
+</div>
+</div>
+<p>The value of the problem started at <span class="math inline">\(x\)</span> is the <strong>value function</strong></p>
+<p><span id="eq-valuefn"><span class="math display">\[
+V(x)=\sup\Bigl\{\textstyle\sum_{t=0}^{T}\beta^{t}\pi_t(x_t,u_t)\ :\ \{x_t,u_t\}\text{ feasible},\ x_0=x\Bigr\}.
+\tag{6.3}\]</span></span></p>
+<section id="policies-open--vs-closed-loop-markovian-stationary" class="level3">
+<h3 class="anchored" data-anchor-id="policies-open--vs-closed-loop-markovian-stationary">Policies: open- vs closed-loop, Markovian, stationary</h3>
+<p>Optimization over paths is recast as optimization over <strong>policies</strong> (strategies) — rules that prescribe an action at every contingency.</p>
+<div id="def-policy" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.2 (Policy and induced path)</strong></span> A <strong>policy</strong> <span class="math inline">\(\sigma=(\sigma_0,\sigma_1,\dots,\sigma_T)\)</span> assigns to each history a feasible action, <span class="math inline">\(u_t=\sigma_t(x_0,u_0;x_1,u_1;\dots;x_{t-1},u_{t-1};x_t)\in\Gamma_t(x_t)\)</span>. Given <span class="math inline">\(\sigma\)</span> and an initial state <span class="math inline">\(x\)</span>, the recursion <a href="#eq-transition" class="quarto-xref">Equation&nbsp;<span>6.1</span></a> generates a unique <strong>induced path</strong>, whose objective value is the <strong>value of the policy</strong> <span class="math inline">\(V_\sigma(x)\)</span>. A policy <span class="math inline">\(\sigma^\ast\)</span> is <strong>optimal</strong> if <span class="math inline">\(V_{\sigma^\ast}(x)=\max_\sigma V_\sigma(x)\)</span> for <em>every</em> <span class="math inline">\(x\in\mathbb{S}\)</span>.</p>
+</div>
+<p>The requirement that one policy be best at <em>every</em> initial state is strong; <a href="#exm-no-optimal" class="quarto-xref">Example&nbsp;<span>6.5</span></a> below shows an optimal policy can fail to exist. The following classification of policies is central.</p>
+<div id="def-markovian" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.3 (Open-loop, closed-loop, Markovian, stationary)</strong></span> A policy is <strong>open-loop</strong> if every <span class="math inline">\(\sigma_t\)</span> depends only on the initial state <span class="math inline">\(x_0\)</span> (equivalently, the whole action sequence is fixed at <span class="math inline">\(t=0\)</span>); otherwise it is <strong>closed-loop</strong> (a feedback policy that reacts to observed history). A policy is <strong>Markovian</strong> if every <span class="math inline">\(\sigma_t\)</span> depends only on the current state, <span class="math inline">\(u_t=\sigma_t(x_t)\)</span>; it is <strong>stationary Markovian</strong> if in addition <span class="math inline">\(\sigma_0=\sigma_1=\dots=\sigma_T\)</span>, in which case we write the single function <span class="math inline">\(\phi\)</span>.</p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Open and closed loops coincide on outcomes.</strong> Every closed-loop policy <span class="math inline">\(\sigma\)</span> is <em>strongly equivalent</em> to a unique open-loop policy: substituting the realized actions back into <span class="math inline">\(\sigma\)</span> recursively expresses each <span class="math inline">\(u_t\)</span> as a function of <span class="math inline">\(x_0\)</span> alone, <span class="math display">\[
+u_0=\sigma_0(x_0)=:\varphi_0(x_0),\quad
+u_1=\sigma_1\bigl(x_0,\varphi_0(x_0);f_0(x_0,\varphi_0(x_0))\bigr)=:\varphi_1(x_0),\ \dots
+\]</span> So a single open-loop policy reproduces the path of <span class="math inline">\(\sigma\)</span> from a given <span class="math inline">\(x_0\)</span>. The information distinction matters only off the realized path: if history is <em>unobservable</em> one can only commit to an open-loop rule at <span class="math inline">\(t=0\)</span>; if it is <em>observable</em> one may use feedback. Markovian policies are the feedback rules that ignore everything but the current state — exactly the right class when, as here, payoffs and dynamics are history-independent.</p>
+</div>
+</div>
+</div>
+<div id="exm-policies-two-period" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.1 (Many policies, one open-loop outcome)</strong></span> For the two-period system <span class="math inline">\(x_1=x_0-u_0\)</span>, <span class="math inline">\(0\le u_0\le x_0\)</span>, <span class="math inline">\(0\le u_1\le x_1\)</span>, every policy of the form <span class="math inline">\(u_0=x_0/2\)</span>, <span class="math inline">\(u_1=\alpha\frac{x_0}{2}+\beta_0 u_0+\gamma x_1\)</span> with <span class="math inline">\(\alpha+\beta_0+\gamma=1\)</span> induces the <em>same</em> open-loop path <span class="math inline">\(u_0=u_1=x_0/2\)</span>, because along that path <span class="math inline">\(u_0=x_1=x_0/2\)</span>. Among them the unique <em>Markovian</em> policy is <span class="math inline">\(u_0=x_0/2,\ u_1=x_1\)</span>.</p>
+</div>
+<p>A first sanity check links <span class="math inline">\(V\)</span> to the value of an optimal policy.</p>
+<div id="thm-value-equals-policy" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.1 (Value of an optimal policy)</strong></span> If problem <a href="#eq-problemP" class="quarto-xref">Equation&nbsp;<span>6.2</span></a> admits an optimal policy <span class="math inline">\(\sigma^\ast\)</span>, then <span class="math inline">\(V=V_{\sigma^\ast}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(\sigma\)</span> be the open-loop policy induced by <span class="math inline">\(\sigma^\ast\)</span>; then <span class="math inline">\(V_{\sigma^\ast}(x)=V_\sigma(x)\)</span> for all <span class="math inline">\(x\)</span>. By the definition <a href="#eq-valuefn" class="quarto-xref">Equation&nbsp;<span>6.3</span></a> of <span class="math inline">\(V\)</span> as a supremum over feasible paths, <span class="math inline">\(V(x)\ge V_\sigma(x)\)</span>; and optimality of <span class="math inline">\(\sigma^\ast\)</span> gives <span class="math inline">\(V_{\sigma^\ast}(x)\ge V_{\sigma'}(x)\)</span> for every policy <span class="math inline">\(\sigma'\)</span>, in particular for the ones tracing any feasible path, so <span class="math inline">\(V(x)\le V_{\sigma^\ast}(x)\)</span>. Hence <span class="math inline">\(V=V_{\sigma^\ast}\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+</section>
+<section id="sec-bellman" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="sec-bellman"><span class="header-section-number">6.2</span> The principle of optimality and the Bellman equation</h2>
+<p>The engine of the method is to split (P) into nested <strong>tail problems</strong>. Problem <span class="math inline">\((\mathrm P_t)\)</span> starts the clock at <span class="math inline">\(t\)</span> in state <span class="math inline">\(x\)</span>:</p>
+<p><span id="eq-tail"><span class="math display">\[
+\sup\ \sum_{s=t}^{T}\beta^{\,s-t}\pi_s(x_s,u_s)
+\qquad\text{s.t.}\quad x_{s+1}=f_s(x_s,u_s),\ u_s\in\Gamma_s(x_s)\ \ \forall s\ge t,\quad x_t=x,
+\tag{6.4}\]</span></span></p>
+<p>with value function <span class="math inline">\(V_t(x)\)</span>. The original problem (P) is <span class="math inline">\((\mathrm P_0)\)</span> and <span class="math inline">\(V=V_0\)</span>. The tail problems are <em>self-similar</em> — each is a dynamic-programming problem in its own right — and the <strong>principle of optimality</strong> says their values obey a one-step recursion.</p>
+<div id="thm-bellman" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.2 (Bellman equation (principle of optimality))</strong></span> For problem <a href="#eq-problemP" class="quarto-xref">Equation&nbsp;<span>6.2</span></a> the value functions of the tail problems satisfy <span id="eq-bellman"><span class="math display">\[
+V_t(x)=\sup_{u\in\Gamma_t(x)}\Bigl\{\pi_t(x,u)+\beta\,V_{t+1}\bigl(f_t(x,u)\bigr)\Bigr\},
+\qquad\forall t,\ \forall x\in\mathbb{S},
+\tag{6.5}\]</span></span> with the terminal convention <span class="math inline">\(V_{T+1}\equiv 0\)</span> when <span class="math inline">\(T&lt;\infty\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(t\)</span> and <span class="math inline">\(x=x_t\)</span>. Any feasible continuation chooses an action <span class="math inline">\(u\in\Gamma_t(x)\)</span> now, earns <span class="math inline">\(\pi_t(x,u)\)</span>, lands at <span class="math inline">\(x_{t+1}=f_t(x,u)\)</span>, and then follows some feasible tail from <span class="math inline">\(t+1\)</span>. The objective of <span class="math inline">\((\mathrm P_t)\)</span> splits additively, <span class="math display">\[
+\sum_{s=t}^{T}\beta^{\,s-t}\pi_s(x_s,u_s)
+=\pi_t(x,u)+\beta\sum_{s=t+1}^{T}\beta^{\,s-(t+1)}\pi_s(x_s,u_s).
+\]</span> Take the supremum on the right. Because the constraints for <span class="math inline">\(s\ge t+1\)</span> involve only the continuation and the inner sum is exactly the objective of <span class="math inline">\((\mathrm P_{t+1})\)</span> started at <span class="math inline">\(f_t(x,u)\)</span>, the supremum of the inner sum over feasible tails is <span class="math inline">\(V_{t+1}(f_t(x,u))\)</span> — this is the principle of optimality: <em>the tail of an optimal plan is optimal for the tail problem</em>, so optimizing the whole is the same as optimizing the first action and then optimizing the remainder. Therefore <span class="math display">\[
+V_t(x)=\sup_{u\in\Gamma_t(x)}\Bigl\{\pi_t(x,u)+\beta\,V_{t+1}\bigl(f_t(x,u)\bigr)\Bigr\}.
+\]</span> The two inequalities behind “the supremum of the sum equals the sum after optimizing the tail” are routine: <span class="math inline">\(\ge\)</span> holds because any feasible action-then-tail is a feasible continuation; <span class="math inline">\(\le\)</span> holds because the tail value can be approached within <span class="math inline">\(\varepsilon\)</span> for each fixed first action. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The Bellman equation is a set of <em>necessary</em> conditions the value functions must satisfy. Its clean one-step form is not automatic; it relies on the structure of (P): the objective is additively separable, and <span class="math inline">\(\pi_t,f_t,\Gamma_t\)</span> depend on history only through the current <span class="math inline">\((x_t,t)\)</span>. This same structure is why we expect an optimal policy, when one exists, to be <em>Markovian</em> — the dynamics forget the past. (When <span class="math inline">\(T=\infty\)</span> the convention <span class="math inline">\(V_{T+1}\equiv0\)</span> is dropped; <a href="#cor-bellman-infinite" class="quarto-xref">Corollary&nbsp;<span>6.1</span></a> restates <a href="#eq-bellman" class="quarto-xref">Equation&nbsp;<span>6.5</span></a> for that case.)</p>
+</section>
+<section id="sec-finite" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="sec-finite"><span class="header-section-number">6.3</span> Finite horizon</h2>
+<p>With <span class="math inline">\(T&lt;\infty\)</span> the tail problems are finitely many and the recursion <a href="#eq-bellman" class="quarto-xref">Equation&nbsp;<span>6.5</span></a> can be solved explicitly. We first record when a Markovian policy is optimal, then the finite-horizon verification theorem, then the two recursions.</p>
+<div id="thm-markov-optimal" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.3 (Optimality of a Markovian policy)</strong></span> A feasible Markovian policy <span class="math inline">\((\sigma_0,\dots,\sigma_T)\)</span> is optimal <strong>iff</strong> for all <span class="math inline">\(t\)</span> and all <span class="math inline">\(x\)</span>, <span class="math display">\[
+V_t(x)=\max_{u\in\Gamma_t(x)}\bigl\{\pi_t(x,u)+\beta V_{t+1}(f_t(x,u))\bigr\}
+=\pi_t(x,\sigma_t(x))+\beta V_{t+1}\bigl(f_t(x,\sigma_t(x))\bigr),
+\]</span> with <span class="math inline">\(V_{T+1}\equiv0\)</span>. Equivalently, <span class="math inline">\(\sigma_t(x)\)</span> attains the maximand of the Bellman equation <a href="#eq-bellman" class="quarto-xref">Equation&nbsp;<span>6.5</span></a> at every <span class="math inline">\((t,x)\)</span>.</p>
+</div>
+<p>A Markovian optimal policy is <em>unique</em> precisely when the static maximization <span class="math inline">\(\max_{u\in\Gamma_t(x)}\{\pi_t(x,u)+\beta V_{t+1}(f_t(x,u))\}\)</span> has a unique solution at every <span class="math inline">\((t,x)\)</span> (corollary of <a href="#thm-markov-optimal" class="quarto-xref">Theorem&nbsp;<span>6.3</span></a>). The converse question — given functions solving the Bellman equation, are they the value functions? — is answered by a <strong>verification theorem</strong>.</p>
+<div id="thm-verify-finite" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.4 (Finite-horizon verification theorem)</strong></span> Suppose real-valued functions <span class="math inline">\((W_0,\dots,W_T)\)</span> on <span class="math inline">\(\mathbb{S}\)</span> and a Markovian policy <span class="math inline">\((\sigma_0,\dots,\sigma_T)\)</span> satisfy, for all <span class="math inline">\(t\)</span> and <span class="math inline">\(x\)</span>, <span class="math display">\[
+W_t(x)=\max_{u\in\Gamma_t(x)}\bigl\{\pi_t(x,u)+\beta W_{t+1}(f_t(x,u))\bigr\}
+=\pi_t(x,\sigma_t(x))+\beta W_{t+1}\bigl(f_t(x,\sigma_t(x))\bigr),
+\]</span> with <span class="math inline">\(W_{T+1}\equiv0\)</span>. Then <span class="math inline">\((\sigma_0,\dots,\sigma_T)\)</span> is an optimal Markovian policy for (P) and <span class="math inline">\(V_t=W_t\)</span> for all <span class="math inline">\(t\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>This is exactly the backward induction below: unfolding the displayed identity from <span class="math inline">\(T\)</span> down to <span class="math inline">\(0\)</span> shows <span class="math inline">\(W_t\)</span> equals the optimized objective of <span class="math inline">\((\mathrm P_t)\)</span> and <span class="math inline">\(\sigma_t\)</span> attains it. The key point is that the system pins the functions <em>uniquely</em> — start from <span class="math inline">\(W_{T+1}\equiv0\)</span> and the recursion determines <span class="math inline">\(W_T\)</span>, then <span class="math inline">\(W_{T-1}\)</span>, and so on — so the verifying functions can only be the value functions <span class="math inline">\(V_t\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Existence of an optimal Markovian policy follows from continuity and compactness, via Berge’s maximum theorem.</p>
+<div id="thm-berge-dp" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.5 (Existence (Berge))</strong></span> If for every <span class="math inline">\(t\)</span> the payoff <span class="math inline">\(\pi_t\)</span> is continuous, the transition <span class="math inline">\(f_t\)</span> is continuous, and the correspondence <span class="math inline">\(\Gamma_t\)</span> is continuous and compact-valued, then (P) has an optimal Markovian policy <span class="math inline">\((\sigma_0,\dots,\sigma_T)\)</span>, each <span class="math inline">\(V_t\)</span> is continuous, and the supremum in <a href="#eq-bellman" class="quarto-xref">Equation&nbsp;<span>6.5</span></a> is attained.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The workhorse is the <strong>maximum theorem</strong>: if <span class="math inline">\(g(x,y)\)</span> is continuous on <span class="math inline">\(\mathbb{A}\times\mathbb{B}\)</span> and <span class="math inline">\(\Gamma\)</span> is continuous and compact-valued, then <span class="math inline">\(F(x)=\sup_{y\in\Gamma(x)}g(x,y)=\max_{y\in\Gamma(x)}g(x,y)\)</span> is continuous and the argmax correspondence is upper hemicontinuous (hence admits a measurable selection, continuous on a dense set). Apply it by backward induction. At <span class="math inline">\(t=T\)</span>, <span class="math inline">\(V_T(x)=\max_{u\in\Gamma_T(x)}\pi_T(x,u)\)</span> is continuous and attained, giving <span class="math inline">\(\sigma_T\)</span>. If <span class="math inline">\(V_{t+1}\)</span> is continuous, then <span class="math inline">\(g(x,u)=\pi_t(x,u)+\beta V_{t+1}(f_t(x,u))\)</span> is continuous (composition of continuous maps), so the maximum theorem makes <span class="math inline">\(V_t\)</span> continuous, the max attained, and yields a selection <span class="math inline">\(\sigma_t\)</span>. Descending to <span class="math inline">\(t=0\)</span> produces the policy and the continuity of every <span class="math inline">\(V_t\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<section id="sec-backward" class="level3">
+<h3 class="anchored" data-anchor-id="sec-backward">Backward recursion</h3>
+<p>The Bellman equation, read from the terminal date downward, gives the <strong>backward recursion</strong>. Solve the smallest tail first: <span class="math display">\[
+\max_{u\in\Gamma_T(x)}\pi_T(x,u)\ \Rightarrow\ (\sigma_T,V_T);\qquad
+\max_{u\in\Gamma_{T-1}(x)}\bigl\{\pi_{T-1}(x,u)+\beta V_T(f_{T-1}(x,u))\bigr\}\ \Rightarrow\ (\sigma_{T-1},V_{T-1});
+\]</span> and so on down to <span class="math inline">\(\max_{u\in\Gamma_0(x)}\{\pi_0(x,u)+\beta V_1(f_0(x,u))\}\Rightarrow(\sigma_0,V_0)\)</span>. The output is the optimal Markovian policy <span class="math inline">\((\sigma_0,\dots,\sigma_T)\)</span> and all the value functions.</p>
+<div id="exm-cake-finite" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.2 (Cake-eating, finite horizon (log utility), two ways)</strong></span> Maximize <span class="math inline">\(\sum_{t=0}^{T}\beta^t\ln c_t\)</span> subject to <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, <span class="math inline">\(x_0&gt;0\)</span>.</p>
+<p><strong>Static route.</strong> The problem reduces to <span class="math inline">\(\max\sum_t\beta^t\ln c_t\)</span> s.t. <span class="math inline">\(\sum_t c_t=x_0\)</span>. Linear-independence CQ holds, the objective is strictly concave, the constraint linear; so the Lagrangian <span class="math inline">\(\mathcal{L}=\sum_t\beta^t\ln c_t+\lambda(x_0-\sum_t c_t)\)</span> gives <span class="math inline">\(\beta^t/c_t=\lambda\)</span>, i.e.&nbsp;<span class="math inline">\(c_t=\beta^t/\lambda\)</span>, and <span class="math inline">\(\sum_t c_t=x_0\)</span> fixes <span class="math display">\[
+c_t=\frac{\beta^t}{\sum_{s=0}^{T}\beta^s}\,x_0,\qquad
+x_t=\frac{\sum_{s=t}^{T}\beta^s}{\sum_{s=0}^{T}\beta^s}\,x_0
+\]</span> (the open-loop solution). In feedback form the Markovian policy is <span class="math inline">\(c_t=\dfrac{\beta^t}{\sum_{s=t}^{T}\beta^s}\,x_t=\dfrac{1}{1+\beta+\dots+\beta^{T-t}}\,x_t\)</span>.</p>
+<p><strong>Backward route.</strong> At <span class="math inline">\(t=T\)</span>: <span class="math inline">\(\max_{c\le x}\ln c\Rightarrow c_T=x_T\)</span>, <span class="math inline">\(V_T(x)=\ln x\)</span>. At <span class="math inline">\(T-1\)</span>: <span class="math inline">\(\max_{c\le x}\{\ln c+\beta\ln(x-c)\}\)</span> gives <span class="math inline">\(c_{T-1}=\tfrac{1}{1+\beta}x_{T-1}\)</span> and <span class="math inline">\(V_{T-1}(x)=(1+\beta)\ln x+A_{T-1}\)</span> for a constant <span class="math inline">\(A_{T-1}\)</span>. By induction, for all <span class="math inline">\(t\)</span>, <span class="math display">\[
+c_t=\frac{1}{1+\beta+\dots+\beta^{T-t}}\,x_t,\qquad
+V_t(x)=(1+\beta+\dots+\beta^{T-t})\ln x+A_t,
+\]</span> reproducing the feedback policy above — a check that the two routes agree.</p>
+</div>
+<div id="exm-consumption-savings" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.3 (Consumption–savings with gross return <span class="math inline">\(k\)</span>)</strong></span> Maximize <span class="math inline">\(\sum_{t=0}^{T}\beta^t\sqrt{c_t}\)</span> subject to <span class="math inline">\(x_{t+1}=k(x_t-c_t)\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, with <span class="math inline">\(\beta,k&gt;0\)</span>. Backward recursion: <span class="math inline">\(V_T(x)=\sqrt x\)</span>, <span class="math inline">\(\sigma_T(x)=x\)</span>. At <span class="math inline">\(T-1\)</span>, <span class="math inline">\(\max_{0\le c\le x}\{\sqrt c+\beta\sqrt{k(x-c)}\}\)</span> yields <span class="math display">\[
+\sigma_{T-1}(x)=\frac{x}{1+\beta^2 k},\qquad V_{T-1}(x)=\bigl(x(1+\beta^2 k)\bigr)^{1/2}.
+\]</span> By induction, for all <span class="math inline">\(t\)</span>, <span class="math display">\[
+\sigma_t(x)=\frac{x}{1+\beta^2 k+\dots+(\beta^2 k)^{T-t}},\qquad
+V_t(x)=\Bigl(x\bigl(1+\beta^2k+\dots+(\beta^2k)^{T-t}\bigr)\Bigr)^{1/2}.
+\]</span> Equivalently, the envelope/Euler relation <span class="math inline">\(\tfrac{1}{2\sqrt{c_t}}=\beta k\,V_{t+1}'(x_{t+1})\)</span> together with <span class="math inline">\(\tfrac1{2\sqrt{c_T}}=V_T'(x_T)\)</span> gives <span class="math inline">\(c_{t+1}=(\beta k)^2 c_t\)</span>, whence the same policy and the open-loop path <span class="math inline">\(c_t=\dfrac{(\beta k)^{2t}}{1+\beta^2k+\dots+(\beta^2k)^{T}}\,x_0\)</span>.</p>
+</div>
+</section>
+<section id="sec-forward" class="level3">
+<h3 class="anchored" data-anchor-id="sec-forward">Forward recursion</h3>
+<p>Because the total payoff is an additive sum, reversing time turns the <em>backward</em> recursion into a <em>forward</em> one. The catch is the direction of the transition: backward recursion needs the <strong>forward difference equation</strong> <a href="#eq-transition" class="quarto-xref">Equation&nbsp;<span>6.1</span></a>, <span class="math inline">\(x_{t+1}=f_t(x_t,u_t)\)</span>; forward recursion needs a <strong>backward difference equation</strong> <span class="math inline">\(x_{t-1}=g_t(x_t,u_t)\)</span>. When a problem already carries a backward law of motion, slicing it into <em>head</em> problems (from time <span class="math inline">\(0\)</span> up to a cutoff) and applying the principle of optimality yields a forward Bellman recursion directly. The classic example is the <strong>knapsack problem</strong>, a divide-and-conquer staple.</p>
+<div id="exm-knapsack" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.4 (Knapsack via forward recursion)</strong></span> A knapsack of capacity <span class="math inline">\(W&gt;0\)</span> may hold any subset of <span class="math inline">\(n\)</span> items with weights <span class="math inline">\(\omega_1,\dots,\omega_n&gt;0\)</span> and values <span class="math inline">\(v_1,\dots,v_n&gt;0\)</span>; choose <span class="math inline">\(x_i\in\{0,1\}\)</span> to maximize <span class="math inline">\(\sum_{i=1}^n x_i v_i\)</span> subject to <span class="math inline">\(\sum_i x_i\omega_i\le W\)</span>. Let <span class="math inline">\(A_t\)</span> be the weight still available after items <span class="math inline">\(t+1,\dots,n\)</span> have been set aside, governed by the <strong>backward</strong> law <span class="math inline">\(A_{t-1}=A_t-x_t\omega_t\)</span> with <span class="math inline">\(A_n\le W\)</span>. Slice into head problems <span class="math inline">\(\mathbb{P}_m\)</span> (items <span class="math inline">\(1,\dots,m\)</span>, capacity <span class="math inline">\(w\)</span>) with value <span class="math inline">\(J_m(w)\)</span>. The forward Bellman recursion is <span class="math display">\[
+J_m(w)=\max_{x\in\{0,1\}}\bigl\{x\,v_m+J_{m-1}(w-x\omega_m)\bigr\}
+=\max\bigl\{J_{m-1}(w),\ v_m+J_{m-1}(w-\omega_m)\bigr\},\qquad J_0(w)=0,
+\]</span> with <span class="math inline">\(J_{m-1}(w-\omega_m)=-\infty\)</span> when <span class="math inline">\(w&lt;\omega_m\)</span>. Iterating from <span class="math inline">\(m=1\)</span> to <span class="math inline">\(n\)</span> builds the optimum by sweeping time <em>forward</em> — a (generally non-stationary) Markovian policy. The lesson: forward recursion works exactly when the state’s law of motion runs backward.</p>
+</div>
+</section>
+</section>
+<section id="sec-infinite" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="sec-infinite"><span class="header-section-number">6.4</span> Infinite horizon</h2>
+<p>For <span class="math inline">\(T=\infty\)</span> we restrict to the <strong>autonomous</strong> problem <span class="math inline">\((\mathrm P_\infty)\)</span>, in which <span class="math inline">\(\pi,f,\Gamma\)</span> are time-independent: <span id="eq-problemPinf"><span class="math display">\[
+\sup\ \sum_{t=0}^{\infty}\beta^{t}\pi(x_t,u_t)
+\qquad\text{s.t.}\quad x_{t+1}=f(x_t,u_t),\ u_t\in\Gamma(x_t)\ \forall t,\quad x_0=x.
+\tag{6.6}\]</span></span> Because the problem is autonomous every tail problem is identical to (P) itself, so a <em>single</em> value function <span class="math inline">\(V\)</span> describes them all. Write <span class="math inline">\(m\le n\)</span> for two functions on <span class="math inline">\(\mathbb{S}\)</span> when <span class="math inline">\(m(x)\le n(x)\)</span> everywhere. The Bellman equation specializes to a fixed-point relation in <span class="math inline">\(V\)</span>.</p>
+<div id="cor-bellman-infinite" class="theorem corollary">
+<p><span class="theorem-title"><strong>Corollary 6.1 (Bellman equation, infinite horizon)</strong></span> For <span class="math inline">\((\mathrm P_\infty)\)</span>, <span id="eq-bellman-inf"><span class="math display">\[
+V(x)=\sup_{u\in\Gamma(x)}\bigl\{\pi(x,u)+\beta V(f(x,u))\bigr\},\qquad x\in\mathbb{S}.
+\tag{6.7}\]</span></span></p>
+</div>
+<p>A Markovian-policy criterion analogous to <a href="#thm-markov-optimal" class="quarto-xref">Theorem&nbsp;<span>6.3</span></a> holds when <span class="math inline">\(V\)</span> is real-valued: a feasible stationary policy <span class="math inline">\(\phi\)</span> is optimal iff it attains <a href="#eq-bellman-inf" class="quarto-xref">Equation&nbsp;<span>6.7</span></a> and the induced path satisfies the tail condition <span class="math inline">\(\lim_{t\to\infty}\beta^t V(x_t)=0\)</span>.</p>
+<section id="sec-operator" class="level3">
+<h3 class="anchored" data-anchor-id="sec-operator">The Bellman operator</h3>
+<p>Let <span class="math inline">\(\mathbb{F}\)</span> be the set of (possibly extended-real) functions on <span class="math inline">\(\mathbb{S}\)</span>. The <strong>Bellman operator</strong> <span class="math inline">\(T:\mathbb{F}\to\mathbb{F}\)</span> sends <span class="math inline">\(v\)</span> to <span id="eq-operator"><span class="math display">\[
+(Tv)(x)=\sup_{u\in\Gamma(x)}\bigl\{\pi(x,u)+\beta v(f(x,u))\bigr\}.
+\tag{6.8}\]</span></span> A function with <span class="math inline">\(Tv=v\)</span> is a <strong>fixed point</strong>. By <a href="#cor-bellman-infinite" class="quarto-xref">Corollary&nbsp;<span>6.1</span></a> the value function <span class="math inline">\(V\)</span> is a fixed point of <span class="math inline">\(T\)</span>. The operator is <strong>monotone</strong>: if <span class="math inline">\(v\le w\)</span> then <span class="math inline">\(Tv\le Tw\)</span>, because raising <span class="math inline">\(v\)</span> raises the maximand pointwise. The reverse question — <em>is the value function the only fixed point?</em> — is the crux of the infinite-horizon theory, because if so we can compute <span class="math inline">\(V\)</span> by solving <span class="math inline">\(Tv=v\)</span>. In general the answer is no on all of <span class="math inline">\(\mathbb{F}\)</span>, but yes once we restrict <span class="math inline">\(T\)</span> to a well-chosen subspace. The next two examples show both faces.</p>
+<div id="exm-no-optimal" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.5 (A value function exists, no optimum)</strong></span> Maximize <span class="math inline">\(\sum_{t=0}^\infty\beta^t\,\frac{u_t}{1+u_t}\)</span> s.t. <span class="math inline">\(x_{t+1}=x_t+a\)</span>, <span class="math inline">\(u_t\in(0,1)\)</span>, <span class="math inline">\(x_0\in\mathbb{R}\)</span>. The payoff strictly increases in <span class="math inline">\(u\)</span>, so no <span class="math inline">\(u_t\)</span> is best (one can always edge closer to <span class="math inline">\(1\)</span>): the problem has <strong>no optimal policy</strong>. Yet the value function exists and is constant, <span class="math inline">\(V\equiv\theta:=\tfrac{1}{2(1-\beta)}\)</span>, since the supremum of each term is <span class="math inline">\(\tfrac12\)</span>. The Bellman equation reads <span class="math inline">\(W(x)=\tfrac12+\beta W(x+a)\)</span>; setting <span class="math inline">\(G=W-\theta\)</span> gives <span class="math inline">\(G(x)=\beta G(x+a)\)</span>. For <span class="math inline">\(a=0\)</span> this forces <span class="math inline">\(G\equiv0\)</span>, so <span class="math inline">\(W\equiv\theta=V\)</span>; for <span class="math inline">\(a\ne0\)</span> the <em>general</em> solution <span class="math inline">\(G(x)=c\,\beta^{-x/a}\)</span> gives infinitely many unbounded solutions <span class="math inline">\(W=\theta+c\beta^{-x/a}\)</span>. But the payoff is bounded, <span class="math inline">\(0&lt;\frac{u}{1+u}&lt;1\)</span>, so <span class="math inline">\(V(x)\le\sum_t\beta^t=\tfrac1{1-\beta}\)</span> is <strong>bounded</strong>; among the <span class="math inline">\(W\)</span>’s only the bounded one, <span class="math inline">\(W\equiv\theta\)</span>, can be <span class="math inline">\(V\)</span>. Restricting <span class="math inline">\(T\)</span> to bounded functions restores uniqueness.</p>
+</div>
+<div id="exm-many-fixed-points" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.6 (Infinitely many fixed points, one bounded)</strong></span> Maximize <span class="math inline">\(\sum_t\beta^t\cdot 0\)</span> (i.e.&nbsp;<span class="math inline">\(\pi\equiv0\)</span>) s.t. <span class="math inline">\(x_{t+1}=x_t+u_t\)</span>, <span class="math inline">\(u_t\in\{1\}\)</span>, <span class="math inline">\(x_0\in\mathbb{R}_+\)</span>. Here <span class="math inline">\(V\equiv0\)</span> and every feasible policy is optimal. The Bellman equation <span class="math inline">\(W(x)=\beta W(x+1)\)</span> has general solution <span class="math inline">\(W(x)=\omega(x-[x])\beta^{-[x]}\)</span> for an arbitrary function <span class="math inline">\(\omega\)</span> on <span class="math inline">\([0,1)\)</span> (<span class="math inline">\([x]\)</span> the integer part), including <span class="math inline">\(W(x)=c\beta^{-x}\)</span> — so <span class="math inline">\(T\)</span> has <strong>infinitely many</strong> fixed points on <span class="math inline">\(\mathbb{F}\)</span>. Among bounded functions only <span class="math inline">\(W\equiv0\)</span> survives; on the bounded set <span class="math inline">\(\mathbb{B}(\mathbb{S})\)</span> the fixed point is unique and equals <span class="math inline">\(V\)</span>.</p>
+</div>
+</section>
+<section id="sec-verify-inf" class="level3">
+<h3 class="anchored" data-anchor-id="sec-verify-inf">Verification theorems and TVC tails</h3>
+<p>Relative to finite horizon, infinite-horizon problems acquire a <em>tail condition</em> at <span class="math inline">\(t=\infty\)</span> — a transversality-type (TVC) condition. We collect the verification theorems built on it; they are the discrete-time analogues of the verification theorems of optimal control, and we fold in the supplement’s three sharper versions in <a href="#sec-verify-omega" class="quarto-xref"><span>Section 6.4.7</span></a>.</p>
+<div id="thm-verify-tvc" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.6 (Verification by a bounded-tail TVC)</strong></span> Suppose real-valued <span class="math inline">\(W\)</span> on <span class="math inline">\(\mathbb{S}\)</span> and a stationary policy <span class="math inline">\(\phi\)</span> satisfy, for all <span class="math inline">\(x\)</span>, <span class="math display">\[
+W(x)=\max_{u\in\Gamma(x)}\bigl\{\pi(x,u)+\beta W(f(x,u))\bigr\}=\pi(x,\phi(x))+\beta W(f(x,\phi(x))),
+\]</span> and along every feasible path <span class="math inline">\(\liminf_{t\to\infty}\beta^t W(x_t)\le 0\le\limsup_{t\to\infty}\beta^t W(x_t)\)</span>. Then <span class="math inline">\(\phi\)</span> is an optimal stationary policy and <span class="math inline">\(V=W\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(x_0\)</span> and let <span class="math inline">\((x_t^\ast,u_t^\ast)\)</span> be the path induced by <span class="math inline">\(\phi\)</span>. Unfolding the Bellman identity along this path, <span class="math display">\[
+W(x_0)=\pi(x_0^\ast,u_0^\ast)+\beta W(x_1^\ast)=\dots=\sum_{t=0}^{T-1}\beta^t\pi(x_t^\ast,u_t^\ast)+\beta^T W(x_T^\ast),
+\]</span> so <span class="math inline">\(W(x_0)-\beta^T W(x_T^\ast)=\sum_{t=0}^{T-1}\beta^t\pi(x_t^\ast,u_t^\ast)\)</span>. Letting <span class="math inline">\(T\to\infty\)</span> and using <span class="math inline">\(\liminf\beta^T W(x_T^\ast)\le0\)</span>, <span class="math inline">\(W(x_0)\le\sum_{t=0}^{\infty}\beta^t\pi(x_t^\ast,u_t^\ast)\le V(x_0)\)</span>. For the reverse, take <em>any</em> feasible <span class="math inline">\((x_t,u_t)\)</span>. Since <span class="math inline">\(W\)</span> dominates each one-step maximand, <span class="math display">\[
+\sum_{t=0}^{T}\beta^t\pi(x_t,u_t)
+\le\sum_{t=0}^{T}\beta^t\bigl[W(x_t)-\beta W(x_{t+1})\bigr]
+=W(x_0)-\beta^{T+1}W(x_{T+1}),
+\]</span> a telescoping sum; letting <span class="math inline">\(T\to\infty\)</span> and using <span class="math inline">\(\limsup\beta^{T+1}W(x_{T+1})\ge0\)</span> gives <span class="math inline">\(\sum_t\beta^t\pi(x_t,u_t)\le W(x_0)\)</span>, hence <span class="math inline">\(V(x_0)\le W(x_0)\)</span>. So <span class="math inline">\(V=W\)</span>, and the first display (now an equality) shows <span class="math inline">\(\phi\)</span> attains <span class="math inline">\(V\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The one-sided version drops the upper tail when only the <em>candidate</em> path needs checking: if <span class="math inline">\(\limsup_t\beta^t W(x_t)\ge0\)</span> along every feasible path and <span class="math inline">\(\lim_t\beta^t W(x_t^\ast)=0\)</span> along the <span class="math inline">\(\phi\)</span>-path, the same telescoping argument gives <span class="math inline">\(V=W\)</span> and optimality of <span class="math inline">\(\phi\)</span>.</p>
+</section>
+<section id="sec-contraction" class="level3">
+<h3 class="anchored" data-anchor-id="sec-contraction">Contraction mapping and uniqueness</h3>
+<p>When the payoff is bounded we can prove uniqueness on the Banach space of bounded continuous functions, the cleanest route to existence, uniqueness, and a <em>constructive</em> iteration <span class="math inline">\(V=\lim T^n v\)</span>. Let <span class="math inline">\(\mathbb{BC}(\mathbb{S})\)</span> be the bounded continuous functions on <span class="math inline">\(\mathbb{S}\)</span> with the <strong>sup norm</strong> <span class="math inline">\(\|f\|=\sup_{x}|f(x)|\)</span>; this is a complete normed (Banach) space.</p>
+<div id="thm-contraction" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.7 (Contraction-mapping theorem (Banach))</strong></span> Let <span class="math inline">\((M,\|\cdot\|)\)</span> be a complete metric space and <span class="math inline">\(T:M\to M\)</span> a <strong>contraction</strong>: there is <span class="math inline">\(\beta\in[0,1)\)</span> with <span class="math inline">\(\|Tf-Tg\|\le\beta\|f-g\|\)</span> for all <span class="math inline">\(f,g\)</span>. Then <span class="math inline">\(T\)</span> has a <strong>unique</strong> fixed point <span class="math inline">\(f^\ast\)</span>, and for every <span class="math inline">\(f_0\in M\)</span> the iterates converge geometrically, <span class="math inline">\(\|T^n f_0-f^\ast\|\le\beta^n\|f_0-f^\ast\|\to0\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The iterates form a Cauchy sequence: <span class="math inline">\(\|T^{n+1}f_0-T^n f_0\|\le\beta^n\|Tf_0-f_0\|\)</span>, so for <span class="math inline">\(m&gt;n\)</span>, <span class="math inline">\(\|T^m f_0-T^n f_0\|\le\sum_{k=n}^{m-1}\beta^k\|Tf_0-f_0\|\le\frac{\beta^n}{1-\beta}\|Tf_0-f_0\|\to0\)</span>. By completeness they converge to some <span class="math inline">\(f^\ast\)</span>. Continuity of <span class="math inline">\(T\)</span> (a contraction is Lipschitz) gives <span class="math inline">\(Tf^\ast=\lim T^{n+1}f_0=f^\ast\)</span>, so <span class="math inline">\(f^\ast\)</span> is a fixed point. If <span class="math inline">\(Tg=g\)</span> too, then <span class="math inline">\(\|f^\ast-g\|=\|Tf^\ast-Tg\|\le\beta\|f^\ast-g\|\)</span> with <span class="math inline">\(\beta&lt;1\)</span> forces <span class="math inline">\(\|f^\ast-g\|=0\)</span>. The error bound is immediate from <span class="math inline">\(\|T^n f_0-f^\ast\|=\|T^n f_0-T^n f^\ast\|\le\beta^n\|f_0-f^\ast\|\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>That <span class="math inline">\(T\)</span> <em>is</em> a contraction follows from two structural properties of the Bellman operator — <strong>Blackwell’s sufficient conditions</strong>.</p>
+<div id="lem-blackwell" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 6.1 (Blackwell’s sufficient conditions)</strong></span> Let <span class="math inline">\(T:\mathbb{B}(\mathbb{S})\to\mathbb{B}(\mathbb{S})\)</span> on bounded functions satisfy (i) <strong>monotonicity</strong>: <span class="math inline">\(v\le w\Rightarrow Tv\le Tw\)</span>; and (ii) <strong>discounting</strong>: there is <span class="math inline">\(\beta\in[0,1)\)</span> with <span class="math inline">\(T(v+a)\le Tv+\beta a\)</span> for every constant <span class="math inline">\(a\ge0\)</span> (adding a constant <span class="math inline">\(a\)</span> to <span class="math inline">\(v\)</span> raises <span class="math inline">\(Tv\)</span> by at most <span class="math inline">\(\beta a\)</span>). Then <span class="math inline">\(T\)</span> is a contraction with modulus <span class="math inline">\(\beta\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For any <span class="math inline">\(v,w\)</span>, <span class="math inline">\(v\le w+\|v-w\|\)</span> (a constant). By monotonicity and then discounting, <span class="math inline">\(Tv\le T(w+\|v-w\|)\le Tw+\beta\|v-w\|\)</span>, i.e.&nbsp;<span class="math inline">\(Tv-Tw\le\beta\|v-w\|\)</span>. Swapping <span class="math inline">\(v,w\)</span> gives <span class="math inline">\(Tw-Tv\le\beta\|v-w\|\)</span>, so <span class="math inline">\(\|Tv-Tw\|\le\beta\|v-w\|\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The Bellman operator <a href="#eq-operator" class="quarto-xref">Equation&nbsp;<span>6.8</span></a> meets both: monotonicity was noted above, and discounting holds since <span class="math inline">\(T(v+a)=\sup_u\{\pi+\beta(v\circ f+a)\}=Tv+\beta a\)</span>. Hence:</p>
+<div id="thm-vf-exists" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.8 (Existence, uniqueness, value iteration)</strong></span> If <span class="math inline">\(\pi\)</span> is bounded and continuous, <span class="math inline">\(f\)</span> is continuous, and <span class="math inline">\(\Gamma\)</span> is continuous and compact-valued, then <span class="math inline">\(T\)</span> maps <span class="math inline">\(\mathbb{BC}(\mathbb{S})\)</span> into itself and is a contraction of modulus <span class="math inline">\(\beta\)</span>. Consequently <span class="math inline">\((\mathrm P_\infty)\)</span> has a value function <span class="math inline">\(V\)</span> that is the <strong>unique</strong> bounded continuous fixed point of <span class="math inline">\(T\)</span>; it is the limit of <strong>value-function iteration</strong> <span class="math inline">\(V=\lim_{n\to\infty}T^n v_0\)</span> from any <span class="math inline">\(v_0\in\mathbb{BC}(\mathbb{S})\)</span>; and there is a stationary optimal policy <span class="math inline">\(\phi\)</span> attaining <a href="#eq-bellman-inf" class="quarto-xref">Equation&nbsp;<span>6.7</span></a>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The maximum theorem (as in <a href="#thm-berge-dp" class="quarto-xref">Theorem&nbsp;<span>6.5</span></a>) makes <span class="math inline">\(Tv\)</span> continuous for continuous <span class="math inline">\(v\)</span>; boundedness of <span class="math inline">\(\pi\)</span> and <span class="math inline">\(\beta&lt;1\)</span> make <span class="math inline">\(Tv\)</span> bounded; so <span class="math inline">\(T:\mathbb{BC}\to\mathbb{BC}\)</span>. By <a href="#lem-blackwell" class="quarto-xref">Lemma&nbsp;<span>6.1</span></a> it is a contraction. <a href="#thm-contraction" class="quarto-xref">Theorem&nbsp;<span>6.7</span></a> supplies the unique fixed point and the geometric convergence of <span class="math inline">\(T^n v_0\)</span>. Since <span class="math inline">\(V\)</span> is itself a bounded continuous fixed point (Berge gives continuity and the standing bound gives boundedness), uniqueness forces the iterates to converge to <span class="math inline">\(V\)</span>. The attained max yields a continuous selection <span class="math inline">\(\phi\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p><a href="#fig-value-iteration" class="quarto-xref">Figure&nbsp;<span>6.1</span></a> shows the iteration in action for the cake-eating model with log utility, whose value function is <span class="math inline">\(V(x)=\ln x/(1-\beta)+K\)</span>: starting from <span class="math inline">\(V_0\equiv0\)</span>, each application of <span class="math inline">\(T\)</span> climbs monotonically toward the fixed point.</p>
+<div id="fig-value-iteration" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-value-iteration-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch05-value-iteration.svg" class="img-fluid figure-img" style="width:78.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-value-iteration-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.1: Value-function iteration <span class="math inline">\(V_n=T^n V_0\)</span> for log-utility cake-eating (<span class="math inline">\(\beta=0.8\)</span>). From <span class="math inline">\(V_0\equiv0\)</span> the iterates rise monotonically and converge geometrically to the fixed point <span class="math inline">\(V=T^\infty V_0\)</span> — the operator <span class="math inline">\(T\)</span> is a contraction, so the limit is unique regardless of the starting guess.
+</figcaption>
+</figure>
+</div>
+<p>When <span class="math inline">\(\pi\)</span> is <em>unbounded</em> (as for <span class="math inline">\(\ln c\)</span> or <span class="math inline">\(\sqrt c\)</span>) the contraction argument does not apply directly; one then either restricts <span class="math inline">\(T\)</span> to a weighted space, or — as we do below — verifies a guessed <span class="math inline">\(V\)</span> with <a href="#thm-verify-tvc" class="quarto-xref">Theorem&nbsp;<span>6.6</span></a>, building an auxiliary <span class="math inline">\(G\ge V\)</span> to which the operator can be iterated (the device of <a href="#thm-verify-G" class="quarto-xref">Theorem&nbsp;<span>6.9</span></a>).</p>
+<div id="thm-verify-G" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.9 (Verification by squeezing from above)</strong></span> Suppose real-valued <span class="math inline">\(G,W\)</span> on <span class="math inline">\(\mathbb{S}\)</span> satisfy <span class="math inline">\(V\le G\)</span>, <span class="math inline">\(TG\le G\)</span>, <span class="math inline">\(TW=W\)</span>, <span class="math inline">\(W(x)=\lim_{n\to\infty}T^n G(x)\)</span>, and <span class="math inline">\(\liminf_{t\to\infty}\beta^t W(x_t)\le0\)</span> along every feasible path. Then <span class="math inline">\(V=W\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>From <span class="math inline">\(V\le G\)</span> and monotonicity, <span class="math inline">\(TV\le TG\le G\)</span>; but <span class="math inline">\(TV=V\)</span>, so <span class="math inline">\(V\le TG\le G\)</span>. Iterating, <span class="math inline">\(V\le T^nG\le G\)</span> for all <span class="math inline">\(n\)</span>; letting <span class="math inline">\(n\to\infty\)</span>, <span class="math inline">\(V\le W\)</span>. For the reverse, an <span class="math inline">\(\varepsilon\)</span>-greedy construction (choose at each step a <span class="math inline">\(u\)</span> within <span class="math inline">\(\varepsilon/2^t\)</span> of the supremum in <span class="math inline">\(W=TW\)</span>) yields a feasible path with <span class="math inline">\(W(x_0)-\beta^{n+1}W(x_{n+1})\le\sum_{t=0}^{n}\beta^t\pi(x_t,u_t)+\varepsilon\sum_{t=0}^{n}\beta^t\)</span>; letting <span class="math inline">\(n\to\infty\)</span> and using the tail condition, <span class="math inline">\(W(x_0)\le V(x_0)+\varepsilon/(1-\beta)\)</span>, and <span class="math inline">\(\varepsilon\downarrow0\)</span> gives <span class="math inline">\(W\le V\)</span>. Hence <span class="math inline">\(V=W\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+<section id="sec-concavity" class="level3">
+<h3 class="anchored" data-anchor-id="sec-concavity">Concavity of the value function</h3>
+<p>Beyond existence, the value function inherits <strong>concavity</strong> from the primitives — the property that makes first-order conditions sufficient. Call a correspondence <span class="math inline">\(\Gamma:\mathbb{S}\rightrightarrows\mathbb{S}\)</span> <strong>concave</strong> if <span class="math inline">\(\alpha\Gamma(x)+(1-\alpha)\Gamma(y)\subseteq\Gamma(\alpha x+(1-\alpha)y)\)</span> for all <span class="math inline">\(x,y\in\mathbb{S}\)</span>, <span class="math inline">\(\alpha\in(0,1)\)</span>.</p>
+<div id="thm-concavity" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.10 (Concavity of <span class="math inline">\(V\)</span>)</strong></span> For <span class="math inline">\((\mathrm P_\infty)\)</span>, if <span class="math inline">\(\pi\)</span> is concave, <span class="math inline">\(\Gamma\)</span> is concave, <span class="math inline">\(f\)</span> is linear (more generally, <span class="math inline">\(f\)</span> concave with <span class="math inline">\(\pi\)</span> nondecreasing in its first argument), and <span class="math inline">\(\mathbb{S}\)</span> is convex, then <span class="math inline">\(V\)</span> is concave.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(x_0,y_0\in\mathbb{S}\)</span> and <span class="math inline">\(\alpha,\beta_0\ge0\)</span> with <span class="math inline">\(\alpha+\beta_0=1\)</span>; convexity of <span class="math inline">\(\mathbb{S}\)</span> gives <span class="math inline">\(\alpha x_0+\beta_0 y_0\in\mathbb{S}\)</span>. Let <span class="math inline">\((x_t,u_t)\)</span> and <span class="math inline">\((y_t,v_t)\)</span> be optimal paths from <span class="math inline">\(x_0\)</span> and <span class="math inline">\(y_0\)</span>. Set <span class="math inline">\(z_t=\alpha x_t+\beta_0 y_t\)</span> and <span class="math inline">\(w_t=\alpha u_t+\beta_0 v_t\)</span>. Linearity of <span class="math inline">\(f\)</span> gives <span class="math inline">\(z_{t+1}=\alpha f(x_t,u_t)+\beta_0 f(y_t,v_t)=f(z_t,w_t)\)</span>, and concavity of <span class="math inline">\(\Gamma\)</span> gives <span class="math inline">\(w_t\in\alpha\Gamma(x_t)+\beta_0\Gamma(y_t)\subseteq\Gamma(z_t)\)</span>. So <span class="math inline">\((z_t,w_t)\)</span> is feasible from <span class="math inline">\(z_0=\alpha x_0+\beta_0 y_0\)</span>, and concavity of <span class="math inline">\(\pi\)</span> gives <span class="math display">\[
+V(\alpha x_0+\beta_0 y_0)\ge\sum_{t}\beta^t\pi(z_t,w_t)
+\ge\alpha\sum_t\beta^t\pi(x_t,u_t)+\beta_0\sum_t\beta^t\pi(y_t,v_t)
+=\alpha V(x_0)+\beta_0 V(y_0).\ \blacksquare
+\]</span></p>
+</div>
+<p>(Differentiability of <span class="math inline">\(V\)</span> is more delicate; we refer to <span class="citation" data-cites="stokeylucas1989">(<a href="references.html#ref-stokeylucas1989" role="doc-biblioref">Stokey, Lucas, and Prescott 1989</a>)</span> and use the envelope theorem only where <span class="math inline">\(V\)</span> is known smooth.)</p>
+</section>
+<section id="sec-dp-euler" class="level3">
+<h3 class="anchored" data-anchor-id="sec-dp-euler">The dynamic-programming Euler equation</h3>
+<p>When the problem has <em>no explicit control</em> — the state next period is chosen directly, <span class="math inline">\(x_{t+1}\in\Gamma(x_t)\)</span> — the Bellman equation collapses to a clean <strong>Euler equation</strong>. Consider <span id="eq-euler-problem"><span class="math display">\[
+\max\ \sum_{t=0}^{\infty}\beta^t F(x_t,x_{t+1})
+\qquad\text{s.t.}\quad x_{t+1}\in\Gamma(x_t)\subseteq\mathbb{R}_+,\ x_0\in\mathbb{S}\text{ given}.
+\tag{6.9}\]</span></span> Write <span class="math inline">\(F_1,F_2\)</span> for the partials in the first and second argument.</p>
+<div id="thm-dp-euler" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.11 (DP Euler equation)</strong></span> If <span class="math inline">\((x_0,x_1,x_2,\dots)\)</span> is an interior optimum of <a href="#eq-euler-problem" class="quarto-xref">Equation&nbsp;<span>6.9</span></a>, then for every <span class="math inline">\(t\ge0\)</span> <span id="eq-dp-euler"><span class="math display">\[
+F_2(x_t,x_{t+1})+\beta\,F_1(x_{t+1},x_{t+2})=0.
+\tag{6.10}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By the principle of optimality, <span class="math inline">\(x_{t+1}\)</span> solves <span class="math inline">\(\max_{u\in\Gamma(x_t)}\{F(x_t,u)+\beta F(u,x_{t+2})\}\)</span> — perturb only the single date <span class="math inline">\(t+1\)</span>, holding <span class="math inline">\(x_t,x_{t+2}\)</span> fixed. The interior first-order condition is exactly <a href="#eq-dp-euler" class="quarto-xref">Equation&nbsp;<span>6.10</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The Euler equation is <em>necessary</em>. With concavity it becomes sufficient once paired with a tail condition — the discrete transversality condition.</p>
+<div id="thm-dp-euler-sufficiency" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.12 (Euler + TVC sufficiency)</strong></span> Suppose <span class="math inline">\(F\)</span> is smooth, concave, and nondecreasing in its first argument (<span class="math inline">\(F_1\ge0\)</span>). A feasible path satisfying the Euler equation <a href="#eq-dp-euler" class="quarto-xref">Equation&nbsp;<span>6.10</span></a> and the transversality condition <span id="eq-dp-tvc"><span class="math display">\[
+\liminf_{t\to\infty}\beta^t\,x_t\,F_1(x_t,x_{t+1})\le 0
+\tag{6.11}\]</span></span> is optimal.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\((y_t)\)</span> be any feasible path with <span class="math inline">\(y_0=x_0\)</span>, and compare term by term. Concavity gives the supporting inequality <span class="math inline">\(F(y_t,y_{t+1})-F(x_t,x_{t+1})\le F_1(x_t,x_{t+1})(y_t-x_t)+F_2(x_t,x_{t+1})(y_{t+1}-x_{t+1})\)</span>. Summing <span class="math inline">\(\sum_{t=0}^{T}\beta^t(\cdots)\)</span> and regrouping by the Euler equation <a href="#eq-dp-euler" class="quarto-xref">Equation&nbsp;<span>6.10</span></a> (which makes the interior terms telescope, using <span class="math inline">\(\beta^tF_2(x_t,x_{t+1})=-\beta^{t+1}F_1(x_{t+1},x_{t+2})\)</span>), <span class="math display">\[
+\sum_{t=0}^{T}\beta^t\bigl[F(y_t,y_{t+1})-F(x_t,x_{t+1})\bigr]
+\le \beta^T F_2(x_T,x_{T+1})(y_{T+1}-x_{T+1})
+=\beta^{T+1}F_1(x_{T+1},x_{T+2})(x_{T+1}-y_{T+1}).
+\]</span> Since <span class="math inline">\(F_1\ge0\)</span> and <span class="math inline">\(y_{T+1}\ge0\)</span>, the right side is <span class="math inline">\(\le\beta^{T+1}F_1(x_{T+1},x_{T+2})x_{T+1}\)</span>. Taking <span class="math inline">\(\liminf\)</span> over a suitable subsequence and using <a href="#eq-dp-tvc" class="quarto-xref">Equation&nbsp;<span>6.11</span></a> gives <span class="math inline">\(\sum_t\beta^t F(y_t,y_{t+1})\le\sum_t\beta^t F(x_t,x_{t+1})\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+<section id="sec-inf-examples" class="level3">
+<h3 class="anchored" data-anchor-id="sec-inf-examples">Worked infinite-horizon examples</h3>
+<div id="exm-cake-infinite" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.7 (Cake-eating, infinite horizon (guess-and-verify))</strong></span> Maximize <span class="math inline">\(\sum_{t=0}^\infty\beta^t\ln c_t\)</span> s.t. <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, <span class="math inline">\(x_0&gt;0\)</span>. Along any feasible path <span class="math inline">\(\sum_t\beta^t\ln c_t\le\frac{\ln x_0}{1-\beta}\)</span> (since <span class="math inline">\(c_t\le x_0\)</span>), so set <span class="math inline">\(G(x)=\frac{\ln x}{1-\beta}\)</span> and <span class="math inline">\(W(x)=\frac{\ln x}{1-\beta}+K\)</span>. One checks the hypotheses of <a href="#thm-verify-G" class="quarto-xref">Theorem&nbsp;<span>6.9</span></a> hold, so <span class="math inline">\(W=V\)</span>, and the optimal stationary policy attains <span class="math inline">\(\arg\max_{0\le c\le x}\{\ln c+\frac{\beta}{1-\beta}\ln(x-c)\}=(1-\beta)x\)</span>.</p>
+<p><em>Direct route.</em> Solving the Bellman equation <span class="math inline">\(V(x)=\max_{0\le c\le x}\{\ln c+\beta V(x-c)\}\)</span>, the interior FOC is <span class="math inline">\(1/c=\beta V'(x-c)\)</span> and the envelope theorem gives <span class="math inline">\(V'(x)=\beta V'(x-c)=1/c\)</span>. Hence along the optimum <span class="math inline">\(\frac1{c_t}=\beta V'(x_{t+1})=\frac{\beta}{c_{t+1}}\)</span>, so <span class="math inline">\(c_{t+1}=\beta c_{t}\)</span>; combined with <span class="math inline">\(x_t=\sum_{s\ge t}c_s=\frac{c_t}{1-\beta}\)</span> this yields <span class="math inline">\(c_t=(1-\beta)x_t\)</span>, the same policy.</p>
+<p><em>Guess the value.</em> Guess <span class="math inline">\(c=\alpha x\)</span>, set <span class="math inline">\(\gamma=1-\alpha\)</span>; the envelope relation <span class="math inline">\(\frac1c=\beta V'(x-c)=V'(x)\)</span> forces <span class="math inline">\(\frac1{\alpha x}=\frac{\beta}{\alpha\gamma x}\)</span>, i.e. <span class="math inline">\(\gamma=\beta\)</span>, <span class="math inline">\(\alpha=1-\beta\)</span>. Then <span class="math inline">\(V(x)=\frac1\alpha\ln x+K\)</span>, and matching constants in the Bellman equation, <span class="math display">\[
+V(x)=\frac{\alpha\ln(\alpha x)+\beta\ln\beta}{\alpha^2},\qquad K=\frac{\alpha\ln\alpha+\beta\ln\beta}{\alpha^2}.
+\]</span> The open-loop path is <span class="math inline">\(x_t=\beta^t x_0\to0\)</span>, <span class="math inline">\(c_t=\alpha\beta^t x_0\to0\)</span>.</p>
+</div>
+<div id="exm-growth-sqrt" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.8 (Optimal growth: the <span class="math inline">\(z^\ast=(\beta/2)^2\)</span> guess-and-verify)</strong></span> Maximize <span class="math inline">\(\sum_{t=0}^\infty\beta^t c_t\)</span> s.t. <span class="math inline">\(x_{t+1}=\sqrt{x_t}-c_t\)</span>, <span class="math inline">\(0\le c_t\le\sqrt{x_t}\)</span>, <span class="math inline">\(x_0&gt;0\)</span>, <span class="math inline">\(\beta\in(0,1)\)</span>. Read <span class="math inline">\(x\)</span> as capital, <span class="math inline">\(\sqrt x\)</span> as the production function (concave, with <span class="math inline">\(\sqrt x&gt;x\)</span> for <span class="math inline">\(x&lt;1\)</span>), <span class="math inline">\(c\)</span> as consumption. Pick the state space <span class="math inline">\(\mathbb{S}=[0,M]\)</span> with <span class="math inline">\(M\)</span> large; then payoffs are bounded and the Bellman equation <span class="math inline">\(V(x)=\max_{0\le c\le\sqrt x}\{c+\beta
+V(\sqrt x-c)\}\)</span> has a unique bounded continuous solution.</p>
+<p><em>Guess.</em> If the interior FOC <span class="math inline">\(1=\beta V'(\sqrt x-c)\)</span> and the envelope <span class="math inline">\(V'(x)=\beta V'(\sqrt x-c)\cdot\frac1{2\sqrt x}\)</span> hold, then <span class="math inline">\(V'(x)=\frac1{2\sqrt x}\)</span>, so <span class="math inline">\(V(x)=\sqrt x+C\)</span>. Then the maximand becomes <span class="math inline">\(\max_{0\le c\le\sqrt x}\{c+\beta\sqrt{\sqrt x-c}\}\)</span>; substituting <span class="math inline">\(y=\sqrt x\)</span>, <span class="math inline">\(z=y-c\)</span> this is <span class="math inline">\(\max_{0\le z\le y}\{\beta\sqrt z-z\}+y\)</span>. The inner objective <span class="math inline">\(f(z)=\beta\sqrt z-z\)</span> has <span class="math inline">\(f'(z)=\frac{\beta}{2\sqrt z}-1\)</span>, vanishing at the <strong>turnpike</strong> <span id="eq-zstar"><span class="math display">\[
+z^\ast=\Bigl(\tfrac{\beta}{2}\Bigr)^2,
+\tag{6.12}\]</span></span> so the maximizer is <span class="math inline">\(z=y\wedge z^\ast\)</span> and the policy is <span id="eq-growth-policy"><span class="math display">\[
+c=y-z=\bigl(\sqrt x-z^\ast\bigr)^{+},
+\tag{6.13}\]</span></span> where <span class="math inline">\(a\wedge b=\min(a,b)\)</span> and <span class="math inline">\(a^{+}=\max(a,0)\)</span>. The policy says: <strong>accumulate while capital is small</strong> (consume nothing until <span class="math inline">\(\sqrt x&gt;z^\ast\)</span>), then consume the surplus over the turnpike.</p>
+<p><em>Once on the turnpike, stay.</em> If <span class="math inline">\(\sqrt{x_0}&gt;z^\ast\)</span>, then <span class="math inline">\(c_0=\sqrt{x_0}-z^\ast\)</span>, <span class="math inline">\(x_1=z^\ast\)</span>, <span class="math inline">\(c_1=\sqrt{z^\ast}-z^\ast\)</span>, <span class="math inline">\(x_2=z^\ast\)</span>, … — the system reaches the steady state in one step and rests. The value is <span class="math display">\[
+V(x)=c_0+c_1\frac{\beta}{1-\beta}=\sqrt x-z^\ast+(\sqrt{z^\ast}-z^\ast)\frac{\beta}{1-\beta}
+=\sqrt x+K,\qquad K=\frac{1}{1-\beta}\Bigl(\frac{\beta}{2}\Bigr)^2.
+\]</span> If <span class="math inline">\(\sqrt{x_0}&lt;z^\ast\)</span> the first few periods save until capital exceeds <span class="math inline">\((z^\ast)^2\)</span>, after which the picture is identical. A full verification (constructing the piecewise <span class="math inline">\(W\)</span> on the intervals <span class="math inline">\(A_n\)</span> where <span class="math inline">\(n\)</span> saving steps remain, checking it is smooth and solves the Bellman equation) confirms <a href="#eq-growth-policy" class="quarto-xref">Equation&nbsp;<span>6.13</span></a> is the unique stationary Markovian optimum.</p>
+</div>
+<p><a href="#fig-growth-policy" class="quarto-xref">Figure&nbsp;<span>6.2</span></a> plots the policy <a href="#eq-growth-policy" class="quarto-xref">Equation&nbsp;<span>6.13</span></a>: flat at zero below the threshold <span class="math inline">\(x=(z^\ast)^2\)</span>, then rising as <span class="math inline">\((\sqrt x-z^\ast)\)</span>.</p>
+<div id="fig-growth-policy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-growth-policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch05-growth-policy.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-growth-policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.2: Optimal policy for the growth problem: consume nothing until capital crosses the threshold <span class="math inline">\(x=(z^\ast)^2\)</span> (with <span class="math inline">\(z^\ast=(\beta/2)^2\)</span>), then consume the surplus <span class="math inline">\((\sqrt x-z^\ast)^{+}\)</span> over the turnpike. The economy accumulates to the turnpike and consumes only the excess thereafter.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-verify-omega" class="level3">
+<h3 class="anchored" data-anchor-id="sec-verify-omega">Verification with the auxiliary function <span class="math inline">\(\omega\)</span></h3>
+<p>The supplement <em>验证定理</em> sharpens the infinite-horizon verification by introducing an <strong>auxiliary function</strong> <span class="math inline">\(\omega\)</span> — playing the role of the marginal value <span class="math inline">\(V'\)</span> — and stating three theorems of increasing convenience. Throughout, <span class="math inline">\(\mathbb{S}\subseteq\mathbb{R}_+\)</span> is an interval, <span class="math inline">\(\pi,f\)</span> are smooth and concave, and <span class="math inline">\(\Gamma:\mathbb{S}\rightrightarrows\mathbb{A}\)</span> is continuous and compact-valued; the problem is <span class="math inline">\(\max\sum_t\beta^t\pi(x_t,c_t)\)</span> with <span class="math inline">\(x_{t+1}=f(x_t,c_t)\)</span>, <span class="math inline">\(c_t\in\Gamma(x_t)\)</span>.</p>
+<div id="thm-verify1" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.13 (Verification theorem 1 (auxiliary <span class="math inline">\(\omega\)</span>))</strong></span> A feasible path <span class="math inline">\((x_t^\ast,c_t^\ast)\)</span> is optimal if there is a function <span class="math inline">\(\omega\)</span> on <span class="math inline">\(\mathbb{S}\)</span> with <span class="math inline">\(\omega(x_t^\ast)\ge0\)</span> for all <span class="math inline">\(t\)</span>, satisfying <span class="math display">\[
+\pi_2(x_t^\ast,c_t^\ast)+\beta\,\omega(x_{t+1}^\ast)f_2(x_t^\ast,c_t^\ast)=0,\quad
+\omega(x_t^\ast)=\pi_1(x_t^\ast,c_t^\ast)+\beta\,\omega(x_{t+1}^\ast)f_1(x_t^\ast,c_t^\ast),
+\]</span> together with the <strong>TVC tail</strong> <span class="math inline">\(\displaystyle\lim_{t\to\infty}\beta^t x_t^\ast\,\omega(x_t^\ast)=0\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For any feasible <span class="math inline">\((x_t,c_t)\)</span>, write <span class="math inline">\(\pi(x_t,c_t)=[\pi(x_t,c_t)+\beta\omega(x_{t+1}^\ast)f(x_t,c_t)]-\beta\omega(x_{t+1}^\ast)x_{t+1}\)</span>. Concavity of <span class="math inline">\(\pi,f\)</span> and <span class="math inline">\(\omega(x_{t+1}^\ast)\ge0\)</span> give the supporting bound <span class="math display">\[
+[\pi(x_t,c_t)+\beta\omega(x_{t+1}^\ast)f(x_t,c_t)]-[\pi(x_t^\ast,c_t^\ast)+\beta\omega(x_{t+1}^\ast)f(x_t^\ast,c_t^\ast)]
+\le(x_t-x_t^\ast)\,\omega(x_t^\ast),
+\]</span> using the two displayed identities to collapse the first-order terms. Summing <span class="math inline">\(\sum_{t=0}^{T}\beta^t(\cdots)\)</span>, the right-hand side telescopes to <span class="math inline">\(\beta^{T+1}(x_{T+1}-x_{T+1}^\ast)\omega(x_{T+1}^\ast)\le\beta^{T+1}x_{T+1}\omega(x_{T+1}^\ast)\)</span>, and letting <span class="math inline">\(T\to\infty\)</span> with the TVC tail gives <span class="math inline">\(\sum_t\beta^t\pi(x_t,c_t)\le\sum_t\beta^t\pi(x_t^\ast,c_t^\ast)\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Specializing <span class="math inline">\(\omega=V'\)</span> gives a <em>value-function</em> verification; taking <span class="math inline">\(f(x,c)=c\)</span> (so <span class="math inline">\(x_{t+1}=c_t\)</span>, no explicit control) reduces the two identities to the single DP Euler equation, recovering a known classical result.</p>
+<div id="cor-stokey-lucas" class="theorem corollary">
+<p><span class="theorem-title"><strong>Corollary 6.2 (Corollary (Stokey–Lucas Theorem 4.15))</strong></span> For <span class="math inline">\(\max\sum_t\beta^t\pi(x_t,x_{t+1})\)</span> with <span class="math inline">\(x_{t+1}\in\Gamma(x_t)\)</span>, a feasible path <span class="math inline">\((x_t^\ast)\)</span> with <span class="math inline">\(\pi_1(x_t^\ast,x_{t+1}^\ast)\ge0\)</span> that satisfies the Euler equation <span class="math inline">\(\pi_2(x_t^\ast,x_{t+1}^\ast)+\beta\pi_1(x_{t+1}^\ast,x_{t+2}^\ast)=0\)</span> and the TVC <span class="math inline">\(\lim_{t\to\infty}\beta^t x_t^\ast\,\pi_1(x_t^\ast,x_{t+1}^\ast)=0\)</span> is optimal.</p>
+</div>
+<p>This is Theorem 4.15 of <span class="citation" data-cites="stokeylucas1989">(<a href="references.html#ref-stokeylucas1989" role="doc-biblioref">Stokey, Lucas, and Prescott 1989</a>)</span>; <a href="#thm-verify1" class="quarto-xref">Theorem&nbsp;<span>6.13</span></a> is strictly more general (it handles an explicit control through <span class="math inline">\(f\)</span>). Two further versions trade hypotheses for ease of checking.</p>
+<div id="thm-verify2" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.14 (Verification theorem 2 (value function))</strong></span> If <span class="math inline">\(V\)</span> is differentiable, <span class="math inline">\(\phi\)</span> is feasible, and for all <span class="math inline">\(x\)</span> <span class="math inline">\(V(x)=\max_{c\in\Gamma(x)}\{\pi(x,c)+\beta V(f(x,c))\}=\pi(x,\phi(x))+\beta V(f(x,\phi(x)))\)</span> with <span class="math inline">\(\phi(x)\)</span> the interior maximizer, and along the <span class="math inline">\(\phi\)</span>-path <span class="math inline">\(V'(x_t^\ast)\ge0\)</span> with the two tails <span class="math inline">\(\lim_t\beta^t x_t^\ast V'(x_t^\ast)=0\)</span> and <span class="math inline">\(\lim_t\beta^t V(x_t^\ast)=0\)</span>, then <span class="math inline">\(V\)</span> is the value function and <span class="math inline">\(\phi\)</span> is the optimal stationary policy (unique if the maximizer is unique).</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Since <span class="math inline">\(\phi(x)\)</span> is interior, the first-order condition and the envelope theorem show <span class="math inline">\(\sigma=\phi\)</span> and <span class="math inline">\(\omega=V'\)</span> satisfy the hypotheses of <a href="#thm-verify1" class="quarto-xref">Theorem&nbsp;<span>6.13</span></a>, so <span class="math inline">\(\phi\)</span> is optimal. That <span class="math inline">\(V\)</span> equals the value function follows by unfolding the Bellman identity along the <span class="math inline">\(\phi\)</span>-path and using <span class="math inline">\(\lim_t\beta^t V(x_t^\ast)=0\)</span>, exactly as in <a href="#thm-verify-tvc" class="quarto-xref">Theorem&nbsp;<span>6.6</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The TVC <span class="math inline">\(\lim_t\beta^t x_t^\ast V'(x_t^\ast)=0\)</span> is <em>sufficient but not necessary</em>; <a href="#exm-verify-counter" class="quarto-xref">Example&nbsp;<span>6.10</span></a> exhibits a problem where it fails yet the candidate is still optimal. The second tail <span class="math inline">\(\lim_t\beta^t V(x_t^\ast)=0\)</span> is equivalent to convergence of <span class="math inline">\(\sum_t\beta^t\pi(x_t^\ast,c_t^\ast)\)</span> and <em>is</em> necessary.</p>
+<div id="thm-verify3" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.15 (Verification theorem 3 (limsup form))</strong></span> If <span class="math inline">\(V\)</span>, <span class="math inline">\(\phi\)</span> solve the Bellman equation as in <a href="#thm-verify2" class="quarto-xref">Theorem&nbsp;<span>6.14</span></a> and for every feasible path <span class="math inline">\(\limsup_{t\to\infty}\beta^t\bigl(V(x_t)-V(x_t^\ast)\bigr)\ge0\)</span>, then <span class="math inline">\(\phi\)</span> is the optimal stationary policy; if moreover <span class="math inline">\(\lim_t\beta^t V(x_t^\ast)=0\)</span> then <span class="math inline">\(V\)</span> is the value function and <span class="math inline">\(\phi\)</span> is the unique stationary optimum.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By the Bellman inequality, for any feasible path <span class="math inline">\(V(x_0)\ge\sum_{t=0}^{T-1}\beta^t\pi(x_t,c_t)+\beta^T V(x_T)\)</span>, with equality along the <span class="math inline">\(\phi\)</span>-path. Subtracting the two and using the limsup hypothesis, <span class="math inline">\(\sum_t\beta^t\pi(x_t^\ast,c_t^\ast)\ge\sum_t\beta^t\pi(x_t,c_t)\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The limsup TVC <a href="#thm-verify3" class="quarto-xref">Theorem&nbsp;<span>6.15</span></a> must be checked over <em>all</em> feasible paths, so it is harder to verify than <a href="#thm-verify2" class="quarto-xref">Theorem&nbsp;<span>6.14</span></a>, which only checks the candidate path — but <a href="#thm-verify3" class="quarto-xref">Theorem&nbsp;<span>6.15</span></a> succeeds in cases where the simpler tail fails. We close with the supplement’s five examples.</p>
+<div id="exm-verify-cobbdouglas" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.9 (Log utility, Cobb–Douglas growth (<span class="math inline">\(x_{t+1}=rx_t^\theta-c_t\)</span>))</strong></span> Maximize <span class="math inline">\(\sum_t\beta^t\ln c_t\)</span> s.t. <span class="math inline">\(x_{t+1}=rx_t^\theta-c_t\)</span>, <span class="math inline">\(0\le c_t\le rx_t^\theta\)</span>, <span class="math inline">\(x_0&gt;0\)</span>, with <span class="math inline">\(\beta,\theta\in(0,1)\)</span>, <span class="math inline">\(r&gt;0\)</span>. The Bellman equation is <span class="math inline">\(V(x)=\max_{0\le c\le rx^\theta}\{\ln c+\beta V(rx^\theta-c)\}\)</span>. FOC and envelope give <span class="math inline">\(\frac1c=\beta V'(rx^\theta-c)\)</span> and <span class="math inline">\(V'(x)=\beta V'(rx^\theta-c)\,r\theta x^{\theta-1}=\frac{r\theta x^{\theta-1}}{c}\)</span>. Guess <span class="math inline">\(c=\tau rx^\theta\)</span> with <span class="math inline">\(\tau\in(0,1)\)</span>; then <span class="math inline">\(V'(x)=\theta/(\tau x)\)</span>, and the FOC forces <span class="math display">\[
+\tau=1-\theta\beta,\qquad V(x)=\frac{\theta}{\tau}\ln x+m,
+\]</span> with <span class="math inline">\(m=\dfrac{\ln r+(1-\theta\beta)\ln(1-\theta\beta)+\theta\beta\ln(\theta\beta)}{(1-\beta)(1-\theta\beta)}\)</span> from matching constants. The TVC tails hold: <span class="math inline">\(\lim_t\beta^t x_t^\ast V'(x_t^\ast)=0\)</span> because <span class="math inline">\(x_{t+1}^\ast=\theta\beta r(x_t^\ast)^\theta\)</span> keeps <span class="math inline">\(\ln x_t^\ast\)</span> bounded, and <span class="math inline">\(\lim_t\beta^t V(x_t^\ast)=0\)</span> likewise. By <a href="#thm-verify2" class="quarto-xref">Theorem&nbsp;<span>6.14</span></a> the <strong>unique</strong> stationary policy is <span class="math display">\[
+c=(1-\theta\beta)\,r\,x^\theta .
+\]</span></p>
+</div>
+<div id="exm-verify-counter" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.10 (A counterexample: the candidate TVC fails, the policy is still optimal)</strong></span> Maximize <span class="math inline">\(\sum_t\beta^t\ln c_t\)</span> s.t. <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, <span class="math inline">\(0\le c_t\le x_t-1\)</span>, <span class="math inline">\(x_0&gt;1\)</span>. The Bellman equation <span class="math inline">\(V(x)=\max_{0\le c\le x-1}\{\ln c+\beta V(x-c)\}\)</span> has solution <span class="math display">\[
+V(x)=\frac1{1-\beta}\ln(x-1)+\frac{(1-\beta)\ln(1-\beta)+\beta\ln\beta}{(1-\beta)^2},\quad
+c=\phi(x)=(1-\beta)(x-1),
+\]</span> the unique interior maximizer. The induced path is <span class="math inline">\(x_t=1+\beta^t(x_0-1)\)</span>, so <span class="math display">\[
+\lim_{t\to\infty}\beta^t x_t^\ast V'(x_t^\ast)=\frac1{(1-\beta)(x_0-1)}\ne0
+\]</span> — the candidate TVC of <a href="#thm-verify2" class="quarto-xref">Theorem&nbsp;<span>6.14</span></a> <em>fails</em>. Yet <span class="math inline">\(V\)</span> genuinely is the value function and <span class="math inline">\(\phi\)</span> the unique optimum: the substitution <span class="math inline">\(z=x-1\)</span> turns the problem into ordinary cake-eating (<span class="math inline">\(z_{t+1}=z_t-c_t\)</span>, <span class="math inline">\(0\le c_t\le z_t\)</span>), which <a href="#thm-verify2" class="quarto-xref">Theorem&nbsp;<span>6.14</span></a> handles cleanly. The moral: the simple TVC is sufficient, not necessary, and a change of variables can rescue the verification.</p>
+</div>
+<div id="exm-verify-crra-affine" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.11 (CRRA with affine accumulation (<span class="math inline">\(x_{t+1}=x_t-c_t+1\)</span>))</strong></span> Maximize <span class="math inline">\(\sum_t\beta^{\theta t}u(c_t)\)</span>, <span class="math inline">\(u(c)=\frac{c^{1-\theta}-1}{1-\theta}\)</span>, s.t. <span class="math inline">\(x_{t+1}=x_t-c_t+1\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, <span class="math inline">\(x_0&gt;0\)</span> (here <span class="math inline">\(\theta&gt;0\)</span>, <span class="math inline">\(\beta\in(0,1)\)</span>). One unit of endowment arrives each period. With <span class="math inline">\(M_0=0\)</span>, <span class="math inline">\(M_i=\sum_{j=0}^{i}\beta^{-j}-i\)</span>, and <span class="math inline">\(n(x)=\sup\{i:M_i&lt;x\}\)</span>, the value function is the piecewise <span class="math display">\[
+V(x)=\Bigl(\textstyle\sum_{i=0}^{n(x)}\beta^i\Bigr)^{\theta}u(x+n(x))+K_{n(x)},\quad
+K_n=\frac1{1-\theta}\Bigl\{\bigl(\textstyle\sum_{i=0}^{n}\beta^i\bigr)^{\theta}-\textstyle\sum_{i=0}^{n}\beta^{\theta i}\Bigr\},
+\]</span> and the policy <span class="math inline">\(c=\phi(x)=\dfrac{x+n(x)}{\sum_{i=0}^{n(x)}\beta^i}\)</span> is the unique Bellman maximizer; <span class="math inline">\(V\)</span> is smooth and concave, <span class="math inline">\(\phi\)</span> a continuous piecewise-linear curve whose slope declines from <span class="math inline">\(1\)</span> toward <span class="math inline">\(1-\beta\)</span>. <a href="#thm-verify3" class="quarto-xref">Theorem&nbsp;<span>6.15</span></a> (limsup form) certifies <span class="math inline">\(V\)</span> and <span class="math inline">\(\phi\)</span>.</p>
+</div>
+<div id="exm-verify-crra-R" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6.12 (CRRA with gross interest <span class="math inline">\(R\)</span> (<span class="math inline">\(x_{t+1}=R(x_t-c_t)+1\)</span>))</strong></span> Maximize <span class="math inline">\(\sum_t\beta^t u(c_t)\)</span>, <span class="math inline">\(u(c)=\frac{c^{1-\theta}-1}{1-\theta}\)</span>, s.t. <span class="math inline">\(x_{t+1}=R(x_t-c_t)+1\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, <span class="math inline">\(x_0&gt;0\)</span>, with <span class="math inline">\(\theta&gt;0\)</span>, <span class="math inline">\(\beta\in(0,1)\)</span>, <span class="math inline">\(R&gt;0\)</span>. Write <span class="math inline">\(\delta=(\beta R)^{1/\theta}\)</span>, <span class="math inline">\(\tau=\delta/R\)</span>. If <span class="math inline">\(\tau&gt;1\)</span> a feasible path drives the objective to <span class="math inline">\(+\infty\)</span> and there is <strong>no solution</strong>; assume <span class="math inline">\(\tau\le1\)</span> (the well-posed case). This is the canonical consumption–savings problem with constant gross return <span class="math inline">\(R\)</span> — the deterministic core of the Bewley/Benhabib–Bisin–Zhu setup <span class="citation" data-cites="benhabib2015">(<a href="references.html#ref-benhabib2015" role="doc-biblioref">Benhabib, Bisin, and Zhu 2015</a>)</span>. With <span class="math inline">\(a=\frac1{R-1}\)</span> the shift <span class="math inline">\(z=x+a\)</span> turns it into a clean CRRA cake-eating problem <span class="math inline">\(z_{t+1}=R(z_t-c_t)\)</span>, <span class="math inline">\(0\le c_t\le z_t-a\)</span>, whose Bellman equation <span class="math inline">\(V(z)=\max\{u(c)+\beta V(R(z-c))\}\)</span> has the kinked solution <span class="math display">\[
+V(z)=\begin{cases}u(z-a)+M,&amp; z&lt;a/\tau,\\[2pt](1-\tau)^{-\theta}u(z)+m,&amp; z\ge a/\tau,\end{cases}
+\qquad
+c=\begin{cases}z-a,&amp; z&lt;a/\tau,\\[2pt](1-\tau)z,&amp; z\ge a/\tau,\end{cases}
+\]</span> with constants <span class="math inline">\(m,M\)</span> pinned by smooth pasting. Translating back, the unique stationary policy of the original problem is <span class="math inline">\(c=x\)</span> for <span class="math inline">\(x&lt;a/\tau-a\)</span> and <span class="math inline">\(c=(1-\tau)(x+a)\)</span> for <span class="math inline">\(x\ge a/\tau-a\)</span>. An equivalent piecewise form (define <span class="math inline">\(M_n\)</span> by <span class="math inline">\(M_0=0\)</span>, <span class="math inline">\(M_1=1/\delta\)</span>, <span class="math inline">\(M_{n+1}=R^{-1}M_n+\delta^{-(n+1)}-R^{-1}\)</span>, and <span class="math inline">\(n(x)=\sup\{i:M_i&lt;x\}\)</span>) is <span class="math display">\[
+V(x)=\Bigl(\textstyle\sum_{j=0}^{n(x)}\tau^j\Bigr)^{\theta}u\Bigl(x+\textstyle\sum_{j=1}^{n(x)}R^{-j}\Bigr)+K_{n(x)},\quad
+c=\frac{x+\sum_{j=1}^{n(x)}R^{-j}}{\sum_{j=0}^{n(x)}\tau^j},
+\]</span> certified by <a href="#thm-verify3" class="quarto-xref">Theorem&nbsp;<span>6.15</span></a>; <span class="math inline">\(V\)</span> is smooth and concave, <span class="math inline">\(\phi\)</span> piecewise-linear with slope declining from <span class="math inline">\(1\)</span> to <span class="math inline">\(1-\tau\)</span>.</p>
+</div>
+</section>
+</section>
+</section>
+<section id="sec-dp-continuous" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Continuous time</h1>
+<p>In continuous time the Bellman equation becomes a partial differential equation — the <strong>HJB equation</strong> — obtained by writing the Bellman equation over a short interval <span class="math inline">\(\Delta t\)</span> and letting <span class="math inline">\(\Delta t\to0\)</span>.</p>
+<section id="sec-hjb-finite" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="sec-hjb-finite"><span class="header-section-number">7.1</span> Finite horizon: the HJB equation</h2>
+<p>Consider the optimal-control problem <span class="math inline">\(\mathbb{P}\)</span> over <span class="math inline">\([0,T]\)</span>: <span id="eq-control-problem"><span class="math display">\[
+\max\ \int_0^T f(t,x,u)\,\mathrm{d}t
+\qquad\text{s.t.}\quad \dot x=g(t,x,u),\ u(t)\in\Gamma_t(x(t))\ \forall t,\ x(0)\in\mathbb{S},
+\tag{7.1}\]</span></span> with <span class="math inline">\(f,g\)</span> smooth and <span class="math inline">\(\Gamma_t\)</span> continuous, compact-valued. The <strong>value function</strong> is the optimized tail, <span id="eq-vf-continuous"><span class="math display">\[
+V(t,x)=\max\Bigl\{\textstyle\int_t^T f(s,z(s),u(s))\,\mathrm{d}s:\ \dot z=g(s,z,u),\ u(s)\in\Gamma_s(z),\ z(t)=x\Bigr\}.
+\tag{7.2}\]</span></span></p>
+<div id="thm-hjb" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.1 (HJB equation)</strong></span> Assuming <span class="math inline">\(V\)</span> is <span class="math inline">\(C^1\)</span>, the value function <a href="#eq-vf-continuous" class="quarto-xref">Equation&nbsp;<span>7.2</span></a> satisfies the <strong>Hamilton–Jacobi–Bellman equation</strong> <span id="eq-hjb"><span class="math display">\[
+-V_t(t,x)=\max_{u\in\Gamma_t(x)}\bigl\{f(t,x,u)+V_x(t,x)\,g(t,x,u)\bigr\},
+\tag{7.3}\]</span></span> with the boundary condition <span class="math inline">\(V(T,x)=0\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Apply the principle of optimality over a short interval <span class="math inline">\([t,t+\Delta t]\)</span>: <span class="math display">\[
+V(t,x)=\max_{u}\Bigl\{\textstyle\int_t^{t+\Delta t}f(s,z(s),u(s))\,\mathrm{d}s+V(t+\Delta t,x+\Delta x)\Bigr\}.
+\]</span> Expand to first order: the integral is <span class="math inline">\(f(t,x,u)\Delta t+o(\Delta t)\)</span>, and a Taylor expansion gives <span class="math inline">\(V(t+\Delta t,x+\Delta x)=V(t,x)+V_t\Delta t+V_x\Delta x+o(\Delta t)\)</span> with <span class="math inline">\(\Delta x=g(t,x,u)\Delta t+o(\Delta t)\)</span>. Substituting and cancelling <span class="math inline">\(V(t,x)\)</span>, <span class="math display">\[
+0=\max_{u\in\Gamma_t(x)}\bigl\{f(t,x,u)\Delta t+V_t\Delta t+V_x\,g(t,x,u)\Delta t+o(\Delta t)\bigr\}.
+\]</span> Divide by <span class="math inline">\(\Delta t\)</span> and let <span class="math inline">\(\Delta t\to0\)</span>: <span class="math inline">\(0=\max_u\{f+V_t+V_x g\}\)</span>. Since <span class="math inline">\(V_t\)</span> is independent of <span class="math inline">\(u\)</span>, this rearranges to <a href="#eq-hjb" class="quarto-xref">Equation&nbsp;<span>7.3</span></a>. The boundary condition is immediate: at <span class="math inline">\(t=T\)</span> the integral is empty, so <span class="math inline">\(V(T,x)=0\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>A converse (verification) theorem holds: if <span class="math inline">\(\mathbb{S},\mathbb{A}\)</span> are compact, <span class="math inline">\(f,g\)</span> are smooth, and <span class="math inline">\(\Gamma_t\)</span> is continuous compact-valued, then <span class="math inline">\(V\)</span> is the <em>unique</em> bounded <span class="math inline">\(C^1\)</span> solution of <a href="#eq-hjb" class="quarto-xref">Equation&nbsp;<span>7.3</span></a> with <span class="math inline">\(V(T,x)=0\)</span>. When the inner maximand has an interior optimum, the first-order condition <span class="math inline">\(f_u+V_x g_u=0\)</span> determines <span class="math inline">\(u=u(t,x)\)</span>, which substituted back into <a href="#eq-hjb" class="quarto-xref">Equation&nbsp;<span>7.3</span></a> gives a sharper PDE for <span class="math inline">\(V\)</span>.</p>
+</section>
+<section id="sec-hjb-control" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="sec-hjb-control"><span class="header-section-number">7.2</span> Connection to the maximum principle</h2>
+<p>The HJB equation is the dynamic-programming face of Pontryagin’s maximum principle; the dictionary is <span class="math inline">\(V_x=\lambda\)</span>. Define the <strong>Hamiltonian</strong> <span class="math inline">\(H=f+\lambda g\)</span> with <span class="math inline">\(\lambda=V_x\)</span>.</p>
+<div id="thm-hjb-pmp" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.2 (<span class="math inline">\(V_x=\lambda\)</span> and the costate equation)</strong></span> Along the optimal path of <a href="#eq-control-problem" class="quarto-xref">Equation&nbsp;<span>7.1</span></a>, with <span class="math inline">\(\lambda(t)=V_x(t,x(t))\)</span> and <span class="math inline">\(H=f+\lambda g\)</span>: <span id="eq-hjb-pmp"><span class="math display">\[
+-V_t=\max_u H,\qquad -\dot\lambda=H_x.
+\tag{7.4}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The first identity is <a href="#eq-hjb" class="quarto-xref">Equation&nbsp;<span>7.3</span></a> with <span class="math inline">\(\lambda=V_x\)</span>. For the costate equation, let <span class="math inline">\(u=u(t,x)\)</span> be the maximizing control, so <span class="math inline">\(-V_t(t,x)=f(t,x,u)+V_x(t,x)g(t,x,u)\)</span>. Differentiate in <span class="math inline">\(x\)</span> (the envelope theorem kills the <span class="math inline">\(\partial u/\partial x\)</span> terms because <span class="math inline">\(f_u+V_xg_u=0\)</span> at the optimum): <span class="math display">\[
+-V_{tx}=f_x+V_{xx}g+V_x g_x.
+\]</span> Now <span class="math inline">\(\lambda(t)=V_x(t,x(t))\)</span> gives, along the path <span class="math inline">\(\dot x=g\)</span>, <span class="math inline">\(\dot\lambda=V_{xt}+V_{xx}\dot x=V_{tx}+V_{xx}g\)</span>. Substituting, <span class="math display">\[
+-\dot\lambda=-V_{tx}-V_{xx}g=f_x+V_x g_x=H_x.\ \blacksquare
+\]</span></p>
+</div>
+<p>So the maximum principle’s three pieces — Hamiltonian maximization <span class="math inline">\(\max_u H\)</span>, the state equation <span class="math inline">\(\dot x=H_\lambda=g\)</span>, and the costate equation <span class="math inline">\(-\dot\lambda=H_x\)</span> — all fall out of the HJB equation, with the costate identified as the <strong>marginal value of the state</strong>, <span class="math inline">\(\lambda=V_x\)</span>. This is the same shadow-price reading of <span class="math inline">\(\lambda\)</span> used in the optimal-control chapter.</p>
+</section>
+<section id="sec-hjb-infinite" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="sec-hjb-infinite"><span class="header-section-number">7.3</span> Infinite horizon: the autonomous HJB equation</h2>
+<p>For the autonomous discounted problem <span class="math inline">\(P(0)\)</span>, <span id="eq-autonomous-control"><span class="math display">\[
+\max\ \int_0^\infty e^{-\rho t}f(x,u)\,\mathrm{d}t
+\qquad\text{s.t.}\quad \dot x=g(x,u),\ u\in\Gamma(x),\ x(0)\in\mathbb{S},
+\tag{7.5}\]</span></span> the value <span class="math inline">\(J(t_0,x_0)\)</span> of the problem started at <span class="math inline">\(t_0\)</span> equals <span class="math inline">\(e^{-\rho t_0}V(x_0)\)</span>, where <span class="math inline">\(V\)</span> is the current-value function (<span class="math inline">\(\rho&gt;0\)</span> is the discount <strong>rate</strong>). Indeed shifting time by <span class="math inline">\(t_0\)</span> in <span class="math inline">\(P(t_0)\)</span> pulls a factor <span class="math inline">\(e^{-\rho t_0}\)</span> out front. Substituting <span class="math inline">\(J(t,x)=e^{-\rho t}V(x)\)</span> (so <span class="math inline">\(J_t=-\rho e^{-\rho t}V\)</span> and <span class="math inline">\(J_x=e^{-\rho t}V'\)</span>) into the finite-horizon HJB equation <a href="#eq-hjb" class="quarto-xref">Equation&nbsp;<span>7.3</span></a> and cancelling <span class="math inline">\(e^{-\rho t}\)</span>:</p>
+<p><span id="eq-hjb-autonomous"><span class="math display">\[
+\rho V(x)=\max_{u\in\Gamma(x)}\bigl\{f(x,u)+V'(x)\,g(x,u)\bigr\}.
+\tag{7.6}\]</span></span></p>
+<p>This is the <strong>autonomous HJB equation</strong>, an ODE in <span class="math inline">\(V\)</span>. Its link to the maximum principle is the same as before: along the optimal path <span class="math inline">\(\lambda(t)=V'(x(t))\)</span>, <span class="math inline">\(H=f+\lambda g\)</span>, and one shows <span class="math inline">\(\rho V(x(t))=H(t)\)</span> for all <span class="math inline">\(t\)</span>. Thus <span class="math inline">\(H\)</span> has the interpretation of the annuity value of the remaining program: <span class="math inline">\(V(x(t))=\int_t^\infty e^{-\rho(s-t)}f\,\mathrm{d}s=\int_t^\infty
+e^{-\rho(s-t)}H(t)\,\mathrm{d}s\)</span> when <span class="math inline">\(H\)</span> is constant along the path.</p>
+<div id="exm-lq-continuous" class="theorem example">
+<p><span class="theorem-title"><strong>Example 7.1 (A linear–quadratic HJB)</strong></span> Minimize <span class="math inline">\(\int_0^\infty(x^2+u^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=1\)</span> (no discounting, <span class="math inline">\(\rho=0\)</span>). The HJB equation <span class="math inline">\(0=\min_u\{x^2+u^2+V'u\}\)</span> gives <span class="math inline">\(2u+V'=0\)</span>, so <span class="math inline">\(u=-V'/2\)</span> and <span class="math inline">\(0=x^2-(V')^2/4\)</span>, whence <span class="math inline">\(V'=\pm2x\)</span> and <span class="math inline">\(u=\mp x\)</span>. With <span class="math inline">\(\dot x=u=-x\)</span> (the convergent root) and <span class="math inline">\(x(0)=1\)</span>, the optimum is <span class="math inline">\(x=e^{-t}\)</span>, <span class="math inline">\(u=-e^{-t}\)</span>. The optimal-control route — <span class="math inline">\(H=x^2+u^2+\lambda u\)</span>, <span class="math inline">\(2u+\lambda=0\)</span>, <span class="math inline">\(-\dot\lambda=2x\)</span>, <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(H|_\infty=0\)</span> — gives the same <span class="math inline">\(x=e^{-t}\)</span>.</p>
+</div>
+<div id="exm-log-extraction" class="theorem example">
+<p><span class="theorem-title"><strong>Example 7.2 (Continuous cake-eating / log extraction)</strong></span> Maximize <span class="math inline">\(\int_0^\infty e^{-\rho t}\ln c\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=-c\)</span>, <span class="math inline">\(x(0)=1\)</span>. The HJB equation <span class="math inline">\(\rho V(x)=\max_c\{\ln c-V'(x)c\}\)</span> has interior FOC <span class="math inline">\(1/c=V'(x)\)</span>, so <span class="math inline">\(\rho V=\ln c-1=-\ln
+V'-1\)</span>. Envelope: <span class="math inline">\(\rho V'=-cV''\)</span>, i.e.&nbsp;<span class="math inline">\(V''=-\rho(V')^2\)</span>; with <span class="math inline">\(c=1/V'\)</span> this is <span class="math inline">\(\mathrm{d}c/\mathrm{d}x=\rho\)</span>, so <span class="math inline">\(c=\rho x+K\)</span>. The boundary <span class="math inline">\(V(0)=-\infty\)</span> forces <span class="math inline">\(K=0\)</span>, giving the policy <span class="math inline">\(c=\rho x\)</span>, value <span class="math inline">\(V(x)=\frac{\ln(\rho x)-1}{\rho}\)</span>, and paths <span class="math inline">\(x=e^{-\rho t}\)</span>, <span class="math inline">\(c=\rho e^{-\rho t}\)</span>. (The maximum-principle solution, with <span class="math inline">\(H=\ln c-\lambda c\)</span>, <span class="math inline">\(H_c=1/c-\lambda=0\)</span>, <span class="math inline">\(-\dot\lambda=-\rho\lambda\)</span>, and the discounted TVC <span class="math inline">\((e^{-\rho t}\lambda x)|_\infty=0\)</span>, reproduces <span class="math inline">\(c=\rho e^{-\rho t}\)</span>, <span class="math inline">\(x=e^{-\rho t}\)</span>.)</p>
+</div>
+</section>
+</section>
+<section id="sec-dp-stochastic" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Stochastic dynamic programming</h1>
+<p>Uncertainty enters through random shocks. In discrete time the Bellman equation acquires a conditional expectation; in continuous time the state follows a stochastic differential equation and <strong>Itô’s lemma</strong> adds a curvature term to the HJB equation.</p>
+<section id="sec-stoch-discrete" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="sec-stoch-discrete"><span class="header-section-number">8.1</span> Discrete time</h2>
+<p>Let <span class="math inline">\(Z_{t+1}\)</span> be a random shock realized after the time-<span class="math inline">\(t\)</span> action. The stochastic dynamic-programming problem (finite horizon) is <span id="eq-stoch-problem"><span class="math display">\[
+\max\ \mathbb{E}\sum_{t=0}^{T}\beta^t\pi_t(x_t,u_t)
+\qquad\text{s.t.}\quad x_{t+1}=f_t(x_t,u_t,Z_{t+1}),\ u_t\in\Gamma_t(x_t)\ \forall t,\ x_0\text{ given}.
+\tag{8.1}\]</span></span> Write <span class="math inline">\(\mathbb{E}_t[\cdot]\)</span> for the conditional expectation given information up to <span class="math inline">\(t\)</span>.</p>
+<div id="thm-stoch-bellman" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.1 (Stochastic Bellman equation)</strong></span> Under the continuity/compactness hypotheses of <a href="#thm-berge-dp" class="quarto-xref">Theorem&nbsp;<span>6.5</span></a>, there is an optimal Markovian policy and the value functions satisfy <span id="eq-stoch-bellman"><span class="math display">\[
+V_t(x)=\max_{u\in\Gamma_t(x)}\mathbb{E}_t\bigl[\pi_t(x,u)+\beta V_{t+1}(f_t(x,u,Z_{t+1}))\bigr]
+=\mathbb{E}_t\bigl[\pi_t(x,\sigma_t(x))+\beta V_{t+1}(f_t(x,\sigma_t(x),Z_{t+1}))\bigr].
+\tag{8.2}\]</span></span></p>
+</div>
+<p>The proof mirrors <a href="#thm-bellman" class="quarto-xref">Theorem&nbsp;<span>6.2</span></a>, with the principle of optimality applied to expected continuation values; backward recursion proceeds as in the deterministic case, integrating over <span class="math inline">\(Z_{t+1}\)</span> at each step.</p>
+<div id="exm-mining" class="theorem example">
+<p><span class="theorem-title"><strong>Example 8.1 (Two-period mineral exploration and extraction)</strong></span> A firm holds two-period exploration-and-extraction rights. Let <span class="math inline">\(x_t\)</span> be proven reserves and <span class="math inline">\(u_t=(q_t,e_t)\)</span> the extraction and exploration effort. Solve <span class="math inline">\(\max\ \pi_0+\beta\,\mathbb{E}\pi_1\)</span> s.t. <span class="math inline">\(x_1=x_0-q_0+\alpha Z e_0\)</span>, <span class="math inline">\(\pi_0=p_0 q_0-cq_0^2/x_0-we_0^2\)</span>, <span class="math inline">\(\pi_1=p_1 q_1-cq_1^2/x_1\)</span>, where <span class="math inline">\(Z\in\{1,0\}\)</span> with probabilities <span class="math inline">\(\varepsilon,1-\varepsilon\)</span> (a discovery shock). <strong>Backward:</strong> the smallest tail is <span class="math inline">\(\max_{q_1}\{p_1 q_1-cq_1^2/x_1\}\)</span>, giving <span class="math inline">\(q_1=\frac{p_1}{2c}x_1\)</span> and <span class="math inline">\(V_1(x_1)=\frac{p_1^2}{4c}x_1\)</span>. Then <span class="math inline">\(\mathbb{E}V_1(x_1)=\frac{p_1^2}{4c}\mathbb{E}[x_0-q_0+\alpha Z e_0]=\frac{p_1^2}{4c}[x_0-q_0+\alpha\varepsilon e_0]\)</span>. The first-stage problem <span class="math inline">\(\max_{q_0,e_0}\{p_0 q_0-cq_0^2/x_0-we_0^2+\beta\frac{p_1^2}{4c}(x_0-q_0+\alpha\varepsilon e_0)\}\)</span> has the optimum <span class="math display">\[
+q_0=\frac{x_0(4cp_0-\beta p_1^2)}{8c^2},\qquad e_0=\frac{\beta p_1^2\alpha\varepsilon}{8cw},\qquad q_1=\frac{p_1}{2c}x_1.
+\]</span> Exploration effort rises with the discovery probability <span class="math inline">\(\varepsilon\)</span> and the future price <span class="math inline">\(p_1\)</span>.</p>
+</div>
+<section id="sec-random-horizon" class="level3">
+<h3 class="anchored" data-anchor-id="sec-random-horizon">Random horizon</h3>
+<p>The supplement <em>带有随机时限</em> treats a horizon <span class="math inline">\(T\ge0\)</span> that is itself a known-distribution random variable, with the dynamics deterministic. This is exactly survival risk: the program may end at any date. The conditional expectation <span class="math inline">\(\mathbb{E}_t[\cdot]=\mathbb{E}[\cdot\mid T\ge t]\)</span> given survival to <span class="math inline">\(t\)</span> obeys <span class="math display">\[
+\mathbb{E}_t\bigl[Y\cdot\mathbf{1}(T\ge t+1)\bigr]=p_t\,\mathbb{E}_{t+1}[Y],\qquad p_t=\mathbb{P}(T\ge t+1\mid T\ge t),
+\]</span> the per-period <strong>survival probability</strong> (<span class="math inline">\(1-p_t\)</span> is the hazard). With <span class="math inline">\(V(t,x)\)</span> the value of the tail problem <span class="math inline">\(\max\mathbb{E}_t\sum_{s=t}^T\pi_s(x_s,u_s)\)</span> started at <span class="math inline">\((t,x)\)</span>, the principle of optimality gives the random-horizon Bellman equation <span id="eq-random-horizon-bellman"><span class="math display">\[
+V(t,x)=\max_{u\in\Gamma_t(x)}\bigl\{\pi_t(x,u)+p_t\,V\bigl(t+1,f_t(x,u)\bigr)\bigr\}.
+\tag{8.3}\]</span></span> The survival probability <span class="math inline">\(p_t\)</span> multiplies the continuation value — <em>future payoffs are discounted both for time and for the chance the program has already ended.</em></p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>The memoryless (exponential) case gives a modified discount.</strong> If <span class="math inline">\(T\)</span> has the geometric (discretized exponential) law <span class="math inline">\(\mathbb{P}(T\ge t)=e^{-rt}\)</span>, then <span class="math inline">\(p_t=e^{-r}\)</span> is <em>constant</em> by memorylessness, <span class="math inline">\(\mathbb{P}(T\ge t+s\mid T\ge t)=\mathbb{P}(T\ge s)\)</span>. Combined with ordinary time discounting <span class="math inline">\(e^{-\rho t}\)</span>, the problem is autonomous with a single effective discount factor <span class="math inline">\(e^{-(\rho+r)}\)</span>: writing <span class="math inline">\(V(t,x)=e^{-\rho t}V(x)\)</span>, the Bellman equation becomes <span id="eq-random-horizon-auto"><span class="math display">\[
+V(x)=\max_{u\in\Gamma(x)}\bigl\{\pi(x,u)+e^{-(\rho+r)}V(f(x,u))\bigr\}.
+\tag{8.4}\]</span></span> Mortality risk simply <em>raises the effective discount rate</em> from <span class="math inline">\(\rho\)</span> to <span class="math inline">\(\rho+r\)</span>.</p>
+</div>
+</div>
+</div>
+<div id="exm-stoch-cake-discrete" class="theorem example">
+<p><span class="theorem-title"><strong>Example 8.2 (Stochastic-horizon cake-eating (discrete))</strong></span> Maximize <span class="math inline">\(\mathbb{E}\sum_{t=0}^T e^{-\rho t}u(c_t)\)</span>, <span class="math inline">\(u(c)=\frac{c^{1-\theta}-1}{1-\theta}\)</span>, s.t. <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, with <span class="math inline">\(T\)</span> geometric, <span class="math inline">\(\mathbb{P}(T\ge t)=e^{-rt}\)</span>. By <a href="#eq-random-horizon-auto" class="quarto-xref">Equation&nbsp;<span>8.4</span></a> the Bellman equation is <span class="math inline">\(V(x)=\max_{0\le c\le x}\{u(c)+e^{-(\rho+r)}V(x-c)\}\)</span>; the FOC is <span class="math inline">\(c^{-\theta}=\delta V'(x-c)=V'(x)\)</span> with <span class="math inline">\(\delta=e^{-(\rho+r)}\)</span>. Guessing <span class="math inline">\(c=\alpha x\)</span> gives <span class="math inline">\((\alpha x)^{-\theta}=\delta(\alpha(1-\alpha)x)^{-\theta}\)</span>, so <span class="math inline">\(\alpha=1-\delta^{1/\theta}\)</span> and <span class="math inline">\(V(x)=\frac{\alpha^{-\theta}}{1-\theta}x^{1-\theta}+K\)</span>. The stationary policy is <span class="math display">\[
+c=\bigl(1-e^{-(\rho+r)/\theta}\bigr)x.
+\]</span></p>
+</div>
+</section>
+<section id="sec-random-horizon-cont" class="level3">
+<h3 class="anchored" data-anchor-id="sec-random-horizon-cont">Continuous-hazard horizon</h3>
+<p>In continuous time the horizon <span class="math inline">\(T\ge0\)</span> has <strong>hazard rate</strong> <span class="math inline">\(r(t)\)</span>, with survival function <span class="math inline">\(S(t)=\mathbb{P}(T&gt;t)=\exp(-\int_0^t r(s)\,\mathrm{d}s)\)</span>, so <span class="math inline">\(\dot S/S=-r(t)\)</span>. For <span class="math inline">\(\max\mathbb{E}\int_0^T f(t,x,u)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=g(t,x,u)\)</span>, the HJB equation for the value function <span class="math inline">\(V(t,x)\)</span> is <span id="eq-hazard-hjb"><span class="math display">\[
+r(t)\,V=\max_{u\in\Gamma_t(x)}\bigl\{f+V_t+V_x g\bigr\}.
+\tag{8.5}\]</span></span> For the autonomous problem with constant hazard <span class="math inline">\(r\)</span> and time discount <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\max\mathbb{E}\int_0^\infty e^{-\rho t}f(x,u)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=g(x,u)\)</span>, this reduces to <span id="eq-hazard-hjb-auto"><span class="math display">\[
+(\rho+r)\,V=\max_{u\in\Gamma(x)}\bigl\{f+V'g\bigr\},
+\tag{8.6}\]</span></span> again the deterministic autonomous HJB equation <a href="#eq-hjb-autonomous" class="quarto-xref">Equation&nbsp;<span>7.6</span></a> with the discount rate raised to <span class="math inline">\(\rho+r\)</span>. For continuous cake-eating <span class="math inline">\(\max\mathbb{E}\int_0^\infty e^{-\rho t}u(c)\,\mathrm{d}t\)</span>, <span class="math inline">\(\dot x=-c\)</span>, with CRRA <span class="math inline">\(u\)</span>, the stationary policy is <span class="math inline">\(c=\frac{\rho+r}{\theta}x\)</span> — survival risk again accelerates consumption.</p>
+</section>
+</section>
+<section id="sec-stoch-continuous" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="sec-stoch-continuous"><span class="header-section-number">8.2</span> Continuous time: Brownian motion and Itô’s lemma</h2>
+<p>A <strong>stochastic process</strong> <span class="math inline">\(\{x(t)\}_{t\ge0}\)</span> assigns a random variable to each time; a realization is a <strong>sample path</strong>. The basic driving noise is <strong>Brownian motion</strong> (the Wiener process) <span class="math inline">\(\{z(t)\}\)</span>: for any <span class="math inline">\(0\le t_0&lt;t_1&lt;\dots&lt;t_n\)</span> the increments <span class="math inline">\(z(t_1)-z(t_0),\dots,z(t_n)-z(t_{n-1})\)</span> are independent and <span class="math inline">\(z(t_k)-z(t_{k-1})\sim N(0,\,t_k-t_{k-1})\)</span>. Formally the increment satisfies <span class="math inline">\(\mathrm{d}z\sim N(0,\mathrm{d}t)\)</span>, with the <strong>multiplication rules</strong> <span id="eq-ito-rules"><span class="math display">\[
+\mathrm{d}z\cdot\mathrm{d}t=0,\qquad \mathrm{d}t\cdot\mathrm{d}t=0,\qquad \mathrm{d}z\cdot\mathrm{d}z=\mathrm{d}t.
+\tag{8.7}\]</span></span> The last rule — <span class="math inline">\((\mathrm{d}z)^2=\mathrm{d}t\)</span> — is the engine of stochastic calculus: a squared Brownian increment is <em>not</em> negligible at order <span class="math inline">\(\mathrm{d}t\)</span>.</p>
+<div id="thm-ito" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.2 (Itô’s lemma)</strong></span> If <span class="math inline">\(x\)</span> satisfies the stochastic differential equation <span class="math inline">\(\mathrm{d}x=f(t,x)\,\mathrm{d}t+g(t,x)\,\mathrm{d}z\)</span> and <span class="math inline">\(y=F(t,x)\)</span>, then <span id="eq-ito"><span class="math display">\[
+\mathrm{d}y=\Bigl(F_t+fF_x+\tfrac{g^2}{2}F_{xx}\Bigr)\mathrm{d}t+gF_x\,\mathrm{d}z.
+\tag{8.8}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Taylor-expand <span class="math inline">\(F\)</span> to second order, keeping terms of order <span class="math inline">\(\mathrm{d}t\)</span>: <span class="math display">\[
+\mathrm{d}y=F_t\,\mathrm{d}t+F_x\,\mathrm{d}x+\tfrac12\bigl[F_{tt}(\mathrm{d}t)^2+2F_{tx}\,\mathrm{d}t\,\mathrm{d}x+F_{xx}(\mathrm{d}x)^2\bigr].
+\]</span> By <a href="#eq-ito-rules" class="quarto-xref">Equation&nbsp;<span>8.7</span></a>, <span class="math inline">\((\mathrm{d}t)^2=0\)</span>, <span class="math inline">\(\mathrm{d}t\,\mathrm{d}x=0\)</span>, and <span class="math inline">\((\mathrm{d}x)^2=(f\,\mathrm{d}t+g\,\mathrm{d}z)^2=g^2(\mathrm{d}z)^2=g^2\,\mathrm{d}t\)</span>. So the second-order bracket reduces to <span class="math inline">\(F_{xx}g^2\,\mathrm{d}t\)</span>, and substituting <span class="math inline">\(\mathrm{d}x=f\,\mathrm{d}t+g\,\mathrm{d}z\)</span> gives <a href="#eq-ito" class="quarto-xref">Equation&nbsp;<span>8.8</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="exm-gbm" class="theorem example">
+<p><span class="theorem-title"><strong>Example 8.3 (Geometric Brownian motion)</strong></span> If <span class="math inline">\(\mathrm{d}x/x=r\,\mathrm{d}t+\sigma\,\mathrm{d}z\)</span> (<span class="math inline">\(r,\sigma\)</span> constant) and <span class="math inline">\(y=\ln x\)</span>, then <span class="math inline">\(F=\ln x\)</span> has <span class="math inline">\(F_t=0\)</span>, <span class="math inline">\(F_x=1/x\)</span>, <span class="math inline">\(F_{xx}=-1/x^2\)</span>, so by <a href="#eq-ito" class="quarto-xref">Equation&nbsp;<span>8.8</span></a> <span class="math inline">\(\mathrm{d}y=\bigl(r-\tfrac{\sigma^2}{2}\bigr)\mathrm{d}t+\sigma\,\mathrm{d}z\)</span> — the Itô correction <span class="math inline">\(-\sigma^2/2\)</span> is what distinguishes the drift of <span class="math inline">\(\ln x\)</span> from the raw return <span class="math inline">\(r\)</span>. The process <span class="math inline">\(x\)</span> is <strong>geometric Brownian motion with drift</strong>.</p>
+</div>
+<section id="sec-stoch-hjb" class="level3">
+<h3 class="anchored" data-anchor-id="sec-stoch-hjb">The stochastic HJB equation</h3>
+<p>For the finite-horizon stochastic control problem <span id="eq-stoch-control"><span class="math display">\[
+\max\ \mathbb{E}\int_0^T f(t,x,u)\,\mathrm{d}t
+\qquad\text{s.t.}\quad \mathrm{d}x=g(t,x,u)\,\mathrm{d}t+\sigma(t,x,u)\,\mathrm{d}z,\ x(0)=x_0,
+\tag{8.9}\]</span></span> the same <span class="math inline">\(\Delta t\)</span>-expansion as <a href="#thm-hjb" class="quarto-xref">Theorem&nbsp;<span>7.1</span></a>, but with <span class="math inline">\(\mathbb{E}[\Delta x]=g\Delta t\)</span> and <span class="math inline">\(\mathbb{E}[(\Delta x)^2]=\sigma^2\Delta t\)</span> from Itô, gives the <strong>stochastic HJB equation</strong>.</p>
+<div id="thm-stoch-hjb" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.3 (Stochastic HJB equation)</strong></span> Assuming <span class="math inline">\(V\)</span> is <span class="math inline">\(C^{1,2}\)</span>, the value function of <a href="#eq-stoch-control" class="quarto-xref">Equation&nbsp;<span>8.9</span></a> satisfies <span id="eq-stoch-hjb"><span class="math display">\[
+-V_t=\max_{u}\Bigl\{f+g\,V_x+\tfrac{\sigma^2}{2}\,V_{xx}\Bigr\},
+\tag{8.10}\]</span></span> with <span class="math inline">\(V(T,x)=0\)</span>. For the autonomous discounted problem <span class="math inline">\(\max\mathbb{E}\int_0^\infty e^{-\rho t}f(x,u)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\mathrm{d}x=g(x,u)\,\mathrm{d}t+\sigma(x,u)\,\mathrm{d}z\)</span>, with <span class="math inline">\(V(t,x)=e^{-\rho t}V(x)\)</span>, <span id="eq-stoch-hjb-auto"><span class="math display">\[
+\rho V=\max_{u}\Bigl\{f+g\,V'+\tfrac{\sigma^2}{2}\,V''\Bigr\}.
+\tag{8.11}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Over <span class="math inline">\([t,t+\Delta t]\)</span>, the principle of optimality gives <span class="math inline">\(V(t,x)=\max_u\mathbb{E}_t[f\Delta t+V(t+\Delta t,x+\Delta x)]\)</span>. By Itô, <span class="math inline">\(\mathbb{E}_t[V(t+\Delta t,x+\Delta x)]=V+V_t\Delta t+V_x\mathbb{E}_t[\Delta x]+\tfrac12 V_{xx}\mathbb{E}_t[(\Delta x)^2]+o(\Delta t)\)</span>, and <span class="math inline">\(\mathbb{E}_t[\Delta x]=g\Delta t\)</span>, <span class="math inline">\(\mathbb{E}_t[(\Delta x)^2]=\sigma^2\Delta t+o(\Delta t)\)</span>. Cancelling <span class="math inline">\(V\)</span>, dividing by <span class="math inline">\(\Delta t\)</span>, and letting <span class="math inline">\(\Delta t\to0\)</span> yields <a href="#eq-stoch-hjb" class="quarto-xref">Equation&nbsp;<span>8.10</span></a>; the autonomous reduction is the substitution <span class="math inline">\(V(t,x)=e^{-\rho t}V(x)\)</span> as in <a href="#sec-hjb-infinite" class="quarto-xref"><span>Section 7.3</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The new term <span class="math inline">\(\tfrac{\sigma^2}{2}V_{xx}\)</span> is the <strong>Itô correction</strong>: it penalizes a concave value function for the risk in <span class="math inline">\(x\)</span> — the continuous-time signature of prudence.</p>
+</section>
+</section>
+<section id="sec-merton" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="sec-merton"><span class="header-section-number">8.3</span> The Merton portfolio problem</h2>
+<p>The centerpiece application is Merton’s continuous-time portfolio choice <span class="citation" data-cites="merton1971">(<a href="references.html#ref-merton1971" role="doc-biblioref">Merton 1971</a>)</span>. A market has two assets: a riskless bond and a risky stock, with prices <span class="math inline">\(p,y\)</span> following <span id="eq-merton-assets"><span class="math display">\[
+\frac{\mathrm{d}p}{p}=r_f\,\mathrm{d}t,\qquad \frac{\mathrm{d}y}{y}=r\,\mathrm{d}t+\sigma\,\mathrm{d}z,
+\tag{8.12}\]</span></span> where <span class="math inline">\(r&gt;r_f&gt;0\)</span>, <span class="math inline">\(\sigma&gt;0\)</span>. The riskless rate is <span class="math inline">\(r_f\)</span>; the stock’s expected return and volatility are <span class="math inline">\(r,\sigma\)</span>, and <span class="math inline">\((r-r_f)/\sigma\)</span> is its <strong>Sharpe ratio</strong> (excess return per unit risk). An investor with wealth <span class="math inline">\(x(t)\)</span> puts a fraction <span class="math inline">\(w(t)\)</span> in the stock and consumes at rate <span class="math inline">\(c(t)\)</span>. Wealth evolves as <span id="eq-merton-wealth"><span class="math display">\[
+\mathrm{d}x=\frac{x(1-w)}{p}\,\mathrm{d}p+\frac{xw}{y}\,\mathrm{d}y-c\,\mathrm{d}t
+=\bigl(x(r_f(1-w)+rw)-c\bigr)\mathrm{d}t+xw\sigma\,\mathrm{d}z.
+\tag{8.13}\]</span></span> With CRRA utility <span class="math inline">\(U(c)=c^{\alpha}/\alpha\)</span>, <span class="math inline">\(\alpha\in(0,1)\)</span> (more generally <span class="math inline">\(\alpha&lt;1\)</span>, <span class="math inline">\(\alpha\ne0\)</span>), and discount rate <span class="math inline">\(\rho&gt;0\)</span>, the problem is <span id="eq-merton-problem"><span class="math display">\[
+\max\ \mathbb{E}\int_0^\infty e^{-\rho t}\frac{c^\alpha}{\alpha}\,\mathrm{d}t
+\qquad\text{s.t.}\quad \mathrm{d}x=\bigl(x(r_f(1-w)+rw)-c\bigr)\mathrm{d}t+xw\sigma\,\mathrm{d}z,\ x(0)=x_0,
+\tag{8.14}\]</span></span> with controls <span class="math inline">\(c,w\)</span> and state <span class="math inline">\(x\)</span>.</p>
+<div id="thm-merton" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.4 (Merton’s rule)</strong></span> The optimal portfolio share and consumption are <span id="eq-merton-rule"><span class="math display">\[
+w=\frac{r-r_f}{(1-\alpha)\sigma^2}\quad(\textbf{Merton ratio}),\qquad c=(A\alpha)^{1/(\alpha-1)}x,
+\tag{8.15}\]</span></span> constant fractions of wealth, where the value function is <span class="math inline">\(V(x)=Ax^\alpha\)</span> with <span id="eq-merton-A"><span class="math display">\[
+A=\frac1\alpha\Bigl[\frac1{1-\alpha}\Bigl(\rho-\alpha r_f-\frac{\alpha}{2(1-\alpha)}\Bigl(\frac{r-r_f}{\sigma}\Bigr)^2\Bigr)\Bigr]^{\alpha-1}.
+\tag{8.16}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The autonomous stochastic HJB equation <a href="#eq-stoch-hjb-auto" class="quarto-xref">Equation&nbsp;<span>8.11</span></a> for <a href="#eq-merton-problem" class="quarto-xref">Equation&nbsp;<span>8.14</span></a> is, with state variance <span class="math inline">\((xw\sigma)^2\)</span>, <span class="math display">\[
+\rho V=\max_{c,w}\Bigl\{\frac{c^\alpha}{\alpha}+\bigl(x(r_f(1-w)+rw)-c\bigr)V'+\frac{(xw\sigma)^2}{2}V''\Bigr\}.
+\]</span> The first-order conditions in <span class="math inline">\(c\)</span> and <span class="math inline">\(w\)</span> are <span class="math display">\[
+c^{\alpha-1}-V'=0\ \Rightarrow\ c=(V')^{1/(\alpha-1)},\qquad
+V'x(r-r_f)+V''w(x\sigma)^2=0\ \Rightarrow\ w=-\frac{V'}{V''x}\cdot\frac{r-r_f}{\sigma^2}.
+\]</span> Substituting both back collapses the HJB equation to <span class="math display">\[
+\rho V=\frac{1-\alpha}{\alpha}(V')^{\alpha/(\alpha-1)}+r_f x V'-\frac{(V')^2}{2V''}\Bigl(\frac{r-r_f}{\sigma}\Bigr)^2.
+\]</span> <strong>Guess</strong> <span class="math inline">\(V=Ax^\alpha\)</span>, so <span class="math inline">\(V'=A\alpha x^{\alpha-1}\)</span>, <span class="math inline">\(V''=A\alpha(\alpha-1)x^{\alpha-2}\)</span>, and <span class="math inline">\(-\frac{(V')^2}{2V''}=-\frac{A\alpha}{2(\alpha-1)}x^\alpha=\frac{A\alpha}{2(1-\alpha)}x^\alpha\)</span>. Every term carries <span class="math inline">\(x^\alpha\)</span>; cancelling it pins <span class="math inline">\(A\)</span> to <a href="#eq-merton-A" class="quarto-xref">Equation&nbsp;<span>8.16</span></a>. The control <span class="math inline">\(w\)</span> uses <span class="math inline">\(-\frac{V'}{V''x}=-\frac{1}{\alpha-1}=\frac1{1-\alpha}\)</span>, giving the Merton ratio <span class="math inline">\(w=\frac{r-r_f}{(1-\alpha)\sigma^2}\)</span>, while <span class="math inline">\(c=(V')^{1/(\alpha-1)}=(A\alpha)^{1/(\alpha-1)}x\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The portfolio share is <strong>constant</strong>: the fraction in the risky asset is proportional to the risk premium <span class="math inline">\(r-r_f\)</span>, inversely proportional to relative risk aversion <span class="math inline">\(1-\alpha\)</span>, and inversely proportional to the variance <span class="math inline">\(\sigma^2\)</span>. Under the optimal rule, wealth is geometric Brownian motion <span id="eq-merton-wealth-dynamics"><span class="math display">\[
+\frac{\mathrm{d}x}{x}=r^\ast\,\mathrm{d}t+\sigma^\ast\,\mathrm{d}z,\qquad
+r^\ast=r_f+\frac1{1-\alpha}\Bigl(\frac{r-r_f}{\sigma}\Bigr)^2-(A\alpha)^{1/(\alpha-1)},\quad
+\sigma^\ast=\frac1{1-\alpha}\cdot\frac{r-r_f}{\sigma},
+\tag{8.17}\]</span></span> so the volatility of wealth is the Sharpe ratio scaled by <span class="math inline">\(1/(1-\alpha)\)</span>. <a href="#fig-merton-path" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> shows a simulated wealth path drifting up while fluctuating, with consumption a constant fraction of it.</p>
+<div id="fig-merton-path" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-merton-path-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch05-merton-path.svg" class="img-fluid figure-img" style="width:78.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-merton-path-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.1: Merton solution: optimal consumption (blue) is a fixed fraction <span class="math inline">\(c=mx\)</span> of wealth (red), which follows a geometric Brownian motion <span class="math inline">\(\mathrm{d}x/x=r^\ast\mathrm{d}t+\sigma^\ast\mathrm{d}z\)</span> drifting up along the deterministic trend <span class="math inline">\(e^{r^\ast t}\)</span> (grey dashed) but fluctuating with the risky asset. The portfolio share <span class="math inline">\(w\)</span> and consumption fraction are both constant.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-dp-problems" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Problems</h1>
+<p>The following are the chapter’s exercises; worked solutions to a representative subset follow in <a href="#sec-dp-solutions" class="quarto-xref"><span>Chapter 10</span></a>.</p>
+<ol type="1">
+<li>(Consumption–savings.) Solve <span class="math inline">\(\max\sum_{t=0}^{T}\beta^t\ln c_t\)</span> s.t. <span class="math inline">\(x_{t+1}=k(x_t-c_t)\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, <span class="math inline">\(x_0&gt;0\)</span>, with <span class="math inline">\(\beta,k&gt;0\)</span>.</li>
+<li>Convert <span class="math inline">\(\max\prod_{t=0}^{T}c_t\)</span> s.t. <span class="math inline">\(\sum_{t=0}^{T}c_t=1\)</span>, <span class="math inline">\(c_t\ge0\)</span>, into a dynamic-programming problem and solve it by backward recursion.</li>
+<li>(Cake-eating, non-renewable resource.) Solve <span class="math inline">\(\max\sum_{t=0}^\infty\beta^t\sqrt{c_t}\)</span> s.t. <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, <span class="math inline">\(x_0=1\)</span>, <span class="math inline">\(\beta\in(0,1)\)</span>.</li>
+<li>Show <span class="math inline">\(\max\sum_{t=0}^\infty\ln c_t\)</span> s.t. <span class="math inline">\(\sum_{t=0}^\infty c_t=1\)</span> has <strong>no</strong> solution.</li>
+<li>(Lake water.) Solve <span class="math inline">\(\max\sum_{t=0}^\infty\beta^t\ln c_t\)</span> s.t. <span class="math inline">\(x_{t+1}=x_t-c_t+1\)</span>, <span class="math inline">\(0\le c_t\le x_t\)</span>, <span class="math inline">\(x_0&gt;0\)</span>.</li>
+<li>Find the optimal consumption policy of the growth model <span class="math inline">\(\max\sum_{t=0}^\infty\beta^t\ln c_t\)</span> s.t. <span class="math inline">\(x_{t+1}=rx_t^\theta-c_t\)</span>, <span class="math inline">\(x_t\ge0\)</span>, <span class="math inline">\(x_0&gt;0\)</span>, with <span class="math inline">\(\beta,\theta\in(0,1)\)</span>, <span class="math inline">\(r&gt;0\)</span>, and determine whether the optimal path converges and to what level.</li>
+<li>Does <span class="math inline">\(\min\sum_{t=0}^\infty\beta^t\frac{u_t^2}{1+u_t}\)</span> s.t. <span class="math inline">\(x_{t+1}=ax_t\)</span>, <span class="math inline">\(u_t\in(0,1)\)</span>, <span class="math inline">\(x_0\in\mathbb{R}\)</span> (<span class="math inline">\(\beta\in(0,1)\)</span>, <span class="math inline">\(a&gt;0\)</span>) have a solution? Solve its Bellman equation.</li>
+</ol>
+<p><em>Supplementary.</em> (S1) Solve the Merton problem <a href="#eq-merton-problem" class="quarto-xref">Equation&nbsp;<span>8.14</span></a> and derive the Merton ratio and the Sharpe-ratio scaling of wealth volatility. (S2) Solve stochastic-horizon cake-eating <a href="#exm-stoch-cake-discrete" class="quarto-xref">Example&nbsp;<span>8.2</span></a> with geometric <span class="math inline">\(T\)</span> and CRRA utility. (S3) Set up the DHSS exhaustible -resource program <span class="math inline">\(\max\int_0^\infty e^{-\rho t}A\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot K=F(K,R)-C\)</span>, <span class="math inline">\(\dot S=-R\)</span>, <span class="math inline">\(C\ge A\)</span>, by the HJB equation.</p>
+</section>
+<section id="sec-dp-solutions" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Selected solutions</h1>
+<section id="problem-1" class="level3">
+<h3 class="anchored" data-anchor-id="problem-1">Problem 1</h3>
+<p>Backward recursion as in <a href="#exm-consumption-savings" class="quarto-xref">Example&nbsp;<span>6.3</span></a> but with <span class="math inline">\(\ln\)</span> utility. <span class="math inline">\(V_T(x)=\ln x\)</span>, <span class="math inline">\(\sigma_T(x)=x\)</span>. The envelope/Euler relation <span class="math inline">\(\frac1{c_t}=\beta k\,V_{t+1}'(x_{t+1})\)</span> with <span class="math inline">\(\frac1{c_T}=V_T'(x_T)\)</span> gives <span class="math inline">\(c_{t+1}=\beta k\,c_t\)</span>, and <span class="math inline">\(x_{t+1}=k(x_t-c_t)\)</span>. By induction the Markovian consumption share is the same as for plain cake-eating, <span class="math display">\[
+\sigma_t(x)=\frac{1}{1+\beta+\dots+\beta^{T-t}}\,x,\qquad
+V_t(x)=(1+\beta+\dots+\beta^{T-t})\ln x+A_t,
+\]</span> because <span class="math inline">\(\ln\)</span> is scale-separable, so the gross return <span class="math inline">\(k\)</span> shifts only the additive constant <span class="math inline">\(A_t\)</span>, not the share. The open-loop path follows from <span class="math inline">\(x_{t+1}=k(x_t-c_t)\)</span>.</p>
+</section>
+<section id="problem-3-square-root-cake-eating-guess-and-verify" class="level3">
+<h3 class="anchored" data-anchor-id="problem-3-square-root-cake-eating-guess-and-verify">Problem 3 (square-root cake-eating, guess-and-verify)</h3>
+<p>Maximize <span class="math inline">\(\sum_t\beta^t\sqrt{c_t}\)</span> s.t. <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, <span class="math inline">\(x_0=1\)</span>. The Bellman equation is <span class="math inline">\(V(x)=\max_{0\le c\le x}\{\sqrt c+\beta V(x-c)\}\)</span>. FOC <span class="math inline">\(\frac1{2\sqrt c}=\beta V'(x-c)\)</span> and envelope <span class="math inline">\(V'(x)=\beta V'(x-c)=\frac1{2\sqrt c}\)</span> give <span class="math inline">\(\frac1{2\sqrt{c_t}}=\frac{\beta}{2\sqrt{c_{t+1}}}\)</span>, so <span class="math inline">\(c_{t+1}=\beta^2 c_t\)</span>. With <span class="math inline">\(x_t=\sum_{s\ge t}c_s=\frac{c_t}{1-\beta^2}\)</span> this gives the policy <span class="math inline">\(c_t=(1-\beta^2)x_t\)</span> and value <span class="math inline">\(V(x)=\frac{\sqrt x}{\sqrt{1-\beta^2}}\)</span> (check: <span class="math inline">\(V(x)=\sum_t\beta^t\sqrt{(1-\beta^2)x_t}=\sqrt{(1-\beta^2)x_0}\sum_t\beta^{2t}=\frac{\sqrt x}{\sqrt{1-\beta^2}}\)</span>). With <span class="math inline">\(x_0=1\)</span>, <span class="math inline">\(c_t=(1-\beta^2)\beta^{2t}\)</span>.</p>
+</section>
+<section id="problem-4-no-solution" class="level3">
+<h3 class="anchored" data-anchor-id="problem-4-no-solution">Problem 4 (no solution)</h3>
+<p>If <span class="math inline">\(\sum_{t=0}^\infty c_t=1\)</span> with <span class="math inline">\(c_t\ge0\)</span>, then <span class="math inline">\(c_t\to0\)</span>, so <span class="math inline">\(\ln c_t\to-\infty\)</span> and the undiscounted sum <span class="math inline">\(\sum_t\ln c_t=-\infty\)</span> for <em>every</em> feasible sequence. No allocation gives a finite value, so the problem is ill-posed — there is <strong>no</strong> maximizer. The undiscounted infinite sum of a utility unbounded below cannot be made finite under a summability constraint.</p>
+</section>
+<section id="problem-6-cobbdouglas-growth-convergence" class="level3">
+<h3 class="anchored" data-anchor-id="problem-6-cobbdouglas-growth-convergence">Problem 6 (Cobb–Douglas growth, convergence)</h3>
+<p>This is <a href="#exm-verify-cobbdouglas" class="quarto-xref">Example&nbsp;<span>6.9</span></a>. The unique stationary policy is <span class="math inline">\(c=(1-\theta\beta)rx^\theta\)</span>, and the capital path obeys <span class="math inline">\(x_{t+1}=\theta\beta r\,x_t^\theta\)</span>. Taking logs, <span class="math inline">\(\ln x_{t+1}=\ln(\theta\beta r)+\theta\ln x_t\)</span>, a linear recursion in <span class="math inline">\(\ln x_t\)</span> with <span class="math inline">\(|\theta|&lt;1\)</span>, so <span class="math inline">\(\ln x_t\to\frac{\ln(\theta\beta r)}{1-\theta}\)</span>, i.e.&nbsp;the path <strong>converges monotonically</strong> to the steady state <span class="math display">\[
+x^\ast=(\theta\beta r)^{1/(1-\theta)},\qquad c^\ast=(1-\theta\beta)r(x^\ast)^\theta.
+\]</span> Consumption converges to <span class="math inline">\(c^\ast\)</span> from any <span class="math inline">\(x_0&gt;0\)</span>.</p>
+</section>
+<section id="problem-7-no-solution-bounded-fixed-point" class="level3">
+<h3 class="anchored" data-anchor-id="problem-7-no-solution-bounded-fixed-point">Problem 7 (no solution; bounded fixed point)</h3>
+<p>This is <a href="#exm-no-optimal" class="quarto-xref">Example&nbsp;<span>6.5</span></a> in minimization form. Each term <span class="math inline">\(\frac{u^2}{1+u}\)</span> is <em>minimized</em> by driving <span class="math inline">\(u\downarrow0\)</span>, but <span class="math inline">\(u\in(0,1)\)</span> is open, so no minimizer exists — the problem has <strong>no solution</strong>. The value function is nonetheless <span class="math inline">\(V\equiv0\)</span> (the infimum of each term is <span class="math inline">\(0\)</span>). The Bellman equation <span class="math inline">\(W(x)=\beta W(ax)\)</span> has the bounded solution <span class="math inline">\(W\equiv0\)</span> (with unbounded spurious solutions that are constant on orbits of <span class="math inline">\(x\mapsto ax\)</span> scaled by <span class="math inline">\(\beta^{-n}\)</span>); since payoffs are bounded below by <span class="math inline">\(0\)</span>, <span class="math inline">\(V\)</span> is bounded, and on bounded functions the unique fixed point is <span class="math inline">\(W\equiv0=V\)</span>.</p>
+</section>
+<section id="problem-s1-merton" class="level3">
+<h3 class="anchored" data-anchor-id="problem-s1-merton">Problem S1 (Merton)</h3>
+<p>Worked in full in <a href="#thm-merton" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a>: guess <span class="math inline">\(V=Ax^\alpha\)</span>, solve the stochastic HJB equation <a href="#eq-stoch-hjb-auto" class="quarto-xref">Equation&nbsp;<span>8.11</span></a>, obtain the <strong>Merton ratio</strong> <span class="math inline">\(w=\frac{r-r_f}{(1-\alpha)\sigma^2}\)</span>, the constant consumption fraction <span class="math inline">\(c=(A\alpha)^{1/(\alpha-1)}x\)</span>, and the wealth dynamics <a href="#eq-merton-wealth-dynamics" class="quarto-xref">Equation&nbsp;<span>8.17</span></a> with volatility <span class="math inline">\(\sigma^\ast=\frac1{1-\alpha}\cdot\frac{r-r_f}{\sigma}\)</span> — the Sharpe ratio scaled by inverse risk tolerance.</p>
+</section>
+<section id="problem-s3-dhss-exhaustible-resources-setup" class="level3">
+<h3 class="anchored" data-anchor-id="problem-s3-dhss-exhaustible-resources-setup">Problem S3 (DHSS exhaustible resources, setup)</h3>
+<p>For <span class="math inline">\(\max\int_0^\infty e^{-\rho t}A\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot K=F(K,R)-C\)</span>, <span class="math inline">\(\dot S=-R\)</span>, <span class="math inline">\(C\ge A\)</span>, the autonomous HJB equation in the two states <span class="math inline">\((K,S)\)</span> is <span class="math inline">\(\rho V=\max_{R,C,A}\{A+V_K(F(K,R)-C)+V_S(-R)\}\)</span> subject to <span class="math inline">\(C\ge A\)</span>. Since the integrand is linear in <span class="math inline">\(A\)</span> and <span class="math inline">\(A\le C\)</span>, the optimum sets <span class="math inline">\(A=C\)</span> (consume all output as amenity flow), reducing the maximand to <span class="math inline">\(\rho V=\max_{R}\{C+V_K(F(K,R)-C)+V_S(-R)\}\)</span>; the stationarity conditions <span class="math inline">\(V_K=1\)</span> along the optimum and <span class="math inline">\(F_R(K,R)=V_S/V_K\)</span> give Hotelling’s rule that the resource’s shadow price <span class="math inline">\(V_S\)</span> grows at rate <span class="math inline">\(\rho\)</span>, the continuous-time exhaustible-resource benchmark.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-bellman1957" class="csl-entry" role="listitem">
+Bellman, Richard. 1957. <em>Dynamic Programming</em>. Princeton, NJ: Princeton University Press.
+</div>
+<div id="ref-benhabib2015" class="csl-entry" role="listitem">
+Benhabib, Jess, Alberto Bisin, and Shenghao Zhu. 2015. <span>“The Wealth Distribution in Bewley Economies with Capital Income Risk.”</span> <em>Journal of Economic Theory</em> 159: 489–515.
+</div>
+<div id="ref-merton1971" class="csl-entry" role="listitem">
+Merton, Robert C. 1971. <span>“Optimum Consumption and Portfolio Rules in a Continuous-Time Model.”</span> <em>Journal of Economic Theory</em> 3 (4): 373–413.
+</div>
+<div id="ref-stokeylucas1989" class="csl-entry" role="listitem">
+Stokey, Nancy L., Jr. Lucas Robert E., and Edward C. Prescott. 1989. <em>Recursive Methods in Economic Dynamics</em>. Cambridge, MA: Harvard University Press.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./04-optimal-control.html" class="pagination-link" aria-label="Optimal Control">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./notation.html" class="pagination-link" aria-label="Notation">
+        <span class="nav-page-text">Notation</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

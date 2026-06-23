@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+
+<title>1&nbsp; Static Optimization – Dynamic Optimization</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02-odes.html" rel="next">
+<link href="./00-introduction.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-static-optimization.html">Foundations</a></li><li class="breadcrumb-item"><a href="./01-static-optimization.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Dynamic Optimization</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-static-optimization.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Continuous-Time Dynamic Optimization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-calculus-of-variations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-optimal-control.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Dynamic Programming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-prelim" id="toc-sec-prelim" class="nav-link active" data-scroll-target="#sec-prelim"><span class="header-section-number">1.1</span> Preliminaries</a>
+  <ul class="collapse">
+  <li><a href="#sec-matrices" id="toc-sec-matrices" class="nav-link" data-scroll-target="#sec-matrices">Definite matrices</a></li>
+  <li><a href="#sec-compact" id="toc-sec-compact" class="nav-link" data-scroll-target="#sec-compact">Compact sets and existence</a></li>
+  <li><a href="#sec-convex-sets" id="toc-sec-convex-sets" class="nav-link" data-scroll-target="#sec-convex-sets">Convex sets and separation</a></li>
+  <li><a href="#sec-convex-fns" id="toc-sec-convex-fns" class="nav-link" data-scroll-target="#sec-convex-fns">Convex and concave functions</a></li>
+  <li><a href="#sec-berge" id="toc-sec-berge" class="nav-link" data-scroll-target="#sec-berge">Correspondences and the maximum theorem</a></li>
+  </ul></li>
+  <li><a href="#sec-uncon" id="toc-sec-uncon" class="nav-link" data-scroll-target="#sec-uncon"><span class="header-section-number">1.2</span> Unconstrained optimization</a>
+  <ul class="collapse">
+  <li><a href="#sec-uncon-foc" id="toc-sec-uncon-foc" class="nav-link" data-scroll-target="#sec-uncon-foc">First- and second-order conditions</a></li>
+  <li><a href="#sec-envelope" id="toc-sec-envelope" class="nav-link" data-scroll-target="#sec-envelope">The envelope theorem</a></li>
+  </ul></li>
+  <li><a href="#sec-con" id="toc-sec-con" class="nav-link" data-scroll-target="#sec-con"><span class="header-section-number">1.3</span> Constrained optimization</a>
+  <ul class="collapse">
+  <li><a href="#sec-active" id="toc-sec-active" class="nav-link" data-scroll-target="#sec-active">Active constraints and the Lagrangian</a></li>
+  <li><a href="#sec-fritz-john" id="toc-sec-fritz-john" class="nav-link" data-scroll-target="#sec-fritz-john">The Fritz–John conditions</a></li>
+  <li><a href="#sec-licq" id="toc-sec-licq" class="nav-link" data-scroll-target="#sec-licq">Constraint qualifications and LICQ</a></li>
+  <li><a href="#sec-kkt-examples" id="toc-sec-kkt-examples" class="nav-link" data-scroll-target="#sec-kkt-examples">Worked KKT examples</a></li>
+  </ul></li>
+  <li><a href="#sec-comparative" id="toc-sec-comparative" class="nav-link" data-scroll-target="#sec-comparative"><span class="header-section-number">1.4</span> Comparative statics</a>
+  <ul class="collapse">
+  <li><a href="#sec-envelope-con" id="toc-sec-envelope-con" class="nav-link" data-scroll-target="#sec-envelope-con">The constrained envelope theorem</a></li>
+  <li><a href="#sec-shadow" id="toc-sec-shadow" class="nav-link" data-scroll-target="#sec-shadow">Multipliers as shadow prices</a></li>
+  <li><a href="#sec-cs-choice" id="toc-sec-cs-choice" class="nav-link" data-scroll-target="#sec-cs-choice">Comparative statics of the choice</a></li>
+  </ul></li>
+  <li><a href="#sec-duality" id="toc-sec-duality" class="nav-link" data-scroll-target="#sec-duality"><span class="header-section-number">1.5</span> Duality</a>
+  <ul class="collapse">
+  <li><a href="#sec-weak-duality" id="toc-sec-weak-duality" class="nav-link" data-scroll-target="#sec-weak-duality">Weak duality and the duality gap</a></li>
+  <li><a href="#sec-saddle" id="toc-sec-saddle" class="nav-link" data-scroll-target="#sec-saddle">Saddle points and the three-way equivalence</a></li>
+  </ul></li>
+  <li><a href="#sec-examples" id="toc-sec-examples" class="nav-link" data-scroll-target="#sec-examples"><span class="header-section-number">1.6</span> Economic examples</a>
+  <ul class="collapse">
+  <li><a href="#sec-cake" id="toc-sec-cake" class="nav-link" data-scroll-target="#sec-cake">Cake-eating</a></li>
+  <li><a href="#sec-marshall" id="toc-sec-marshall" class="nav-link" data-scroll-target="#sec-marshall">Marshallian demand, indirect utility, and Roy’s identity</a></li>
+  <li><a href="#sec-hicks" id="toc-sec-hicks" class="nav-link" data-scroll-target="#sec-hicks">Hicksian demand, the expenditure function, and Shephard’s lemma</a></li>
+  <li><a href="#sec-slutsky" id="toc-sec-slutsky" class="nav-link" data-scroll-target="#sec-slutsky">The Slutsky equation</a></li>
+  <li><a href="#sec-markowitz" id="toc-sec-markowitz" class="nav-link" data-scroll-target="#sec-markowitz">The Markowitz frontier, two-fund theorem, and CAPM</a></li>
+  <li><a href="#sec-resource" id="toc-sec-resource" class="nav-link" data-scroll-target="#sec-resource">Resource shadow pricing</a></li>
+  </ul></li>
+  <li><a href="#sec-problems" id="toc-sec-problems" class="nav-link" data-scroll-target="#sec-problems"><span class="header-section-number">1.7</span> Problems</a></li>
+  <li><a href="#sec-solutions" id="toc-sec-solutions" class="nav-link" data-scroll-target="#sec-solutions"><span class="header-section-number">1.8</span> Selected solutions</a>
+  <ul class="collapse">
+  <li><a href="#problem-1" id="toc-problem-1" class="nav-link" data-scroll-target="#problem-1">Problem 1</a></li>
+  <li><a href="#problem-4-life-cycle-consumption" id="toc-problem-4-life-cycle-consumption" class="nav-link" data-scroll-target="#problem-4-life-cycle-consumption">Problem 4 (life-cycle consumption)</a></li>
+  <li><a href="#problem-5-land-allocation-and-the-shadow-price" id="toc-problem-5-land-allocation-and-the-shadow-price" class="nav-link" data-scroll-target="#problem-5-land-allocation-and-the-shadow-price">Problem 5 (land allocation and the shadow price)</a></li>
+  <li><a href="#problem-6-licq-in-mathbbr3" id="toc-problem-6-licq-in-mathbbr3" class="nav-link" data-scroll-target="#problem-6-licq-in-mathbbr3">Problem 6 (LICQ in <span class="math inline">\(\mathbb{R}^3\)</span>)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-static-optimization.html">Foundations</a></li><li class="breadcrumb-item"><a href="./01-static-optimization.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Dynamic optimization is, at bottom, static optimization carried out over an infinite-dimensional choice space — a whole <em>path</em> rather than a single point. Every later chapter therefore leans on the finite-dimensional theory assembled here: the first-order conditions of the calculus of variations are an Euler equation <em>because</em> an interior optimum has zero gradient (<a href="#sec-uncon" class="quarto-xref"><span>Section 1.2</span></a>); the costate of optimal control is a <strong>Lagrange multiplier</strong> on the law of motion (<a href="#sec-con" class="quarto-xref"><span>Section 1.3</span></a>); the value function <span class="math inline">\(V\)</span> of dynamic programming inherits its smoothness and its envelope derivative from <strong>Berge’s maximum theorem</strong> (<a href="#sec-prelim" class="quarto-xref"><span>Section 1.1</span></a>) and the <strong>envelope theorem</strong> (<a href="#sec-envelope" class="quarto-xref"><span>Section 1.2.2</span></a>). This chapter develops that machinery from scratch and to research-grade rigor, deriving every result rather than asserting it.</p>
+<p>The general <strong>static optimization problem</strong> is</p>
+<p><span id="eq-static-problem"><span class="math display">\[
+\max_{x}\; f(x)\qquad\text{subject to}\qquad x\in X,
+\tag{1.1}\]</span></span></p>
+<p>where <span class="math inline">\(f:\mathbb{R}^n\to\mathbb{R}\)</span> is the <strong>objective</strong> and <span class="math inline">\(X\subseteq\mathbb{R}^n\)</span> is the <strong>feasible set</strong> — the set of admissible decisions. The constraint <span class="math inline">\(x\in X\)</span> is usually presented through inequality constraints <span class="math inline">\(g(x)\ge 0\)</span> (the non-strict kind), equality constraints <span class="math inline">\(h(x)=0\)</span>, or a mix of the two; when <span class="math inline">\(X=\mathbb{R}^n\)</span> the problem is <strong>unconstrained</strong>. Following the naming conventions of the course, we call <a href="#eq-static-problem" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> a <strong>convex program</strong> when <span class="math inline">\(f\)</span> is concave and <span class="math inline">\(X\)</span> convex, a <strong>linear program</strong> when <span class="math inline">\(f\)</span> and the constraints are all linear, and a <strong>quadratic program</strong> when <span class="math inline">\(f\)</span> is quadratic and the constraints are linear.</p>
+<p>A point <span class="math inline">\(x_0\in X\)</span> is a <strong>(global) solution</strong>, or global maximizer, if <span class="math inline">\(f(x)\le f(x_0)\)</span> for all <span class="math inline">\(x\in X\)</span>; it is a <strong>local maximizer</strong> if the same holds only for <span class="math inline">\(x\)</span> in some neighbourhood <span class="math inline">\(O_\delta(x_0)\)</span>. Throughout we phrase the theory for <em>maximization</em>; a minimization is handled by maximizing <span class="math inline">\(-f\)</span>, and we flag the sign reversals where they bite.</p>
+<p>Four questions organize the chapter, and the whole book repeats them in richer settings:</p>
+<ul>
+<li><strong>Existence</strong> — does a solution exist at all? (<a href="#sec-prelim" class="quarto-xref"><span>Section 1.1</span></a>, via Weierstrass.)</li>
+<li><strong>Necessity</strong> — what must a solution satisfy? (FOC/SOC unconstrained; KKT constrained.)</li>
+<li><strong>Sufficiency</strong> — when do these conditions <em>guarantee</em> optimality? (Concavity.)</li>
+<li><strong>Sensitivity</strong> — how does the optimum move with the data? (Comparative statics and the envelope theorem.)</li>
+</ul>
+<p>We close with <strong>duality</strong> and a suite of <strong>economic applications</strong>, from cake-eating to the Markowitz frontier.</p>
+<section id="sec-prelim" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="sec-prelim"><span class="header-section-number">1.1</span> Preliminaries</h2>
+<p>Optimization theory rests on four pillars from real analysis: the algebra of <strong>definite matrices</strong> (which classifies critical points), the topology of <strong>compact sets</strong> (which delivers existence), the geometry of <strong>convex sets</strong> (which underlies the multiplier theorems through separation), and the calculus of <strong>convex functions</strong> (which converts necessary conditions into sufficient ones). We treat each in turn, proving the results the rest of the chapter consumes.</p>
+<section id="sec-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="sec-matrices">Definite matrices</h3>
+<p>A symmetric matrix encodes a quadratic form, and the sign of that form decides whether a critical point is a max, a min, or a saddle. We need a usable test.</p>
+<div id="def-definite" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.1 (Definite and semidefinite matrices)</strong></span> A symmetric <span class="math inline">\(n\times n\)</span> matrix <span class="math inline">\(A\)</span> is <strong>positive semidefinite</strong> if <span class="math inline">\(\alpha^\top A\,\alpha\ge 0\)</span> for every <span class="math inline">\(\alpha\in\mathbb{R}^n\)</span>, and <strong>positive definite</strong> if <span class="math inline">\(\alpha^\top A\,\alpha&gt;0\)</span> for every <span class="math inline">\(\alpha\ne 0\)</span>. It is <strong>negative (semi)definite</strong> if <span class="math inline">\(-A\)</span> is positive (semi)definite, and <strong>indefinite</strong> if <span class="math inline">\(\alpha^\top A\,\alpha\)</span> takes both signs.</p>
+</div>
+<p>Checking the definition directly is impossible — there are infinitely many <span class="math inline">\(\alpha\)</span>. The <em>leading-principal-minor test</em> reduces it to finitely many determinants. Write <span class="math inline">\(A_k\)</span> for the <span class="math inline">\(k\)</span>-th <strong>leading principal submatrix</strong> (the top-left <span class="math inline">\(k\times k\)</span> block) and <span class="math inline">\(D_k=\det A_k\)</span> for its <strong>leading principal minor</strong>.</p>
+<div id="thm-minor-test" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.1 (Leading-principal-minor test)</strong></span> For a symmetric <span class="math inline">\(A\)</span>:</p>
+<ol type="1">
+<li><span class="math inline">\(A\)</span> is positive definite <span class="math inline">\(\iff\)</span> all leading principal minors are positive, <span class="math inline">\(D_k&gt;0\)</span> for <span class="math inline">\(k=1,\dots,n\)</span>;</li>
+<li><span class="math inline">\(A\)</span> is negative definite <span class="math inline">\(\iff\)</span> the leading principal minors alternate in sign starting negative, <span class="math inline">\((-1)^k D_k&gt;0\)</span> for <span class="math inline">\(k=1,\dots,n\)</span>;</li>
+<li><span class="math inline">\(A\)</span> is positive semidefinite <span class="math inline">\(\iff\)</span> <em>all</em> principal minors (not only the leading ones) are <span class="math inline">\(\ge 0\)</span>;</li>
+<li><span class="math inline">\(A\)</span> is negative semidefinite <span class="math inline">\(\iff\)</span> every principal minor of order <span class="math inline">\(k\)</span> has sign <span class="math inline">\((-1)^k\)</span> or is zero.</li>
+</ol>
+</div>
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Leading is not enough for the semidefinite case.</strong> For definiteness the <em>leading</em> minors suffice, but semidefiniteness requires <em>all</em> principal minors. The matrix <span class="math inline">\(\bigl(\begin{smallmatrix}0&amp;0\\0&amp;-1\end{smallmatrix}\bigr)\)</span> has leading minors <span class="math inline">\(D_1=0,\ D_2=0\)</span> yet is negative semidefinite, while <span class="math inline">\(\bigl(\begin{smallmatrix}0&amp;0\\0&amp;1\end{smallmatrix}\bigr)\)</span> has the same leading minors and is positive semidefinite — only the full set of principal minors distinguishes them.</p>
+</div>
+</div>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>We prove (1); the rest follow by symmetry and a limiting argument. Diagonalize <span class="math inline">\(A=Q^\top\Lambda Q\)</span> with <span class="math inline">\(Q\)</span> orthogonal and <span class="math inline">\(\Lambda=\operatorname{diag}(\lambda_1,\dots,\lambda_n)\)</span>. Then <span class="math inline">\(\alpha^\top A\alpha=\sum_i\lambda_i (Q\alpha)_i^2\)</span>, which is positive for all <span class="math inline">\(\alpha\ne0\)</span> iff every eigenvalue <span class="math inline">\(\lambda_i&gt;0\)</span>; so positive definiteness is equivalent to all eigenvalues being positive, and <span class="math inline">\(\det A=\prod_i\lambda_i&gt;0\)</span> in that case.</p>
+<p>For the minors, argue by induction on <span class="math inline">\(n\)</span>. If <span class="math inline">\(A\)</span> is positive definite then so is every leading block <span class="math inline">\(A_k\)</span> (apply the form to vectors supported on the first <span class="math inline">\(k\)</span> coordinates), hence <span class="math inline">\(D_k=\det
+A_k&gt;0\)</span>. Conversely suppose <span class="math inline">\(D_1,\dots,D_n&gt;0\)</span>. By induction <span class="math inline">\(A_{n-1}\)</span> is positive definite, so it has positive eigenvalues; performing symmetric Gaussian elimination (an <span class="math inline">\(LDL^\top\)</span> factorization, which exists because every leading block is invertible) writes <span class="math inline">\(A=L\,D\,L^\top\)</span> with <span class="math inline">\(L\)</span> unit lower triangular and <span class="math inline">\(D=\operatorname{diag}(d_1,\dots,d_n)\)</span>. The leading minors satisfy <span class="math inline">\(D_k=d_1\cdots d_k\)</span>, so <span class="math inline">\(d_k=D_k/D_{k-1}&gt;0\)</span> for all <span class="math inline">\(k\)</span> (with <span class="math inline">\(D_0:=1\)</span>); hence <span class="math inline">\(D\)</span> is positive definite and so is <span class="math inline">\(A=L D L^\top\)</span>, since <span class="math inline">\(\alpha^\top A\alpha=(L^\top\alpha)^\top D(L^\top\alpha)&gt;0\)</span> for <span class="math inline">\(\alpha\ne0\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="exm-2x2-matrix" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1.1 (The <span class="math inline">\(2\times 2\)</span> case)</strong></span> For <span class="math inline">\(A=\bigl(\begin{smallmatrix}a&amp;c\\c&amp;d\end{smallmatrix}\bigr)\)</span> the test reads: <span class="math inline">\(A\)</span> is <strong>negative definite</strong> iff <span class="math inline">\(a&lt;0\)</span> and <span class="math inline">\(ad-c^2&gt;0\)</span>, and <strong>negative semidefinite</strong> iff <span class="math inline">\(a\le0\)</span>, <span class="math inline">\(d\le0\)</span>, and <span class="math inline">\(ad-c^2\ge0\)</span>. The semidefinite test needs <span class="math inline">\(d\le0\)</span> as a separate condition because <span class="math inline">\(d\)</span> is itself a (non-leading) principal minor — checking only <span class="math inline">\(a\le0\)</span> and the determinant would wrongly admit <span class="math inline">\(\bigl(\begin{smallmatrix}0&amp;0\\0&amp;1\end{smallmatrix}\bigr)\)</span>, which has <span class="math inline">\(a\le0\)</span> and <span class="math inline">\(\det\ge0\)</span> yet is not negative semidefinite, showing why <span class="math inline">\(d\le 0\)</span> cannot be dropped.</p>
+</div>
+</section>
+<section id="sec-compact" class="level3">
+<h3 class="anchored" data-anchor-id="sec-compact">Compact sets and existence</h3>
+<p>For points <span class="math inline">\(x,y\in\mathbb{R}^n\)</span> write <span class="math inline">\(\|x-y\|=\bigl(\sum_{k=1}^n (x_k-y_k)^2\bigr)^{1/2}\)</span> for the Euclidean distance, and <span class="math inline">\(O_\delta(x)=\{y:\|y-x\|&lt;\delta\}\)</span> for the open ball of radius <span class="math inline">\(\delta&gt;0\)</span>. A point <span class="math inline">\(x\)</span> is <strong>interior</strong> to <span class="math inline">\(A\)</span> if <span class="math inline">\(O_\delta(x)\subseteq A\)</span> for some <span class="math inline">\(\delta&gt;0\)</span>; <span class="math inline">\(A\)</span> is <strong>open</strong> if all its points are interior; <span class="math inline">\(x\)</span> is a <strong>limit point</strong> of <span class="math inline">\(A\)</span> if some sequence in <span class="math inline">\(A\)</span> converges to <span class="math inline">\(x\)</span>; and <span class="math inline">\(A\)</span> is <strong>closed</strong> if it contains all its limit points. Open and closed are complementary: <span class="math inline">\(A\)</span> is open iff <span class="math inline">\(A^c=\mathbb{R}^n\setminus A\)</span> is closed.</p>
+<div id="def-compact" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.2 (Compact set)</strong></span> <span class="math inline">\(A\subseteq\mathbb{R}^n\)</span> is <strong>compact</strong> if every sequence in <span class="math inline">\(A\)</span> has a subsequence converging to a point of <span class="math inline">\(A\)</span>.</p>
+</div>
+<p>In <span class="math inline">\(\mathbb{R}^n\)</span> this sequential definition coincides with the more familiar one through the <strong>Heine–Borel theorem</strong>.</p>
+<div id="thm-heine-borel" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.2 (Heine–Borel)</strong></span> A set <span class="math inline">\(A\subseteq\mathbb{R}^n\)</span> is compact if and only if it is closed and bounded.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>(<span class="math inline">\(\Rightarrow\)</span>) If <span class="math inline">\(A\)</span> is unbounded, pick <span class="math inline">\(x_n\in A\)</span> with <span class="math inline">\(\|x_n\|&gt;n\)</span>; no subsequence can converge (a convergent sequence is bounded), so <span class="math inline">\(A\)</span> is not compact. If <span class="math inline">\(A\)</span> is not closed, some limit point <span class="math inline">\(x\notin A\)</span> is the limit of a sequence in <span class="math inline">\(A\)</span>; every subsequence also converges to <span class="math inline">\(x\notin A\)</span>, so again compactness fails.</p>
+<p>(<span class="math inline">\(\Leftarrow\)</span>) Let <span class="math inline">\(A\)</span> be closed and bounded and <span class="math inline">\((x_n)\subseteq A\)</span>. Boundedness confines the first coordinates to a bounded interval, so by Bolzano–Weierstrass a subsequence has convergent first coordinate; passing to a further subsequence makes the second coordinate converge too, and after <span class="math inline">\(n\)</span> such extractions we obtain a subsequence <span class="math inline">\(x_{n_k}\to x\)</span> in every coordinate. Since <span class="math inline">\(A\)</span> is closed, <span class="math inline">\(x\in A\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Compactness buys existence — the single most important “free” fact in optimization.</p>
+<div id="thm-weierstrass-evt" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.3 (Weierstrass extreme-value theorem)</strong></span> A continuous function <span class="math inline">\(f\)</span> on a nonempty compact set <span class="math inline">\(A\subseteq\mathbb{R}^n\)</span> attains its maximum: there exists <span class="math inline">\(x^\ast\in A\)</span> with <span class="math inline">\(f(x)\le f(x^\ast)\)</span> for all <span class="math inline">\(x\in A\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(M=\sup_{x\in A}f(x)\in(-\infty,+\infty]\)</span> and choose a <strong>maximizing sequence</strong> <span class="math inline">\(x_n\in A\)</span> with <span class="math inline">\(f(x_n)\to M\)</span>. By compactness a subsequence <span class="math inline">\(x_{n_k}\to x^\ast\in A\)</span>. Continuity gives <span class="math inline">\(f(x^\ast)=\lim_k f(x_{n_k})=M\)</span>; in particular <span class="math inline">\(M&lt;\infty\)</span>, and <span class="math inline">\(x^\ast\)</span> attains it. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Existence can fail if either hypothesis is dropped: <span class="math inline">\(f(x)=x\)</span> on the open interval <span class="math inline">\((0,1)\)</span> is continuous but has no maximum (the domain is not closed), and <span class="math inline">\(f(x)=x\)</span> on <span class="math inline">\([0,\infty)\)</span> has none (unbounded). Weierstrass is the workhorse behind every later existence claim, including the continuity of value functions in <a href="#thm-berge" class="quarto-xref">Theorem&nbsp;<span>1.7</span></a> below.</p>
+</section>
+<section id="sec-convex-sets" class="level3">
+<h3 class="anchored" data-anchor-id="sec-convex-sets">Convex sets and separation</h3>
+<div id="def-convex-set" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.3 (Convex set)</strong></span> <span class="math inline">\(A\subseteq\mathbb{R}^n\)</span> is <strong>convex</strong> if <span class="math inline">\(\alpha x+(1-\alpha)y\in A\)</span> whenever <span class="math inline">\(x,y\in A\)</span> and <span class="math inline">\(\alpha\in(0,1)\)</span> — the segment between any two of its points stays inside it.</p>
+</div>
+<p>The geometric fact that underlies <em>every</em> Lagrange-multiplier theorem is that two disjoint convex sets can be separated by a hyperplane.</p>
+<div id="thm-separating-hyperplane" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.4 (Separating-hyperplane theorem)</strong></span> If <span class="math inline">\(A,B\subseteq\mathbb{R}^n\)</span> are disjoint nonempty convex sets, there is a nonzero <span class="math inline">\(\alpha\in\mathbb{R}^n\)</span> with <span id="eq-separation"><span class="math display">\[
+\alpha^\top x\;\ge\;\alpha^\top y\qquad\text{for all } x\in A,\ y\in B .
+\tag{1.2}\]</span></span> If in addition <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are closed and at least one is bounded, the inequality can be made strict.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>We prove the basic case in which <span class="math inline">\(B=\{b\}\)</span> is a single point outside a <em>closed</em> convex set <span class="math inline">\(A\)</span>; the general statement follows by applying it to the (convex) difference set <span class="math inline">\(A-B\)</span> and the origin.</p>
+<p>Because <span class="math inline">\(A\)</span> is closed and nonempty, the distance <span class="math inline">\(\inf_{x\in A}\|x-b\|\)</span> is attained — restrict to a closed ball around <span class="math inline">\(b\)</span> meeting <span class="math inline">\(A\)</span>, which is compact, and apply <a href="#thm-weierstrass-evt" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a> to the continuous map <span class="math inline">\(x\mapsto-\|x-b\|\)</span>. Call the nearest point <span class="math inline">\(p\in A\)</span> and set <span class="math inline">\(\alpha=p-b\ne 0\)</span>. For any <span class="math inline">\(x\in A\)</span> and <span class="math inline">\(t\in(0,1]\)</span>, convexity gives <span class="math inline">\(p+t(x-p)\in A\)</span>, so <span class="math display">\[
+\|p-b\|^2\le\|p+t(x-p)-b\|^2=\|p-b\|^2+2t\,\alpha^\top(x-p)+t^2\|x-p\|^2 .
+\]</span> Dividing by <span class="math inline">\(t\)</span> and letting <span class="math inline">\(t\downarrow 0\)</span> yields <span class="math inline">\(\alpha^\top(x-p)\ge0\)</span>, i.e. <span class="math inline">\(\alpha^\top x\ge\alpha^\top p\)</span> for all <span class="math inline">\(x\in A\)</span>. Meanwhile <span class="math inline">\(\alpha^\top p-\alpha^\top b=\|\alpha\|^2&gt;0\)</span>, so <span class="math inline">\(\alpha^\top x\ge\alpha^\top p&gt;\alpha^\top b\)</span>, which both separates and (strictly) does so. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>A finite-dimensional avatar of separation is <strong>Farkas’ lemma</strong>, the exact algebraic tool we need to prove the KKT conditions in <a href="#sec-con" class="quarto-xref"><span>Section 1.3</span></a>. It is a <em>theorem of the alternative</em>: of two systems, exactly one is solvable.</p>
+<div id="lem-farkas" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 1.1 (Farkas’ lemma)</strong></span> Let <span class="math inline">\(a_1,\dots,a_n,\beta\in\mathbb{R}^m\)</span> (here <span class="math inline">\(\beta\)</span> is the target vector, <em>not</em> the discount factor of <code>notation.qmd</code>). Then <strong>exactly one</strong> of the following holds:</p>
+<ol type="1">
+<li>there exists <span class="math inline">\(x\in\mathbb{R}^m\)</span> with <span class="math inline">\(a_k^\top x\ge 0\)</span> for all <span class="math inline">\(k\)</span> and <span class="math inline">\(\beta^\top x&lt;0\)</span>; or</li>
+<li>there exist non-negative scalars <span class="math inline">\(p_1,\dots,p_n\ge 0\)</span> with <span class="math inline">\(\beta=\sum_{k=1}^n p_k a_k\)</span>.</li>
+</ol>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The two cannot both hold: if (2) holds and <span class="math inline">\(a_k^\top x\ge0\)</span> for all <span class="math inline">\(k\)</span>, then <span class="math inline">\(\beta^\top x=\sum_k p_k\,a_k^\top x\ge0\)</span>, contradicting <span class="math inline">\(\beta^\top x&lt;0\)</span>.</p>
+<p>Suppose (2) fails. The set <span class="math inline">\(C=\{\sum_k p_k a_k:p_k\ge0\}\)</span> is a closed convex cone (a finitely generated cone is closed) and, by assumption, <span class="math inline">\(\beta\notin C\)</span>. Since <span class="math inline">\(\beta\notin C\)</span> and <span class="math inline">\(C\)</span> is closed and convex, the separation of <a href="#thm-separating-hyperplane" class="quarto-xref">Theorem&nbsp;<span>1.4</span></a> yields a strict separator <span class="math inline">\(x\)</span> with <span class="math inline">\(x^\top\beta&lt;\inf_{c\in C}x^\top c\)</span>. Since <span class="math inline">\(0\in C\)</span> the infimum is <span class="math inline">\(\le0\)</span>, giving <span class="math inline">\(x^\top\beta&lt;0\)</span>. And since <span class="math inline">\(C\)</span> is a cone, <span class="math inline">\(x^\top c\)</span> is bounded below over <span class="math inline">\(C\)</span> only if <span class="math inline">\(x^\top c\ge0\)</span> for every <span class="math inline">\(c\in C\)</span> (otherwise scaling <span class="math inline">\(c\)</span> by <span class="math inline">\(t\to\infty\)</span> sends it to <span class="math inline">\(-\infty\)</span>); in particular <span class="math inline">\(x^\top a_k\ge0\)</span> for each generator. This is exactly (1). <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+<section id="sec-convex-fns" class="level3">
+<h3 class="anchored" data-anchor-id="sec-convex-fns">Convex and concave functions</h3>
+<p>For an <span class="math inline">\(n\)</span>-variable function <span class="math inline">\(f\)</span> we write the <strong>gradient</strong> and <strong>Hessian</strong> as <span class="math display">\[
+\nabla f(x)=\Bigl(\tfrac{\partial f}{\partial x_i}\Bigr)_{i},\qquad
+\nabla^2 f(x)=\Bigl(\tfrac{\partial^2 f}{\partial x_i\partial x_j}\Bigr)_{i,j}.
+\]</span></p>
+<div id="def-concave" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.4 (Convex, concave, quasiconcave)</strong></span> A function <span class="math inline">\(f\)</span> on a convex set <span class="math inline">\(A\)</span> is <strong>convex</strong> if for all <span class="math inline">\(x,y\in A\)</span> and <span class="math inline">\(\theta\in(0,1)\)</span> <span id="eq-jensen"><span class="math display">\[
+f\bigl(\theta x+(1-\theta)y\bigr)\le\theta f(x)+(1-\theta)f(y),
+\tag{1.3}\]</span></span> and <strong>concave</strong> if <span class="math inline">\(-f\)</span> is convex (the inequality reverses). It is <strong>strictly</strong> convex/concave when the inequality is strict for <span class="math inline">\(x\ne y\)</span>. It is <strong>quasiconcave</strong> if <span class="math inline">\(f(\theta x+(1-\theta)y)\ge\min\{f(x),f(y)\}\)</span>, equivalently if every upper level set <span class="math inline">\(\{x:f(x)\ge c\}\)</span> is convex; <strong>quasiconvex</strong> is the dual notion.</p>
+</div>
+<p>Inequality <a href="#eq-jensen" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> is <strong>Jensen’s inequality</strong> in its two-point form; iterating it gives <span class="math inline">\(f(\sum_i\theta_i x_i)\le\sum_i\theta_i f(x_i)\)</span> for any convex weights <span class="math inline">\(\theta_i\ge0\)</span>, <span class="math inline">\(\sum_i\theta_i=1\)</span>. Concavity is the property that makes a stationary point a <em>global</em> maximum, and quasiconcavity — strictly weaker — is what guarantees a convex (hence connected) solution set. The two derivative characterizations below are used constantly.</p>
+<div id="thm-foc-concave" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.5 (First-order characterization)</strong></span> If <span class="math inline">\(f\)</span> is differentiable on a convex set <span class="math inline">\(A\)</span>, then <span class="math inline">\(f\)</span> is concave <strong>if and only if</strong> <span id="eq-supporting"><span class="math display">\[
+f(y)-f(x)\le\nabla f(x)^\top(y-x)\qquad\text{for all }x,y\in A,
+\tag{1.4}\]</span></span> with strict inequality (for <span class="math inline">\(x\ne y\)</span>) iff <span class="math inline">\(f\)</span> is strictly concave. The tangent plane lies <em>above</em> the graph.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>We prove the convex version (<span class="math inline">\(f\)</span> convex <span class="math inline">\(\iff\)</span> tangent below graph); negate for concavity.</p>
+<p>(<span class="math inline">\(\Rightarrow\)</span>) Let <span class="math inline">\(f\)</span> be convex. For <span class="math inline">\(\theta\in(0,1)\)</span>, <a href="#eq-jensen" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> gives <span class="math inline">\(f(x+\theta(y-x))\le f(x)+\theta\bigl(f(y)-f(x)\bigr)\)</span>, hence <span class="math display">\[
+\frac{f(x+\theta(y-x))-f(x)}{\theta}\le f(y)-f(x).
+\]</span> Letting <span class="math inline">\(\theta\downarrow0\)</span>, the left side tends to the directional derivative <span class="math inline">\(\nabla f(x)^\top(y-x)\)</span>, giving <span class="math inline">\(\nabla f(x)^\top(y-x)\le f(y)-f(x)\)</span>.</p>
+<p>(<span class="math inline">\(\Leftarrow\)</span>) Suppose the tangent inequality holds. Fix <span class="math inline">\(x,y\)</span>, set <span class="math inline">\(z=\theta x+(1-\theta)y\)</span>, and apply it twice, from <span class="math inline">\(z\)</span> to <span class="math inline">\(x\)</span> and from <span class="math inline">\(z\)</span> to <span class="math inline">\(y\)</span>: <span class="math display">\[
+f(x)\ge f(z)+\nabla f(z)^\top(x-z),\qquad f(y)\ge f(z)+\nabla f(z)^\top(y-z).
+\]</span> Multiply the first by <span class="math inline">\(\theta\)</span>, the second by <span class="math inline">\(1-\theta\)</span>, and add: the gradient terms cancel because <span class="math inline">\(\theta(x-z)+(1-\theta)(y-z)=0\)</span>, leaving <span class="math inline">\(\theta f(x)+(1-\theta)f(y)\ge f(z)\)</span> — convexity. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="thm-soc-concave" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.6 (Second-order characterization)</strong></span> If <span class="math inline">\(f\)</span> is twice differentiable on an open convex set, then <span class="math inline">\(f\)</span> is concave <strong>if and only if</strong> the Hessian <span class="math inline">\(\nabla^2 f(x)\)</span> is negative semidefinite at every <span class="math inline">\(x\)</span>. If <span class="math inline">\(\nabla^2 f(x)\)</span> is negative definite everywhere, <span class="math inline">\(f\)</span> is strictly concave (the converse is false).</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Again prove the convex version (<span class="math inline">\(\nabla^2 f\succeq0\)</span>). Fix <span class="math inline">\(x\)</span> and a direction <span class="math inline">\(v\)</span> and set <span class="math inline">\(\phi(t)=f(x+tv)\)</span>, so <span class="math inline">\(\phi''(t)=v^\top\nabla^2 f(x+tv)\,v\)</span>. By the first-order characterization <a href="#thm-foc-concave" class="quarto-xref">Theorem&nbsp;<span>1.5</span></a>, <span class="math inline">\(f\)</span> is convex iff <span class="math inline">\(\phi\)</span> is convex on every line, and a <span class="math inline">\(C^2\)</span> function of one variable is convex iff <span class="math inline">\(\phi''\ge0\)</span>. Thus <span class="math inline">\(f\)</span> convex <span class="math inline">\(\iff v^\top\nabla^2 f\,v\ge0\)</span> for all <span class="math inline">\(x,v\)</span>, i.e.&nbsp;<span class="math inline">\(\nabla^2 f\succeq0\)</span>. Strict definiteness gives <span class="math inline">\(\phi''&gt;0\)</span>, hence strict convexity; the converse fails since <span class="math inline">\(f(x)=x^4\)</span> is strictly convex with <span class="math inline">\(f''(0)=0\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+<section id="sec-berge" class="level3">
+<h3 class="anchored" data-anchor-id="sec-berge">Correspondences and the maximum theorem</h3>
+<p>A constraint set that <em>moves</em> with a parameter is a <strong>correspondence</strong> (set-valued map); the feasible-action map <span class="math inline">\(\Gamma_t(x)\)</span> of dynamic programming is the leading example. Write <span class="math inline">\(2^Y=\{B:B\subseteq Y\}\)</span> for the power set of <span class="math inline">\(Y\)</span>. A <strong>correspondence</strong> <span class="math inline">\(\Gamma:X\to 2^Y\)</span> assigns to each <span class="math inline">\(x\in X\)</span> a subset <span class="math inline">\(\Gamma(x)\subseteq Y\)</span>; its <strong>graph</strong> is <span class="math inline">\(\mathrm{Gr}(\Gamma)=\{(x,y):y\in\Gamma(x)\}\)</span>. It is <strong>compact-valued</strong> (convex-valued, closed-valued) if each <span class="math inline">\(\Gamma(x)\)</span> is compact (convex, closed).</p>
+<div id="def-hemicontinuous" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.5 (Upper and lower hemicontinuity)</strong></span> <span class="math inline">\(\Gamma\)</span> is <strong>upper hemicontinuous (uhc)</strong> at <span class="math inline">\(x\)</span> if for every open <span class="math inline">\(A\supseteq\Gamma(x)\)</span> there is <span class="math inline">\(\delta&gt;0\)</span> with <span class="math inline">\(\Gamma(y)\subseteq A\)</span> for all <span class="math inline">\(y\in O_\delta(x)\)</span>; it is <strong>lower hemicontinuous (lhc)</strong> at <span class="math inline">\(x\)</span> if for every open <span class="math inline">\(A\)</span> meeting <span class="math inline">\(\Gamma(x)\)</span> there is <span class="math inline">\(\delta&gt;0\)</span> with <span class="math inline">\(\Gamma(y)\cap
+A\neq\varnothing\)</span> for all <span class="math inline">\(y\in O_\delta(x)\)</span>. It is <strong>continuous</strong> if both.</p>
+</div>
+<p>Upper hemicontinuity forbids the set from “exploding” outward in the limit; lower hemicontinuity forbids it from “imploding”. A single-valued correspondence is continuous in this sense exactly when it is a continuous function. The theorem we need — the foundation of comparative statics for <em>constrained</em> problems and of the smoothness of value functions later — is Berge’s.</p>
+<div id="thm-berge" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.7 (Berge’s maximum theorem)</strong></span> Let <span class="math inline">\(\Gamma:X\to 2^Y\)</span> be a continuous, compact-valued correspondence and <span class="math inline">\(f:X\times Y\to\mathbb{R}\)</span> continuous. Define the <strong>value function</strong> and the <strong>argmax correspondence</strong> <span class="math display">\[
+V(x)=\max_{y\in\Gamma(x)} f(x,y),\qquad
+\Lambda(x)=\operatorname*{arg\,max}_{y\in\Gamma(x)} f(x,y).
+\]</span> Then <span class="math inline">\(V\)</span> is continuous on <span class="math inline">\(X\)</span> and <span class="math inline">\(\Lambda\)</span> is nonempty, compact-valued, and upper hemicontinuous. If moreover <span class="math inline">\(\Gamma\)</span> is convex-valued and <span class="math inline">\(f\)</span> is strictly concave in <span class="math inline">\(y\)</span>, then <span class="math inline">\(\Lambda\)</span> is single-valued — a continuous function.</p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Idea of proof.</strong> Nonemptiness of <span class="math inline">\(\Lambda(x)\)</span> is Weierstrass (<a href="#thm-weierstrass-evt" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a>) applied on the compact set <span class="math inline">\(\Gamma(x)\)</span>. <em>Continuity of <span class="math inline">\(V\)</span></em> splits into two inequalities. Lower hemicontinuity of <span class="math inline">\(\Gamma\)</span> lets one track an optimal <span class="math inline">\(y^\ast\in\Lambda(x)\)</span> by nearby feasible points as <span class="math inline">\(x\)</span> moves, giving <span class="math inline">\(\liminf V\ge V(x)\)</span>; upper hemicontinuity plus compactness keeps optimizers from escaping, giving <span class="math inline">\(\limsup V\le V(x)\)</span>. <em>Upper hemicontinuity of <span class="math inline">\(\Lambda\)</span></em> follows from a closed-graph argument: if <span class="math inline">\(y_n\in\Lambda(x_n)\)</span>, <span class="math inline">\(x_n\to x\)</span>, <span class="math inline">\(y_n\to y\)</span>, then <span class="math inline">\(y\in\Gamma(x)\)</span> (uhc) and <span class="math inline">\(f(x,y)=\lim f(x_n,y_n)=\lim V(x_n)=V(x)\)</span> (continuity of <span class="math inline">\(f\)</span> and <span class="math inline">\(V\)</span>), so <span class="math inline">\(y\in\Lambda(x)\)</span>. Strict concavity makes <span class="math inline">\(\Lambda(x)\)</span> a singleton (a strictly concave function has a unique maximizer on a convex set), and a single-valued uhc correspondence is a continuous function. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</div>
+</div>
+<p>We will invoke <a href="#thm-berge" class="quarto-xref">Theorem&nbsp;<span>1.7</span></a> whenever we need a value function to be continuous and an optimal policy to vary continuously — it is the silent partner of every comparative-statics statement in the book.</p>
+</section>
+</section>
+<section id="sec-uncon" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="sec-uncon"><span class="header-section-number">1.2</span> Unconstrained optimization</h2>
+<p>Take <span class="math inline">\(X=\mathbb{R}^n\)</span>, so the problem is <span class="math inline">\(\max_x f(x)\)</span> with <span class="math inline">\(f\)</span> twice continuously differentiable. The analysis is the multivariate version of the one-dimensional rule “set the derivative to zero and check the second derivative”.</p>
+<section id="sec-uncon-foc" class="level3">
+<h3 class="anchored" data-anchor-id="sec-uncon-foc">First- and second-order conditions</h3>
+<div id="thm-uncon-nec" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.8 (Necessary conditions (FOC and SOC))</strong></span> If <span class="math inline">\(x^\ast\)</span> is a local maximizer of <span class="math inline">\(f\)</span>, then <span id="eq-foc-soc"><span class="math display">\[
+\nabla f(x^\ast)=0\qquad\text{and}\qquad \nabla^2 f(x^\ast)\ \text{is negative semidefinite}.
+\tag{1.5}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix a direction <span class="math inline">\(v\in\mathbb{R}^n\)</span> and set <span class="math inline">\(\phi(t)=f(x^\ast+tv)\)</span>. Since <span class="math inline">\(x^\ast\)</span> is a local maximizer, <span class="math inline">\(\phi\)</span> has a local maximum at <span class="math inline">\(t=0\)</span>, so <span class="math inline">\(\phi'(0)=0\)</span> and <span class="math inline">\(\phi''(0)\le0\)</span>. By the chain rule <span class="math inline">\(\phi'(0)=\nabla f(x^\ast)^\top v\)</span> and <span class="math inline">\(\phi''(0)=v^\top\nabla^2 f(x^\ast)\,v\)</span>. The first vanishing for <em>every</em> <span class="math inline">\(v\)</span> forces <span class="math inline">\(\nabla f(x^\ast)=0\)</span>; the second being <span class="math inline">\(\le0\)</span> for every <span class="math inline">\(v\)</span> is precisely negative semidefiniteness of <span class="math inline">\(\nabla^2 f(x^\ast)\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>A point with <span class="math inline">\(\nabla f=0\)</span> is a <strong>stationary</strong> (or <strong>critical</strong>) point; like a stationary point in one variable it may be a maximum, a minimum, or a saddle. To certify a maximum we strengthen the second-order condition.</p>
+<div id="thm-uncon-suff" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.9 (Sufficient conditions)</strong></span> If <span class="math inline">\(\nabla f(x^\ast)=0\)</span> and <span class="math inline">\(\nabla^2 f(x^\ast)\)</span> is negative <strong>definite</strong>, then <span class="math inline">\(x^\ast\)</span> is a <strong>strict local</strong> maximizer. If <span class="math inline">\(\nabla f(x^\ast)=0\)</span> and <span class="math inline">\(f\)</span> is <strong>concave</strong> on <span class="math inline">\(\mathbb{R}^n\)</span>, then <span class="math inline">\(x^\ast\)</span> is a <strong>global</strong> maximizer.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><em>Local part.</em> By Taylor’s theorem with the gradient zero, <span class="math inline">\(f(x^\ast+v)=f(x^\ast)+\tfrac12 v^\top\nabla^2 f(x^\ast)\,v+o(\|v\|^2)\)</span>. Negative definiteness gives a constant <span class="math inline">\(c&gt;0\)</span> with <span class="math inline">\(v^\top\nabla^2 f(x^\ast)v\le-c\|v\|^2\)</span>, so <span class="math inline">\(f(x^\ast+v)&lt;f(x^\ast)\)</span> for all small <span class="math inline">\(v\ne 0\)</span>.</p>
+<p><em>Global part.</em> By the first-order characterization <a href="#thm-foc-concave" class="quarto-xref">Theorem&nbsp;<span>1.5</span></a>, concavity gives the supporting inequality <span class="math inline">\(f(y)\le f(x^\ast)+\nabla f(x^\ast)^\top(y-x^\ast)=f(x^\ast)\)</span> for every <span class="math inline">\(y\)</span>, since <span class="math inline">\(\nabla f(x^\ast)=0\)</span>. Hence <span class="math inline">\(x^\ast\)</span> is a global maximizer. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Putting the two together: for a concave <span class="math inline">\(f\)</span>, the single equation <span class="math inline">\(\nabla f(x^\ast)=0\)</span> is <strong>both necessary and sufficient</strong> for global optimality. This is the cleanest theorem in the subject and the reason economists prize concavity.</p>
+<div class="callout callout-style-simple callout-tip">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Minimization.</strong> For <span class="math inline">\(\min f\)</span> the signs flip: a local minimizer has <span class="math inline">\(\nabla f=0\)</span> and <span class="math inline">\(\nabla^2 f\succeq0\)</span> (positive semidefinite), and <span class="math inline">\(\nabla^2 f\succ0\)</span> or convexity certifies the minimum. We will use this freely, e.g.&nbsp;for variance minimization in the Markowitz problem (<a href="#sec-markowitz" class="quarto-xref"><span>Section 1.6.5</span></a>).</p>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-envelope" class="level3">
+<h3 class="anchored" data-anchor-id="sec-envelope">The envelope theorem</h3>
+<p>How does the <em>optimal value</em> respond to a parameter? Consider a parametrized unconstrained problem <span id="eq-uncon-value"><span class="math display">\[
+V(\theta)=\max_x f(x,\theta),
+\tag{1.6}\]</span></span> with optimizer <span class="math inline">\(x(\theta)\)</span>, so <span class="math inline">\(V(\theta)=f(x(\theta),\theta)\)</span>. The naive total derivative would carry an <span class="math inline">\(f_x\,x'(\theta)\)</span> term measuring how the <em>choice</em> moves; the envelope theorem says that term vanishes, because at an interior optimum the choice is already optimal.</p>
+<div id="thm-envelope-uncon" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.10 (Envelope theorem (unconstrained))</strong></span> If <span class="math inline">\(x(\theta)\)</span> is an interior maximizer of <a href="#eq-uncon-value" class="quarto-xref">Equation&nbsp;<span>1.6</span></a> and <span class="math inline">\(f\)</span>, <span class="math inline">\(x(\cdot)\)</span> are differentiable, then <span id="eq-envelope-uncon"><span class="math display">\[
+V'(\theta)=f_\theta\bigl(x(\theta),\theta\bigr),
+\tag{1.7}\]</span></span> the partial of <span class="math inline">\(f\)</span> with respect to <span class="math inline">\(\theta\)</span> evaluated at the optimum — <em>holding the choice fixed</em>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Differentiate <span class="math inline">\(V(\theta)=f(x(\theta),\theta)\)</span> by the chain rule: <span class="math display">\[
+V'(\theta)=f_x\bigl(x(\theta),\theta\bigr)\,x'(\theta)+f_\theta\bigl(x(\theta),\theta\bigr).
+\]</span> The first-order condition <a href="#eq-foc-soc" class="quarto-xref">Equation&nbsp;<span>1.5</span></a> at the interior optimum gives <span class="math inline">\(f_x(x(\theta),\theta)=0\)</span>, killing the first term and leaving <a href="#eq-envelope-uncon" class="quarto-xref">Equation&nbsp;<span>1.7</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>If in addition <span class="math inline">\(f_{xx}(x(\theta),\theta)\)</span> is negative definite, the implicit-function theorem applied to the FOC <span class="math inline">\(f_x(x(\theta),\theta)=0\)</span> yields the <strong>comparative-statics formula</strong> <span id="eq-cs-uncon"><span class="math display">\[
+x'(\theta)=-\bigl(f_{xx}\bigr)^{-1} f_{x\theta}\Big|_{(x(\theta),\theta)},
+\tag{1.8}\]</span></span> which we generalize in <a href="#sec-comparative" class="quarto-xref"><span>Section 1.4</span></a>.</p>
+<div id="exm-envelope" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1.2 (A two-line envelope check)</strong></span> Let <span class="math inline">\(g(x,\theta)=x^2-2\theta x\)</span> and consider <span class="math inline">\(\min_x g\)</span>. Since <span class="math inline">\(g_{xx}=2&gt;0\)</span>, <span class="math inline">\(g\)</span> is strictly convex in <span class="math inline">\(x\)</span>, so the FOC <span class="math inline">\(g_x=2x-2\theta=0\)</span> is sufficient and gives <span class="math inline">\(x(\theta)=\theta\)</span>, hence <span class="math inline">\(x'(\theta)=1\)</span>. The value is <span class="math inline">\(V(\theta)=\min_x g=g(\theta,\theta)=-\theta^2\)</span>, and indeed the envelope theorem (in its minimization form) predicts <span class="math inline">\(V'(\theta)=g_\theta(x(\theta),\theta)=-2x(\theta)=-2\theta\)</span>, matching <span class="math inline">\(\frac{\mathrm d}{\mathrm
+d\theta}(-\theta^2)=-2\theta\)</span> directly. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+</section>
+<section id="sec-con" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="sec-con"><span class="header-section-number">1.3</span> Constrained optimization</h2>
+<p>Now restore the constraints. The general <strong>constrained problem</strong> is</p>
+<p><span id="eq-con-problem"><span class="math display">\[
+\max_x\; f(x)\qquad\text{subject to}\qquad g(x)\ge 0,\quad h(x)=0,
+\tag{1.9}\]</span></span></p>
+<p>with <span class="math inline">\(f:\mathbb{R}^n\to\mathbb{R}\)</span>, <span class="math inline">\(g:\mathbb{R}^n\to\mathbb{R}^m\)</span>, <span class="math inline">\(h:\mathbb{R}^n\to\mathbb{R}^k\)</span> all differentiable. The <strong>feasible set</strong> is <span class="math inline">\(X=\{x:g(x)\ge0,\ h(x)=0\}\)</span>. Equality constraints specialize to the Lagrange case (<span class="math inline">\(m=0\)</span>); inequality constraints are the genuinely new ingredient, and they introduce a sign — the <strong>complementary slackness</strong> that is the heart of the KKT theory.</p>
+<section id="sec-active" class="level3">
+<h3 class="anchored" data-anchor-id="sec-active">Active constraints and the Lagrangian</h3>
+<p>For a feasible <span class="math inline">\(x\)</span>, an inequality constraint <span class="math inline">\(g_i(x)\ge0\)</span> is <strong>active</strong> (or <strong>binding</strong>) if <span class="math inline">\(g_i(x)=0\)</span> and <strong>inactive</strong> (or <strong>slack</strong>) if <span class="math inline">\(g_i(x)&gt;0\)</span>. Equality constraints are active at every feasible point by definition. The <strong>active set</strong> at <span class="math inline">\(x\)</span> is <span id="eq-active-set"><span class="math display">\[
+I(x)=\{i:g_i(x)=0\}.
+\tag{1.10}\]</span></span> Only the active constraints can constrain a <em>local</em> move: an inactive <span class="math inline">\(g_i\)</span> holds with strict inequality, so it continues to hold under small perturbations and may be dropped from local analysis. We assemble the data into the <strong>Lagrangian</strong> (script-<span class="math inline">\(\mathcal{L}\)</span>) <span id="eq-lagrangian"><span class="math display">\[
+\mathcal{L}(x,\lambda,\mu)=f(x)+\lambda^\top g(x)+\mu^\top h(x),
+\tag{1.11}\]</span></span> with <strong>KKT multiplier</strong> <span class="math inline">\(\lambda\in\mathbb{R}^m\)</span> on the inequalities and <strong>equality multiplier</strong> <span class="math inline">\(\mu\in\mathbb{R}^k\)</span> on the equalities.</p>
+</section>
+<section id="sec-fritz-john" class="level3">
+<h3 class="anchored" data-anchor-id="sec-fritz-john">The Fritz–John conditions</h3>
+<p>Without any regularity assumption on the constraints, the cleanest necessary condition carries an extra multiplier <span class="math inline">\(\lambda_0\ge0\)</span> on the objective — the <strong>Fritz–John</strong> form. It says the gradients of objective and active constraints are linearly dependent, but allows the objective’s own weight to be zero in degenerate cases.</p>
+<div id="thm-fritz-john" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.11 (Fritz–John conditions)</strong></span> If <span class="math inline">\(x^\ast\)</span> solves <a href="#eq-con-problem" class="quarto-xref">Equation&nbsp;<span>1.9</span></a>, there exist multipliers <span class="math inline">\(\lambda_0\ge0\)</span>, <span class="math inline">\(\lambda\in\mathbb{R}^m\)</span>, <span class="math inline">\(\mu\in\mathbb{R}^k\)</span>, <strong>not all zero</strong>, such that <span id="eq-fj-stationarity"><span class="math display">\[
+\nabla_x\mathcal{L}_0(x^\ast,\lambda_0,\lambda,\mu)
+=\lambda_0\nabla f(x^\ast)+\sum_{i=1}^m\lambda_i\nabla g_i(x^\ast)+\sum_{j=1}^k\mu_j\nabla h_j(x^\ast)=0,
+\tag{1.12}\]</span></span> <span id="eq-fj-slack"><span class="math display">\[
+\lambda\ge0,\qquad g(x^\ast)\ge0,\qquad \lambda\odot g(x^\ast)=0,\qquad h(x^\ast)=0,
+\tag{1.13}\]</span></span> where <span class="math inline">\(\mathcal{L}_0=\lambda_0 f+\lambda^\top g+\mu^\top h\)</span> and <span class="math inline">\(\odot\)</span> is the componentwise (Hadamard) product, so <span class="math inline">\(\lambda\odot g(x^\ast)=0\)</span> means <span class="math inline">\(\lambda_i g_i(x^\ast)=0\)</span> for every <span class="math inline">\(i\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Write <span class="math inline">\(I=I(x^\ast)\)</span> for the active inequalities and assemble the gradients at <span class="math inline">\(x^\ast\)</span> of the objective and the active constraints. We claim the system <span id="eq-fj-system"><span class="math display">\[
+\nabla f(x^\ast)^\top d&gt;0,\quad \nabla g_i(x^\ast)^\top d&gt;0\ (i\in I),\quad \nabla h_j(x^\ast)^\top
+d=0\ (\forall j)
+\tag{1.14}\]</span></span> has <strong>no</strong> solution <span class="math inline">\(d\in\mathbb{R}^n\)</span>. If it had one, then for small <span class="math inline">\(t&gt;0\)</span> the perturbation <span class="math inline">\(x^\ast+t d\)</span> would (to first order) strictly increase <span class="math inline">\(f\)</span>, keep each active <span class="math inline">\(g_i\)</span> non-negative, and respect the equalities — and a standard implicit-function correction along the equality manifold turns this first-order feasibility into genuine feasibility — contradicting optimality of <span class="math inline">\(x^\ast\)</span>.</p>
+<p>Infeasibility of <a href="#eq-fj-system" class="quarto-xref">Equation&nbsp;<span>1.14</span></a> is exactly a <em>theorem-of-the-alternative</em> hypothesis: by a Gordan/ Farkas-type alternative (<a href="#lem-farkas" class="quarto-xref">Lemma&nbsp;<span>1.1</span></a> applied after splitting each equality into two inequalities), there exist scalars <span class="math inline">\(\lambda_0\ge0\)</span>, <span class="math inline">\(\lambda_i\ge0\)</span> <span class="math inline">\((i\in I)\)</span>, and free <span class="math inline">\(\mu_j\)</span>, not all zero, with <span class="math display">\[
+\lambda_0\nabla f(x^\ast)+\sum_{i\in I}\lambda_i\nabla g_i(x^\ast)+\sum_j\mu_j\nabla h_j(x^\ast)=0 .
+\]</span> Setting <span class="math inline">\(\lambda_i=0\)</span> for the inactive <span class="math inline">\(i\notin I\)</span> gives <a href="#eq-fj-stationarity" class="quarto-xref">Equation&nbsp;<span>1.12</span></a>, and these zeros are precisely the complementary-slackness statement <span class="math inline">\(\lambda\odot g(x^\ast)=0\)</span>, since <span class="math inline">\(g_i(x^\ast)&gt;0\)</span> forces <span class="math inline">\(\lambda_i=0\)</span> while <span class="math inline">\(g_i(x^\ast)=0\)</span> allows <span class="math inline">\(\lambda_i\ge0\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The blemish of Fritz–John is the case <span class="math inline">\(\lambda_0=0\)</span>: then the conditions involve only the constraints and say nothing about <span class="math inline">\(f\)</span>, so they cannot locate the optimum. The course names this a <strong>singular problem</strong> (and <span class="math inline">\(\lambda_0&gt;0\)</span>, normalizable to <span class="math inline">\(\lambda_0=1\)</span>, <strong>non-singular</strong>). Ruling out <span class="math inline">\(\lambda_0=0\)</span> is exactly what a <strong>constraint qualification</strong> does.</p>
+</section>
+<section id="sec-licq" class="level3">
+<h3 class="anchored" data-anchor-id="sec-licq">Constraint qualifications and LICQ</h3>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>This subsection folds in the course supplement <em>关于线性独立资质</em> (“On Linear Independence Qualification”). Its content — the definition of LICQ, the resulting KKT theorem, sufficiency, the corollary, and a fully worked <span class="math inline">\(\mathbb{R}^2\)</span> example — is reconstructed here in full.</p>
+</div>
+</div>
+</div>
+<p>A <strong>constraint qualification (CQ)</strong> is any condition on the constraints guaranteeing <span class="math inline">\(\lambda_0&gt;0\)</span> in <a href="#thm-fritz-john" class="quarto-xref">Theorem&nbsp;<span>1.11</span></a>, hence the existence of ordinary (non-singular) multipliers. The simplest and most-used is <strong>LICQ</strong>.</p>
+<div id="def-licq" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.6 (Linear independence constraint qualification (LICQ))</strong></span> The constraints of <a href="#eq-con-problem" class="quarto-xref">Equation&nbsp;<span>1.9</span></a> satisfy <strong>LICQ at a feasible point <span class="math inline">\(x\)</span></strong> if the gradients of all <em>active</em> constraints there, <span class="math display">\[
+\bigl\{\nabla g_i(x):i\in I(x)\bigr\}\ \cup\ \bigl\{\nabla h_j(x):j=1,\dots,k\bigr\},
+\]</span> are <strong>linearly independent</strong>. (The empty case — no active constraints — counts as satisfying LICQ vacuously.) The constraints satisfy LICQ <em>on the problem</em> if LICQ holds at every feasible point.</p>
+</div>
+<p>Under LICQ the degenerate weight cannot occur, and the Fritz–John conditions sharpen to the celebrated <strong>Karush–Kuhn–Tucker</strong> conditions with <span class="math inline">\(\lambda_0=1\)</span>.</p>
+<div id="thm-kkt" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.12 (Karush–Kuhn–Tucker conditions)</strong></span> If <span class="math inline">\(x^\ast\)</span> solves <a href="#eq-con-problem" class="quarto-xref">Equation&nbsp;<span>1.9</span></a> and LICQ holds at <span class="math inline">\(x^\ast\)</span>, there exist <span class="math inline">\(\lambda\in\mathbb{R}^m\)</span>, <span class="math inline">\(\mu\in\mathbb{R}^k\)</span> with <span id="eq-kkt-stationarity"><span class="math display">\[
+\nabla_x\mathcal{L}(x^\ast,\lambda,\mu)=\nabla f(x^\ast)+\sum_{i=1}^m\lambda_i\nabla g_i(x^\ast)
++\sum_{j=1}^k\mu_j\nabla h_j(x^\ast)=0,
+\tag{1.15}\]</span></span> <span id="eq-kkt-slack"><span class="math display">\[
+\lambda\ge0,\qquad g(x^\ast)\ge0,\qquad \lambda\odot g(x^\ast)=0,\qquad h(x^\ast)=0,
+\tag{1.16}\]</span></span> with <span class="math inline">\(\mathcal{L}\)</span> the Lagrangian <a href="#eq-lagrangian" class="quarto-xref">Equation&nbsp;<span>1.11</span></a>. Here <span class="math inline">\(\lambda\)</span> is the <strong>K–T multiplier</strong> and <span class="math inline">\(\mu\)</span> the <strong>Lagrange multiplier</strong>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Apply <a href="#thm-fritz-john" class="quarto-xref">Theorem&nbsp;<span>1.11</span></a> to get multipliers <span class="math inline">\((\lambda_0,\lambda,\mu)\)</span> not all zero with <a href="#eq-fj-stationarity" class="quarto-xref">Equation&nbsp;<span>1.12</span></a>. Suppose <span class="math inline">\(\lambda_0=0\)</span>. Then <span class="math inline">\(\sum_{i\in I}\lambda_i\nabla g_i(x^\ast)+\sum_j\mu_j\nabla h_j(x^\ast)=0\)</span> with the active inactive <span class="math inline">\(\lambda_i\)</span> zero by slackness, so this is a linear dependence among the active gradients with not all coefficients zero (since <span class="math inline">\((\lambda,\mu)\ne0\)</span> when <span class="math inline">\(\lambda_0=0\)</span>) — contradicting LICQ. Hence <span class="math inline">\(\lambda_0&gt;0\)</span>; dividing through by <span class="math inline">\(\lambda_0\)</span> and renaming <span class="math inline">\(\lambda/\lambda_0\to\lambda\)</span>, <span class="math inline">\(\mu/\lambda_0\to\mu\)</span> gives <a href="#eq-kkt-stationarity" class="quarto-xref">Equation&nbsp;<span>1.15</span></a> with <span class="math inline">\(\lambda_0=1\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p><a href="#fig-kkt-geometry" class="quarto-xref">Figure&nbsp;<span>1.1</span></a> shows the geometry. Because we maximize <span class="math inline">\(f\)</span> subject to <span class="math inline">\(g\ge0\)</span>, at the optimum <span class="math inline">\(\nabla f\)</span> cannot point into the feasible interior, or <span class="math inline">\(f\)</span> could be increased. The clean statement is that <strong><span class="math inline">\(\nabla f(x^\ast)\)</span> lies in the cone spanned by the outward normals of the binding constraints</strong>: there are non-negative weights <span class="math inline">\(\lambda_i\ge0\)</span> with <span id="eq-kkt-cone"><span class="math display">\[
+\nabla f(x^\ast)=-\sum_{i\in I}\lambda_i\,\nabla g_i(x^\ast),\qquad \lambda_i\ge0,
+\tag{1.17}\]</span></span> where the <span class="math inline">\(\nabla g_i\)</span> are the inward normals of the binding constraints, so <span class="math inline">\(-\nabla g_i\)</span> are the outward normals. This is exactly the stationarity condition <a href="#eq-kkt-stationarity" class="quarto-xref">Equation&nbsp;<span>1.15</span></a> with the constraint terms moved to the right-hand side; geometrically <span class="math inline">\(\nabla f\)</span> lies in the convex cone of the outward normals <span class="math inline">\(-\nabla g_i\)</span>, so <span class="math inline">\(f\)</span> cannot increase without leaving the feasible set.</p>
+<div id="fig-kkt-geometry" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kkt-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch01-kkt-geometry.svg" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kkt-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: At a binding corner the objective gradient <span class="math inline">\(\nabla f\)</span> points <em>out</em> of the feasible set, lying in the cone spanned by the outward normals <span class="math inline">\(-\nabla g_i\)</span>: <span class="math inline">\(\nabla f=-(\lambda_1\nabla g_1+\lambda_2\nabla
+g_2)\)</span> with <span class="math inline">\(\lambda_i\ge0\)</span> (<a href="#eq-kkt-cone" class="quarto-xref">Equation&nbsp;<span>1.17</span></a>). This cone condition <em>is</em> the KKT stationarity equation, and the sign <span class="math inline">\(\lambda_i\ge0\)</span> is exactly what prevents <span class="math inline">\(f\)</span> from being increased into the feasible set.
+</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Why the sign of <span class="math inline">\(\lambda\)</span> is non-negative.</strong> Suppose only <span class="math inline">\(g_i\)</span> binds and <span class="math inline">\(\lambda_i&lt;0\)</span>. Moving infinitesimally into the feasible interior along <span class="math inline">\(d\)</span> with <span class="math inline">\(\nabla g_i^\top d&gt;0\)</span> keeps feasibility and changes <span class="math inline">\(f\)</span> by <span class="math inline">\(\nabla f^\top d=-\lambda_i\nabla g_i^\top d&gt;0\)</span>, a strict improvement — contradiction. So <span class="math inline">\(\lambda_i\ge0\)</span>. Complementary slackness <span class="math inline">\(\lambda_i g_i=0\)</span> then encodes the dichotomy: a slack constraint (<span class="math inline">\(g_i&gt;0\)</span>) carries no multiplier (<span class="math inline">\(\lambda_i=0\)</span>) and may be ignored in the Lagrangian, while a binding constraint may carry a positive shadow price.</p>
+</div>
+</div>
+</div>
+<p>The sufficiency direction needs no CQ — only concavity.</p>
+<div id="thm-kkt-suff" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.13 (KKT sufficiency)</strong></span> Suppose <span class="math inline">\(f\)</span> and each <span class="math inline">\(g_i\)</span> are concave and each <span class="math inline">\(h_j\)</span> is affine (linear plus a constant). If <span class="math inline">\((x^\ast,\lambda,\mu)\)</span> satisfies the KKT conditions <a href="#eq-kkt-stationarity" class="quarto-xref">Equation&nbsp;<span>1.15</span></a>–<a href="#eq-kkt-slack" class="quarto-xref">Equation&nbsp;<span>1.16</span></a>, then <span class="math inline">\(x^\ast\)</span> solves <a href="#eq-con-problem" class="quarto-xref">Equation&nbsp;<span>1.9</span></a>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Define <span class="math inline">\(\psi(x)=\mathcal{L}(x,\lambda,\mu)=f(x)+\lambda^\top g(x)+\mu^\top h(x)\)</span>. With <span class="math inline">\(\lambda\ge0\)</span> and <span class="math inline">\(g_i\)</span> concave, <span class="math inline">\(\lambda^\top g\)</span> is concave; <span class="math inline">\(\mu^\top h\)</span> is affine; <span class="math inline">\(f\)</span> is concave; so <span class="math inline">\(\psi\)</span> is concave in <span class="math inline">\(x\)</span>, and <a href="#eq-kkt-stationarity" class="quarto-xref">Equation&nbsp;<span>1.15</span></a> says <span class="math inline">\(\nabla_x\psi(x^\ast)=0\)</span>. By <a href="#thm-uncon-suff" class="quarto-xref">Theorem&nbsp;<span>1.9</span></a>, <span class="math inline">\(x^\ast\)</span> globally maximizes <span class="math inline">\(\psi\)</span> over <span class="math inline">\(\mathbb{R}^n\)</span>: <span class="math display">\[
+f(x^\ast)+\lambda^\top g(x^\ast)+\mu^\top h(x^\ast)\;\ge\;f(x)+\lambda^\top g(x)+\mu^\top h(x)
+\quad\text{for all }x .
+\]</span> At <span class="math inline">\(x^\ast\)</span>, complementary slackness gives <span class="math inline">\(\lambda^\top g(x^\ast)=0\)</span> and <span class="math inline">\(h(x^\ast)=0\)</span>, so the left side is <span class="math inline">\(f(x^\ast)\)</span>. For any <em>feasible</em> <span class="math inline">\(x\)</span> (so <span class="math inline">\(g(x)\ge0\)</span>, <span class="math inline">\(h(x)=0\)</span>) with <span class="math inline">\(\lambda\ge0\)</span> we have <span class="math inline">\(\lambda^\top g(x)\ge0\)</span> and <span class="math inline">\(\mu^\top h(x)=0\)</span>, so the right side is <span class="math inline">\(\ge f(x)\)</span>. Hence <span class="math inline">\(f(x^\ast)\ge f(x)\)</span> for all feasible <span class="math inline">\(x\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="cor-kkt-iff" class="theorem corollary">
+<p><span class="theorem-title"><strong>Corollary 1.1 (Necessary and sufficient under concavity + LICQ)</strong></span> Suppose <span class="math inline">\(f,g\)</span> are concave, <span class="math inline">\(h\)</span> affine, and the constraints satisfy LICQ. Then <span class="math inline">\(x^\ast\)</span> solves <a href="#eq-con-problem" class="quarto-xref">Equation&nbsp;<span>1.9</span></a> <strong>if and only if</strong> there exist <span class="math inline">\(\lambda\ge0\)</span>, <span class="math inline">\(\mu\)</span> satisfying the KKT conditions <a href="#eq-kkt-stationarity" class="quarto-xref">Equation&nbsp;<span>1.15</span></a>–<a href="#eq-kkt-slack" class="quarto-xref">Equation&nbsp;<span>1.16</span></a>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Necessity is <a href="#thm-kkt" class="quarto-xref">Theorem&nbsp;<span>1.12</span></a> (LICQ); sufficiency is <a href="#thm-kkt-suff" class="quarto-xref">Theorem&nbsp;<span>1.13</span></a> (concavity). <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The concavity hypothesis of <a href="#thm-kkt-suff" class="quarto-xref">Theorem&nbsp;<span>1.13</span></a> can be weakened: it remains valid if <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> are merely <strong>quasiconcave</strong> <em>and</em> <span class="math inline">\(\nabla f(x^\ast)\ne0\)</span>. (Quasiconcavity convexifies the upper level sets, and the nonvanishing gradient supplies the strict supporting direction the concave proof got for free.)</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>On the proofs.</strong> Sufficiency (<a href="#thm-kkt-suff" class="quarto-xref">Theorem&nbsp;<span>1.13</span></a>) is elementary, resting only on concavity. Necessity (<a href="#thm-fritz-john" class="quarto-xref">Theorem&nbsp;<span>1.11</span></a>, <a href="#thm-kkt" class="quarto-xref">Theorem&nbsp;<span>1.12</span></a>) is the deep part: the classical route runs through <em>theorems of the alternative</em> — Gordan’s, Motzkin’s, or Farkas’ lemma (<a href="#lem-farkas" class="quarto-xref">Lemma&nbsp;<span>1.1</span></a>) — which are themselves finite-dimensional separation theorems (<a href="#thm-separating-hyperplane" class="quarto-xref">Theorem&nbsp;<span>1.4</span></a>). This is why <a href="#sec-prelim" class="quarto-xref"><span>Section 1.1</span></a> spent effort on convexity and separation: they are the analytic backbone of the multiplier rule.</p>
+</div>
+</div>
+</div>
+<section id="sec-licq-example" class="level4">
+<h4 class="anchored" data-anchor-id="sec-licq-example">A worked LICQ check</h4>
+<div id="exm-licq-r2" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1.3 (LICQ for the unit-simplex constraints in <span class="math inline">\(\mathbb{R}^2\)</span>)</strong></span> Consider the three inequality constraints in <span class="math inline">\(\mathbb{R}^2\)</span> <span class="math display">\[
+g_1(x,y)=x+y-1\ge0,\qquad g_2(x,y)=x\ge0,\qquad g_3(x,y)=y\ge0,
+\]</span> with constant gradients <span class="math inline">\(\nabla g_1=\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\)</span>, <span class="math inline">\(\nabla g_2=\bigl(\begin{smallmatrix}1\\0\end{smallmatrix}\bigr)\)</span>, <span class="math inline">\(\nabla g_3=\bigl(\begin{smallmatrix}0\\1\end{smallmatrix}\bigr)\)</span>. We claim LICQ holds at <em>every</em> feasible point.</p>
+<p>First, <strong>at most two</strong> constraints can be active at once: the three equations <span class="math inline">\(x+y-1=0\)</span>, <span class="math inline">\(x=0\)</span>, <span class="math inline">\(y=0\)</span> have no common solution (the first needs <span class="math inline">\(x+y=1\)</span>, the last two force <span class="math inline">\(x=y=0\)</span>), so no feasible point activates all three. The active set has size <span class="math inline">\(0\)</span>, <span class="math inline">\(1\)</span>, or <span class="math inline">\(2\)</span>, and we check each.</p>
+<p><em>No active constraint.</em> LICQ holds vacuously.</p>
+<p><em>One active constraint.</em> The single active gradient is one of <span class="math inline">\(\nabla g_1,\nabla g_2,\nabla g_3\)</span>, each a nonzero vector, and a one-vector set is linearly independent. LICQ holds. (Concretely: on the edge <span class="math inline">\(x+y=1\)</span> with <span class="math inline">\(x,y&gt;0\)</span> only <span class="math inline">\(g_1\)</span> binds, with gradient <span class="math inline">\(\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\ne0\)</span>; on the axis <span class="math inline">\(x=0\)</span>, <span class="math inline">\(y&gt;0\)</span>, <span class="math inline">\(x+y&gt;1\)</span> only <span class="math inline">\(g_2\)</span> binds; on <span class="math inline">\(y=0\)</span>, <span class="math inline">\(x&gt;0\)</span>, <span class="math inline">\(x+y&gt;1\)</span> only <span class="math inline">\(g_3\)</span> binds.)</p>
+<p><em>Two active constraints.</em> Two cases arise (the third pairing <span class="math inline">\(\{g_2,g_3\}\)</span> is infeasible since it forces <span class="math inline">\(x=y=0\)</span>, where <span class="math inline">\(g_1=-1&lt;0\)</span>):</p>
+<ul>
+<li><span class="math inline">\(g_1,g_2\)</span> active (<span class="math inline">\(x+y=1\)</span>, <span class="math inline">\(x=0\)</span>, so the point <span class="math inline">\((0,1)\)</span>): gradients <span class="math inline">\(\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\)</span> and <span class="math inline">\(\bigl(\begin{smallmatrix}1\\0\end{smallmatrix}\bigr)\)</span> are linearly independent.</li>
+<li><span class="math inline">\(g_1,g_3\)</span> active (<span class="math inline">\(x+y=1\)</span>, <span class="math inline">\(y=0\)</span>, the point <span class="math inline">\((1,0)\)</span>): gradients <span class="math inline">\(\bigl(\begin{smallmatrix}1\\1\end{smallmatrix}\bigr)\)</span> and <span class="math inline">\(\bigl(\begin{smallmatrix}0\\1\end{smallmatrix}\bigr)\)</span> are linearly independent.</li>
+</ul>
+<p>Every feasible point falls into one of these cases, so <strong>LICQ holds on the whole feasible set</strong>, and the KKT conditions are necessary for optimality of any program over it. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The companion <span class="math inline">\(\mathbb{R}^3\)</span> exercise from the supplement appears as <a href="#sec-problems" class="quarto-xref"><span>Section 1.7</span></a>, Problem 6.</p>
+</section>
+</section>
+<section id="sec-kkt-examples" class="level3">
+<h3 class="anchored" data-anchor-id="sec-kkt-examples">Worked KKT examples</h3>
+<div id="exm-kkt-simplex" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1.4 (A quadratic program over the simplex)</strong></span> Solve <span class="math inline">\(\min\,(x^2+y^2)\)</span> subject to <span class="math inline">\(x+y\ge1\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(y\ge0\)</span>. Rewrite as <span class="math inline">\(\max\,-(x^2+y^2)\)</span>; the objective <span class="math inline">\(-(x^2+y^2)\)</span> is concave, the constraints are linear, and LICQ holds (<a href="#exm-licq-r2" class="quarto-xref">Example&nbsp;<span>1.3</span></a>), so by <a href="#cor-kkt-iff" class="quarto-xref">Corollary&nbsp;<span>1.1</span></a> the KKT conditions are necessary and sufficient. With <span class="math inline">\(\mathcal{L}=-(x^2+y^2)+\lambda(x+y-1)+\mu_1 x+\mu_2 y\)</span> the conditions are <span class="math display">\[
+-2x+\lambda+\mu_1=0,\quad -2y+\lambda+\mu_2=0,\quad
+x+y\ge1,\ \lambda\ge0,\ \lambda(x+y-1)=0,
+\]</span> <span class="math display">\[
+x\ge0,\ \mu_1\ge0,\ \mu_1 x=0,\qquad y\ge0,\ \mu_2\ge0,\ \mu_2 y=0 .
+\]</span> First, <span class="math inline">\(\lambda&gt;0\)</span>: if <span class="math inline">\(\lambda=0\)</span> then <span class="math inline">\(2x=\mu_1\)</span>, <span class="math inline">\(2y=\mu_2\)</span>, and <span class="math inline">\(\mu_1 x=\mu_2 y=0\)</span> force <span class="math inline">\(x=y=0\)</span>, violating <span class="math inline">\(x+y\ge1\)</span>. With <span class="math inline">\(\lambda&gt;0\)</span>, <span class="math inline">\(2x=\lambda+\mu_1&gt;0\)</span> and <span class="math inline">\(2y=\lambda+\mu_2&gt;0\)</span>, so <span class="math inline">\(x,y&gt;0\)</span>, whence <span class="math inline">\(\mu_1=\mu_2=0\)</span> by slackness. Then <span class="math inline">\(x=\lambda/2=y\)</span>, and <span class="math inline">\(\lambda(x+y-1)=0\)</span> with <span class="math inline">\(\lambda&gt;0\)</span> gives <span class="math inline">\(x+y=1\)</span>. Therefore <span class="math inline">\(x=y=1/2\)</span>, the projection of the origin onto the line <span class="math inline">\(x+y=1\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="exm-kkt-strictly-convex" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1.5 (When the objective is the <em>wrong</em> curvature)</strong></span> Solve <span class="math inline">\(\max\,(x^2+y^2)\)</span> subject to <span class="math inline">\(x+y\le1\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(y\ge0\)</span>. The objective is strictly <em>convex</em>, so <a href="#cor-kkt-iff" class="quarto-xref">Corollary&nbsp;<span>1.1</span></a> does not apply — KKT points are merely <em>candidates</em>. But the feasible set is the compact triangle with vertices <span class="math inline">\((0,0),(1,0),(0,1)\)</span>, and <span class="math inline">\(f\)</span> is continuous, so Weierstrass (<a href="#thm-weierstrass-evt" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a>) guarantees a maximum; LICQ holds, so the maximizer satisfies KKT. Solving the KKT system (with <span class="math inline">\(g_1=1-x-y\)</span>, multipliers <span class="math inline">\(\lambda_1,\lambda_2,\lambda_3\)</span>) yields four candidate points <span class="math inline">\((0,0),(1,0),(0,1),(1/2,1/2)\)</span>. Evaluating <span class="math inline">\(f\)</span>: the values are <span class="math inline">\(0,1,1,1/2\)</span>, so the maxima are the <strong>two corners</strong> <span class="math inline">\((1,0)\)</span> and <span class="math inline">\((0,1)\)</span>, each with <span class="math inline">\(f=1\)</span>.</p>
+<p>The <em>direct method</em> confirms this without multipliers. Interior stationarity <span class="math inline">\(\nabla f=0\)</span> gives only <span class="math inline">\((0,0)\)</span>, not in the interior of the triangle, so the maximum is on the boundary. On the edge <span class="math inline">\(x=0,\ y\in[0,1]\)</span>, <span class="math inline">\(f=y^2\)</span> peaks at <span class="math inline">\((0,1)\)</span>; on <span class="math inline">\(y=0\)</span>, at <span class="math inline">\((1,0)\)</span>; on the edge <span class="math inline">\(x+y=1\)</span>, <span class="math inline">\(f=x^2+(1-x)^2\)</span> peaks at the endpoints <span class="math inline">\(x=0,1\)</span>. Comparing all boundary maxima recovers <span class="math inline">\((1,0)\)</span> and <span class="math inline">\((0,1)\)</span>. The lesson: when the program is non-convex, enumerate interior critical points <em>and</em> the boundary pieces, then compare values. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+</section>
+</section>
+<section id="sec-comparative" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="sec-comparative"><span class="header-section-number">1.4</span> Comparative statics</h2>
+<p>Comparative statics asks how the optimum <span class="math inline">\(x(\theta)\)</span> and the optimal value <span class="math inline">\(V(\theta)\)</span> shift when an exogenous parameter <span class="math inline">\(\theta\)</span> moves. Two tools answer it: the <strong>implicit-function theorem</strong> (applied to the FOC/KKT system) for <span class="math inline">\(x'(\theta)\)</span>, and the <strong>envelope theorem</strong> for <span class="math inline">\(V'(\theta)\)</span>. Because equalities convert to a pair of inequalities, it suffices to treat the inequality- constrained problem <span id="eq-cs-problem"><span class="math display">\[
+\max_x f(x,\theta)\quad\text{s.t.}\quad g(x,\theta)\ge0,
+\tag{1.18}\]</span></span> with <span class="math inline">\(f:\mathbb{R}^{n+1}\to\mathbb{R}\)</span>, <span class="math inline">\(g:\mathbb{R}^{n+1}\to\mathbb{R}^k\)</span>. Let <span class="math inline">\(x(\theta)\)</span> be the solution and <span class="math inline">\(\lambda(\theta)\ge0\)</span> the associated KKT multiplier; under the standing assumptions (LICQ, strict complementarity, a negative-definite bordered Hessian) both are differentiable in <span class="math inline">\(\theta\)</span> — a fact whose continuity half is exactly Berge’s theorem (<a href="#thm-berge" class="quarto-xref">Theorem&nbsp;<span>1.7</span></a>).</p>
+<section id="sec-envelope-con" class="level3">
+<h3 class="anchored" data-anchor-id="sec-envelope-con">The constrained envelope theorem</h3>
+<div id="thm-envelope-con" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.14 (Envelope theorem (constrained))</strong></span> For <a href="#eq-cs-problem" class="quarto-xref">Equation&nbsp;<span>1.18</span></a> with value <span class="math inline">\(V(\theta)=f(x(\theta),\theta)\)</span> and Lagrangian <span class="math inline">\(\mathcal{L}(x,\lambda,\theta)=f(x,\theta)+\lambda^\top g(x,\theta)\)</span>, <span id="eq-envelope-con"><span class="math display">\[
+V'(\theta)=\mathcal{L}_\theta\bigl(x(\theta),\lambda(\theta),\theta\bigr)
+=f_\theta\bigl(x(\theta),\theta\bigr)+\lambda(\theta)^\top g_\theta\bigl(x(\theta),\theta\bigr).
+\tag{1.19}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By complementary slackness <span class="math inline">\(\lambda(\theta)^\top g(x(\theta),\theta)=0\)</span>, so <span class="math inline">\(V(\theta)=f(x(\theta),\theta)+\lambda(\theta)^\top
+g(x(\theta),\theta)=\mathcal{L}(x(\theta),\lambda(\theta),\theta)\)</span>. Differentiate totally: <span class="math display">\[
+V'(\theta)=\mathcal{L}_x\,x'(\theta)+\mathcal{L}_\lambda\,\lambda'(\theta)+\mathcal{L}_\theta,
+\]</span> all evaluated at <span class="math inline">\((x(\theta),\lambda(\theta),\theta)\)</span>. The KKT stationarity <span class="math inline">\(\mathcal{L}_x=0\)</span> kills the first term. The second is <span class="math inline">\(\mathcal{L}_\lambda\,\lambda'(\theta)=g(x(\theta),\theta)^\top\lambda'(\theta)\)</span>, which vanishes: indeed <span class="math inline">\(g_i\lambda_i'=0\)</span> component-wise because if <span class="math inline">\(g_i(x(\theta),\theta)&gt;0\)</span> then <span class="math inline">\(\lambda_i(\theta)\equiv0\)</span> in a neighbourhood (slackness persists by continuity), so <span class="math inline">\(\lambda_i'(\theta)=0\)</span>; and if <span class="math inline">\(g_i(x(\theta),\theta)=0\)</span> then the factor <span class="math inline">\(g_i=0\)</span>. Hence <span class="math inline">\(V'(\theta)=\mathcal{L}_\theta\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>The vanishing of the multiplier-derivative term, <span class="math inline">\(g(x(\theta),\theta)^\top\lambda'(\theta)=0\)</span>, is the constrained analogue of the FOC killing <span class="math inline">\(f_x x'\)</span> in <a href="#thm-envelope-uncon" class="quarto-xref">Theorem&nbsp;<span>1.10</span></a> — both express that we need not track how the <em>solution</em> moves, only how the data enter directly.</p>
+</section>
+<section id="sec-shadow" class="level3">
+<h3 class="anchored" data-anchor-id="sec-shadow">Multipliers as shadow prices</h3>
+<p>The most useful special case is a constraint loosened by the parameter itself. Consider <span id="eq-shadow-problem"><span class="math display">\[
+\max_x f(x)\quad\text{s.t.}\quad h(x)\le\theta,
+\tag{1.20}\]</span></span> i.e.&nbsp;<span class="math inline">\(g(x,\theta)=\theta-h(x)\ge0\)</span>, with value <span class="math inline">\(V(\theta)\)</span> and multiplier <span class="math inline">\(\lambda(\theta)\)</span>. The Lagrangian is <span class="math inline">\(\mathcal{L}=f(x)+\lambda(\theta-h(x))\)</span>, so <span class="math inline">\(\mathcal{L}_\theta=\lambda\)</span>, and <a href="#thm-envelope-con" class="quarto-xref">Theorem&nbsp;<span>1.14</span></a> gives <span id="eq-shadow-price"><span class="math display">\[
+V'(\theta)=\lambda(\theta).
+\tag{1.21}\]</span></span> The multiplier is the <strong>shadow price</strong> of the constraint: it measures the marginal value to the objective of relaxing the constraint by one unit. This single identity is the bridge from the abstract multiplier rule to economics — it reappears below as the marginal utility of wealth, the price of a resource, and (in later chapters) the costate variable of optimal control.</p>
+</section>
+<section id="sec-cs-choice" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cs-choice">Comparative statics of the choice</h3>
+<p>When the relevant constraints are non-binding (or absent) the optimum solves <span class="math inline">\(f_x(x(\theta),
+\theta)=0\)</span>. Differentiating this identity in <span class="math inline">\(\theta\)</span>, <span class="math display">\[
+f_{xx}\bigl(x(\theta),\theta\bigr)\,x'(\theta)+f_{x\theta}\bigl(x(\theta),\theta\bigr)=0,
+\]</span> and inverting the (assumed negative-definite, hence nonsingular) Hessian gives the comparative-statics formula already met as <a href="#eq-cs-uncon" class="quarto-xref">Equation&nbsp;<span>1.8</span></a>, <span id="eq-cs-choice"><span class="math display">\[
+x'(\theta)=-\bigl(f_{xx}\bigr)^{-1} f_{x\theta}\Big|_{(x(\theta),\theta)}.
+\tag{1.22}\]</span></span> For binding constraints one differentiates the full KKT system, including the active <span class="math inline">\(g_i=0\)</span>, and inverts the <strong>bordered Hessian</strong> — the same algebra, with the constraint gradients bordering the Lagrangian Hessian.</p>
+</section>
+</section>
+<section id="sec-duality" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="sec-duality"><span class="header-section-number">1.5</span> Duality</h2>
+<p>Every maximization has a shadow <strong>minimization</strong> — its <em>dual</em> — whose optimal value bounds, and under good conditions equals, the original (<em>primal</em>) optimum. Duality reorganizes the KKT theory around <strong>saddle points</strong> of the Lagrangian and is the analytic root of price decentralization in economics and of efficient algorithms in computation.</p>
+<section id="sec-weak-duality" class="level3">
+<h3 class="anchored" data-anchor-id="sec-weak-duality">Weak duality and the duality gap</h3>
+<p>Abstractly, a problem <span class="math inline">\(\max_{x\in X}f(x)\)</span> has a <strong>dual</strong> <span class="math inline">\(\min_{y\in Y}\phi(y)\)</span> whenever <span class="math inline">\(f(x)\le\phi(y)\)</span> for all <span class="math inline">\(x\in X\)</span>, <span class="math inline">\(y\in Y\)</span>. The two values then satisfy the <strong>weak duality</strong> inequality <span id="eq-weak-duality-abstract"><span class="math display">\[
+\max_{x\in X} f(x)\;\le\;\min_{y\in Y}\phi(y),
+\tag{1.23}\]</span></span> and the nonnegative difference <span class="math inline">\(\min_{y}\phi(y)-\max_{x}f(x)\)</span> is the <strong>duality gap</strong>. When the gap is zero one may solve either problem to learn the common optimal value — the basis of much of linear and convex programming.</p>
+<p>For the constrained problem <span class="math inline">\(\max_x f(x)\)</span> s.t. <span class="math inline">\(g(x)\ge0\)</span> the canonical dual is the <strong>Lagrangian dual</strong>. Form <span class="math inline">\(\mathcal{L}(x,\lambda)=f(x)+\lambda^\top g(x)\)</span> with <span class="math inline">\(\lambda\in\mathbb{R}^m_+\)</span>. Then <span id="eq-inner-min"><span class="math display">\[
+\min_{\lambda\ge0}\mathcal{L}(x,\lambda)=
+\begin{cases} f(x), &amp; g(x)\ge0,\\ -\infty, &amp; g(x)\not\ge0,\end{cases}
+\tag{1.24}\]</span></span> because if some <span class="math inline">\(g_i(x)&lt;0\)</span> we drive <span class="math inline">\(\lambda_i\to+\infty\)</span> to send <span class="math inline">\(\mathcal{L}\to-\infty\)</span>, while if <span class="math inline">\(g(x)\ge0\)</span> the best <span class="math inline">\(\lambda\ge0\)</span> can do is set <span class="math inline">\(\lambda^\top g(x)=0\)</span>. Hence the primal value equals a max–min, <span id="eq-primal-maxmin"><span class="math display">\[
+\max_{x:g(x)\ge0} f(x)=\max_x\min_{\lambda\ge0}\mathcal{L}(x,\lambda).
+\tag{1.25}\]</span></span> Defining the <strong>dual function</strong> <span class="math inline">\(\varphi(\lambda)=\max_x\mathcal{L}(x,\lambda)\)</span>, the <strong>dual problem</strong> is <span id="eq-dual-problem"><span class="math display">\[
+\min_{\lambda\ge0}\varphi(\lambda)=\min_{\lambda\ge0}\max_x\mathcal{L}(x,\lambda).
+\tag{1.26}\]</span></span></p>
+<div id="thm-weak-duality" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.15 (Weak duality)</strong></span> For any primal-feasible <span class="math inline">\(x\)</span> (so <span class="math inline">\(g(x)\ge0\)</span>) and any dual-feasible <span class="math inline">\(\lambda\ge0\)</span>, <span class="math inline">\(f(x)\le\varphi(\lambda)\)</span>; consequently <span class="math inline">\(\max_x f(x)\le\min_{\lambda\ge0}\varphi(\lambda)\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>With <span class="math inline">\(g(x)\ge0\)</span> and <span class="math inline">\(\lambda\ge0\)</span> we have <span class="math inline">\(\lambda^\top g(x)\ge0\)</span>, so <span class="math display">\[
+f(x)\le f(x)+\lambda^\top g(x)=\mathcal{L}(x,\lambda)\le\max_{x'}\mathcal{L}(x',\lambda)=\varphi(\lambda).
+\]</span> Taking the max over feasible <span class="math inline">\(x\)</span> on the left and the min over <span class="math inline">\(\lambda\ge0\)</span> on the right preserves the inequality. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>This is the <strong>weak duality theorem</strong>: the max–min never exceeds the min–max, <span class="math inline">\(\max_x\min_\lambda\mathcal{L}\le\min_\lambda\max_x\mathcal{L}\)</span>, which holds for <em>any</em> function of two arguments. The question is when equality — <strong>strong duality</strong>, zero gap — holds.</p>
+</section>
+<section id="sec-saddle" class="level3">
+<h3 class="anchored" data-anchor-id="sec-saddle">Saddle points and the three-way equivalence</h3>
+<p>A point <span class="math inline">\((x^\ast,\lambda^\ast)\)</span> is a <strong>saddle point</strong> of <span class="math inline">\(\mathcal{L}\)</span> if <span id="eq-saddle"><span class="math display">\[
+\mathcal{L}(x,\lambda^\ast)\le\mathcal{L}(x^\ast,\lambda^\ast)\le\mathcal{L}(x^\ast,\lambda)
+\qquad\text{for all }x,\ \lambda\ge0,
+\tag{1.27}\]</span></span> i.e.&nbsp;<span class="math inline">\(x^\ast\)</span> maximizes <span class="math inline">\(\mathcal{L}(\cdot,\lambda^\ast)\)</span> while <span class="math inline">\(\lambda^\ast\)</span> minimizes <span class="math inline">\(\mathcal{L}(x^\ast,\cdot)\)</span>. At a saddle point the gap closes: <span class="math inline">\(\max_x\min_\lambda\mathcal{L}=\mathcal{L}(x^\ast,\lambda^\ast)=\min_\lambda\max_x\mathcal{L}\)</span>. The following equivalence ties together optimality, the saddle property, and the KKT conditions.</p>
+<div id="thm-duality-equivalence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.16 (Three-way equivalence)</strong></span> For the program <span class="math inline">\(\max_x f(x)\)</span> s.t. <span class="math inline">\(g(x)\ge0\)</span> with Lagrangian <span class="math inline">\(\mathcal{L}=f+\lambda^\top g\)</span>, the following are equivalent:</p>
+<ol type="1">
+<li><span class="math inline">\(x^\ast\)</span> solves the primal, <span class="math inline">\(\lambda^\ast\)</span> solves the dual, and the duality gap is zero;</li>
+<li><span class="math inline">\((x^\ast,\lambda^\ast)\)</span> is a saddle point of <span class="math inline">\(\mathcal{L}\)</span>;</li>
+<li><span class="math inline">\(\mathcal{L}(x^\ast,\lambda^\ast)=\max_x\mathcal{L}(x,\lambda^\ast)\)</span> together with <span class="math inline">\(g(x^\ast)\ge0\)</span> and <span class="math inline">\(\lambda^\ast\odot g(x^\ast)=0\)</span> (the KKT slackness).</li>
+</ol>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><em>(2)<span class="math inline">\(\Rightarrow\)</span>(3).</em> The left inequality of <a href="#eq-saddle" class="quarto-xref">Equation&nbsp;<span>1.27</span></a> says <span class="math inline">\(x^\ast\)</span> maximizes <span class="math inline">\(\mathcal{L}(\cdot,\lambda^\ast)\)</span>. The right inequality says <span class="math inline">\(\lambda^\ast\)</span> minimizes <span class="math inline">\(\lambda\mapsto f(x^\ast)+\lambda^\top g(x^\ast)\)</span> over <span class="math inline">\(\lambda\ge0\)</span>; a linear function of <span class="math inline">\(\lambda\ge0\)</span> is minimized at a finite value only if its slope <span class="math inline">\(g(x^\ast)\ge0\)</span>, and the minimizing <span class="math inline">\(\lambda^\ast\)</span> then makes <span class="math inline">\(\lambda^\ast{}^\top g(x^\ast)=0\)</span> (put weight only where <span class="math inline">\(g_i=0\)</span>). This is feasibility plus complementary slackness.</p>
+<p><em>(3)<span class="math inline">\(\Rightarrow\)</span>(2).</em> Given (3), for any <span class="math inline">\(\lambda\ge0\)</span>, <span class="math inline">\(\mathcal{L}(x^\ast,\lambda)=f(x^\ast)+\lambda^\top g(x^\ast)\ge f(x^\ast)=\mathcal{L}(x^\ast,
+\lambda^\ast)\)</span> using <span class="math inline">\(g(x^\ast)\ge0\)</span>, <span class="math inline">\(\lambda\ge0\)</span>, and slackness — the right saddle inequality; the left is the stated maximization. So <span class="math inline">\((x^\ast,\lambda^\ast)\)</span> is a saddle.</p>
+<p><em>(2)<span class="math inline">\(\Rightarrow\)</span>(1).</em> At a saddle the gap is zero and the saddle value is the common optimum, so <span class="math inline">\(x^\ast\)</span> is primal-optimal and <span class="math inline">\(\lambda^\ast\)</span> dual-optimal: for any feasible <span class="math inline">\(x\)</span>, <span class="math inline">\(f(x)\le\mathcal{L}(x,\lambda^\ast)\le\mathcal{L}(x^\ast,\lambda^\ast)=f(x^\ast)\)</span> (first step weak duality, last step slackness), and dually <span class="math inline">\(\varphi(\lambda)\ge\varphi(\lambda^\ast)\)</span>.</p>
+<p><em>(1)<span class="math inline">\(\Rightarrow\)</span>(2).</em> Zero gap means <span class="math inline">\(f(x^\ast)=\varphi(\lambda^\ast)=\max_x\mathcal{L}(x,\lambda^\ast)\ge\mathcal{L}(x^\ast,
+\lambda^\ast)=f(x^\ast)+\lambda^\ast{}^\top g(x^\ast)\ge f(x^\ast)\)</span>, forcing all to be equalities; hence <span class="math inline">\(x^\ast\)</span> maximizes <span class="math inline">\(\mathcal{L}(\cdot,\lambda^\ast)\)</span> and <span class="math inline">\(\lambda^\ast{}^\top g(x^\ast)=0\)</span>, which is (3), hence (2). <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>When <span class="math inline">\(f,g\)</span> are concave, <span class="math inline">\(\mathcal{L}(\cdot,\lambda^\ast)\)</span> is concave in <span class="math inline">\(x\)</span>, so its maximization in condition (3) reduces to the single equation <span class="math inline">\(\nabla_x\mathcal{L}(x^\ast,\lambda^\ast)=0\)</span> — the KKT stationarity. Thus <strong>in the concave case the saddle-point property is equivalent to the KKT conditions</strong>, and strong duality (zero gap) holds whenever a KKT point exists. This is the precise sense in which “solve the dual” and “solve the KKT system” are the same.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Linear programming.</strong> For <span class="math inline">\(\max c^\top x\)</span> s.t. <span class="math inline">\(Ax\le b\)</span>, <span class="math inline">\(x\ge0\)</span> (with <span class="math inline">\(c,b,A\)</span> entrywise positive), the Lagrangian <span class="math inline">\(\mathcal{L}(x,y)=c^\top x+y^\top(b-Ax)=b^\top y+x^\top(c-A^\top y)\)</span> is <em>simultaneously</em> the Lagrangian of the dual LP <span class="math inline">\(\min b^\top y\)</span> s.t. <span class="math inline">\(A^\top y\ge c\)</span>, <span class="math inline">\(y\ge0\)</span> — with the roles of multiplier and variable exchanged. Strong duality is exact here (the gap is always zero for feasible, bounded LPs), the cornerstone of linear programming.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-examples" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="sec-examples"><span class="header-section-number">1.6</span> Economic examples</h2>
+<p>The remaining sections apply the apparatus to the canonical problems of microeconomics and finance. Each illustrates the same three moves: write the Lagrangian, read off KKT, and interpret the multiplier as a price.</p>
+<section id="sec-cake" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cake">Cake-eating</h3>
+<p>A consumer holds <span class="math inline">\(A\)</span> units of cake to eat at dates <span class="math inline">\(t=0,1,\dots,n\)</span>, with discounted log utility <span class="math inline">\(\sum_{k=0}^n\beta^k\ln x_k\)</span> for a per-period discount factor <span class="math inline">\(\beta\in(0,1)\)</span> (the discrete-time factor, written <span class="math inline">\(\beta\)</span> throughout — see <a href="./notation.html">Notation</a>). The problem <span id="eq-cake"><span class="math display">\[
+\max_{x_0,\dots,x_n}\ \sum_{k=0}^n\beta^k\ln x_k\quad\text{s.t.}\quad\sum_{k=0}^n x_k=A
+\tag{1.28}\]</span></span> has a strictly concave objective and a linear constraint satisfying LICQ, so KKT is necessary and sufficient (<a href="#cor-kkt-iff" class="quarto-xref">Corollary&nbsp;<span>1.1</span></a>). With <span class="math inline">\(\mathcal{L}=\sum_k\beta^k\ln x_k+\lambda(A-\sum_k x_k)\)</span>, stationarity <span class="math inline">\(\partial\mathcal{L}/\partial x_k=\beta^k/x_k-\lambda=0\)</span> gives <span class="math inline">\(x_k=\beta^k/\lambda\)</span>. Substituting into the budget, <span class="math inline">\(\sum_k\beta^k/\lambda=A\)</span> fixes <span class="math inline">\(\lambda=\frac1A\sum_{k=0}^n\beta^k\)</span>, so <span id="eq-cake-solution"><span class="math display">\[
+x_k=A\,\frac{\beta^k}{\sum_{j=0}^n\beta^j},\qquad k=0,\dots,n .
+\tag{1.29}\]</span></span> Consumption falls geometrically at the discount factor — the consumer front-loads eating because the future is discounted. The multiplier <span class="math inline">\(\lambda\)</span> is the marginal utility of cake (the shadow price of the budget). With <span class="math inline">\(n=\infty\)</span> the geometric series converges to <span class="math inline">\(\sum_j\beta^j=1/(1-\beta)\)</span>, giving <span class="math inline">\(x_k=A(1-\beta)\beta^k\)</span> — the infinite-horizon cake-eating rule (Problem 2).</p>
+</section>
+<section id="sec-marshall" class="level3">
+<h3 class="anchored" data-anchor-id="sec-marshall">Marshallian demand, indirect utility, and Roy’s identity</h3>
+<p>A consumer with strictly concave utility <span class="math inline">\(U\)</span> over bundles <span class="math inline">\(x\)</span>, wealth <span class="math inline">\(y\)</span>, and price vector <span class="math inline">\(p\)</span> solves <span id="eq-marshall"><span class="math display">\[
+\max_x U(x)\quad\text{s.t.}\quad p^\top x\le y .
+\tag{1.30}\]</span></span> The unique solution <span class="math inline">\(x(p,y)\)</span> is <strong>Marshallian (uncompensated) demand</strong>, and the value <span class="math inline">\(V(p,y)=U(x(p,y))\)</span> is the <strong>indirect utility function</strong>. With Lagrangian <span class="math inline">\(\mathcal{L}=U(x)+\lambda(y-p^\top x)\)</span> the optimum satisfies <span class="math inline">\(\mathcal{L}_x=0\)</span> and slackness <span class="math inline">\(\lambda(y-p^\top x)=0\)</span>, and <span class="math inline">\(V(p,y)=\mathcal{L}(x(p,y),\lambda(p,y))\)</span>. By the envelope theorem (<a href="#thm-envelope-con" class="quarto-xref">Theorem&nbsp;<span>1.14</span></a>), differentiating the Lagrangian in the parameters <span class="math inline">\(p\)</span> and <span class="math inline">\(y\)</span> directly, <span id="eq-roy-envelope"><span class="math display">\[
+V_p=\mathcal{L}_p=-\lambda\,x,\qquad V_y=\mathcal{L}_y=\lambda .
+\tag{1.31}\]</span></span> Eliminating <span class="math inline">\(\lambda\)</span> gives <strong>Roy’s identity</strong> <span id="eq-roy"><span class="math display">\[
+x(p,y)=-\frac{V_p(p,y)}{V_y(p,y)},
+\tag{1.32}\]</span></span> recovering demand from the indirect utility’s price- and wealth-gradients. Economically, <span class="math inline">\(\lambda
+=V_y&gt;0\)</span> is the <strong>marginal utility of wealth</strong> — the shadow price of the budget constraint, exactly <a href="#eq-shadow-price" class="quarto-xref">Equation&nbsp;<span>1.21</span></a>.</p>
+</section>
+<section id="sec-hicks" class="level3">
+<h3 class="anchored" data-anchor-id="sec-hicks">Hicksian demand, the expenditure function, and Shephard’s lemma</h3>
+<p>The <em>dual</em> consumer problem minimizes the spending needed to reach a utility target <span class="math inline">\(u\)</span>: <span id="eq-hicks"><span class="math display">\[
+\min_x p^\top x\quad\text{s.t.}\quad U(x)\ge u .
+\tag{1.33}\]</span></span> Its solution <span class="math inline">\(h(p,u)\)</span> is <strong>Hicksian (compensated) demand</strong> and the value <span class="math inline">\(e(p,u)=p^\top h(p,u)\)</span> is the <strong>expenditure function</strong>. Writing the Lagrangian <span class="math inline">\(\mathcal{L}=p^\top x+\mu(u-U(x))\)</span> (a minimization, so <span class="math inline">\(\mu\ge0\)</span>), the envelope theorem in the price <span class="math inline">\(p\)</span> gives, since only the explicit <span class="math inline">\(p^\top x\)</span> term depends on <span class="math inline">\(p\)</span>, <span id="eq-shephard"><span class="math display">\[
+e_p(p,u)=\mathcal{L}_p=h(p,u).
+\tag{1.34}\]</span></span> This is <strong>Shephard’s lemma</strong>: the price-gradient of the expenditure function <em>is</em> Hicksian demand. It is the cost-minimization mirror of Roy’s identity, and the envelope theorem delivers both with no differentiation of the optimal choice.</p>
+</section>
+<section id="sec-slutsky" class="level3">
+<h3 class="anchored" data-anchor-id="sec-slutsky">The Slutsky equation</h3>
+<p>Marshallian and Hicksian demand are the primal and dual faces of the same consumer. They coincide when the wealth and utility targets are matched: <span class="math inline">\(y=e(p,u)\iff u=V(p,y)\)</span>, and then <span class="math inline">\(h(p,u)=x(p,y)\)</span>, giving the identity <span id="eq-duality-identity"><span class="math display">\[
+h(p,u)=x\bigl(p,\,e(p,u)\bigr).
+\tag{1.35}\]</span></span> Differentiate in <span class="math inline">\(p\)</span> (matrix form, with <span class="math inline">\(D_p\)</span> the Jacobian in <span class="math inline">\(p\)</span> and <span class="math inline">\(D_y\)</span> the wealth-derivative column): <span class="math display">\[
+D_p h=D_p x+D_y x\,\cdot(e_p)^\top .
+\]</span> By Shephard’s lemma <span class="math inline">\(e_p=h=x\)</span>, so substituting <span class="math inline">\(e_p=x\)</span> and rearranging gives the <strong>Slutsky equation</strong> <span id="eq-slutsky"><span class="math display">\[
+D_p x=D_p h-D_y x\cdot x^\top,
+\tag{1.36}\]</span></span> or component-wise <span id="eq-slutsky-scalar"><span class="math display">\[
+\frac{\partial x_i}{\partial p_j}
+=\underbrace{\frac{\partial h_i}{\partial p_j}}_{\text{substitution}}
+-\underbrace{\frac{\partial x_i}{\partial y}\,x_j}_{\text{income}} .
+\tag{1.37}\]</span></span> The price response of demand splits into a <strong>substitution effect</strong> (the Hicksian, compensated response) and an <strong>income effect</strong> (the wealth response scaled by the quantity bought). Moreover <span class="math inline">\(D_p h=D_p(e_p)=D_{pp}e=\nabla^2_p e\)</span>: the <strong>Slutsky matrix is the Hessian of the expenditure function</strong>, hence symmetric and negative semidefinite — compensated demand slopes down, and cross substitution effects are symmetric. This is the deepest comparative-statics result in consumer theory, and it falls out of the envelope theorem and concavity of <span class="math inline">\(e\)</span>.</p>
+</section>
+<section id="sec-markowitz" class="level3">
+<h3 class="anchored" data-anchor-id="sec-markowitz">The Markowitz frontier, two-fund theorem, and CAPM</h3>
+<p>(Throughout this section <span class="math inline">\(\beta\)</span> denotes the frontier-portfolio direction vector <a href="#eq-markowitz-affine" class="quarto-xref">Equation&nbsp;<span>1.40</span></a> and, later, the CAPM beta <a href="#eq-capm" class="quarto-xref">Equation&nbsp;<span>1.42</span></a> — <em>not</em> the discount factor reserved for <span class="math inline">\(\beta\)</span> in <code>notation.qmd</code> and used in this chapter’s cake-eating example.)</p>
+<p>Consider a one-period market with <span class="math inline">\(n\)</span> risky assets, expected-return vector <span class="math inline">\(\theta\ne\mathbf{1}\)</span>, and positive-definite return-covariance matrix <span class="math inline">\(A\)</span>. A portfolio <span class="math inline">\(x\)</span> (weights summing to one) has expected return <span class="math inline">\(\theta^\top x\)</span> and return variance <span class="math inline">\(x^\top A x\)</span>. A portfolio is a <strong>frontier portfolio</strong> if it minimizes variance among all portfolios with its expected return <span class="math inline">\(r\)</span>: <span id="eq-markowitz"><span class="math display">\[
+\min_x\ x^\top A x\quad\text{s.t.}\quad \theta^\top x=r,\quad \mathbf{1}^\top x=1 .
+\tag{1.38}\]</span></span> The objective is strictly convex, the constraints linear and independent (LICQ holds), so KKT is necessary and sufficient. With <span class="math inline">\(\mathcal{L}=x^\top A x+\lambda(r-\theta^\top
+x)+\mu(1-\mathbf{1}^\top x)\)</span>, stationarity <span class="math inline">\(\nabla_x\mathcal{L}=2Ax-\lambda\theta-\mu\mathbf{1}=0\)</span> gives (absorbing the <span class="math inline">\(2\)</span> into <span class="math inline">\(\lambda,\mu\)</span>) <span id="eq-markowitz-x"><span class="math display">\[
+x=\lambda A^{-1}\theta+\mu A^{-1}\mathbf{1}.
+\tag{1.39}\]</span></span> Imposing the two constraints yields two linear equations in <span class="math inline">\((\lambda,\mu)\)</span>; solving and substituting back, the frontier portfolio is <strong>affine in its target return</strong>, <span id="eq-markowitz-affine"><span class="math display">\[
+x=\alpha+r\,\beta,
+\tag{1.40}\]</span></span> where <span class="math inline">\(\alpha,\beta\in\mathbb{R}^n\)</span> depend only on <span class="math inline">\(A,\theta\)</span>. A portfolio is therefore a frontier portfolio <strong>if and only if</strong> it can be written in the form <a href="#eq-markowitz-affine" class="quarto-xref">Equation&nbsp;<span>1.40</span></a>, and it is uniquely pinned down by its expected return <span class="math inline">\(r\)</span>. Substituting <a href="#eq-markowitz-x" class="quarto-xref">Equation&nbsp;<span>1.39</span></a> into the objective shows the minimized variance traces a hyperbola in the <span class="math inline">\((\sigma,r)\)</span> plane, <span id="eq-markowitz-hyperbola"><span class="math display">\[
+\frac{\sigma^2}{a^2}-\frac{(r-r_0)^2}{b^2}=1,\qquad \sigma&gt;0,
+\tag{1.41}\]</span></span> with <span class="math inline">\(a,b,r_0\)</span> positive constants of <span class="math inline">\(A,\theta\)</span>. The right branch is the <strong>portfolio frontier</strong>; its <strong>upper half</strong> (<span class="math inline">\(r\ge r_0\)</span>) is the <strong>efficient frontier</strong> — efficient portfolios both minimize variance for their return and maximize return for their variance. The vertex <span class="math inline">\((a,r_0)\)</span> is the <strong>minimum-variance portfolio</strong>, and a frontier portfolio is efficient iff <span class="math inline">\(r\ge r_0\)</span> (<a href="#fig-markowitz" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>).</p>
+<div id="thm-two-fund" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.17 (Two-fund theorem)</strong></span> Any frontier portfolio is a combination of any two distinct frontier portfolios. Conversely every combination of two frontier portfolios is a frontier portfolio.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By <a href="#eq-markowitz-affine" class="quarto-xref">Equation&nbsp;<span>1.40</span></a> each frontier portfolio is <span class="math inline">\(\alpha+r\beta\)</span>. Fix two distinct frontier portfolios <span class="math inline">\(x_1=\alpha+r_1\beta\)</span>, <span class="math inline">\(x_2=\alpha+r_2\beta\)</span> with <span class="math inline">\(r_1\ne r_2\)</span>. For any target <span class="math inline">\(r\)</span> solve <span class="math inline">\(w_1 r_1+w_2 r_2=r\)</span>, <span class="math inline">\(w_1+w_2=1\)</span> (a <span class="math inline">\(2\times2\)</span> system, nonsingular since <span class="math inline">\(r_1\ne r_2\)</span>). Then <span class="math inline">\(w_1 x_1+w_2 x_2=\alpha(w_1+w_2)+(w_1 r_1+w_2 r_2)\beta=\alpha+r\beta=x\)</span>, the frontier portfolio of return <span class="math inline">\(r\)</span>. So investing fractions <span class="math inline">\(w_1,w_2\)</span> in the two “funds” reproduces the whole frontier; the converse is immediate since any <span class="math inline">\(w_1 x_1+w_2 x_2\)</span> is again affine in its return. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="fig-markowitz" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-markowitz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch01-markowitz.svg" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-markowitz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.2: The portfolio frontier is the right branch of a hyperbola <a href="#eq-markowitz-hyperbola" class="quarto-xref">Equation&nbsp;<span>1.41</span></a> in risk–return space; its upper half (the efficient frontier) starts at the minimum-variance vertex. Adding a risk-free asset <span class="math inline">\(r_f&lt;r_0\)</span>, the <strong>capital market line</strong> is the ray from <span class="math inline">\((0,r_f)\)</span> tangent to the upper branch at the <strong>market portfolio</strong> <span class="math inline">\(M\)</span>, and it dominates the risky-only frontier — every investor holds a mix of <span class="math inline">\(r_f\)</span> and <span class="math inline">\(M\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>Now add a <strong>risk-free asset</strong> with return <span class="math inline">\(r_f&lt;r_0\)</span>. The feasible set in <span class="math inline">\((\sigma,r)\)</span> space becomes the region bounded by the <strong>capital market line (CML)</strong> — the ray from <span class="math inline">\((0,r_f)\)</span> tangent to the efficient frontier at a portfolio <span class="math inline">\(M\)</span> (<a href="#fig-markowitz" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>). The <strong>one-fund theorem</strong> holds: every frontier portfolio is a combination of the risk-free asset and the single tangency portfolio <span class="math inline">\(M\)</span>. If all investors are mean-variance optimizers, in equilibrium each holds a mix of <span class="math inline">\(r_f\)</span> and <span class="math inline">\(M\)</span>, so <span class="math inline">\(M\)</span> must be the <strong>market portfolio</strong> (risky assets in proportion to their total values). From the geometry of the CML one derives the <strong>Capital Asset Pricing Model</strong>: for any portfolio <span class="math inline">\(x\)</span>, <span id="eq-capm"><span class="math display">\[
+r_x-r_f=\beta_x\,(r_m-r_f),\qquad \beta_x=\frac{\operatorname{Cov}(R_x,R_m)}{\operatorname{Var}(R_m)},
+\tag{1.42}\]</span></span> where <span class="math inline">\(r_x=\mathbb{E}R_x\)</span>, <span class="math inline">\(r_m=\mathbb{E}R_m\)</span>. An asset’s risk premium is proportional to its <strong>beta</strong>, its covariance with the market normalized by market variance; only undiversifiable (market) risk is priced. CAPM converts the portfolio-optimization geometry into a pricing rule for every asset <span class="citation" data-cites="dixit1990 acemoglu2009">(<a href="references.html#ref-dixit1990" role="doc-biblioref">Dixit 1990</a>; <a href="references.html#ref-acemoglu2009" role="doc-biblioref">Acemoglu 2009</a>)</span>.</p>
+</section>
+<section id="sec-resource" class="level3">
+<h3 class="anchored" data-anchor-id="sec-resource">Resource shadow pricing</h3>
+<p>A region has total available water <span class="math inline">\(x\)</span>, allocated across four uses — industry, agriculture, residential, ecological — in amounts <span class="math inline">\(y_1,\dots,y_4\)</span> generating monetized values <span class="math inline">\(f_i(y_i)\)</span>. The optimal allocation solves <span id="eq-water"><span class="math display">\[
+\max_{y_1,\dots,y_4}\ \sum_{i=1}^4 f_i(y_i)\quad\text{s.t.}\quad \sum_{i=1}^4 y_i\le x .
+\tag{1.43}\]</span></span> With <span class="math inline">\(\mathcal{L}=\sum_i f_i(y_i)+\lambda(x-\sum_i y_i)\)</span> and value <span class="math inline">\(V(x)\)</span>, the envelope theorem <a href="#eq-shadow-price" class="quarto-xref">Equation&nbsp;<span>1.21</span></a> gives <span id="eq-water-shadow"><span class="math display">\[
+V'(x)=\frac{\partial\mathcal{L}}{\partial x}=\lambda,
+\tag{1.44}\]</span></span> so the multiplier <span class="math inline">\(\lambda\)</span> is the <strong>shadow price</strong> of water — its marginal contribution to regional value. Since the <span class="math inline">\(f_i\)</span> are hard to pin down, one estimates <span class="math inline">\(V\)</span> directly (at least locally) and reads off <span class="math inline">\(V'\)</span>. If developing one unit of water costs <span class="math inline">\(c\)</span>, net value is <span class="math inline">\(W(x)=V(x)-cx\)</span>, and the optimal development level <span class="math inline">\(x^\ast\)</span> (with <span class="math inline">\(V'&gt;0&gt;V''\)</span>) satisfies <span id="eq-water-development"><span class="math display">\[
+c=V'(x^\ast)=\lambda(x^\ast).
+\tag{1.45}\]</span></span> Under perfect competition the water price <span class="math inline">\(p\)</span> equals marginal cost, <span class="math inline">\(p=c=\lambda(x^\ast)\)</span>: the <strong>market price of the resource equals its shadow price</strong> at the optimal development level. If the region’s growth target requires more water than the shadow price justifies, it should import water from lower-cost regions or, failing that, scale back its target — a textbook application of shadow pricing to policy.</p>
+</section>
+</section>
+<section id="sec-problems" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="sec-problems"><span class="header-section-number">1.7</span> Problems</h2>
+<p>The following are the chapter’s exercises; worked solutions to a selected, instructive subset follow in <a href="#sec-solutions" class="quarto-xref"><span>Section 1.8</span></a>.</p>
+<ol type="1">
+<li>Solve <span class="math inline">\(\max\,(x+y)\)</span> subject to <span class="math inline">\(x^2+y^2\le1\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(y\ge0\)</span>, and give a geometric interpretation.</li>
+<li>In the cake-eating problem <a href="#eq-cake" class="quarto-xref">Equation&nbsp;<span>1.28</span></a> with <span class="math inline">\(n=\infty\)</span>, find the optimal consumption path.</li>
+<li><em>(Advertising model.)</em> A firm spends <span class="math inline">\(x_1,x_2\)</span> on advertising in two markets, generating sales <span class="math inline">\(Q_1=\sqrt{x_1}\)</span> and <span class="math inline">\(Q_2=2\sqrt{x_2}\)</span>. With unit product price <span class="math inline">\(1\)</span> and a fixed total advertising budget <span class="math inline">\(M\)</span>, find the optimal budget split and the value of <span class="math inline">\(M\)</span>.</li>
+<li><em>(Life-cycle model.)</em> A consumer lives two periods, works only in the first (earning wage <span class="math inline">\(M\)</span>), consumes <span class="math inline">\(x\)</span> in period 1, and banks the rest at interest rate <span class="math inline">\(i\)</span> to consume <span class="math inline">\(y\)</span> in period 2, with utility <span class="math inline">\(u(x,y)=u(x)+\beta\,u(y)\)</span>, <span class="math inline">\(\beta\in(0,1)\)</span>. Find the optimal first-period consumption when (a) <span class="math inline">\(u(x)=\sqrt{x}\)</span> and (b) <span class="math inline">\(u(x)=1-e^{-x}\)</span>.</li>
+<li><em>(Land allocation.)</em> A landowner has 10 mu of land; planting <span class="math inline">\(x\)</span> mu of trees yields <span class="math inline">\(2x\)</span> and <span class="math inline">\(y\)</span> mu of flowers yields <span class="math inline">\(y^2\)</span>. Find the allocation maximizing total revenue, the shadow price of the land, and whether the owner should sell at 1 per mu.</li>
+<li><em>(LICQ in <span class="math inline">\(\mathbb{R}^3\)</span>; from the supplement.)</em> Determine whether the constraint set <span class="math display">\[
+x+y=z,\qquad x^2+y^2\ge 2z,\qquad x^3+y^3\ge 3z
+\]</span> satisfies LICQ at every feasible point.</li>
+</ol>
+</section>
+<section id="sec-solutions" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="sec-solutions"><span class="header-section-number">1.8</span> Selected solutions</h2>
+<section id="problem-1" class="level3">
+<h3 class="anchored" data-anchor-id="problem-1">Problem 1</h3>
+<p>Maximize <span class="math inline">\(f=x+y\)</span> over the quarter-disk <span class="math inline">\(\{x^2+y^2\le1,\ x\ge0,\ y\ge0\}\)</span>, a compact set, so a maximum exists (<a href="#thm-weierstrass-evt" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a>). The objective is linear (hence concave) and the constraints are concave with LICQ on the relevant boundary, so KKT is sufficient as well as necessary. The unconstrained gradient <span class="math inline">\(\nabla f=(1,1)\ne0\)</span> never vanishes, so the optimum is on the boundary. The disk constraint <span class="math inline">\(g_1=1-x^2-y^2\ge0\)</span> must bind (moving outward radially raises <span class="math inline">\(x+y\)</span> until it does), and on <span class="math inline">\(x^2+y^2=1\)</span> with <span class="math inline">\(x,y&gt;0\)</span> the axis constraints are slack, so only <span class="math inline">\(\lambda_1&gt;0\)</span> is active. Stationarity <span class="math inline">\(\nabla f=\lambda_1\nabla(x^2+y^2)=\lambda_1(2x,2y)\)</span> forces <span class="math inline">\(x=y\)</span>; combined with <span class="math inline">\(x^2+y^2=1\)</span> this gives <span class="math display">\[
+x=y=\tfrac{1}{\sqrt2},\qquad f_{\max}=\sqrt2 .
+\]</span> Geometrically, the level lines <span class="math inline">\(x+y=\text{const}\)</span> are lines of slope <span class="math inline">\(-1\)</span>; the largest one meeting the quarter-disk is tangent to the circle at the <span class="math inline">\(45^\circ\)</span> point <span class="math inline">\((\tfrac{1}{\sqrt2},
+\tfrac{1}{\sqrt2})\)</span>, where the line’s normal <span class="math inline">\((1,1)\)</span> is parallel to the radius — exactly the KKT condition <span class="math inline">\(\nabla f\parallel\nabla g_1\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</section>
+<section id="problem-4-life-cycle-consumption" class="level3">
+<h3 class="anchored" data-anchor-id="problem-4-life-cycle-consumption">Problem 4 (life-cycle consumption)</h3>
+<p>The period-2 budget is <span class="math inline">\(y=(1+i)(M-x)\)</span>, so the consumer solves the one-variable problem <span class="math display">\[
+\max_{0\le x\le M}\ u(x)+\beta\,u\bigl((1+i)(M-x)\bigr).
+\]</span> The FOC (interior) is <span class="math inline">\(u'(x)=\beta(1+i)\,u'\bigl((1+i)(M-x)\bigr)\)</span>, the <strong>Euler equation</strong> of two-period consumption: the marginal utility of consuming today equals the discounted, interest- compounded marginal utility of consuming tomorrow.</p>
+<p><em>(a) <span class="math inline">\(u(x)=\sqrt{x}\)</span>, so <span class="math inline">\(u'(x)=\tfrac12 x^{-1/2}\)</span>.</em> The FOC becomes <span class="math inline">\(x^{-1/2}=\beta(1+i)\bigl[(1+i)(M-x)\bigr]^{-1/2}\)</span>. Squaring, <span class="math inline">\(\frac1x=\frac{\beta^2(1+i)^2}{(1+i)(M-x)}=\frac{\beta^2(1+i)}{M-x}\)</span>, hence <span class="math inline">\(M-x=\beta^2(1+i)\,x\)</span> and <span class="math display">\[
+x=\frac{M}{1+\beta^2(1+i)} .
+\]</span> Since <span class="math inline">\(u\)</span> is strictly concave and the constraint linear, this interior critical point is the global optimum. Higher interest <span class="math inline">\(i\)</span> or patience <span class="math inline">\(\beta\)</span> lowers first-period consumption — the consumer saves more when the future is better-rewarded.</p>
+<p><em>(b) <span class="math inline">\(u(x)=1-e^{-x}\)</span>, so <span class="math inline">\(u'(x)=e^{-x}\)</span>.</em> The FOC is <span class="math inline">\(e^{-x}=\beta(1+i)\,e^{-(1+i)(M-x)}\)</span>. Taking logs, <span class="math inline">\(-x=\ln\!\bigl(\beta(1+i)\bigr)-(1+i)(M-x)\)</span>, i.e.&nbsp;<span class="math inline">\(-x+(1+i)(M-x)=\ln\!\bigl(\beta(1+i)\bigr)\)</span>, which rearranges to <span class="math display">\[
+x=\frac{(1+i)M-\ln\!\bigl(\beta(1+i)\bigr)}{2+i},
+\]</span> again the global optimum by strict concavity (clipped to <span class="math inline">\([0,M]\)</span> if the formula falls outside). <span class="math inline">\(\;\blacksquare\)</span></p>
+</section>
+<section id="problem-5-land-allocation-and-the-shadow-price" class="level3">
+<h3 class="anchored" data-anchor-id="problem-5-land-allocation-and-the-shadow-price">Problem 5 (land allocation and the shadow price)</h3>
+<p>With <span class="math inline">\(x\)</span> mu of trees and <span class="math inline">\(y\)</span> mu of flowers, revenue is <span class="math inline">\(2x+y^2\)</span> subject to <span class="math inline">\(x+y\le10\)</span>, <span class="math inline">\(x,y\ge0\)</span>. The objective is <strong>convex</strong> in <span class="math inline">\(y\)</span>, so this is not a concave program and KKT points are only candidates — but the feasible triangle is compact, guaranteeing a maximizer (<a href="#thm-weierstrass-evt" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a>). Because the land constraint will bind (revenue rises in both crops), set <span class="math inline">\(x=10-y\)</span> and maximize <span class="math display">\[
+R(y)=2(10-y)+y^2=20-2y+y^2,\qquad y\in[0,10].
+\]</span> This parabola opens upward with vertex at <span class="math inline">\(y=1\)</span> (a <em>minimum</em>), so the maximum is at an endpoint: <span class="math inline">\(R(0)=20\)</span> versus <span class="math inline">\(R(10)=20-20+100=100\)</span>. Hence the owner plants <strong>all 10 mu of flowers</strong>, <span class="math inline">\(y=10\)</span>, <span class="math inline">\(x=0\)</span>, for revenue <span class="math inline">\(100\)</span>.</p>
+<p>The <strong>shadow price</strong> of land is the marginal value of an extra mu, <span class="math inline">\(V'(10)\)</span>. With all land in flowers, <span class="math inline">\(V(L)=L^2\)</span> for <span class="math inline">\(L\)</span> near <span class="math inline">\(10\)</span> (the corner solution persists), so <span class="math inline">\(V'(10)=2L|_{L=10}=20\)</span>: an extra mu is worth <span class="math inline">\(20\)</span>. Since the offered purchase price is only <span class="math inline">\(1\)</span> per mu, far below the shadow price of <span class="math inline">\(20\)</span>, the owner should <strong>not sell</strong> — the land is worth far more in flower production than the market offers. <span class="math inline">\(\;\blacksquare\)</span></p>
+</section>
+<section id="problem-6-licq-in-mathbbr3" class="level3">
+<h3 class="anchored" data-anchor-id="problem-6-licq-in-mathbbr3">Problem 6 (LICQ in <span class="math inline">\(\mathbb{R}^3\)</span>)</h3>
+<p>Write the constraints as one equality and two inequalities, <span class="math display">\[
+h(x,y,z)=x+y-z=0,\quad g_1=x^2+y^2-2z\ge0,\quad g_2=x^3+y^3-3z\ge0,
+\]</span> with gradients <span class="math display">\[
+\nabla h=\bigl(1,1,-1\bigr),\quad \nabla g_1=\bigl(2x,2y,-2\bigr),\quad
+\nabla g_2=\bigl(3x^2,3y^2,-3\bigr).
+\]</span> The equality is active everywhere, so LICQ requires that <span class="math inline">\(\nabla h\)</span> together with the gradients of whichever inequalities bind be linearly independent.</p>
+<p><em>Both inequalities slack.</em> Only <span class="math inline">\(\nabla h\ne0\)</span> is active; trivially independent.</p>
+<p><em>One inequality active, say <span class="math inline">\(g_1=0\)</span>.</em> Need <span class="math inline">\(\nabla h,\nabla g_1\)</span> independent. They are dependent only if <span class="math inline">\(\nabla g_1=c\,\nabla h\)</span>, i.e.&nbsp;<span class="math inline">\(2x=2y=c\)</span> and <span class="math inline">\(-2=-c\)</span>, forcing <span class="math inline">\(c=2\)</span> and <span class="math inline">\(x=y=1\)</span>; then <span class="math inline">\(g_1=0\)</span> gives <span class="math inline">\(z=1\)</span>, which also satisfies <span class="math inline">\(h\)</span>: <span class="math inline">\(x+y-z=1\)</span>. But check <span class="math inline">\(g_2\)</span> at <span class="math inline">\((1,1,1)\)</span>: <span class="math inline">\(g_2=1+1-3=-1&lt;0\)</span>, infeasible. So the dependence point is not feasible, and LICQ holds wherever <span class="math inline">\(g_1\)</span> alone binds. The case <span class="math inline">\(g_2=0\)</span> alone is analogous: <span class="math inline">\(\nabla g_2=c\nabla h\)</span> needs <span class="math inline">\(3x^2=3y^2=c\)</span>, <span class="math inline">\(-3=-c\)</span>, so <span class="math inline">\(c=3\)</span>, <span class="math inline">\(x^2=y^2=1\)</span>; the feasible-and-active configurations must be checked but generic points are independent.</p>
+<p><em>Both inequalities active, <span class="math inline">\(g_1=g_2=0\)</span>.</em> Need <span class="math inline">\(\nabla h,\nabla g_1,\nabla g_2\)</span> independent, i.e. <span class="math display">\[
+\det\begin{pmatrix}1&amp;1&amp;-1\\ 2x&amp;2y&amp;-2\\ 3x^2&amp;3y^2&amp;-3\end{pmatrix}\ne0 .
+\]</span> Expanding, this determinant is <span class="math inline">\(6(x-y)(\,\text{a factor}\,)\)</span>; it <strong>vanishes when <span class="math inline">\(x=y\)</span></strong>. At a point with <span class="math inline">\(x=y\)</span> on the common boundary <span class="math inline">\(g_1=g_2=0\)</span> the three gradients are dependent and LICQ <strong>fails</strong>. For instance <span class="math inline">\(x=y\)</span> with <span class="math inline">\(g_1=2x^2-2z=0\)</span> (<span class="math inline">\(z=x^2\)</span>) and <span class="math inline">\(g_2=2x^3-3z=0\)</span> (<span class="math inline">\(z=\tfrac23 x^3\)</span>) requires <span class="math inline">\(x^2=\tfrac23 x^3\)</span>, i.e.&nbsp;<span class="math inline">\(x=\tfrac32\)</span>, giving the point <span class="math inline">\((\tfrac32,\tfrac32,\tfrac94)\)</span>; one checks <span class="math inline">\(h=\tfrac32+\tfrac32-\tfrac94=\tfrac34\ne0\)</span>, so this particular point is infeasible — but the analysis shows the qualification is <em>delicate</em> and must be checked case-by-case rather than assumed. The conclusion contrasts with <a href="#exm-licq-r2" class="quarto-xref">Example&nbsp;<span>1.3</span></a>, where LICQ held everywhere: here the nonlinear constraints can align their gradients along the diagonal <span class="math inline">\(x=y\)</span>, so LICQ is <strong>not automatic</strong> and fails at any feasible point lying on both curved boundaries with <span class="math inline">\(x=y\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+<p>Problems 2 and 3 are left as practice: Problem 2 is the <span class="math inline">\(n=\infty\)</span> limit of <a href="#eq-cake-solution" class="quarto-xref">Equation&nbsp;<span>1.29</span></a>, giving <span class="math inline">\(x_k=A(1-\beta)\beta^k\)</span>; Problem 3 is a budget-split with concave returns, solved by equating marginal sales-per-dollar <span class="math inline">\(Q_i'/1\)</span> across markets exactly as in the cake problem.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-acemoglu2009" class="csl-entry" role="listitem">
+Acemoglu, Daron. 2009. <em>Introduction to Modern Economic Growth</em>. Princeton, NJ: Princeton University Press.
+</div>
+<div id="ref-dixit1990" class="csl-entry" role="listitem">
+Dixit, Avinash K. 1990. <em>Optimization in Economic Theory</em>. 2nd ed. Oxford: Oxford University Press.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./00-introduction.html" class="pagination-link" aria-label="Introduction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Introduction</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02-odes.html" class="pagination-link" aria-label="Ordinary Differential Equations">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

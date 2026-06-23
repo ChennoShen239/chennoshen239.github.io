@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+
+<title>4&nbsp; Optimal Control – Dynamic Optimization</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./05-dynamic-programming.html" rel="next">
+<link href="./03-calculus-of-variations.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8823d9b0d993be1e49f9a84dbd9a1052.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03-calculus-of-variations.html">Continuous-Time Dynamic Optimization</a></li><li class="breadcrumb-item"><a href="./04-optimal-control.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Dynamic Optimization</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-static-optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Static Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ordinary Differential Equations</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Continuous-Time Dynamic Optimization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-calculus-of-variations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-optimal-control.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Dynamic Programming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-dynamic-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-oc-mp" id="toc-sec-oc-mp" class="nav-link active" data-scroll-target="#sec-oc-mp"><span class="header-section-number">4.1</span> The free-boundary case: the maximum principle</a>
+  <ul class="collapse">
+  <li><a href="#statement-and-derivation" id="toc-statement-and-derivation" class="nav-link" data-scroll-target="#statement-and-derivation">Statement and derivation</a></li>
+  <li><a href="#sec-oc-shadow" id="toc-sec-oc-shadow" class="nav-link" data-scroll-target="#sec-oc-shadow">The costate as a shadow price</a></li>
+  <li><a href="#sec-oc-currentvalue" id="toc-sec-oc-currentvalue" class="nav-link" data-scroll-target="#sec-oc-currentvalue">The current-value Hamiltonian</a></li>
+  </ul></li>
+  <li><a href="#sec-oc-boundary" id="toc-sec-oc-boundary" class="nav-link" data-scroll-target="#sec-oc-boundary"><span class="header-section-number">4.2</span> Other boundary cases</a></li>
+  <li><a href="#sec-oc-multi" id="toc-sec-oc-multi" class="nav-link" data-scroll-target="#sec-oc-multi"><span class="header-section-number">4.3</span> The multivariate maximum principle</a></li>
+  <li><a href="#sec-oc-infinite" id="toc-sec-oc-infinite" class="nav-link" data-scroll-target="#sec-oc-infinite"><span class="header-section-number">4.4</span> Infinite-horizon problems</a>
+  <ul class="collapse">
+  <li><a href="#sec-oc-halkin" id="toc-sec-oc-halkin" class="nav-link" data-scroll-target="#sec-oc-halkin">Halkin’s counterexample</a></li>
+  <li><a href="#sec-oc-infinite-suff" id="toc-sec-oc-infinite-suff" class="nav-link" data-scroll-target="#sec-oc-infinite-suff">Infinite-horizon sufficiency</a></li>
+  </ul></li>
+  <li><a href="#sec-oc-constraints" id="toc-sec-oc-constraints" class="nav-link" data-scroll-target="#sec-oc-constraints"><span class="header-section-number">4.5</span> More complex constraints</a>
+  <ul class="collapse">
+  <li><a href="#algebraic-equality-and-inequality-constraints" id="toc-algebraic-equality-and-inequality-constraints" class="nav-link" data-scroll-target="#algebraic-equality-and-inequality-constraints">Algebraic equality and inequality constraints</a></li>
+  <li><a href="#sec-oc-bangbang" id="toc-sec-oc-bangbang" class="nav-link" data-scroll-target="#sec-oc-bangbang">Bang-bang and singular solutions</a></li>
+  <li><a href="#corner-conditions-and-state-constrained-arcs" id="toc-corner-conditions-and-state-constrained-arcs" class="nav-link" data-scroll-target="#corner-conditions-and-state-constrained-arcs">Corner conditions and state-constrained arcs</a></li>
+  <li><a href="#isoperimetric-and-integral-constraints" id="toc-isoperimetric-and-integral-constraints" class="nav-link" data-scroll-target="#isoperimetric-and-integral-constraints">Isoperimetric and integral constraints</a></li>
+  </ul></li>
+  <li><a href="#sec-oc-mrap" id="toc-sec-oc-mrap" class="nav-link" data-scroll-target="#sec-oc-mrap"><span class="header-section-number">4.6</span> Most rapid approach paths</a></li>
+  <li><a href="#sec-oc-comparative" id="toc-sec-oc-comparative" class="nav-link" data-scroll-target="#sec-oc-comparative"><span class="header-section-number">4.7</span> Comparative statics</a></li>
+  <li><a href="#sec-oc-sufficiency" id="toc-sec-oc-sufficiency" class="nav-link" data-scroll-target="#sec-oc-sufficiency"><span class="header-section-number">4.8</span> Sufficiency: Mangasarian and Arrow</a></li>
+  <li><a href="#sec-oc-applications" id="toc-sec-oc-applications" class="nav-link" data-scroll-target="#sec-oc-applications"><span class="header-section-number">4.9</span> Economic applications</a>
+  <ul class="collapse">
+  <li><a href="#sec-oc-ramsey" id="toc-sec-oc-ramsey" class="nav-link" data-scroll-target="#sec-oc-ramsey">The Ramsey model in current-value form</a></li>
+  <li><a href="#sec-oc-govt" id="toc-sec-oc-govt" class="nav-link" data-scroll-target="#sec-oc-govt">Government-spending Ramsey</a></li>
+  <li><a href="#sec-oc-extraction" id="toc-sec-oc-extraction" class="nav-link" data-scroll-target="#sec-oc-extraction">Optimal mineral extraction with free terminal</a></li>
+  <li><a href="#sec-oc-dhss" id="toc-sec-oc-dhss" class="nav-link" data-scroll-target="#sec-oc-dhss">The DHSS exhaustible-resource model</a></li>
+  <li><a href="#sec-oc-maximin" id="toc-sec-oc-maximin" class="nav-link" data-scroll-target="#sec-oc-maximin">Maximin consumption</a></li>
+  </ul></li>
+  <li><a href="#sec-oc-problems" id="toc-sec-oc-problems" class="nav-link" data-scroll-target="#sec-oc-problems"><span class="header-section-number">4.10</span> Problems</a></li>
+  <li><a href="#sec-oc-solutions" id="toc-sec-oc-solutions" class="nav-link" data-scroll-target="#sec-oc-solutions"><span class="header-section-number">4.11</span> Selected solutions</a>
+  <ul class="collapse">
+  <li><a href="#problem-5-bounded-control-bang-bang" id="toc-problem-5-bounded-control-bang-bang" class="nav-link" data-scroll-target="#problem-5-bounded-control-bang-bang">Problem 5 (bounded control, bang-bang)</a></li>
+  <li><a href="#problem-10-extraction-with-all-five-horizon-cases" id="toc-problem-10-extraction-with-all-five-horizon-cases" class="nav-link" data-scroll-target="#problem-10-extraction-with-all-five-horizon-cases">Problem 10 / extraction with all five horizon cases</a></li>
+  <li><a href="#problem-11-log-utility-growth-phase-diagram" id="toc-problem-11-log-utility-growth-phase-diagram" class="nav-link" data-scroll-target="#problem-11-log-utility-growth-phase-diagram">Problem 11 (log-utility growth, phase diagram)</a></li>
+  <li><a href="#problem-27-lake-resource-sufficiency" id="toc-problem-27-lake-resource-sufficiency" class="nav-link" data-scroll-target="#problem-27-lake-resource-sufficiency">Problem 27 (lake resource, sufficiency)</a></li>
+  <li><a href="#problem-28-the-sufficiency-tail-problem" id="toc-problem-28-the-sufficiency-tail-problem" class="nav-link" data-scroll-target="#problem-28-the-sufficiency-tail-problem">Problem 28 (the sufficiency-tail problem)</a></li>
+  <li><a href="#problem-4-bolza-reduction" id="toc-problem-4-bolza-reduction" class="nav-link" data-scroll-target="#problem-4-bolza-reduction">Problem 4 (Bolza reduction)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03-calculus-of-variations.html">Continuous-Time Dynamic Optimization</a></li><li class="breadcrumb-item"><a href="./04-optimal-control.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Optimal Control</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The calculus of variations of the previous chapter optimizes over a path <span class="math inline">\(x(\cdot)\)</span> directly, through the velocity <span class="math inline">\(\dot x\)</span>. <strong>Optimal control theory</strong>, developed in the mid-twentieth century by Pontryagin and his school <span class="citation" data-cites="pontryagin1962">(<a href="references.html#ref-pontryagin1962" role="doc-biblioref">Pontryagin et al. 1962</a>)</span>, reorganizes the same problems around a sharper distinction: between the <strong>state</strong> <span class="math inline">\(x\)</span>, which the planner cares about but cannot touch, and the <strong>control</strong> <span class="math inline">\(u\)</span>, which the planner sets and which drives the state through a law of motion <span class="math inline">\(\dot x=g(t,x,u)\)</span>. The objective is an integral of a running payoff <span class="math inline">\(f(t,x,u)\)</span>, and the central idea is to steer <span class="math inline">\(x\)</span> along an ideal trajectory by choosing <span class="math inline">\(u\)</span>.</p>
+<p>This reframing buys three things the bare calculus of variations lacks. First, it handles <strong>differential constraints</strong> <span class="math inline">\(\dot x=g\)</span> natively rather than by elimination. Second, it accommodates <strong>bounded controls</strong> <span class="math inline">\(u\in U\)</span> — the typical economic situation, where investment cannot be negative or extraction cannot exceed capacity — through a <em>maximization</em> condition rather than a derivative set to zero, so that boundary (bang-bang) solutions are first-class citizens. Third, it attaches to the state a <strong>costate</strong> <span class="math inline">\(\lambda\)</span>, the multiplier on the law of motion, whose economic reading as the <strong>shadow price</strong> of the state organizes every application in this chapter.</p>
+<p>The organizing result is the <strong>Pontryagin maximum principle</strong>: along an optimal path the control maximizes, instant by instant, a single scalar — the <strong>Hamiltonian</strong></p>
+<p><span id="eq-hamiltonian"><span class="math display">\[
+H(t,x,u,\lambda)=f(t,x,u)+\lambda\,g(t,x,u),
+\tag{4.1}\]</span></span></p>
+<p>— while the state and costate evolve as a Hamiltonian system <span class="math inline">\(\dot x=H_\lambda\)</span>, <span class="math inline">\(\dot\lambda=-H_x\)</span>, closed by a transversality condition at the free boundary. Where Chapter 3 had the pair (Euler equation, TVC), this chapter has the triple (maximum condition, costate equation, TVC). We derive the principle (<a href="#sec-oc-mp" class="quarto-xref"><span>Section 4.1</span></a>), tabulate its transversality conditions (<a href="#sec-oc-boundary" class="quarto-xref"><span>Section 4.2</span></a>), extend it to vectors (<a href="#sec-oc-multi" class="quarto-xref"><span>Section 4.3</span></a>) and to infinite horizons (<a href="#sec-oc-infinite" class="quarto-xref"><span>Section 4.4</span></a>, where Halkin’s counterexample shows the subtlety of the boundary term), handle pathwise constraints (<a href="#sec-oc-constraints" class="quarto-xref"><span>Section 4.5</span></a>), recover the most rapid approach path (<a href="#sec-oc-mrap" class="quarto-xref"><span>Section 4.6</span></a>), develop comparative statics (<a href="#sec-oc-comparative" class="quarto-xref"><span>Section 4.7</span></a>), prove the Mangasarian and Arrow sufficiency theorems (<a href="#sec-oc-sufficiency" class="quarto-xref"><span>Section 4.8</span></a>), and work the canonical economic applications (<a href="#sec-oc-applications" class="quarto-xref"><span>Section 4.9</span></a>).</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Notation.</strong> Throughout, <span class="math inline">\(x\)</span> is the state, <span class="math inline">\(u\)</span> the control, <span class="math inline">\(\dot x=g(t,x,u)\)</span> the state equation, <span class="math inline">\(f\)</span> the running payoff, and <span class="math inline">\(\lambda\)</span> the costate. The (present-value) Hamiltonian is <span class="math inline">\(H=f+\lambda g\)</span>. For discounted autonomous problems we use the <strong>current-value Hamiltonian</strong> <span class="math inline">\(\mathcal{H}=f+\mu g\)</span> with <strong>current-value costate</strong> <span class="math inline">\(\mu=\lambda e^{\rho t}\)</span> and discount <strong>rate</strong> <span class="math inline">\(\rho&gt;0\)</span> (<a href="#sec-oc-currentvalue" class="quarto-xref"><span>Section 4.1.3</span></a>). Multipliers on <em>algebraic</em> constraints are written <span class="math inline">\(\eta\)</span>, reserving <span class="math inline">\(\theta\)</span> for the exogenous parameter in comparative statics. This matches the master table in <a href="./notation.html">Notation</a>; the course writes <span class="math inline">\(\dot x=f\)</span>, <span class="math inline">\(H_c\)</span>, and <span class="math inline">\(\gamma\)</span> for these objects.</p>
+</div>
+</div>
+</div>
+<section id="sec-oc-mp" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="sec-oc-mp"><span class="header-section-number">4.1</span> The free-boundary case: the maximum principle</h2>
+<p>The <strong>standard optimal control problem</strong> is</p>
+<p><span id="eq-oc-standard"><span class="math display">\[
+\begin{aligned}
+\max_{u}\quad &amp; \int_0^T f(t,x,u)\,\mathrm{d}t\\
+\text{s.t.}\quad &amp; \dot x=g(t,x,u)\quad\text{(off finitely many corners)},\\
+&amp; x(0)=x_0,
+\end{aligned}
+\tag{4.2}\]</span></span></p>
+<p>with <span class="math inline">\(T\)</span> and <span class="math inline">\(x_0\)</span> fixed, <span class="math inline">\(f,g\)</span> smooth, the state <span class="math inline">\(x\)</span> continuous and piecewise smooth, and the control <span class="math inline">\(u\)</span> piecewise smooth. The terminal <span class="math inline">\(x(T)\)</span> is <em>free</em> — the “free-boundary” case that the rest of the chapter perturbs.</p>
+<section id="statement-and-derivation" class="level3">
+<h3 class="anchored" data-anchor-id="statement-and-derivation">Statement and derivation</h3>
+<div id="thm-pmp" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.1 (Pontryagin maximum principle (free terminal))</strong></span> If <span class="math inline">\((x,u)\)</span> solves <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a>, then there is a continuous, piecewise-smooth costate <span class="math inline">\(\lambda(t)\)</span> such that <span class="math inline">\((x,u,\lambda)\)</span> satisfies, with <span class="math inline">\(H=f+\lambda g\)</span> as in <a href="#eq-hamiltonian" class="quarto-xref">Equation&nbsp;<span>4.1</span></a>,</p>
+<p><span id="eq-pmp-max"><span class="math display">\[
+H\bigl(t,x(t),u(t),\lambda(t)\bigr)=\max_{u}\,H\bigl(t,x(t),u,\lambda(t)\bigr),
+\qquad t\in[0,T],
+\tag{4.3}\]</span></span></p>
+<p>together with the <strong>Hamiltonian system</strong> and <strong>transversality condition</strong></p>
+<p><span id="eq-pmp-system"><span class="math display">\[
+\dot\lambda=-H_x,\qquad \dot x=H_\lambda=g,\qquad \lambda(T)=0.
+\tag{4.4}\]</span></span></p>
+<p>If moreover <span class="math inline">\(u(t)\)</span> is interior to the control set, <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a> sharpens to the first- and second-order conditions</p>
+<p><span id="eq-pmp-interior"><span class="math display">\[
+H_u=0,\qquad H_{uu}\le 0,
+\tag{4.5}\]</span></span></p>
+<p>and along the optimal path <span class="math inline">\(\dfrac{\mathrm{d}}{\mathrm{d}t}H=H_t\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For <strong>any</strong> feasible pair <span class="math inline">\((y,v)\)</span> — meaning <span class="math inline">\(\dot y=g(t,y,v)\)</span> and <span class="math inline">\(y(0)=x_0\)</span> — and <strong>any</strong> continuous piecewise-smooth function <span class="math inline">\(\lambda\)</span>, integrate by parts to rewrite the objective:</p>
+<p><span id="eq-pmp-rewrite"><span class="math display">\[
+\int_0^T f(t,y,v)\,\mathrm{d}t
+=\int_0^T\!\bigl[f+\lambda(g-\dot y)\bigr]\mathrm{d}t
+=\int_0^T\!\bigl[H(t,y,v,\lambda)+\dot\lambda\,y\bigr]\mathrm{d}t-\bigl[\lambda y\bigr]_0^T .
+\tag{4.6}\]</span></span></p>
+<p>This identity uses only <span class="math inline">\(\dot y=g\)</span>, so it holds along every feasible path; it converts the constrained integral into an unconstrained one at the cost of carrying <span class="math inline">\(\lambda\)</span>.</p>
+<p>Now fix the optimal <span class="math inline">\((x,u)\)</span> and <strong>choose</strong> <span class="math inline">\(\lambda\)</span> to solve the linear terminal-value problem</p>
+<p><span id="eq-pmp-costate-def"><span class="math display">\[
+-\dot\lambda=f_x\bigl(t,x,u\bigr)+\lambda\,g_x\bigl(t,x,u\bigr)=H_x,\qquad \lambda(T)=0 .
+\tag{4.7}\]</span></span></p>
+<p>Because <span class="math inline">\(f,g\)</span> are smooth and <span class="math inline">\((x,u)\)</span> piecewise smooth, <a href="#eq-pmp-costate-def" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> is a first-order linear ODE with a boundary value and so has a unique continuous, piecewise-smooth solution: the costate exists. This <em>defines</em> <span class="math inline">\(\lambda\)</span>; we now show the maximum condition follows.</p>
+<p>Perturb the control. Pick an arbitrary piecewise-continuous <span class="math inline">\(h(t)\)</span> on <span class="math inline">\([0,T]\)</span>, set <span class="math inline">\(u_\varepsilon=u+\varepsilon h\)</span> for <span class="math inline">\(\varepsilon\in\mathbb{R}\)</span>, and let <span class="math inline">\(x_\varepsilon\)</span> be the state it generates (<span class="math inline">\(\dot x_\varepsilon=g(t,x_\varepsilon,u_\varepsilon)\)</span>, <span class="math inline">\(x_\varepsilon(0)=x_0\)</span>; this exists for the same reason <span class="math inline">\(\lambda\)</span> does). Applying <a href="#eq-pmp-rewrite" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> to <span class="math inline">\((x_\varepsilon,u_\varepsilon)\)</span> and using <span class="math inline">\(\lambda(T)=0\)</span>, <span class="math inline">\(x_\varepsilon(0)=x_0\)</span>,</p>
+<p><span class="math display">\[
+V(\varepsilon):=\int_0^T f(t,x_\varepsilon,u_\varepsilon)\,\mathrm{d}t
+=\int_0^T\!\bigl[H(t,x_\varepsilon,u_\varepsilon,\lambda)+\dot\lambda\,x_\varepsilon\bigr]\mathrm{d}t+\lambda(0)x_0 .
+\]</span></p>
+<p>Since <span class="math inline">\((x,u)\)</span> is optimal, <span class="math inline">\(V\)</span> has a maximum at <span class="math inline">\(\varepsilon=0\)</span>. Differentiating under the integral, writing <span class="math inline">\(\partial x_\varepsilon/\partial\varepsilon\big|_0=:\xi\)</span>,</p>
+<p><span id="eq-pmp-foc"><span class="math display">\[
+0=V'(0)=\int_0^T\Bigl[(H_x+\dot\lambda)\,\xi+H_u\,h\Bigr]\mathrm{d}t
+=\int_0^T H_u\,h\,\mathrm{d}t,
+\tag{4.8}\]</span></span></p>
+<p>because <span class="math inline">\(H_x+\dot\lambda=0\)</span> by the very choice <a href="#eq-pmp-costate-def" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> of <span class="math inline">\(\lambda\)</span> — that choice was engineered precisely to annihilate the awkward <span class="math inline">\(\xi\)</span> term, whose dynamics we never need to compute. As <span class="math inline">\(h\)</span> is arbitrary, the fundamental lemma forces <span class="math inline">\(H_u\equiv 0\)</span> along the optimum; this is the interior first-order half of <a href="#eq-pmp-interior" class="quarto-xref">Equation&nbsp;<span>4.5</span></a>. The full maximum condition <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a> is the global statement of the same idea: holding <span class="math inline">\((t,x,\lambda)\)</span> at their optimal values, the optimal <span class="math inline">\(u\)</span> cannot be beaten by any feasible alternative, interior or not, because any improving <span class="math inline">\(u\)</span> would, by <a href="#eq-pmp-rewrite" class="quarto-xref">Equation&nbsp;<span>4.6</span></a>, raise the objective. The interior second-order condition <span class="math inline">\(H_{uu}\le0\)</span> is the local necessary condition <span class="math inline">\(V''(0)\le0\)</span> at an interior maximizer of <span class="math inline">\(H\)</span> in <span class="math inline">\(u\)</span> (the analogue of the Legendre condition). Finally, the costate equation <span class="math inline">\(\dot\lambda=-H_x\)</span> is <a href="#eq-pmp-costate-def" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> itself, <span class="math inline">\(\dot x=H_\lambda=g\)</span> is the state equation, and <span class="math inline">\(\lambda(T)=0\)</span> is its terminal value, so the system <a href="#eq-pmp-system" class="quarto-xref">Equation&nbsp;<span>4.4</span></a> holds. The envelope identity <span class="math inline">\(\tfrac{\mathrm{d}}{\mathrm{d}t}H=H_t\)</span> follows from <span class="math inline">\(\dot H=H_t+H_x\dot x+H_u\dot u+H_\lambda\dot\lambda\)</span> with <span class="math inline">\(H_u=0\)</span>, <span class="math inline">\(\dot x=H_\lambda\)</span>, <span class="math inline">\(\dot\lambda=-H_x\)</span>, which cancels all but <span class="math inline">\(H_t\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Three remarks fix the vocabulary and the economic content.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Names.</strong> Equation <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a> is the <strong>maximum condition</strong> (or maximum <em>principle</em>); the pair <span class="math inline">\(\dot\lambda=-H_x\)</span>, <span class="math inline">\(\dot x=H_\lambda\)</span> are the <strong>equations of motion</strong> of <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(x\)</span> and together form the <strong>Hamiltonian system</strong>; <span class="math inline">\(\lambda(T)=0\)</span> is the <strong>transversality condition (TVC)</strong>. When the control is <strong>bounded</strong>, <span class="math inline">\(u\in[a,b]\)</span>, the interior conditions <a href="#eq-pmp-interior" class="quarto-xref">Equation&nbsp;<span>4.5</span></a> need <em>not</em> hold — the maximizer of <span class="math inline">\(H\)</span> may sit at an endpoint <span class="math inline">\(a\)</span> or <span class="math inline">\(b\)</span> — so one returns to the global condition <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>. This is the decisive practical difference from the calculus of variations.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Relation to the Euler–Lagrange treatment of §3.7.</strong> Reading <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> as a variational problem in the <em>two</em> paths <span class="math inline">\((x,u)\)</span> with the differential constraint <span class="math inline">\(\dot x=g\)</span>, the constrained Lagrangian is <span class="math inline">\(L=f+\lambda(g-\dot x)\)</span> and the three Euler–Lagrange equations <span class="math inline">\(L_{x}=\tfrac{\mathrm d}{\mathrm dt}L_{\dot x}\)</span>, <span class="math inline">\(L_{u}=\tfrac{\mathrm d}{\mathrm dt}L_{\dot u}\)</span>, <span class="math inline">\(L_{\lambda}=\tfrac{\mathrm d}{\mathrm dt}L_{\dot\lambda}\)</span> reduce exactly to <span class="math inline">\(H_x=-\dot\lambda\)</span>, <span class="math inline">\(H_u=0\)</span>, <span class="math inline">\(H_\lambda=\dot x\)</span>. The maximum principle is sharper: it replaces <span class="math inline">\(H_u=0\)</span> (which presumes an interior, smooth optimum) by the global maximization <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>, extracting information at boundary controls and corners that the Euler–Lagrange route misses.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-oc-shadow" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-shadow">The costate as a shadow price</h3>
+<p>The costate is not a bookkeeping device; it <em>prices</em> the state. Embed <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> in a family indexed by the initial stock, replacing <span class="math inline">\(x(0)=x_0\)</span> by <span class="math inline">\(x(0)=x_0+\epsilon\)</span>, and let <span class="math inline">\(V(\epsilon)\)</span> be the resulting optimal value, with <span class="math inline">\(\lambda\)</span> the costate of the <span class="math inline">\(\epsilon=0\)</span> problem. Applying <a href="#eq-pmp-rewrite" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> to the <span class="math inline">\(\epsilon\)</span>-optimal path,</p>
+<p><span class="math display">\[
+V(\epsilon)=\int_0^T\!\bigl[H(t,x_\epsilon,u_\epsilon,\lambda)+\dot\lambda\,x_\epsilon\bigr]\mathrm{d}t
++\lambda(0)(x_0+\epsilon),
+\]</span></p>
+<p>and differentiating at <span class="math inline">\(\epsilon=0\)</span> — the interior and costate conditions kill the integral, exactly as in <a href="#eq-pmp-foc" class="quarto-xref">Equation&nbsp;<span>4.8</span></a> — leaves</p>
+<p><span id="eq-oc-shadow"><span class="math display">\[
+V'(0)=\lambda(0).
+\tag{4.9}\]</span></span></p>
+<p>So <span class="math inline">\(\lambda(0)\)</span> measures the sensitivity of the maximized total payoff to the initial stock: it is the <strong>shadow price of <span class="math inline">\(x_0\)</span></strong>. Reading <span class="math inline">\(x\)</span> as a firm’s capital, <span class="math inline">\(u\)</span> as a decision affecting its growth, <span class="math inline">\(f\)</span> as the instantaneous return and <span class="math inline">\(V\)</span> as the total return, <span class="math inline">\(\lambda(0)\)</span> is the marginal value of an extra unit of initial capital. The same argument run from time <span class="math inline">\(t\)</span> shows <span class="math inline">\(\lambda(t)\)</span> is the shadow price of the stock <span class="math inline">\(x(t)\)</span>: the marginal contribution of the date-<span class="math inline">\(t\)</span> stock to the remaining payoff. The TVC <span class="math inline">\(\lambda(T)=0\)</span> then says the obvious — at the end of a finite, free-terminal horizon, leftover stock is worthless.</p>
+<div id="exm-oc-point-line" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.1 (Point to a line, by control)</strong></span> Recover the elementary fact that the shortest curve from a point to a line meets it perpendicularly. With time as the horizontal axis, minimize arclength <span class="math inline">\(\int_0^T\sqrt{1+u^2}\,\mathrm{d}t\)</span> subject to <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=0\)</span>, <span class="math inline">\(x(T)\)</span> free. Maximizing the negative, <span class="math inline">\(H=-\sqrt{1+u^2}+\lambda u\)</span>. The interior condition <span class="math inline">\(H_u=-u/\sqrt{1+u^2}+\lambda=0\)</span>, the costate equation <span class="math inline">\(-\dot\lambda=H_x=0\)</span>, and the TVC <span class="math inline">\(\lambda(T)=0\)</span> give <span class="math inline">\(\lambda\equiv0\)</span>, hence <span class="math inline">\(u\equiv0\)</span>, hence <span class="math inline">\(\dot x\equiv0\)</span> and (with <span class="math inline">\(x(0)=0\)</span>) <span class="math inline">\(x\equiv0\)</span>. Since <span class="math inline">\(H_{xx}=H_{xu}=0\)</span> and <span class="math inline">\(H_{uu}=-(1+u^2)^{-3/2}\le0\)</span>, <span class="math inline">\(H\)</span> is concave in <span class="math inline">\((x,u)\)</span>, so by the Mangasarian theorem (<a href="#thm-mangasarian" class="quarto-xref">Theorem&nbsp;<span>4.7</span></a>) this is the global minimizer: the path runs straight and hits the line perpendicularly.</p>
+</div>
+<div id="exm-oc-bounded" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.2 (A bounded-control linear problem)</strong></span> <span class="math display">\[
+\max\int_0^2(2x-3u)\,\mathrm{d}t
+\quad\text{s.t.}\quad \dot x=x+u,\ x(0)=4,\ u\in[0,2].
+\]</span></p>
+<p>Here <span class="math inline">\(H=(2x-3u)+\lambda(x+u)=(2+\lambda)x+(\lambda-3)u\)</span> is <em>linear</em> in <span class="math inline">\(u\)</span>, so the bound matters.</p>
+<p><em>Costate.</em> <span class="math inline">\(-\dot\lambda=H_x=2+\lambda\)</span>, i.e.&nbsp;<span class="math inline">\(\dot\lambda+\lambda=-2\)</span>, with general solution <span class="math inline">\(\lambda=ce^{-t}-2\)</span>. The TVC <span class="math inline">\(\lambda(2)=0\)</span> gives <span class="math inline">\(c=2e^{2}\)</span>, so <span class="math inline">\(\lambda=2e^{2-t}-2\)</span>.</p>
+<p><em>Control.</em> Because <span class="math inline">\(H\)</span> is linear in <span class="math inline">\(u\)</span> with slope <span class="math inline">\(\lambda-3\)</span>, the maximizer is bang-bang,</p>
+<p><span class="math display">\[
+u=\begin{cases}2,&amp;\lambda&gt;3,\\[2pt]0,&amp;\lambda&lt;3,\end{cases}
+\]</span></p>
+<p>and at <span class="math inline">\(\lambda=3\)</span> the principle is silent. Solving <span class="math inline">\(2e^{2-t}-2=3\)</span> gives the switch time <span class="math inline">\(\tau=2-\ln(5/2)\approx1.08\)</span>, so <span class="math inline">\(u=2\)</span> on <span class="math inline">\([0,\tau)\)</span> and <span class="math inline">\(u=0\)</span> on <span class="math inline">\((\tau,2]\)</span>. (The single instant <span class="math inline">\(t=\tau\)</span> does not matter: in continuous time the value of <span class="math inline">\(u\)</span> at one point does not move the state.)</p>
+<p><em>State.</em> On <span class="math inline">\([0,\tau]\)</span>, <span class="math inline">\(\dot x=x+2\)</span> with <span class="math inline">\(x(0)=4\)</span> gives <span class="math inline">\(x=6e^{t}-2\)</span>, so <span class="math inline">\(x(\tau)=6e^{\tau}-2\)</span>. On <span class="math inline">\((\tau,2]\)</span>, <span class="math inline">\(\dot x=x\)</span> with that value gives <span class="math inline">\(x=(6-2e^{-\tau})e^{t}\)</span>. The optimal state is the continuous concatenation; the optimal control is piecewise smooth with one jump.</p>
+</div>
+</section>
+<section id="sec-oc-currentvalue" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-currentvalue">The current-value Hamiltonian</h3>
+<p>Economic problems discount: the payoff is <span class="math inline">\(e^{-\rho t}f(t,x,u)\)</span> with <span class="math inline">\(\rho&gt;0\)</span> the discount <strong>rate</strong>. Carrying the factor <span class="math inline">\(e^{-\rho t}\)</span> through the costate equation is clumsy because the present-value costate <span class="math inline">\(\lambda\)</span> then inherits an exponential trend. The remedy is the <strong>current-value Hamiltonian</strong>. For</p>
+<p><span id="eq-oc-discounted"><span class="math display">\[
+\max\int_0^T e^{-\rho t}f(t,x,u)\,\mathrm{d}t
+\quad\text{s.t.}\quad \dot x=g(t,x,u),\ x(0)=x_0,
+\tag{4.10}\]</span></span></p>
+<p>define</p>
+<p><span id="eq-oc-currentH"><span class="math display">\[
+\mathcal{H}(t,x,u,\mu)=f(t,x,u)\,e^{\rho t}\cdot e^{-\rho t}+\mu\,g(t,x,u)
+= f(t,x,u)+\mu\,g(t,x,u),\qquad \mu:=\lambda e^{\rho t},
+\tag{4.11}\]</span></span></p>
+<p>so that the present-value Hamiltonian is <span class="math inline">\(H=\mathcal{H}e^{-\rho t}\)</span> and <span class="math inline">\(\mu\)</span> — the <strong>current-value costate</strong> — strips out the discount trend. Translating <a href="#thm-pmp" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a> through <span class="math inline">\(\mu=\lambda e^{\rho t}\)</span> (so <span class="math inline">\(\dot\lambda=\dot\mu e^{-\rho t}-\rho\mu e^{-\rho t}\)</span>) gives the conditions in current-value form:</p>
+<p><span id="eq-oc-cv-conditions"><span class="math display">\[
+\mathcal{H}\bigl(t,x,u,\mu\bigr)=\max_u\mathcal{H},
+\qquad
+\frac{\partial\mathcal{H}}{\partial x}=-\dot\mu+\rho\mu,
+\qquad
+\frac{\partial\mathcal{H}}{\partial \mu}=\dot x,
+\qquad
+\mu(T)e^{-\rho T}=0 .
+\tag{4.12}\]</span></span></p>
+<p>The only change from the present-value system is the extra <span class="math inline">\(+\rho\mu\)</span> in the costate equation — the “interest” the planner charges on the shadow price — and the TVC <span class="math inline">\(\mu(T)e^{-\rho T}=0\)</span>, equivalently <span class="math inline">\(\mu(T)=0\)</span> for finite <span class="math inline">\(T\)</span>. We use this form for every discounted application below.</p>
+</section>
+</section>
+<section id="sec-oc-boundary" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="sec-oc-boundary"><span class="header-section-number">4.2</span> Other boundary cases</h2>
+<p>As in <a href="03-calculus-of-variations.html#sec-field" class="quarto-xref"><span>Section 3.4</span></a> of the variational chapter, the interior conditions of the maximum principle are unchanged by the terminal data; only the <strong>transversality condition</strong> changes. Consider <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> with the terminal subject to one of the eight standard constraints. The maximum condition <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a> and the equations of motion <span class="math inline">\(\dot\lambda=-H_x\)</span>, <span class="math inline">\(\dot x=g\)</span> continue to hold; the TVC <span class="math inline">\(\lambda(T)=0\)</span> is replaced according to the following table, the optimal-control analogue of the variational TVC table (<a href="03-calculus-of-variations.html#thm-tvc" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>).</p>
+<div id="thm-oc-tvc" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.2 (Transversality conditions)</strong></span> For <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> with <span class="math inline">\(x(0)=x_0\)</span> fixed and <span class="math inline">\(H=f+\lambda g\)</span>, the optimal <span class="math inline">\((x,u,\lambda)\)</span> satisfies <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>, <span class="math inline">\(\dot\lambda=-H_x\)</span>, <span class="math inline">\(\dot x=g\)</span>, together with the boundary condition matching the terminal type:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Terminal constraint</th>
+<th>Transversality condition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>(a) <span class="math inline">\(T\)</span>, <span class="math inline">\(x(T)=x_1\)</span> both fixed</td>
+<td><span class="math inline">\(x(T)=x_1\)</span></td>
+</tr>
+<tr class="even">
+<td>(b) <span class="math inline">\(T\)</span> free, <span class="math inline">\(x(T)=x_1\)</span> fixed</td>
+<td><span class="math inline">\(x(T)=x_1,\quad H\big|_T=0\)</span></td>
+</tr>
+<tr class="odd">
+<td>(c) <span class="math inline">\(T\)</span> and <span class="math inline">\(x(T)\)</span> both free</td>
+<td><span class="math inline">\(\lambda(T)=0,\quad H\big|_T=0\)</span></td>
+</tr>
+<tr class="even">
+<td>(d) <span class="math inline">\(T\)</span> free, <span class="math inline">\(x(T)=\varphi(T)\)</span> on a curve</td>
+<td><span class="math inline">\(\bigl(H-\lambda\dot\varphi\bigr)\big|_T=0\)</span></td>
+</tr>
+<tr class="odd">
+<td>(e) <span class="math inline">\(T\)</span> fixed, <span class="math inline">\(x(T)\ge x_1\)</span></td>
+<td><span class="math inline">\(\lambda(T)\ge0,\ x(T)\ge x_1,\ \bigl(x(T)-x_1\bigr)\lambda(T)=0\)</span></td>
+</tr>
+<tr class="even">
+<td>(f) <span class="math inline">\(x(T)=x_1\)</span> fixed, <span class="math inline">\(T\le t_1\)</span></td>
+<td><span class="math inline">\(x(T)=x_1,\ H\big|_T\ge0,\ T\le t_1,\ (T-t_1)H\big|_T=0\)</span></td>
+</tr>
+<tr class="odd">
+<td>(g) <span class="math inline">\(T\le t_1\)</span>, <span class="math inline">\(x(T)\)</span> free</td>
+<td><span class="math inline">\(\lambda(T)=0,\ H\big|_T\ge0,\ T\le t_1,\ (T-t_1)H\big|_T=0\)</span></td>
+</tr>
+<tr class="even">
+<td>(h) <span class="math inline">\(T\)</span> free, <span class="math inline">\(x(T)\ge\varphi(T)\)</span></td>
+<td><span class="math inline">\(\bigl(H-\lambda\dot\varphi\bigr)\big|_T=0,\ \lambda(T)\ge0,\ x(T)\ge\varphi(T),\ \bigl(x(T)-\varphi(T)\bigr)\lambda(T)=0\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The single source is the <strong>variation of the objective</strong>, derived as in <a href="03-calculus-of-variations.html#sec-field" class="quarto-xref"><span>Section 3.4</span></a>. Take the optimal <span class="math inline">\((x,u)\)</span> with costate <span class="math inline">\(\lambda\)</span>, a nearby feasible <span class="math inline">\((y,v)=(x+p,\,u+q)\)</span> defined on <span class="math inline">\([0,T+\Delta T]\)</span>, with <span class="math inline">\(\Delta T,p,q\)</span> small. Writing the objective via <a href="#eq-pmp-rewrite" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> for both paths and subtracting, the first-order change is</p>
+<p><span id="eq-oc-deltaJ"><span class="math display">\[
+\delta J=\int_0^T\bigl[(H_x+\dot\lambda)\,p+H_u\,q\bigr]\mathrm{d}t
++H\big|_T\,\Delta T-\lambda(T)\,\delta x_T,
+\tag{4.13}\]</span></span></p>
+<p>where <span class="math inline">\(\delta x_T=p(T)+\dot x(T)\Delta T\)</span> is the displacement of the terminal point. The interior conditions <span class="math inline">\(H_x+\dot\lambda=0\)</span> and <span class="math inline">\(H_u=0\)</span> annihilate the integral, leaving the master inequality</p>
+<p><span id="eq-oc-tvc-master"><span class="math display">\[
+\delta J=H\big|_T\,\Delta T-\lambda(T)\,\delta x_T\le0
+\tag{4.14}\]</span></span></p>
+<p>for every admissible <span class="math inline">\((\Delta T,\delta x_T)\)</span>. Each table line specializes <a href="#eq-oc-tvc-master" class="quarto-xref">Equation&nbsp;<span>4.14</span></a>.</p>
+<p><em>(c) Both free:</em> <span class="math inline">\(\Delta T\)</span> and <span class="math inline">\(\delta x_T\)</span> are independent free reals, so each coefficient vanishes: <span class="math inline">\(H\big|_T=0\)</span> and <span class="math inline">\(\lambda(T)=0\)</span>. <em>(b) <span class="math inline">\(T\)</span> free, <span class="math inline">\(x(T)\)</span> fixed:</em> <span class="math inline">\(\delta x_T=0\)</span>, <span class="math inline">\(\Delta T\)</span> free, giving <span class="math inline">\(H\big|_T=0\)</span>. <em>(d) Terminal on a curve:</em> the endpoint tracks <span class="math inline">\(\varphi\)</span>, so <span class="math inline">\(\delta x_T=\dot\varphi(T)\Delta T\)</span> and <a href="#eq-oc-tvc-master" class="quarto-xref">Equation&nbsp;<span>4.14</span></a> reads <span class="math inline">\(\bigl(H-\lambda\dot\varphi\bigr)\big|_T\Delta T=0\)</span> for free <span class="math inline">\(\Delta T\)</span>. <em>(e) Inequality <span class="math inline">\(x(T)\ge x_1\)</span>:</em> <span class="math inline">\(\delta x_T\ge0\)</span> when the constraint binds and is free when slack; <span class="math inline">\(-\lambda(T)\delta x_T\le0\)</span> for all such <span class="math inline">\(\delta x_T\)</span> forces <span class="math inline">\(\lambda(T)\ge0\)</span> with complementary slackness. <em>(g) <span class="math inline">\(T\le t_1\)</span>, <span class="math inline">\(x(T)\)</span> free:</em> the value <span class="math inline">\(\Delta T=0\)</span> is always admissible and <span class="math inline">\(\delta x_T\)</span> free, so <span class="math inline">\(-\lambda(T)\delta x_T\le0\)</span> for all signs gives <span class="math inline">\(\lambda(T)=0\)</span>; then <span class="math inline">\(\delta J=H\big|_T\Delta T\le0\)</span>, and at <span class="math inline">\(T=t_1\)</span> only <span class="math inline">\(\Delta T\le0\)</span> is admissible (forcing <span class="math inline">\(H\big|_T\ge0\)</span>) while at <span class="math inline">\(T&lt;t_1\)</span> both signs are admissible (forcing <span class="math inline">\(H\big|_T=0\)</span>), which combine into the complementary-slackness line. The remaining lines follow identically. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>No solution.</strong> The TVC equations may be inconsistent, or may have only inadmissible solutions — for example, a “free” terminal time <span class="math inline">\(T\)</span> that comes out negative. When that happens the conclusion is that the optimization problem <strong>has no solution</strong>, not that the principle has failed.</p>
+</div>
+</div>
+</div>
+<div id="exm-oc-fixed-fixed" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.3 (Both endpoints fixed)</strong></span> <span class="math inline">\(\min\int_0^1 u^2\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(x(0)=0\)</span>, <span class="math inline">\(x(1)=1\)</span>. With <span class="math inline">\(H=-u^2+\lambda(x+u)\)</span>: <span class="math inline">\(-\dot\lambda=H_x=\lambda\)</span> gives <span class="math inline">\(\lambda=2ce^{-t}\)</span>; <span class="math inline">\(H_u=-2u+\lambda=0\)</span> gives <span class="math inline">\(u=ce^{-t}\)</span>. Then <span class="math inline">\(\dot x=x+ce^{-t}\)</span> has solution <span class="math inline">\(x=c_1e^{t}+c_2e^{-t}\)</span>, and the two fixed endpoints pin <span class="math inline">\(c_1=\tfrac{1}{e-e^{-1}}\)</span>, <span class="math inline">\(c_2=-\tfrac{1}{e-e^{-1}}\)</span> (no TVC needed — line (a)).</p>
+</div>
+<div id="exm-oc-ineq-terminal" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.4 (An inequality terminal that binds)</strong></span> <span class="math inline">\(\min\int_0^1 u^2\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(x(0)=0\)</span>, <span class="math inline">\(x(1)\ge3\)</span>. As above <span class="math inline">\(\lambda=2ce^{-t}\)</span>, <span class="math inline">\(\lambda=2u\)</span>. Line (e) gives the TVC <span class="math inline">\(\lambda(1)\ge0\)</span>, <span class="math inline">\(x(1)\ge3\)</span>, <span class="math inline">\(\bigl(x(1)-3\bigr)\lambda(1)=0\)</span>. <em>Try the slack branch</em> <span class="math inline">\(\lambda(1)=0\)</span>: then <span class="math inline">\(c=0\)</span>, so <span class="math inline">\(\lambda\equiv0\)</span>, <span class="math inline">\(u\equiv0\)</span>, <span class="math inline">\(\dot x=x\)</span>, <span class="math inline">\(x(0)=0\Rightarrow x\equiv0\)</span>, contradicting <span class="math inline">\(x(1)\ge3\)</span>. So the constraint <strong>binds</strong>, <span class="math inline">\(x(1)=3\)</span>, and the TVC becomes <span class="math inline">\(\lambda(1)\ge0\)</span>. Solving <span class="math inline">\(\dot x=x+ce^{-t}\)</span> with <span class="math inline">\(x(0)=0\)</span>, <span class="math inline">\(x(1)=3\)</span> gives <span class="math inline">\(c_1=c_2=\tfrac{3}{e-e^{-1}}\cdot(\pm1)\)</span> with <span class="math inline">\(c_2&lt;0\)</span>, and one verifies <span class="math inline">\(\lambda(1)=2u(1)=2\bigl(\dot x(1)-x(1)\bigr)=-2c_2e^{-1}&gt;0\)</span>, consistent.</p>
+</div>
+<div id="exm-oc-mintime" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.5 (A minimum-time problem (free <span class="math inline">\(T\)</span>, fixed <span class="math inline">\(x(T)\)</span>))</strong></span> <span class="math inline">\(\min\int_0^T 1\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(x(0)=5\)</span>, <span class="math inline">\(x(T)=11\)</span>, <span class="math inline">\(u\in[-1,1]\)</span>, <span class="math inline">\(T\)</span> free. Here <span class="math inline">\(H=-1+\lambda(x+u)\)</span>, <span class="math inline">\(-\dot\lambda=H_x=\lambda\)</span> gives <span class="math inline">\(\lambda=ce^{-t}\)</span>. The free-<span class="math inline">\(T\)</span>, fixed-<span class="math inline">\(x(T)\)</span> TVC (line (b)) is <span class="math inline">\(H\big|_T=0\)</span>, i.e.&nbsp;<span class="math inline">\(ce^{-T}\bigl(11+u(T)\bigr)=1\)</span>. Since <span class="math inline">\(11+u(T)&gt;0\)</span>, we need <span class="math inline">\(c&gt;0\)</span>, hence <span class="math inline">\(\lambda&gt;0\)</span> for all <span class="math inline">\(t\)</span>; as <span class="math inline">\(H=\lambda u+\lambda(x-1)\)</span> is strictly increasing in <span class="math inline">\(u\)</span>, the maximizer is <span class="math inline">\(u\equiv1\)</span>. Then <span class="math inline">\(\dot x=x+1\)</span>, <span class="math inline">\(x(0)=5\)</span> gives <span class="math inline">\(x=6e^{t}-1\)</span>, and <span class="math inline">\(6e^{T}-1=11\)</span> yields the minimum time <span class="math inline">\(T=\ln 2\)</span>.</p>
+</div>
+</section>
+<section id="sec-oc-multi" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="sec-oc-multi"><span class="header-section-number">4.3</span> The multivariate maximum principle</h2>
+<p>Everything extends verbatim to a vector state <span class="math inline">\(x\in\mathbb{R}^n\)</span> and vector control <span class="math inline">\(u\in\mathbb{R}^m\)</span> with <span class="math inline">\(g:\mathbb{R}^{1+n+m}\to\mathbb{R}^n\)</span>. The costate <span class="math inline">\(\lambda\in\mathbb{R}^n\)</span> now lives in the same space as <span class="math inline">\(x\)</span>, and <span class="math inline">\(\lambda g\)</span> denotes the inner product <span class="math inline">\(\sum_i\lambda_i g_i\)</span>.</p>
+<div id="thm-oc-multi" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.3 (Multivariate maximum principle)</strong></span> If <span class="math inline">\((x,u)\)</span> solves <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> with <span class="math inline">\(x\in\mathbb{R}^n\)</span>, <span class="math inline">\(u\in\mathbb{R}^m\)</span>, there is an <span class="math inline">\(n\)</span>-vector costate <span class="math inline">\(\lambda\)</span> with, for <span class="math inline">\(H=f+\lambda\cdot g\)</span>,</p>
+<p><span id="eq-oc-multi-system"><span class="math display">\[
+H\bigl(t,x,u,\lambda\bigr)=\max_{u}H,\qquad
+\dot\lambda=-H_x,\qquad \dot x=H_\lambda=g,\qquad \lambda(T)=0,
+\tag{4.15}\]</span></span></p>
+<p>where <span class="math inline">\(H_x=(\partial H/\partial x_i)_{i}\)</span>. When <span class="math inline">\(u\)</span> is unconstrained, <a href="#eq-oc-multi-system" class="quarto-xref">Equation&nbsp;<span>4.15</span></a> sharpens to <span class="math inline">\(H_u=0\)</span> (an <span class="math inline">\(m\)</span>-vector) and <span class="math inline">\(H_{uu}\preceq0\)</span> (the <span class="math inline">\(m\times m\)</span> Hessian negative semidefinite — the Legendre analogue), and <span class="math inline">\(\tfrac{\mathrm d}{\mathrm dt}H=H_t\)</span>.</p>
+</div>
+<p>The proof is the scalar one with inner products replacing products; the costate components solve the linear system <span class="math inline">\(-\dot\lambda_i=f_{x_i}+\sum_j\lambda_j g_{j,x_i}\)</span>, <span class="math inline">\(\lambda_i(T)=0\)</span>. Boundary variations give the vector master inequality</p>
+<p><span id="eq-oc-multi-master"><span class="math display">\[
+\delta J=H\big|_T\,\Delta T-\lambda(T)\cdot\delta x_T\le0,
+\tag{4.16}\]</span></span></p>
+<p>from which all vector transversality conditions read off as before. One new boundary type deserves a worked derivation: a smooth <em>terminal manifold</em> <span class="math inline">\(K(x,t)\big|_T\ge0\)</span>, with <span class="math inline">\(K\)</span> an <span class="math inline">\((n+1)\)</span>-variable function.</p>
+<div id="prp-oc-manifold" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 4.1 (Transversality on a terminal manifold)</strong></span> For <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> with terminal constraint <span class="math inline">\(K(x,t)\big|_T\ge0\)</span> (<span class="math inline">\(K\)</span> smooth, <span class="math inline">\(T\)</span> free), the transversality conditions are: there exists <span class="math inline">\(p\in\mathbb{R}\)</span> with</p>
+<p><span id="eq-oc-manifold"><span class="math display">\[
+\lambda(T)=p\,K_x\big|_T,\qquad p\ge0,\quad K\big|_T\ge0,\quad p\,K\big|_T=0,\qquad
+\bigl(H+pK_t\bigr)\big|_T=0 .
+\tag{4.17}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Start from <a href="#eq-oc-multi-master" class="quarto-xref">Equation&nbsp;<span>4.16</span></a>. Along the optimum, when <span class="math inline">\(K\big|_T&gt;0\)</span> the constraint is slack: all sufficiently small <span class="math inline">\(\Delta T,\delta x_T\)</span> are admissible, so both coefficients vanish, <span class="math inline">\(H\big|_T=0\)</span> and <span class="math inline">\(\lambda(T)=0\)</span> — which is <a href="#eq-oc-manifold" class="quarto-xref">Equation&nbsp;<span>4.17</span></a> with <span class="math inline">\(p=0\)</span>. When <span class="math inline">\(K\big|_T=0\)</span> the constraint binds, and the admissible variations are those keeping <span class="math inline">\(K\ge0\)</span> to first order:</p>
+<p><span class="math display">\[
+(\mathrm dK)\big|_T=K_t\big|_T\,\Delta T+K_x\big|_T\cdot\delta x_T\ge0 .
+\]</span></p>
+<p>For all such <span class="math inline">\((\Delta T,\delta x_T)\)</span> we need <span class="math inline">\(-H\big|_T\,\Delta T+\lambda(T)\cdot\delta x_T\le0\)</span>, i.e.&nbsp;the linear functional <span class="math inline">\(\bigl(-H\big|_T,\lambda(T)\bigr)\)</span> is nonpositive wherever <span class="math inline">\(\bigl(K_t\big|_T,K_x\big|_T\bigr)\)</span> is nonnegative. By <strong>Farkas’ lemma</strong> there is <span class="math inline">\(p\ge0\)</span> with <span class="math inline">\(\bigl(-H\big|_T,\lambda(T)\bigr)=p\bigl(K_t\big|_T,K_x\big|_T\bigr)\)</span>, that is <span class="math inline">\(\lambda(T)=pK_x\big|_T\)</span> and <span class="math inline">\(H\big|_T=-pK_t\big|_T\)</span>, the second being <span class="math inline">\(\bigl(H+pK_t\bigr)\big|_T=0\)</span>. Unifying the slack (<span class="math inline">\(p=0\)</span>) and binding cases gives <a href="#eq-oc-manifold" class="quarto-xref">Equation&nbsp;<span>4.17</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div id="exm-oc-twostate" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.6 (A two-state problem with a terminal manifold)</strong></span> <span class="math display">\[
+\min\int_0^1 u^2\,\mathrm{d}t\quad\text{s.t.}\quad \dot x=y,\ \dot y=u,\ x(0)=y(0)=0,\ x(1)+y(1)\ge2.
+\]</span></p>
+<p>With <span class="math inline">\(H=-u^2+\lambda_1 y+\lambda_2 u\)</span> and <span class="math inline">\(K=x+y-2\)</span>: <span class="math inline">\(H_u=-2u+\lambda_2=0\)</span>, <span class="math inline">\(-\dot\lambda_1=H_x=0\)</span>, <span class="math inline">\(-\dot\lambda_2=H_y=\lambda_1\)</span> give <span class="math inline">\(\lambda_1\equiv c_1\)</span>, <span class="math inline">\(\lambda_2=c_2-c_1t\)</span>, <span class="math inline">\(u=\tfrac{c_2}{2}-\tfrac{c_1}{2}t\)</span>. Integrating with the zero initial data, <span class="math inline">\(y=\tfrac{c_2}{2}t-\tfrac{c_1}{4}t^2\)</span> and <span class="math inline">\(x=\tfrac{c_2}{4}t^2-\tfrac{c_1}{12}t^3\)</span>. The manifold TVC (line at <span class="math inline">\(T=1\)</span>) is <span class="math inline">\(\bigl(\lambda_1,\lambda_2\bigr)\big|_1=p\,(K_x,K_y)=p(1,1)\)</span> with <span class="math inline">\(p\ge0\)</span>, <span class="math inline">\(K\big|_1\ge0\)</span>, <span class="math inline">\(pK\big|_1=0\)</span>: <span class="math display">\[
+\begin{pmatrix}c_1\\ c_2-c_1\end{pmatrix}=p\begin{pmatrix}1\\1\end{pmatrix},
+\qquad p\ge0,\ \tfrac34 c_2-\tfrac13 c_1\ge2,\ p\bigl(\tfrac34 c_2-\tfrac13 c_1-2\bigr)=0,
+\]</span> whose solution is <span class="math inline">\(p=c_1=\tfrac{12}{7}\)</span>, <span class="math inline">\(c_2=\tfrac{24}{7}\)</span>.</p>
+</div>
+<p>Initial boundaries are handled symmetrically. For a problem on <span class="math inline">\([t_0,t_1]\)</span> with both endpoints on curves <span class="math inline">\(x(t_0)=\varphi(t_0)\)</span>, <span class="math inline">\(x(t_1)=\psi(t_1)\)</span> and both times free, the TVCs are <span class="math inline">\(\bigl(H-\lambda\dot\varphi\bigr)\big|_{t_0}=0\)</span> and <span class="math inline">\(\bigl(H-\lambda\dot\psi\bigr)\big|_{t_1}=0\)</span>.</p>
+</section>
+<section id="sec-oc-infinite" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="sec-oc-infinite"><span class="header-section-number">4.4</span> Infinite-horizon problems</h2>
+<p>The leading economic case runs forever:</p>
+<p><span id="eq-oc-infinite"><span class="math display">\[
+\max_{u}\ J(x,u)=\int_0^\infty f(t,x,u)\,\mathrm{d}t
+\quad\text{s.t.}\quad \dot x=g(t,x,u),\ x(0)=x_0,
+\tag{4.18}\]</span></span></p>
+<p>where feasibility now demands, on top of the law of motion and the initial condition, that the improper integral <strong>exist</strong>. (Existence in the Riemann sense means at least one of <span class="math inline">\(\int_0^\infty f^+\)</span>, <span class="math inline">\(\int_0^\infty f^-\)</span> is finite; convergence means both are, with <span class="math inline">\(f^\pm=\max\{\pm f,0\}\)</span>.) The interior necessary conditions are exactly those of the finite horizon; the subtlety is entirely in the boundary term.</p>
+<div id="thm-oc-infinite" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.4 (Infinite-horizon necessary conditions)</strong></span> If <span class="math inline">\((x,u)\)</span> solves <a href="#eq-oc-infinite" class="quarto-xref">Equation&nbsp;<span>4.18</span></a>, there is a costate <span class="math inline">\(\lambda\)</span> with <span class="math inline">\(H=f+\lambda g\)</span> and</p>
+<p><span id="eq-oc-infinite-conditions"><span class="math display">\[
+H\bigl(t,x,u,\lambda\bigr)=\max_u H,\qquad \dot\lambda=-H_x,\qquad \dot x=g,
+\qquad \lim_{t\to\infty}H\big|_t=0,
+\tag{4.19}\]</span></span></p>
+<p>with the interior sharpenings <span class="math inline">\(H_u=0\)</span>, <span class="math inline">\(H_{uu}\le0\)</span> and <span class="math inline">\(\tfrac{\mathrm d}{\mathrm dt}H=H_t\)</span> when <span class="math inline">\(u\)</span> is unconstrained.</p>
+</div>
+<p>The transversality condition <span class="math inline">\(\lim_{t\to\infty}H\big|_t=0\)</span> was established rigorously by Michel <span class="citation" data-cites="michel1982">(<a href="references.html#ref-michel1982" role="doc-biblioref">Michel 1982</a>)</span>. Kamihigashi <span class="citation" data-cites="kamihigashi2001">(<a href="references.html#ref-kamihigashi2001" role="doc-biblioref">Kamihigashi 2001</a>)</span> proved the <em>weaker, costate-on-the-state</em> condition</p>
+<p><span id="eq-oc-kamihigashi"><span class="math display">\[
+\text{if }x\text{ is free at }t=\infty,\qquad \lim_{t\to\infty}\lambda(t)\,x(t)=0 ,
+\tag{4.20}\]</span></span></p>
+<p>whose economic reading is appealing — the present value of the terminal stock, priced at its marginal value <span class="math inline">\(\lambda\)</span>, is asymptotically exhausted — and which is widely imposed in applications. But <a href="#eq-oc-kamihigashi" class="quarto-xref">Equation&nbsp;<span>4.20</span></a> is <strong>not</strong> a theorem in full generality, as Halkin’s celebrated example shows.</p>
+<section id="sec-oc-halkin" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-halkin">Halkin’s counterexample</h3>
+<div id="exm-oc-halkin" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.7 (Halkin’s example)</strong></span> <span class="math display">\[
+\max\int_0^\infty (1-x)u\,\mathrm{d}t
+\quad\text{s.t.}\quad \dot x=(1-x)u,\ x(0)=0,\ u\in[0,1].
+\]</span></p>
+<p><em>The honest answer first.</em> The integrand <strong>is</strong> <span class="math inline">\(\dot x\)</span>, so the objective telescopes: <span class="math inline">\(\int_0^\infty \dot x\,\mathrm{d}t=x(\infty)-x(0)=x(\infty)\)</span>. The problem is simply to maximize the terminal value <span class="math inline">\(x(\infty)\)</span>. From <span class="math inline">\(\dot x+ux=u\)</span> with <span class="math inline">\(x(0)=0\)</span>,</p>
+<p><span id="eq-oc-halkin-x"><span class="math display">\[
+x(t)=1-e^{-U(t)},\qquad U(t)=\int_0^t u(s)\,\mathrm{d}s,
+\tag{4.21}\]</span></span></p>
+<p>so <span class="math inline">\(x&lt;1\)</span> always and <span class="math inline">\(x(\infty)=1\)</span> is attainable by <em>any</em> <span class="math inline">\(u\in[0,1]\)</span> whose integral <span class="math inline">\(U\)</span> diverges. The optimum exists and is highly non-unique; none of this used the maximum principle.</p>
+<p><em>What the principle says about <span class="math inline">\(\lambda\)</span>.</em> Form <span class="math inline">\(H=(1-x)u+\lambda(1-x)u=(1+\lambda)(1-x)u\)</span>. Since <span class="math inline">\(H\)</span> is linear in <span class="math inline">\(u\)</span> and <span class="math inline">\(1-x&gt;0\)</span>, the maximum condition gives the bang-singular structure <span class="math display">\[
+u=\begin{cases}1,&amp;\lambda&gt;-1,\\0,&amp;\lambda&lt;-1,\end{cases}
+\]</span> with <span class="math inline">\(\lambda=-1\)</span> a <strong>singular</strong> value at which the principle does not pin <span class="math inline">\(u\)</span>. The costate equation <span class="math inline">\(\dot\lambda=-H_x=(1+\lambda)u\)</span>, i.e.&nbsp;<span class="math inline">\(\dot\lambda-\lambda u=u\)</span>, integrates to <span id="eq-oc-halkin-lambda"><span class="math display">\[
+\lambda(t)=-1+ce^{U(t)} .
+\tag{4.22}\]</span></span></p>
+<p>Now impose the genuine TVC <span class="math inline">\(\lim_t H\big|_t=0\)</span>. Since <span class="math inline">\(H=(1+\lambda)(1-x)u=ce^{U}(1-x)u\)</span> and (by <a href="#eq-oc-halkin-x" class="quarto-xref">Equation&nbsp;<span>4.21</span></a>) <span class="math inline">\(1-x=e^{-U}\)</span>, we get <span class="math inline">\(H=cu\)</span>; an optimal <span class="math inline">\(u\)</span> has <span class="math inline">\(U\to\infty\)</span>, and along any segment where <span class="math inline">\(u\)</span> is interior we already need <span class="math inline">\(c=0\)</span>. Either way <span class="math inline">\(\lim_t H=0\)</span> forces <span class="math inline">\(c=0\)</span>. Hence <span class="math inline">\(\lambda\equiv-1\)</span> and <span class="math inline">\(H\equiv0\)</span>.</p>
+<p><em>The punchline.</em> With <span class="math inline">\(\lambda\equiv-1\)</span> and <span class="math inline">\(x(\infty)=1\)</span>, <span class="math display">\[
+\lim_{t\to\infty}\lambda(t)\,x(t)=-1\neq0 ,
+\]</span> so the Kamihigashi-type condition <a href="#eq-oc-kamihigashi" class="quarto-xref">Equation&nbsp;<span>4.20</span></a> <strong>fails</strong>, and a fortiori <span class="math inline">\(\lim_t\lambda(t)=0\)</span> fails. Even with no explicit constraint on <span class="math inline">\(x(\infty)\)</span>, the asymptotic costate condition need not hold: <a href="#eq-oc-kamihigashi" class="quarto-xref">Equation&nbsp;<span>4.20</span></a> is not universally valid.</p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Why it is not a true counterexample to the <em>free-state</em> claim.</strong> Halkin’s example does <em>not</em> refute “<span class="math inline">\(x(\infty)\)</span> free <span class="math inline">\(\Rightarrow \lambda x\big|_\infty=0\)</span>”, because in it <span class="math inline">\(x(\infty)\)</span> is not truly free. The law of motion and <span class="math inline">\(u\in[0,1]\)</span> force <span class="math inline">\(0\le x(t)\le1\)</span> for all <span class="math inline">\(t\)</span>, hence <span class="math inline">\(0\le x(\infty)\le1\)</span>: there is an <em>implicit</em> state constraint, and the optimum sits <strong>on its boundary</strong> <span class="math inline">\(x(\infty)=1\)</span>. As in the finite-horizon analysis, the boundary case is exactly where the naive TVC can break. So Halkin’s example warns that an active (even implicit) state bound voids the asymptotic costate condition — it does not show the condition fails when the state is genuinely free. Note too that <span class="math inline">\(\lim_t H=0\)</span> here holds for the <em>specific</em> <span class="math inline">\(\lambda\equiv-1\)</span>.</p>
+</div>
+</div>
+</div>
+<p>For the discounted autonomous case the conditions take current-value form: <span class="math inline">\(\mathcal{H}=\max\)</span>, <span class="math inline">\(\partial\mathcal{H}/\partial x=-\dot\mu+\rho\mu\)</span>, <span class="math inline">\(\dot x=g\)</span>, with the present-value TVC <span class="math inline">\(\lim_t e^{-\rho t}\mathcal{H}\big|_t=0\)</span> and the commonly-imposed <span class="math inline">\(\lim_t e^{-\rho t}\mu(t)x(t)=0\)</span>.</p>
+</section>
+<section id="sec-oc-infinite-suff" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-infinite-suff">Infinite-horizon sufficiency</h3>
+<p>Necessary conditions usually yield several candidates; sufficiency selects. The infinite-horizon Arrow theorem closes the gap.</p>
+<div id="thm-oc-arrow-infinite" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.5 (Infinite-horizon Arrow sufficiency)</strong></span> For <a href="#eq-oc-infinite" class="quarto-xref">Equation&nbsp;<span>4.18</span></a>, suppose <span class="math inline">\((x,u,\lambda)\)</span> satisfies <span class="math inline">\(H_x+\dot\lambda=0\)</span>, <span class="math inline">\(H_u=0\)</span>, <span class="math inline">\(H_\lambda=\dot x\)</span>, that the <strong>maximized Hamiltonian</strong> <span class="math inline">\(H^0(t,x)=\max_u H(t,x,u,\lambda(t))\)</span> is concave in <span class="math inline">\(x\)</span>, and that <span id="eq-oc-arrow-tail"><span class="math display">\[
+\limsup_{t\to\infty}\ \lambda(t)\bigl(y(t)-x(t)\bigr)\ge0\qquad\text{for every feasible state }y .
+\tag{4.23}\]</span></span> Then <span class="math inline">\((x,u)\)</span> is optimal.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For any feasible <span class="math inline">\((y,v)\)</span> set <span class="math inline">\(p=y-x\)</span>. By <a href="#eq-pmp-rewrite" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> on <span class="math inline">\([0,T]\)</span>, <span class="math display">\[
+\int_0^T\!\bigl[f(t,y,v)-f(t,x,u)\bigr]\mathrm{d}t
+=\int_0^T\!\bigl[H(t,y,v,\lambda)-H(t,x,u,\lambda)+\dot\lambda\,p\bigr]\mathrm{d}t-\lambda p\big|_0^T .
+\]</span> Now <span class="math inline">\(H(t,y,v,\lambda)\le H^0(t,y)\)</span> (definition of <span class="math inline">\(H^0\)</span>) and <span class="math inline">\(H(t,x,u,\lambda)=H^0(t,x)\)</span> (the optimum attains the max), so the bracket is <span class="math inline">\(\le H^0(t,y)-H^0(t,x)+\dot\lambda p\)</span>. Concavity of <span class="math inline">\(H^0\)</span> in <span class="math inline">\(x\)</span> gives <span class="math inline">\(H^0(t,y)-H^0(t,x)\le H^0_x(t,x)\,p\)</span>, and <span class="math inline">\(H^0_x(t,x)=H_x(t,x,u,\lambda)=-\dot\lambda\)</span> by the envelope theorem, so the bracket is <span class="math inline">\(\le0\)</span>. With <span class="math inline">\(p(0)=0\)</span>, <span class="math display">\[
+\int_0^T\!\bigl[f(t,y,v)-f(t,x,u)\bigr]\mathrm{d}t\le-\lambda(T)p(T).
+\]</span> Let <span class="math inline">\(T\to\infty\)</span>: <span class="math inline">\(J(y,v)-J(x,u)\le\liminf_T\bigl(-\lambda(T)p(T)\bigr)=-\limsup_T\bigl(\lambda(T)p(T)\bigr)\)</span>. By <a href="#eq-oc-arrow-tail" class="quarto-xref">Equation&nbsp;<span>4.23</span></a>, <span class="math inline">\(\limsup_T\lambda(T)p(T)\ge0\)</span>, so <span class="math inline">\(J(y,v)-J(x,u)\le0\)</span>, i.e. <span class="math inline">\(J(x,u)-J(y,v)\ge\limsup_T\bigl(\lambda p\big|_T\bigr)\ge0\)</span>. Hence <span class="math inline">\((x,u)\)</span> is optimal. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>A practical selection rule.</strong> Because the optimum lies among the paths satisfying the necessary conditions, <em>if</em> existence of an optimum is known, one may simply compare the finitely many candidate paths and keep the best — particularly useful when a phase diagram delivers a unique convergent (saddle) path. Verifying <a href="#eq-oc-arrow-tail" class="quarto-xref">Equation&nbsp;<span>4.23</span></a> against all candidate <span class="math inline">\(y\)</span> then confirms optimality. We use exactly this strategy in the Ramsey and lake-resource applications below.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-oc-constraints" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="sec-oc-constraints"><span class="header-section-number">4.5</span> More complex constraints</h2>
+<p>So far constraints lived only at the terminal. We now allow constraints <strong>along the whole path</strong>: all variables remain at least piecewise smooth. Throughout, <span class="math inline">\(x\in\mathbb{R}^n\)</span>, <span class="math inline">\(u\in\mathbb{R}^m\)</span>, <span class="math inline">\(g\)</span> <span class="math inline">\(n\)</span>-valued, and the new constraint function <span class="math inline">\(h\)</span> is <span class="math inline">\(k\)</span>-valued.</p>
+<section id="algebraic-equality-and-inequality-constraints" class="level3">
+<h3 class="anchored" data-anchor-id="algebraic-equality-and-inequality-constraints">Algebraic equality and inequality constraints</h3>
+<p>For the <strong>equality</strong> problem</p>
+<p><span id="eq-oc-eq"><span class="math display">\[
+\max\int_0^T f\,\mathrm{d}t\quad\text{s.t.}\quad \dot x=g,\ h(t,x,u)=0,\ x(0)=x_0,
+\tag{4.24}\]</span></span></p>
+<p>augment the Hamiltonian with a multiplier <span class="math inline">\(\eta(t)\in\mathbb{R}^k\)</span> on the algebraic constraint:</p>
+<p><span id="eq-oc-H-eq"><span class="math display">\[
+H=f+\lambda g+\eta\, h .
+\tag{4.25}\]</span></span></p>
+<p>If <span class="math inline">\((x,u)\)</span> is optimal (and the constraint is consistent), there exist <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(\eta\)</span> with</p>
+<p><span id="eq-oc-eq-conditions"><span class="math display">\[
+H_u=0,\quad H_{uu}\preceq0,\qquad \dot\lambda=-H_x,\qquad H_\eta=h=0,\qquad \lambda(T)=0 .
+\tag{4.26}\]</span></span></p>
+<p>Here <span class="math inline">\(\lambda\)</span> is the <strong>costate</strong> (Hamilton multiplier) on the <em>dynamic</em> constraint and <span class="math inline">\(\eta\)</span> the <strong>Lagrange multiplier</strong> on the <em>algebraic</em> one. For the <strong>inequality</strong> problem <span class="math inline">\(h(t,x,u)\ge0\)</span> the multiplier turns nonnegative with complementary slackness:</p>
+<p><span id="eq-oc-ineq-conditions"><span class="math display">\[
+H=f+\lambda g+\eta\, h,\qquad
+H_u=0,\ H_{uu}\preceq0,\quad \dot\lambda=-H_x,\quad
+\eta\ge0,\ h\ge0,\ \eta\odot h=0,\quad \lambda(T)=0 .
+\tag{4.27}\]</span></span></p>
+<p>Both follow from the objective variation plus Farkas’ lemma exactly as in <a href="#prp-oc-manifold" class="quarto-xref">Proposition&nbsp;<span>4.1</span></a>; the slackness <span class="math inline">\(\eta\odot h=0\)</span> is the variational KKT condition. For sufficiency: if <span class="math inline">\(H\)</span> (with the multipliers fixed at their optimal values) is concave in <span class="math inline">\((x,u)\)</span>, a path meeting the necessary conditions is optimal; in the one-dimensional infinite-horizon case the extra tail <span class="math inline">\(\limsup_t\lambda(y-x)\ge0\)</span> secures optimality.</p>
+<div id="exm-oc-many-multipliers" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.8 (When multipliers proliferate)</strong></span> <span class="math display">\[
+\max\int_0^3(4-t)u\,\mathrm{d}t\quad\text{s.t.}\quad \dot x=u,\ x\le t+1,\ 0\le u\le2,\ x(0)=0,\ x(3)=3.
+\]</span></p>
+<p>With three inequality constraints, <span class="math inline">\(H=(4-t)u+\lambda u+\eta(t+1-x)+\eta_1 u+\eta_2(2-u)\)</span> and the necessary conditions are <span class="math display">\[
+0=H_u=4-t+\lambda+\eta_1-\eta_2,\qquad -\dot\lambda=H_x=-\eta,
+\]</span> with slackness <span class="math inline">\(\eta\ge0,\ \eta(t+1-x)=0\)</span>; <span class="math inline">\(\eta_1\ge0,\ \eta_1u=0\)</span>; <span class="math inline">\(\eta_2\ge0,\ \eta_2(2-u)=0\)</span>. Eliminating, <span class="math inline">\(-2\eta_2=(\eta_1-\eta_2)u=-(\lambda-t+4)u\)</span>, so <span class="math inline">\((\lambda-t+4)\,u\,(2-u)=0\)</span>. On any interior arc <span class="math inline">\(u\in(0,2)\)</span> this forces <span class="math inline">\(\lambda=t-4\)</span>, hence <span class="math inline">\(\eta=\dot\lambda=1\)</span> and (from the binding <span class="math inline">\(x=t+1\)</span>) the arc rides the upper boundary. The principle thus yields only: <em><span class="math inline">\(u\in\{0,1,2\}\)</span>, and <span class="math inline">\(u=1\Leftrightarrow x=t+1\)</span>.</em> Pinning the path needs the objective’s structure.</p>
+<p><em>Finishing with calculus.</em> Integrating by parts, <span class="math inline">\(\int_0^3(4-t)u\,\mathrm{d}t=\int_0^3(4-t)\,\mathrm{d}x=\bigl[(4-t)x\bigr]_0^3+\int_0^3 x\,\mathrm{d}t
+=3+\int_0^3 x\,\mathrm{d}t\)</span>, so the problem is equivalent to <span class="math inline">\(\max\int_0^3 x\,\mathrm{d}t\)</span> over monotone curves from <span class="math inline">\((0,0)\)</span> to <span class="math inline">\((3,3)\)</span> lying below both <span class="math inline">\(x=t+1\)</span> and <span class="math inline">\(x=2t\)</span> (the latter from <span class="math inline">\(\dot x\le2\)</span>). The area is maximized by hugging the upper envelope, giving <span class="math display">\[
+x=\begin{cases}2t,&amp;t\in[0,1],\\ t+1,&amp;t\in(1,2),\\ 3,&amp;t\in[2,3],\end{cases}
+\]</span> i.e.&nbsp;<span class="math inline">\(u=2\)</span>, then <span class="math inline">\(1\)</span>, then <span class="math inline">\(0\)</span>. The example’s moral: many constraints breed many multipliers and the maximum principle alone may not isolate the optimum — supplementary calculus or geometry is needed.</p>
+</div>
+</section>
+<section id="sec-oc-bangbang" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-bangbang">Bang-bang and singular solutions</h3>
+<p>When <span class="math inline">\(H\)</span> is <strong>linear in <span class="math inline">\(u\)</span></strong> the maximum condition cannot be satisfied at an interior <span class="math inline">\(u\)</span> unless the coefficient of <span class="math inline">\(u\)</span> vanishes. Off such instants the optimal control sits at a <strong>boundary</strong> of the control set — a <strong>bang-bang</strong> control, switching between extremes; on intervals where the coefficient of <span class="math inline">\(u\)</span> is identically zero the control is <strong>singular</strong>, undetermined by the principle and pinned only by a separate (higher-order) condition. <a href="#fig-bang-bang" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> shows the canonical <em>bang–singular–bang</em> profile.</p>
+<div id="fig-bang-bang" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bang-bang-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch04-bang-bang.svg" class="img-fluid figure-img" style="width:78.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bang-bang-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Canonical bang–singular–bang control. With <span class="math inline">\(H\)</span> linear in <span class="math inline">\(u\)</span>, the optimal control rides the upper bound <span class="math inline">\(u=b(x)\)</span>, drops onto an interior <strong>singular arc</strong> where the switching function vanishes and the maximum principle is silent, then rides the lower bound <span class="math inline">\(u=a(x)\)</span>. The dotted lines mark the switch times <span class="math inline">\(t_1,t_2\)</span>; the control may jump at a switch.
+</figcaption>
+</figure>
+</div>
+<div id="exm-oc-investment" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.9 (A bang-bang investment problem)</strong></span> <span class="math display">\[
+\max\int_0^T (1-u)x\,\mathrm{d}t\quad\text{s.t.}\quad \dot x=xu,\ 0\le u\le1,\ x(0)=c&gt;0.
+\]</span></p>
+<p>With <span class="math inline">\(H=(1-u)x+\lambda xu=x+(\lambda-1)xu\)</span>, linear in <span class="math inline">\(u\)</span> with switching coefficient <span class="math inline">\((\lambda-1)x\)</span> and <span class="math inline">\(x&gt;0\)</span> throughout. The costate equation <span class="math inline">\(-\dot\lambda=H_x=1+(\lambda-1)u\)</span> and the TVC <span class="math inline">\(\lambda(T)=0\)</span> govern the structure. Because <span class="math inline">\(\dot\lambda=-1&lt;0\)</span> near <span class="math inline">\(T\)</span> (where <span class="math inline">\(u=0\)</span>, as we now show), <span class="math inline">\(\lambda\)</span> rises to the left from <span class="math inline">\(\lambda(T)=0\)</span> along <span class="math inline">\(\lambda=T-t\)</span>, so <span class="math inline">\(\lambda&lt;1\)</span> on a left-neighbourhood of <span class="math inline">\(T\)</span>, giving (from <span class="math inline">\(H_u\)</span>) <span class="math inline">\(u=0\)</span> and <span class="math inline">\(\dot x=0\)</span> there. If <span class="math inline">\(T\le1\)</span>, this persists to <span class="math inline">\(t=0\)</span> and the optimum is <span class="math inline">\(x\equiv c\)</span>. If <span class="math inline">\(T&gt;1\)</span>, <span class="math inline">\(\lambda\)</span> reaches <span class="math inline">\(1\)</span> at <span class="math inline">\(t=T-1\)</span>; to its left <span class="math inline">\(\lambda&gt;1\)</span> forces <span class="math inline">\(u=1\)</span>, where <span class="math inline">\(\dot\lambda+\lambda=0\)</span> gives <span class="math inline">\(\lambda=e^{T-1-t}\)</span> and <span class="math inline">\(\dot x=x\)</span> gives <span class="math inline">\(x=ce^{t}\)</span>. Hence the <strong>bang-bang</strong> optimum <span class="math display">\[
+x(t)=c\,e^{\,t\wedge(T-1)},\qquad
+u(t)=\begin{cases}1,&amp;t&lt;T-1,\\0,&amp;t&gt;T-1,\end{cases}
+\]</span> (invest fully, then consume), where <span class="math inline">\(a\wedge b=\min(a,b)\)</span>. The two Lagrange multipliers on the <span class="math inline">\(u\)</span>-bounds were unnecessary: linearity already forces <span class="math inline">\(u\in\{0,1\}\)</span>, with <span class="math inline">\(u=1\)</span> iff <span class="math inline">\(\lambda&gt;1\)</span>.</p>
+</div>
+</section>
+<section id="corner-conditions-and-state-constrained-arcs" class="level3">
+<h3 class="anchored" data-anchor-id="corner-conditions-and-state-constrained-arcs">Corner conditions and state-constrained arcs</h3>
+<p>When the state is required <em>smooth</em> and is bounded by sloping lines, the optimum splits into free arcs (both bounds slack) joined to boundary arcs, with <strong>corner (matching) conditions</strong> at the junctions ensuring <span class="math inline">\(x\)</span> and the relevant derivatives are continuous.</p>
+<div id="exm-oc-corner" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.10 (Free arcs joined to a state boundary)</strong></span> <span class="math display">\[
+\min\tfrac12\int_0^T\!\bigl(x^2+c^2u^2\bigr)\mathrm{d}t\quad\text{s.t.}\quad
+\dot x=u,\ a_1-b_1t\le x\le a_2-b_2t,\ x(0)=x_0&gt;0,\ x(T)=0,
+\]</span></p>
+<p><span class="math inline">\(T\)</span> free, <span class="math inline">\(c&gt;0\)</span>, <span class="math inline">\(a_i,b_i&gt;0\)</span>, <span class="math inline">\(a_2&gt;x_0&gt;a_1\)</span>, <span class="math inline">\(a_2/b_2&gt;a_1/b_1\)</span>. Form <span class="math inline">\(H=\tfrac12(x^2+c^2u^2)+\lambda u+\eta_1(x+b_1t-a_1)+\eta_2(a_2-b_2t-x)\)</span> (minimization, so we work with <span class="math inline">\(-H\)</span> concave). On a <strong>free</strong> arc <span class="math inline">\(\eta_1=\eta_2=0\)</span>, <span class="math inline">\(-\dot\lambda=H_x=x\)</span> and <span class="math inline">\(\lambda=-c^2u=-c^2\dot x\)</span>, whence <span class="math inline">\(-\dot\lambda=c^2\ddot x\)</span> and the arc obeys <span class="math inline">\(\ddot x=c^{-2}x\)</span>, strictly convex with <span id="eq-oc-corner-arc"><span class="math display">\[
+x=k_1e^{t/c}+k_2e^{-t/c}.
+\tag{4.28}\]</span></span> Checking the three TVC branches at the free <span class="math inline">\(T\)</span> rules out <span class="math inline">\(a_1/b_1&lt;T&lt;a_2/b_2\)</span> and <span class="math inline">\(T=a_1/b_1\)</span> (each contradicts <span class="math inline">\(x(T)=0\)</span> being the <em>first</em> hitting time), leaving <span class="math inline">\(T=a_2/b_2\)</span>. If the whole interval is free, the endpoints pin <span class="math inline">\(k_1,k_2\)</span> in <a href="#eq-oc-corner-arc" class="quarto-xref">Equation&nbsp;<span>4.28</span></a>; if the resulting arc violates a state bound, the optimum is a three-piece path — free arc, straight boundary arc <span class="math inline">\(x=a_1-b_1t\)</span>, free arc — with the corner conditions <span class="math inline">\(k_1+k_2=0\)</span>, <span class="math inline">\(k_1e^{t_1/c}+k_2e^{-t_1/c}=a_1-b_1t_1\)</span>, <span class="math inline">\(k_1e^{t_1/c}-k_2e^{-t_1/c}=-cb_1\)</span> fixing <span class="math inline">\((k_1,k_2,t_1)\)</span> so the free arc joins the boundary <strong>tangentially</strong> (smoothness of <span class="math inline">\(x\)</span>), and symmetrically for the second junction. This is the control-theoretic picture behind <a href="#fig-bang-bang" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>: the state, not the control, is the bounded object, and tangency replaces the bang.</p>
+</div>
+</section>
+<section id="isoperimetric-and-integral-constraints" class="level3">
+<h3 class="anchored" data-anchor-id="isoperimetric-and-integral-constraints">Isoperimetric and integral constraints</h3>
+<p>An <strong>integral (isoperimetric) constraint</strong> <span class="math inline">\(\int_0^T h(t,x,u)\,\mathrm{d}t=a\)</span> is absorbed by adding a state <span class="math inline">\(y(t)=\int_0^t h\)</span>, so that <span class="math inline">\(\dot y=h\)</span>, <span class="math inline">\(y(0)=0\)</span>, <span class="math inline">\(y(T)=a\)</span>. The Hamiltonian <span class="math inline">\(H=f+\lambda g+\nu h\)</span> then has <span class="math inline">\(-\dot\nu=H_y=0\)</span>, so the multiplier <span class="math inline">\(\nu\)</span> is a <strong>constant</strong>; one may therefore simply form</p>
+<p><span id="eq-oc-iso-H"><span class="math display">\[
+H=f+\lambda g+\nu\,h\quad(\nu\text{ constant})
+\tag{4.29}\]</span></span></p>
+<p>and impose <span class="math inline">\(H_u=0\)</span>, <span class="math inline">\(\dot\lambda=-H_x\)</span>, <span class="math inline">\(\lambda(T)=0\)</span>. For an <em>inequality</em> integral constraint <span class="math inline">\(\int_0^T h\,\mathrm{d}t\ge a\)</span> the same reduction gives the slackness conditions <span class="math inline">\(\nu\ge0\)</span>, <span class="math inline">\(y(T)\ge a\)</span>, <span class="math inline">\(\nu\bigl(y(T)-a\bigr)=0\)</span>.</p>
+<div id="exm-oc-iso" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.11 (An isoperimetric control problem)</strong></span> <span class="math display">\[
+\min\int_0^T u^2\,\mathrm{d}t\quad\text{s.t.}\quad \dot x=u,\ x(0)=1,\ \int_0^T x\,\mathrm{d}t=2,
+\]</span></p>
+<p>with <span class="math inline">\(T\)</span> and <span class="math inline">\(x(T)\)</span> both free. With <span class="math inline">\(H=-u^2+\lambda u+\nu x\)</span> (<span class="math inline">\(\nu\)</span> constant): <span class="math inline">\(-\dot\lambda=H_x=\nu\)</span> gives <span class="math inline">\(\lambda=-\nu t+C\)</span>, and the free-<span class="math inline">\(x(T)\)</span> TVC <span class="math inline">\(\lambda(T)=0\)</span> gives <span class="math inline">\(C=\nu T\)</span>, so <span class="math inline">\(\lambda=\nu(T-t)\)</span>; then <span class="math inline">\(H_u=-2u+\lambda=0\)</span> gives <span class="math inline">\(u=\tfrac{\nu}{2}(T-t)\)</span> and <span class="math inline">\(x=-\tfrac{\nu}{4}(t-T)^2+\kappa\)</span>. The free-<span class="math inline">\(T\)</span> TVC <span class="math inline">\(H\big|_T=0\)</span> reduces (since <span class="math inline">\(u(T)=0\)</span>) to <span class="math inline">\(\nu x(T)=0\)</span>, so either <span class="math inline">\(\nu=0\)</span> or <span class="math inline">\(x(T)=0\)</span>. The branch <span class="math inline">\(\nu=0\)</span> gives <span class="math inline">\(x\equiv1\)</span> (from <span class="math inline">\(x(0)=1\)</span>) and <span class="math inline">\(\int_0^T x=2\Rightarrow T=2\)</span>, with objective value <span class="math inline">\(0\)</span>. The branch <span class="math inline">\(x(T)=0\)</span> gives, after imposing <span class="math inline">\(x(0)=1\)</span> and the integral, <span class="math inline">\(T=6\)</span>, <span class="math inline">\(\nu=-\tfrac19\)</span>, <span class="math inline">\(x=\tfrac{1}{36}(t-6)^2\)</span>, with a positive objective value. The minimizer is therefore <span class="math inline">\(x\equiv1\)</span>, <span class="math inline">\(u\equiv0\)</span>, <span class="math inline">\(T=2\)</span> — every feasible path gives a nonnegative integral, and this one attains <span class="math inline">\(0\)</span>.</p>
+</div>
+</section>
+</section>
+<section id="sec-oc-mrap" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="sec-oc-mrap"><span class="header-section-number">4.6</span> Most rapid approach paths</h2>
+<p>When the running payoff and the law of motion combine into something <strong>linear in <span class="math inline">\(\dot x\)</span></strong>, the optimal-control problem reduces to a variational MRAP problem and is solved by the <em>most rapid approach path</em> method of <a href="03-calculus-of-variations.html#sec-mrap" class="quarto-xref"><span>Section 3.6</span></a>. Concretely, the discounted control problem</p>
+<p><span id="eq-oc-mrap-control"><span class="math display">\[
+\max\int_0^\infty e^{-\rho t}\bigl[P(x)+Q(x)f(x,u)\bigr]\mathrm{d}t
+\quad\text{s.t.}\quad \dot x=F(x)+G(x)f(x,u),\ a(x)\le u\le b(x),\ x(0)=x_0,
+\tag{4.30}\]</span></span></p>
+<p>converts — by solving the law of motion for <span class="math inline">\(f(x,u)\)</span> and substituting — into</p>
+<p><span id="eq-oc-mrap-var"><span class="math display">\[
+\max\int_0^\infty e^{-\rho t}\bigl[M(x)+N(x)\dot x\bigr]\mathrm{d}t
+\quad\text{s.t.}\quad A(x)\le\dot x\le B(x),\ x(0)=x_0,
+\tag{4.31}\]</span></span></p>
+<p>with <span class="math inline">\(M=P+Q\,(F\!-\!\cdot)/G\)</span>-type combinations and the speed limits <span class="math inline">\(A,B\)</span> inherited from <span class="math inline">\([a,b]\)</span>. This is precisely the linear-in-<span class="math inline">\(\dot x\)</span> problem <a href="03-calculus-of-variations.html#eq-mrap" class="quarto-xref">Equation&nbsp;<span>3.24</span></a> of <a href="03-calculus-of-variations.html#sec-mrap" class="quarto-xref"><span>Section 3.6</span></a>. By <a href="03-calculus-of-variations.html#thm-mrap" class="quarto-xref">Theorem&nbsp;<span>3.7</span></a> the optimum is the <strong>most rapid approach path</strong>: the algebraic singular condition <span class="math inline">\(M'(x)+\rho N(x)=0\)</span> pins the <strong>turnpike</strong> <span class="math inline">\(x_s\)</span>, and the optimal policy drives <span class="math inline">\(x\)</span> toward <span class="math inline">\(x_s\)</span> at the maximal admissible speed — <span class="math inline">\(\dot x=B(x)\)</span> from below, <span class="math inline">\(\dot x=A(x)\)</span> from above — then stays at <span class="math inline">\(x_s\)</span>, under the same monotonicity and tail hypotheses of <a href="03-calculus-of-variations.html#thm-mrap" class="quarto-xref">Theorem&nbsp;<span>3.7</span></a>. The bang-bang structure of the control is the boundary speed; the singular arc is the turnpike. Thus the variational MRAP and the control-theoretic bang-singular-bang are two readings of one phenomenon.</p>
+</section>
+<section id="sec-oc-comparative" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="sec-oc-comparative"><span class="header-section-number">4.7</span> Comparative statics</h2>
+<p>How does the optimal value respond to an exogenous parameter <span class="math inline">\(\theta\)</span>? Consider the parametrized problem</p>
+<p><span id="eq-oc-param"><span class="math display">\[
+\begin{aligned}
+\max_u\quad &amp; \int_0^{T(\theta)} f(t,x,u,\theta)\,\mathrm{d}t\\
+\text{s.t.}\quad &amp; \dot x=g(t,x,u,\theta),\ h(t,x,u,\theta)\ge0,\\
+&amp; x(0)=\alpha(\theta),\ x(T(\theta))=\psi(T(\theta)),
+\end{aligned}
+\tag{4.32}\]</span></span></p>
+<p>with <span class="math inline">\(H=f+\lambda g+\eta h\)</span>, optimal path <span class="math inline">\(x(t,\theta),u(t,\theta)\)</span>, multipliers <span class="math inline">\(\lambda(t,\theta)\)</span>, <span class="math inline">\(\eta(t,\theta)\)</span>, and value <span class="math inline">\(V(\theta)=\int_0^{T(\theta)}f\,\mathrm{d}t\)</span>.</p>
+<div id="thm-oc-compstat" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.6 (The comparative-statics formula)</strong></span> Assuming the optimal path and multipliers are differentiable in <span class="math inline">\(\theta\)</span>,</p>
+<p><span id="eq-oc-compstat"><span class="math display">\[
+\frac{\mathrm{d}V}{\mathrm{d}\theta}
+=\int_0^{T(\theta)}H_\theta\,\mathrm{d}t
++T'(\theta)\bigl(H-\lambda x_t\bigr)\big|_{T(\theta)}
+-\bigl(\lambda x_\theta\bigr)\big|_0^{T(\theta)} .
+\tag{4.33}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Write <span class="math inline">\(V\)</span> via <a href="#eq-pmp-rewrite" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> and use <span class="math inline">\(\eta h=0\)</span> (smoothness of <span class="math inline">\(\eta,h\)</span>, and slackness): <span class="math inline">\(V(\theta)=\int_0^{T}\bigl[H+\dot\lambda x\bigr]\mathrm{d}t-\bigl[\lambda x\bigr]_0^{T}\)</span>. Differentiate in <span class="math inline">\(\theta\)</span>. The Leibniz rule contributes the endpoint term <span class="math inline">\(T'(\theta)\bigl(H+\dot\lambda x\bigr)\big|_T\)</span>; inside, <span class="math inline">\(H_x x_\theta+H_u u_\theta+H_\lambda\lambda_\theta+H_\theta+\dot\lambda x_\theta\)</span> collapses by the necessary conditions (<span class="math inline">\(H_x=-\dot\lambda\)</span>, <span class="math inline">\(H_u=0\)</span>, <span class="math inline">\(H_\lambda=\dot x\)</span>) to <span class="math inline">\(H_\theta\)</span> plus exact derivatives that integrate to boundary terms. Collecting and cancelling (using <span class="math inline">\(x_t=\dot x=H_\lambda\)</span> at <span class="math inline">\(T\)</span>) yields <a href="#eq-oc-compstat" class="quarto-xref">Equation&nbsp;<span>4.33</span></a>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>Specializing <a href="#eq-oc-compstat" class="quarto-xref">Equation&nbsp;<span>4.33</span></a> gives the workhorse cases (all with no terminal-value constraint unless noted):</p>
+<ul>
+<li><strong>Special case 1</strong> (<span class="math inline">\(f,g,h,T\)</span> independent of <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\alpha(\theta)=\theta\)</span>): <span class="math inline">\(V'(\theta)=\lambda(0,\theta)\)</span> — the <strong>shadow price</strong>, recovering <a href="#eq-oc-shadow" class="quarto-xref">Equation&nbsp;<span>4.9</span></a>.</li>
+<li><strong>Special case 2</strong> (<span class="math inline">\(f,g,h,\lambda\)</span> independent of <span class="math inline">\(\theta\)</span>, <span class="math inline">\(T(\theta)=\theta\)</span>): <span class="math inline">\(V'(\theta)=H\big|_{T(\theta)}=f\big|_{T(\theta)}\)</span>.</li>
+<li><strong>Special case 3</strong> (<span class="math inline">\(T,\alpha\)</span> independent of <span class="math inline">\(\theta\)</span>): <span class="math inline">\(V'(\theta)=\int_0^T H_\theta\,\mathrm{d}t\)</span>.</li>
+<li><strong>Special case 4</strong> (terminal-value constraint <span class="math inline">\(x(\theta,\theta)=\psi(\theta)\)</span>, <span class="math inline">\(T(\theta)=\theta\)</span>): <span class="math inline">\(\psi'=x_t+x_\theta\)</span>, so <span class="math inline">\(V'(\theta)=\bigl(H-\lambda(x_t+x_\theta)\bigr)\big|_T
+=\bigl(H-\lambda\dot\psi\bigr)\big|_T\)</span>.</li>
+</ul>
+<p>When <span class="math inline">\(\theta\)</span> is itself a <em>choice</em> variable (e.g.&nbsp;a free terminal time), the first-order condition <span class="math inline">\(V'(\theta)=0\)</span> reproduces exactly the TVCs of <a href="#sec-oc-boundary" class="quarto-xref"><span>Section 4.2</span></a> — comparative statics and transversality are the same condition seen from two sides. The parameter-only version (fixed <span class="math inline">\(T\)</span>, no terminal constraint) reads <span class="math inline">\(\tfrac{\mathrm dV}{\mathrm d\theta}=\int_0^\infty H_\theta\,\mathrm{d}t+\lambda x_\theta\big|_0\)</span>, and <span class="math inline">\(\int_0^\infty H_\theta\,\mathrm{d}t\)</span> alone when <span class="math inline">\(\alpha\)</span> is <span class="math inline">\(\theta\)</span>-free.</p>
+<p>We apply <a href="#eq-oc-compstat" class="quarto-xref">Equation&nbsp;<span>4.33</span></a> (special case 4) to confirm optimality of a free-<span class="math inline">\(T\)</span> extraction problem in <a href="#sec-oc-extraction" class="quarto-xref"><span>Section 4.9.3</span></a>; <a href="#fig-extraction" class="quarto-xref">Figure&nbsp;<span>4.3</span></a> previews its solution.</p>
+</section>
+<section id="sec-oc-sufficiency" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="sec-oc-sufficiency"><span class="header-section-number">4.8</span> Sufficiency: Mangasarian and Arrow</h2>
+<p>The maximum principle is necessary. Concavity makes it sufficient. The strongest hypothesis is Mangasarian’s; Arrow’s is weaker.</p>
+<div id="thm-mangasarian" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.7 (Mangasarian sufficiency)</strong></span> For <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a>, suppose the Hamiltonian <span class="math inline">\(H=f+\lambda g\)</span> is <strong>concave in <span class="math inline">\((x,u)\)</span> jointly</strong>. Then any <span class="math inline">\((x,u,\lambda)\)</span> satisfying the necessary conditions <a href="#eq-pmp-max" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>–<a href="#eq-pmp-system" class="quarto-xref">Equation&nbsp;<span>4.4</span></a> is optimal.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\((y,v)\)</span> be any feasible pair. By <a href="#eq-pmp-rewrite" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> for both paths (with <span class="math inline">\(y(0)=x(0)=x_0\)</span>, <span class="math inline">\(\lambda(T)=0\)</span>),</p>
+<p><span class="math display">\[
+\int_0^T\!\bigl[f(t,y,v)-f(t,x,u)\bigr]\mathrm{d}t
+=\int_0^T\!\Bigl[\bigl(H(t,y,v,\lambda)-H(t,x,u,\lambda)\bigr)+\dot\lambda\,(y-x)\Bigr]\mathrm{d}t .
+\]</span></p>
+<p>Concavity of <span class="math inline">\(H\)</span> in <span class="math inline">\((x,u)\)</span> gives the supporting inequality <span class="math inline">\(H(t,y,v,\lambda)-H(t,x,u,\lambda)\le H_x\,(y-x)+H_u\,(v-u)\)</span>, with <span class="math inline">\(H_x,H_u\)</span> evaluated at <span class="math inline">\((x,u)\)</span>. Therefore the integrand is bounded above by <span class="math inline">\(\bigl(H_x+\dot\lambda\bigr)(y-x)+H_u\,(v-u)=0\)</span>, since <span class="math inline">\(H_x+\dot\lambda=0\)</span> and <span class="math inline">\(H_u=0\)</span> along the optimum. (At a boundary control where <span class="math inline">\(H_u\neq0\)</span>, the maximum condition still gives <span class="math inline">\(H(t,y,v,\lambda)-H(t,x,u,\lambda)\le0\)</span> directly, because <span class="math inline">\(u\)</span> maximizes <span class="math inline">\(H\)</span>; concavity is then used only in <span class="math inline">\(x\)</span>.) Hence <span class="math inline">\(\int_0^T\!\bigl[f(t,y,v)-f(t,x,u)\bigr]\mathrm{d}t\le0\)</span>, so <span class="math inline">\((x,u)\)</span> is optimal. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>When is <span class="math inline">\(H\)</span> concave in <span class="math inline">\((x,u)\)</span>?</strong> Two convenient sufficient conditions: (i) <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> are both concave in <span class="math inline">\((x,u)\)</span> <strong>and</strong> <span class="math inline">\(\lambda\ge0\)</span>; or (ii) <span class="math inline">\(f\)</span> is concave in <span class="math inline">\((x,u)\)</span> and <span class="math inline">\(g\)</span> is <strong>linear</strong> in <span class="math inline">\((x,u)\)</span> (so <span class="math inline">\(\lambda g\)</span> is linear, hence concave, of either sign). Both are common in applications — linear laws of motion, or nonnegative shadow prices.</p>
+</div>
+</div>
+</div>
+<p>Mangasarian’s joint concavity is often too strong. Arrow’s theorem asks only that the <em>maximized</em> Hamiltonian be concave in the state.</p>
+<div id="thm-arrow" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.8 (Arrow sufficiency)</strong></span> For <a href="#eq-oc-standard" class="quarto-xref">Equation&nbsp;<span>4.2</span></a>, suppose <span class="math inline">\((x,u,\lambda)\)</span> satisfies the necessary conditions and the <strong>maximized Hamiltonian</strong> <span class="math display">\[
+H^0(t,x)=\max_u H(t,x,u,\lambda(t))
+\]</span> is concave in <span class="math inline">\(x\)</span>. Then <span class="math inline">\((x,u)\)</span> is optimal.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>As in <a href="#thm-mangasarian" class="quarto-xref">Theorem&nbsp;<span>4.7</span></a>, for feasible <span class="math inline">\((y,v)\)</span>, <span class="math inline">\(\int_0^T\!\bigl[f(t,y,v)-f(t,x,u)\bigr]\mathrm{d}t
+=\int_0^T\!\bigl[H(t,y,v,\lambda)-H(t,x,u,\lambda)+\dot\lambda(y-x)\bigr]\mathrm{d}t\)</span>. Bound <span class="math inline">\(H(t,y,v,\lambda)\le H^0(t,y)\)</span> and use <span class="math inline">\(H(t,x,u,\lambda)=H^0(t,x)\)</span>, then concavity of <span class="math inline">\(H^0\)</span> in <span class="math inline">\(x\)</span>: <span class="math inline">\(H^0(t,y)-H^0(t,x)\le H^0_x(t,x)(y-x)=H_x(t,x,u,\lambda)(y-x)=-\dot\lambda(y-x)\)</span>, the middle equality by the envelope theorem. The integrand is <span class="math inline">\(\le0\)</span>, so <span class="math inline">\((x,u)\)</span> is optimal. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>That Arrow is <em>weaker</em> than Mangasarian follows from a one-line lemma.</p>
+<div id="lem-oc-maxconcave" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 4.1 (Maximization preserves concavity)</strong></span> If <span class="math inline">\(G(x,y)\)</span> is concave in <span class="math inline">\((x,y)\)</span> jointly, then <span class="math inline">\(G^0(x)=\max_y G(x,y)\)</span> is concave in <span class="math inline">\(x\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(\gamma\in(0,1)\)</span>, <span class="math inline">\(\bar\gamma=1-\gamma\)</span>, and <span class="math inline">\(x_1,x_2\)</span>; let <span class="math inline">\(y_k\)</span> attain <span class="math inline">\(G^0(x_k)=G(x_k,y_k)\)</span>. Then <span class="math inline">\(\gamma G^0(x_1)+\bar\gamma G^0(x_2)=\gamma G(x_1,y_1)+\bar\gamma G(x_2,y_2)
+\le G(\gamma x_1+\bar\gamma x_2,\ \gamma y_1+\bar\gamma y_2)\le G^0(\gamma x_1+\bar\gamma x_2)\)</span>, the first inequality by joint concavity, the second by the definition of <span class="math inline">\(G^0\)</span>. <span class="math inline">\(\;\blacksquare\)</span></p>
+</div>
+<p>So if <span class="math inline">\(H\)</span> is concave in <span class="math inline">\((x,u)\)</span> (Mangasarian) then <span class="math inline">\(H^0\)</span> is concave in <span class="math inline">\(x\)</span> (Arrow) by <a href="#lem-oc-maxconcave" class="quarto-xref">Lemma&nbsp;<span>4.1</span></a> with <span class="math inline">\(G=H\)</span>, <span class="math inline">\(y=u\)</span>. The converse fails — <span class="math inline">\(H^0\)</span> can be concave while <span class="math inline">\(H\)</span> is not — so Arrow applies more widely. The standard infinite-horizon strengthening is <a href="#thm-oc-arrow-infinite" class="quarto-xref">Theorem&nbsp;<span>4.5</span></a>, with the tail <span class="math inline">\(\limsup_t\lambda(y-x)\ge0\)</span>.</p>
+<div id="exm-oc-arrow" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.12 (Arrow where Mangasarian fails)</strong></span> <span class="math display">\[
+\min\int_0^1 x^2 e^{u}\,\mathrm{d}t\quad\text{s.t.}\quad \dot x=u,\ x(0)=0,\ x(1)=1.
+\]</span></p>
+<p>Maximizing the objective means maximizing <span class="math inline">\(H\)</span> with the <em>running payoff</em> <span class="math inline">\(-x^2e^u\)</span> (the negative of the minimand). With <span class="math inline">\(H=-x^2 e^u+\lambda u\)</span>: <span class="math inline">\(H_u=-x^2e^u+\lambda=0\)</span> and <span class="math inline">\(-\dot\lambda=H_x=-2xe^u\)</span>, together with <span class="math inline">\(\dot x=u\)</span>, give <span class="math inline">\(x\ddot x+2\dot x^2=2\)</span> (eliminating <span class="math inline">\(\lambda,u\)</span>); with <span class="math inline">\(x(0)=0\)</span>, <span class="math inline">\(x(1)=1\)</span> the unique solution is <span class="math inline">\(x(t)=t\)</span>, so <span class="math inline">\(u\equiv1\)</span>, <span class="math inline">\(\lambda=e\,t^2\)</span>. Now <span class="math inline">\(H\)</span> is <strong>not</strong> concave in <span class="math inline">\((x,u)\)</span> jointly (the <span class="math inline">\(-x^2e^u\)</span> term is not jointly concave), so Mangasarian does not apply. But <span class="math inline">\(H_{uu}=-x^2e^u&lt;0\)</span>, so <span class="math inline">\(H\)</span> is concave in <span class="math inline">\(u\)</span> for fixed <span class="math inline">\(x\)</span>, and the maximizer is interior: <span class="math inline">\(x^2e^u=\lambda\)</span>, <span class="math inline">\(u=\ln\lambda-2\ln x\)</span>. Substituting back, the <strong>maximized Hamiltonian</strong> is <span class="math display">\[
+H^0(t,x)=\lambda(t)\bigl(-1+\ln\lambda(t)-2\ln x\bigr),
+\]</span> with <span class="math inline">\(\lambda&gt;0\)</span>. Since <span class="math inline">\(-2\lambda\ln x\)</span> has second derivative <span class="math inline">\(H^0_{xx}=2\lambda/x^2&gt;0\)</span>, <span class="math inline">\(H^0\)</span> is <strong>convex</strong>, not concave, in <span class="math inline">\(x\)</span> — so Arrow’s concavity hypothesis is <em>not</em> met by this max-recast, and the theorem does not apply as stated. The clean route is to keep the problem in its native <strong>minimization</strong> form: write the minimand’s Hamiltonian <span class="math inline">\(\widehat H=x^2e^u+\lambda u\)</span>, minimize over <span class="math inline">\(u\)</span>, and the <em>minimized</em> Hamiltonian <span class="math inline">\(\widehat H^0(t,x)\)</span> then inherits <span class="math inline">\(\widehat H^0_{xx}&gt;0\)</span> — exactly the <strong>convexity in <span class="math inline">\(x\)</span></strong> that the sufficiency theorem for a <em>minimum</em> requires. Under that (correctly oriented) hypothesis the candidate <span class="math inline">\(x(t)=t\)</span>, <span class="math inline">\(u\equiv1\)</span> is a genuine minimizer. The lesson: the maximized/minimized Hamiltonian can be well-behaved in the state even when joint concavity fails, but one must match the curvature condition to the direction of optimization.</p>
+</div>
+</section>
+<section id="sec-oc-applications" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="sec-oc-applications"><span class="header-section-number">4.9</span> Economic applications</h2>
+<p>We now run the principle through the canonical models. Discounted problems use the current-value Hamiltonian of <a href="#sec-oc-currentvalue" class="quarto-xref"><span>Section 4.1.3</span></a> throughout.</p>
+<section id="sec-oc-ramsey" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-ramsey">The Ramsey model in current-value form</h3>
+<p>A planner chooses consumption to maximize discounted utility,</p>
+<p><span id="eq-oc-ramsey"><span class="math display">\[
+\max_c\int_0^\infty e^{-\rho t}u(c)\,\mathrm{d}t
+\quad\text{s.t.}\quad \dot k=f(k)-nk-c,\ k(0)=k_0,
+\tag{4.34}\]</span></span></p>
+<p>with <span class="math inline">\(k\)</span> capital per capita, <span class="math inline">\(c\)</span> consumption per capita, <span class="math inline">\(n\)</span> population growth, <span class="math inline">\(u'&gt;0&gt;u''\)</span>, <span class="math inline">\(f'&gt;0&gt;f''\)</span>. The <strong>current-value Hamiltonian</strong> is</p>
+<p><span id="eq-oc-ramsey-H"><span class="math display">\[
+\mathcal{H}=u(c)+\mu\bigl(f(k)-nk-c\bigr),
+\tag{4.35}\]</span></span></p>
+<p>where the current-value costate <span class="math inline">\(\mu\)</span> is the <strong>shadow price of capital</strong>. The conditions <a href="#eq-oc-cv-conditions" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> read</p>
+<p><span id="eq-oc-ramsey-foc"><span class="math display">\[
+0=\mathcal{H}_c=u'(c)-\mu,\qquad
+\dot\mu=\rho\mu-\mathcal{H}_k=\mu\bigl(\rho+n-f'(k)\bigr),\qquad
+\dot k=f(k)-nk-c .
+\tag{4.36}\]</span></span></p>
+<p>Eliminating <span class="math inline">\(\mu=u'(c)\)</span> (so <span class="math inline">\(\dot\mu=u''(c)\dot c\)</span>) gives the <strong>Keynes–Ramsey rule</strong> and the planar system</p>
+<p><span id="eq-oc-ramsey-system"><span class="math display">\[
+\dot c=\frac{u'(c)}{-u''(c)}\bigl(f'(k)-n-\rho\bigr),\qquad
+\dot k=f(k)-nk-c .
+\tag{4.37}\]</span></span></p>
+<p>The steady state <span class="math inline">\(E=(k^\ast,c^\ast)\)</span> solves <span class="math inline">\(f'(k^\ast)=n+\rho\)</span> (the <strong>modified golden rule</strong>: the marginal product of capital equals population growth plus the discount rate) and <span class="math inline">\(c^\ast=f(k^\ast)-nk^\ast\)</span>. Linearizing <a href="#eq-oc-ramsey-system" class="quarto-xref">Equation&nbsp;<span>4.37</span></a> at <span class="math inline">\(E\)</span>, the Jacobian has determinant <span class="math inline">\(\tfrac{u'}{-u''}f''(k^\ast)c^\ast&lt;0\)</span> (using <span class="math inline">\(f''&lt;0\)</span>), so its eigenvalues are real with opposite signs: <span class="math inline">\(E\)</span> is a <strong>saddle point</strong>. There is a unique stable manifold — the <strong>saddle path</strong> — and the planner must set initial consumption <span class="math inline">\(c_0\)</span> so the economy starts on it. <a href="#fig-ramsey-phase" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> draws the portrait for <span class="math inline">\(f(k)=Ak^\alpha\)</span>.</p>
+<div id="fig-ramsey-phase" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ramsey-phase-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch04-ramsey-phase.svg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ramsey-phase-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: Ramsey phase diagram in current-value form, for <span class="math inline">\(f(k)=Ak^\alpha\)</span>. The <span class="math inline">\(\dot k=0\)</span> nullcline (blue) is <span class="math inline">\(c=f(k)-nk\)</span>; the <span class="math inline">\(\dot c=0\)</span> nullcline (green) is the vertical <span class="math inline">\(k=k^\ast\)</span> at the modified golden rule. They cross at the saddle point <span class="math inline">\(E=(k^\ast,c^\ast)\)</span>; only the stable saddle path (red) converges to <span class="math inline">\(E\)</span>. Off it, the flow diverges — too much initial consumption decumulates capital to zero, too little overaccumulates.
+</figcaption>
+</figure>
+</div>
+<p>For the <strong>quadratic (bliss-point)/saturating</strong> specification <span class="math inline">\(u(c)=2\sqrt{A}c-Bc^2\)</span>, <span class="math inline">\(f(k)=ak\)</span> (so <span class="math inline">\(a-n&gt;0\)</span> constant), the system is linear: <span class="math inline">\(u'(c)=2\sqrt A-2Bc\)</span>, the costate equation <span class="math inline">\(-\dot\mu=\mu(a-n-\rho)\)</span> with <span class="math inline">\(\mu(\infty)\)</span> bounded forces <span class="math inline">\(\mu\equiv0\)</span> along the relevant path, hence <span class="math inline">\(c\equiv \sqrt A/B\)</span> (the <strong>bliss/saturation</strong> consumption), and <span class="math inline">\(\dot k=(a-n)k-\sqrt A/B\)</span> with <span class="math inline">\(k(0)=k_0\)</span> integrates to <span class="math display">\[
+k(t)=\bigl(k_0-k^\ast\bigr)e^{(a-n)t}+k^\ast,\qquad k^\ast=\frac{\sqrt A}{B(a-n)} .
+\]</span> Mangasarian (<a href="#thm-mangasarian" class="quarto-xref">Theorem&nbsp;<span>4.7</span></a>) applies because <span class="math inline">\(u\)</span> is concave and <span class="math inline">\(g\)</span> is linear in <span class="math inline">\((k,c)\)</span>, so the candidate is optimal. The same problem solves directly by the variational route of <a href="03-calculus-of-variations.html#sec-ramsey" class="quarto-xref"><span>Section 3.5.1</span></a>: substituting <span class="math inline">\(c=f(k)-nk-\dot k\)</span> turns <a href="#eq-oc-ramsey" class="quarto-xref">Equation&nbsp;<span>4.34</span></a> into <span class="math inline">\(\max\int_0^\infty e^{-\rho t}u\bigl(f(k)-nk-\dot k\bigr)\mathrm{d}t\)</span> and the Euler equation reproduces <a href="#eq-oc-ramsey-system" class="quarto-xref">Equation&nbsp;<span>4.37</span></a>.</p>
+</section>
+<section id="sec-oc-govt" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-govt">Government-spending Ramsey</h3>
+<p>Let utility depend on private consumption <span class="math inline">\(c\)</span> and government spending <span class="math inline">\(g\)</span>, <span class="math inline">\(u(c,g)\)</span>, with</p>
+<p><span id="eq-oc-govt"><span class="math display">\[
+\max_c\int_0^T u(c,g)e^{-\rho t}\,\mathrm{d}t
+\quad\text{s.t.}\quad \dot k=f(k)-nk-c-g,\ k(0)=k_0,\ k(T)\ge0 .
+\tag{4.38}\]</span></span></p>
+<p>Treating <span class="math inline">\(g\)</span> as the comparative-statics parameter (present-value Hamiltonian <span class="math inline">\(H=u(c,g)e^{-\rho t}+\lambda(f(k)-nk-c-g)\)</span>, so <span class="math inline">\(H_g=u_g e^{-\rho t}-\lambda\)</span>, <span class="math inline">\(H_c=u_c e^{-\rho t}-\lambda\)</span>), the value <span class="math inline">\(V(g)=\int_0^T u(c^\ast,g)e^{-\rho t}\,\mathrm{d}t\)</span> has, by the parameter version of <a href="#eq-oc-compstat" class="quarto-xref">Equation&nbsp;<span>4.33</span></a>,</p>
+<p><span id="eq-oc-govt-vprime"><span class="math display">\[
+V'(g)=\int_0^T\bigl(u_g(c^\ast,g)e^{-\rho t}-\lambda^\ast\bigr)\mathrm{d}t
+=\int_0^T\bigl(u_g-u_c\bigr)e^{-\rho t}\,\mathrm{d}t,
+\tag{4.39}\]</span></span></p>
+<p>using the optimality condition <span class="math inline">\(\lambda^\ast=u_c e^{-\rho t}\)</span>. So the welfare effect of government spending is the discounted gap between its marginal utility and that of private consumption: <span class="math inline">\(u_g-u_c=u_c\bigl(u_g/u_c-1\bigr)\)</span>, where <span class="math inline">\(u_g/u_c\)</span> is the marginal rate of substitution of public for private consumption. Spending raises welfare iff <span class="math inline">\(u_g&gt;u_c\)</span> at the margin.</p>
+</section>
+<section id="sec-oc-extraction" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-extraction">Optimal mineral extraction with free terminal</h3>
+<p>A mine holds stock <span class="math inline">\(x\)</span> with <span class="math inline">\(x(0)=1\)</span>; the resource sells at a constant price <span class="math inline">\(1\)</span> with extraction cost <span class="math inline">\(C(q)=q^2\)</span>:</p>
+<p><span id="eq-oc-extraction"><span class="math display">\[
+\max\int_0^T e^{-\rho t}\bigl(q-q^2\bigr)\mathrm{d}t
+\quad\text{s.t.}\quad \dot x=-q,\ q\ge0,\ x\ge0,\ x(0)=1,
+\tag{4.40}\]</span></span></p>
+<p><span class="math inline">\(\rho&gt;0\)</span>, <span class="math inline">\(T\)</span> free. The instantaneous profit <span class="math inline">\(\pi(q)=q-q^2\)</span> peaks at the static rate <span class="math inline">\(q=\tfrac12\)</span>.</p>
+<p><em>The horizon is finite.</em> If <span class="math inline">\(T&gt;2\)</span> then <span class="math inline">\(\int_0^T(\tfrac12)\,\mathrm{d}t=\tfrac T2&gt;1\)</span>, so extracting at the static-profit rate would exhaust <em>more</em> than the stock — meaning at the static rate the deposit would run out before <span class="math inline">\(T\)</span>, and stretching extraction over <span class="math inline">\((2,T)\)</span> at a small positive rate beats it. Hence the optimal <span class="math inline">\(T\)</span> satisfies <span class="math inline">\(T\le2\)</span>, and (for an interior optimum) <span class="math inline">\(x(T)=0\)</span> with <span class="math inline">\(x(t)&gt;0\)</span> on <span class="math inline">\([0,T)\)</span>, <span class="math inline">\(q\)</span> decreasing, <span class="math inline">\(q\in[0,\tfrac12]\)</span>.</p>
+<p><em>Maximum principle.</em> Form <span class="math inline">\(H=q-q^2-\lambda q+\xi q\)</span> where <span class="math inline">\(\xi\ge0\)</span> is the multiplier on <span class="math inline">\(q\ge0\)</span> (the state bound <span class="math inline">\(x\ge0\)</span> is handled by the terminal). Then <span class="math inline">\(0=H_q=1-2q-\lambda+\xi\)</span>, <span class="math inline">\(-\dot\lambda=H_x=0\)</span> so <span class="math inline">\(\lambda=\lambda_0 e^{0}\)</span> — in present value <span class="math inline">\(\dot\lambda=0\)</span> gives <span class="math inline">\(\lambda=\lambda_0\)</span>, and restoring discounting through <span class="math inline">\(\mathcal H=q-q^2+\mu(-q)\)</span> with <span class="math inline">\(\dot\mu=\rho\mu\)</span> gives the current-value costate <span class="math inline">\(\mu=\mu_0 e^{\rho t}\)</span>. With <span class="math inline">\(q&gt;0\)</span> (so <span class="math inline">\(\xi=0\)</span>),</p>
+<p><span id="eq-oc-extraction-q"><span class="math display">\[
+q=\tfrac12\bigl(1-\mu_0 e^{\rho t}\bigr),
+\tag{4.41}\]</span></span></p>
+<p>decreasing iff <span class="math inline">\(\mu_0&gt;0\)</span>. Exhaustion <span class="math inline">\(\int_0^{K}q\,\mathrm{d}t=1\)</span> at the stopping time <span class="math inline">\(K\)</span> gives <span class="math inline">\(\tfrac12\bigl(K-\tfrac{\mu_0}{\rho}(e^{\rho K}-1)\bigr)=1\)</span>, i.e.</p>
+<p><span id="eq-oc-extraction-mu"><span class="math display">\[
+\mu_0=\frac{\rho(K-2)}{e^{\rho K}-1}\ge0\quad\Longrightarrow\quad \rho(K-2)\le1-e^{-\rho K},
+\tag{4.42}\]</span></span></p>
+<p>so <span class="math inline">\(K\in[2,T^\ast]\)</span> where <span class="math inline">\(T^\ast\)</span> solves <span class="math inline">\(\rho(T-2)=1-e^{-\rho T}\)</span>. The free-<span class="math inline">\(T\)</span> TVC <span class="math inline">\(0=H\big|_T=q(1-\mu_0 e^{\rho T}+\cdots)\big|_T\)</span> reduces, after substitution, to <span class="math inline">\(q(T)^2=0\)</span>, i.e.&nbsp;<span class="math inline">\(q(T)=0\)</span> — extraction tapers exactly to zero at exhaustion, which selects <span class="math inline">\(K=T^\ast\)</span>. The optimal profile is therefore</p>
+<p><span id="eq-oc-extraction-profile"><span class="math display">\[
+q(t)=\tfrac12\bigl(1-e^{-\rho(T^\ast-t)}\bigr),\quad t\in[0,T^\ast],\qquad q(t)=0,\ t&gt;T^\ast,
+\tag{4.43}\]</span></span></p>
+<p>shown in <a href="#fig-extraction" class="quarto-xref">Figure&nbsp;<span>4.3</span></a>: extraction starts strictly <strong>below</strong> the static rate <span class="math inline">\(\tfrac12\)</span> and declines monotonically to <span class="math inline">\(0\)</span> at exhaustion <span class="math inline">\(T^\ast\)</span>.</p>
+<div id="fig-extraction" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-extraction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ch04-extraction.svg" class="img-fluid figure-img" style="width:78.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-extraction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.3: Optimal extraction profile for <a href="#eq-oc-extraction" class="quarto-xref">Equation&nbsp;<span>4.40</span></a>. The rate <span class="math inline">\(q(t)\)</span> starts strictly below the static-profit rate <span class="math inline">\(q=\tfrac12\)</span> (dashed) and declines to zero at exhaustion, reaching zero exactly when the deposit is exhausted at the free terminal <span class="math inline">\(T^\ast\)</span>. Discounting makes early extraction attractive; the cost convexity <span class="math inline">\(C(q)=q^2\)</span> keeps it below the static peak.
+</figcaption>
+</figure>
+</div>
+<p><em>Sufficiency by comparative statics.</em> For fixed <span class="math inline">\(T\ge2\)</span> the fixed-<span class="math inline">\(T\)</span> problem satisfies Mangasarian (concave <span class="math inline">\(\pi\)</span>, linear <span class="math inline">\(\dot x\)</span>), so its optimum exists with value <span class="math inline">\(V(T)\)</span> and <span class="math inline">\(x(T,T)=0\)</span>. By special case 4 of <a href="#eq-oc-compstat" class="quarto-xref">Equation&nbsp;<span>4.33</span></a>, <span class="math display">\[
+V'(T)=e^{-\rho T}H\big|_T=e^{-\rho T}q(T)^2
+=\frac{e^{-\rho T}}{4}\Bigl(1-\frac{\rho(T-2)}{1-e^{-\rho T}}\Bigr)^2 ,
+\]</span> which is positive for <span class="math inline">\(T\in[2,T^\ast)\)</span> and zero at <span class="math inline">\(T^\ast\)</span>, confirming that <span class="math inline">\(V\)</span> is maximized at <span class="math inline">\(T^\ast\)</span> and that <a href="#eq-oc-extraction-profile" class="quarto-xref">Equation&nbsp;<span>4.43</span></a> solves both the free-<span class="math inline">\(T\)</span> and the infinite-horizon versions.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Why discounting is needed.</strong> Without discounting (<span class="math inline">\(\rho=0\)</span>), the fixed-<span class="math inline">\(T\)</span> optimum is the constant <span class="math inline">\(q\equiv1/T\)</span> with value <span class="math inline">\(V(T)=1-1/T\to1\)</span> as <span class="math inline">\(T\to\infty\)</span> but never attained — the free-<span class="math inline">\(T\)</span> problem has <strong>no</strong> solution. Undiscounted infinite-horizon resource problems routinely lack optima; discounting restores existence. But discounting raises intergenerational-equity concerns, a recurring tension in resource economics.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-oc-dhss" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-dhss">The DHSS exhaustible-resource model</h3>
+<p>The Dasgupta–Heal–Solow–Stiglitz model adds a second, <em>renewable</em> capital alongside the exhaustible resource. With produced capital <span class="math inline">\(K\)</span>, resource stock <span class="math inline">\(S\)</span>, extraction <span class="math inline">\(R\)</span>, and Cobb–Douglas output <span class="math inline">\(F(K,R)=K^a R^{1-a}\)</span>,</p>
+<p><span id="eq-oc-dhss"><span class="math display">\[
+\max\ \min_t C\quad\text{s.t.}\quad
+\dot K=F(K,R)-C,\ \dot S=-R,\ K,S,R\ge0,\ K(0)=K_0,\ S(0)=S_0 .
+\tag{4.44}\]</span></span></p>
+<p>This is a <strong>maximin</strong> (Rawlsian) consumption problem: maximize the lowest consumption ever sustained. As in the single-capital maximin below, it converts to maximizing a constant floor <span class="math inline">\(\xi\)</span> with <span class="math inline">\(C\ge\xi\)</span> and the two laws of motion, subject to feasibility <span class="math inline">\(\dot K\ge0\)</span> along a constant-<span class="math inline">\(C\)</span> path. The question of whether the maximin path holds consumption <strong>constant</strong> — and whether a positive constant is sustainable given that <span class="math inline">\(F\)</span> requires the depletable <span class="math inline">\(R\)</span> — is the substance of the DHSS symposium: with <span class="math inline">\(a&gt;1-a\)</span> (capital share exceeds resource share) a positive constant consumption is sustainable by accumulating <span class="math inline">\(K\)</span> fast enough to offset declining <span class="math inline">\(R\)</span>. We treat the tractable single-capital case in full next; the two-capital DHSS extension is left as a guided exercise (Problem 25 generalizes the structure).</p>
+</section>
+<section id="sec-oc-maximin" class="level3">
+<h3 class="anchored" data-anchor-id="sec-oc-maximin">Maximin consumption</h3>
+<p>In a one-capital economy with fixed technology, maximize the lowest sustainable consumption:</p>
+<p><span id="eq-oc-maximin"><span class="math display">\[
+\max\ \min_t c\quad\text{s.t.}\quad \dot k=2k-c,\ k\ge0,\ k(0)=k_0&gt;0 .
+\tag{4.45}\]</span></span></p>
+<p>Introduce a <strong>control parameter</strong> <span class="math inline">\(\xi\)</span> (the floor) and rewrite as</p>
+<p><span id="eq-oc-maximin-rewrite"><span class="math display">\[
+\max\int_0^\infty\!\xi\,e^{-t}\,\mathrm{d}t\quad\text{s.t.}\quad \dot k=2k-c,\ k\ge0,\ c\ge\xi,\ k(0)=k_0,
+\tag{4.46}\]</span></span></p>
+<p>over feasible paths and the constant <span class="math inline">\(\xi\)</span>. (The discount weight <span class="math inline">\(e^{-t}\)</span> (rate <span class="math inline">\(\rho=1\)</span>) is a harmless device making the objective <span class="math inline">\(\xi\)</span>.) Mangasarian holds, so the principle is sufficient. Since <span class="math inline">\(c=\xi=2k_0\)</span> is feasible (keeping <span class="math inline">\(k\equiv k_0\)</span>), restrict to <span class="math inline">\(\xi\le2k_0\)</span>, where <span class="math inline">\(c\ge0\)</span>, <span class="math inline">\(k\ge0\)</span> and the bound <span class="math inline">\(k\ge0\)</span> is slack; set <span class="math inline">\(H=\xi+\lambda(2k-c)+\zeta(c-\xi)\)</span>. Then <span class="math inline">\(0=H_c=-\lambda+\zeta\)</span>, <span class="math inline">\(-\dot\lambda+\lambda=H_k=2\lambda\)</span>, the slackness <span class="math inline">\(\zeta\ge0,\ \zeta(c-\xi)=0\)</span>, and the <span class="math inline">\(\xi\)</span>-optimality condition <span class="math inline">\(0=\int_0^\infty e^{-t}H_\xi\,\mathrm{d}t=\int_0^\infty e^{-t}(1-\lambda)\,\mathrm{d}t\)</span> give <span class="math inline">\(\lambda\equiv\)</span> const <span class="math inline">\(&gt;0\)</span> and <span class="math inline">\(c\equiv\xi\)</span>. The state then obeys <span class="math inline">\(\dot k=2k-\xi\)</span>, so <span class="math inline">\(k=(k_0-\xi/2)e^{2t}+\xi/2\)</span>; the <strong>largest</strong> <span class="math inline">\(\xi\)</span> keeping <span class="math inline">\(k\ge0\)</span> for all <span class="math inline">\(t\)</span> is <span class="math inline">\(\xi=2k_0\)</span>, giving</p>
+<p><span id="eq-oc-maximin-soln"><span class="math display">\[
+c\equiv2k_0,\qquad k\equiv k_0 .
+\tag{4.47}\]</span></span></p>
+<p>The maximin path is <strong>constant consumption</strong> at <span class="math inline">\(2k_0\)</span> with capital held at <span class="math inline">\(k_0\)</span> forever: a flat consumption path is optimal because any temporary surplus that lets <span class="math inline">\(c\)</span> rise must be paid for by a later dip below the floor, which a maximin planner refuses.</p>
+<div id="exm-oc-lake" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.13 (The lake-resource (log-utility growth) problem)</strong></span> <span class="math display">\[
+\max\int_0^\infty e^{-t}\ln c\,\mathrm{d}t\quad\text{s.t.}\quad \dot x=1-c,\ x\ge0,\ x(0)=1 .
+\]</span></p>
+<p>With <span class="math inline">\(\mathcal{H}=\ln c+\mu(1-c)\)</span>: <span class="math inline">\(\mathcal H_c=1/c-\mu=0\)</span> and <span class="math inline">\(\dot\mu=\mu-\mathcal H_x=\mu\)</span> (since <span class="math inline">\(\mathcal H_x=0\)</span>, <span class="math inline">\(\rho=1\)</span>) give <span class="math inline">\(\mu=\mu_0 e^{t}\)</span> and <span class="math inline">\(c=1/\mu=e^{-t}/\mu_0\)</span>. The tail/objective- convergence argument (the standard transversality requirement, since <span class="math inline">\(x\ge0\)</span> holds automatically below) pins <span class="math inline">\(\mu_0=1\)</span>, so <span class="math inline">\(c=e^{-t}\)</span>. The state equation <span class="math inline">\(\dot x=1-c=1-e^{-t}\)</span> with <span class="math inline">\(x(0)=1\)</span> then integrates to <span class="math inline">\(x(t)=1+\int_0^t(1-e^{-s})\,\mathrm ds=t+e^{-t}\)</span>, which <strong>grows without bound</strong> (<span class="math inline">\(x(t)\sim t\)</span>): the stock does <em>not</em> converge to a finite limit. Consumption decays geometrically at the discount rate while the lake fills indefinitely; the constraint <span class="math inline">\(x\ge0\)</span> is never threatened. Mangasarian holds (<span class="math inline">\(\ln c\)</span> concave, <span class="math inline">\(g\)</span> linear), confirming optimality. This is Problem 27.</p>
+</div>
+</section>
+</section>
+<section id="sec-oc-problems" class="level2" data-number="4.10">
+<h2 data-number="4.10" class="anchored" data-anchor-id="sec-oc-problems"><span class="header-section-number">4.10</span> Problems</h2>
+<p>The chapter’s exercises follow; they fold in the 28-problem set <em>最优控制练习题</em> and the two supplementary problems <em>补充作业</em>. Worked solutions to a curated subset appear in <a href="#sec-oc-solutions" class="quarto-xref"><span>Section 4.11</span></a>.</p>
+<ol type="1">
+<li><span class="math inline">\(\max\int_0^1(Kc+c^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot K=K-c\)</span>, <span class="math inline">\(K\ge0\)</span>, <span class="math inline">\(K(0)=1\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^T e^{-\rho t}\pi(c)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=f(x,c)\)</span>, <span class="math inline">\(x(0)=x_0\)</span>, where <span class="math inline">\(\rho&gt;0\)</span>, <span class="math inline">\(x_0\)</span> constant, <span class="math inline">\(0&lt;T\le\infty\)</span> given, <span class="math inline">\(\pi,f\)</span> smooth, <span class="math inline">\(\lim_{c\to\infty}\pi(c)=\infty\)</span>.</li>
+<li><span class="math inline">\(\max\int_1^5(xu-x^2-u^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(x(1)=2\)</span>.</li>
+<li>(Bolza <span class="math inline">\(\to\)</span> standard via <span class="math inline">\(x^2(1)=x^2(0)+\int_0^1 2x\dot x\,\mathrm{d}t\)</span>.) <span class="math inline">\(\min\int_0^1 u^2\,\mathrm{d}t+x^2(1)\)</span> s.t. <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(x(0)=1\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^3(2x-3u-u^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(u\in[0,4]\)</span>, <span class="math inline">\(x(0)=5\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^1 u\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=x+u^2\)</span>, <span class="math inline">\(x(0)=1\)</span>, <span class="math inline">\(x(1)=0\)</span>. (Show it has no solution.)</li>
+<li>Shortest path from the parabola <span class="math inline">\(x=t^2\)</span> to the line <span class="math inline">\(x=t-1\)</span>.</li>
+<li>Shortest path from the circle <span class="math inline">\(x^2+t^2=1\)</span> to the line <span class="math inline">\(x=t-2\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^1(x+y-u^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=y\)</span>, <span class="math inline">\(\dot y=2u\)</span>, <span class="math inline">\(x(0)=y(0)=0\)</span>, <span class="math inline">\(x(1)+2y(1)\ge1\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^T e^{-\rho t}(q-q^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=-q\)</span>, <span class="math inline">\(q\ge0\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(x(0)=1\)</span>, in five cases: (1) <span class="math inline">\(T\)</span> fixed, <span class="math inline">\(T\in(0,2)\)</span>; (2) <span class="math inline">\(T=2\)</span>; (3) <span class="math inline">\(T\)</span> fixed, <span class="math inline">\(T\in(2,T^\ast)\)</span>; (4) <span class="math inline">\(T=\infty\)</span>; (5) <span class="math inline">\(T\)</span> free, where <span class="math inline">\(T^\ast\)</span> solves <span class="math inline">\(\rho(T-2)=1-e^{-\rho T}\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^\infty e^{-\rho t}\ln c\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=rx-c\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(x(0)=1\)</span>, <span class="math inline">\(\rho&gt;0,\ r\ge0\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^\infty e^{-\rho t}\ln c\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=rx(1-x)-c\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(x(0)=1\)</span>, in the four cases <span class="math inline">\(r=0\)</span>, <span class="math inline">\(0&lt;r&lt;\rho\)</span>, <span class="math inline">\(r=\rho\)</span>, <span class="math inline">\(r&gt;\rho\)</span>.</li>
+<li><span class="math inline">\(\min\int_0^\infty e^{-2t}(x^2-2u)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(0\le u\le1\)</span>, <span class="math inline">\(x(0)=1\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^\infty e^{-t/2}\sqrt c\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=\sqrt x-c\)</span>, <span class="math inline">\(x(0)=1\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^\infty e^{-\rho t}(1-u)x\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=(ux)^\alpha-\delta x\)</span>, <span class="math inline">\(u\in[0,1]\)</span>, <span class="math inline">\(x(0)=x_0\)</span>, with <span class="math inline">\(\rho,\delta&gt;0\)</span>, <span class="math inline">\(\alpha\in(0,1)\)</span>, <span class="math inline">\(x_0&gt;0\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^\infty e^{-\rho t}\pi(c)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=rx-c\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(x(0)=x_0\)</span>, <span class="math inline">\(\pi(c)=\min(c^{\alpha_1},c^{\alpha_2})\)</span>, with <span class="math inline">\(\rho,r&gt;0\)</span>, <span class="math inline">\(1&gt;\alpha_2&gt;\alpha_1&gt;0\)</span>, <span class="math inline">\(x_0&gt;0\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^\infty e^{-\rho t}\pi(c)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot K=rK-c\)</span>, <span class="math inline">\(K\ge0\)</span>, <span class="math inline">\(K(0)=K_0\)</span>, <span class="math inline">\(\pi(c)=\min(2c,c+1)\)</span>, with <span class="math inline">\(\rho,r&gt;0\)</span>, <span class="math inline">\(K_0&gt;0\)</span>.</li>
+<li><span class="math inline">\(\min\int_0^5(4x+u^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=10\)</span>, <span class="math inline">\(x(5)=0\)</span>, <span class="math inline">\(x\ge6-2t\)</span>.</li>
+<li><span class="math inline">\(\min\int_0^T(x^2+u^2)\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=2\)</span>, <span class="math inline">\(x(T)=0\)</span>, <span class="math inline">\(3-2t\le x\le1-t\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^3(4-t)u\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x\le t+1\)</span>, <span class="math inline">\(0\le u\le2\)</span>, <span class="math inline">\(x(0)=0\)</span>.</li>
+<li><span class="math inline">\(\min\int_0^T u^2\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=1\)</span>, <span class="math inline">\(\int_0^T x\,\mathrm{d}t\ge2\)</span>, with <span class="math inline">\(T\)</span> and <span class="math inline">\(x(T)\)</span> free.</li>
+<li><span class="math inline">\(\min\int_0^T u^2\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=1\)</span>, <span class="math inline">\(x\le2t\)</span>, <span class="math inline">\(\int_0^T x\,\mathrm{d}t\ge13/3\)</span>, with <span class="math inline">\(T\)</span> and <span class="math inline">\(x(T)\)</span> free.</li>
+<li>(Corner conditions.) <span class="math inline">\(\min\int_0^4(u^2-1)^2\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=0\)</span>, <span class="math inline">\(x(4)=2\)</span>.</li>
+<li><span class="math inline">\(\max\int_0^T e^{-\rho t}(1-u)x\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=ux^\gamma-\delta x\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(u\in[0,1]\)</span>, <span class="math inline">\(x(0)=x_0\)</span>, with <span class="math inline">\(T,\rho,\gamma,\delta&gt;0\)</span>, <span class="math inline">\(0&lt;\gamma&lt;1\)</span>, <span class="math inline">\(x_0&gt;0\)</span>.</li>
+<li>(Two capitals.) <span class="math inline">\(\max\int_0^\infty e^{-rt}u\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot K=\sqrt K-\delta K-u+y-rB\)</span>, <span class="math inline">\(\dot B=y\)</span>, <span class="math inline">\(y\le b\)</span>, <span class="math inline">\(B\le aK\)</span>, <span class="math inline">\(u\ge0\)</span>, <span class="math inline">\(K\ge0\)</span>, <span class="math inline">\(K(0)=K_0\)</span>, <span class="math inline">\(B(0)=0\)</span>, constants <span class="math inline">\(r,\delta,a,b,K_0&gt;0\)</span>, <span class="math inline">\(K_0\)</span> small.</li>
+<li>(Investment with adjustment cost.) <span class="math inline">\(\max\int_0^\infty e^{-rt}\bigl(\pi(K)-C(I)\bigr)\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot K=I-\delta K\)</span>, <span class="math inline">\(0\le I\le\pi(K)\)</span>, <span class="math inline">\(K\ge0\)</span>, <span class="math inline">\(K(0)=K_0\)</span>, with <span class="math inline">\(\pi',-\pi'',C',C''&gt;0\)</span>, <span class="math inline">\(\pi(0)=C(0)=0\)</span>, <span class="math inline">\(\pi'(0)=\infty\)</span>, <span class="math inline">\(\pi'(\infty)=0\)</span>, <span class="math inline">\(C'(0)=0\)</span>, <span class="math inline">\(C'(\infty)=\infty\)</span>, <span class="math inline">\(r,\delta,K_0&gt;0\)</span>, <span class="math inline">\(K_0\)</span> small.</li>
+<li>(Lake resource.) <span class="math inline">\(\max\int_0^\infty e^{-t}\ln c\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=1-c\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(x(0)=1\)</span>.</li>
+<li>(Sufficiency tail.) Use the maximum principle to solve <span class="math inline">\(\min\int_0^\infty e^{-\rho t}(x-u)^2\,\mathrm{d}t\)</span> s.t. <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=1\)</span>, <span class="math inline">\(\rho&gt;0\)</span>. <strong>Note:</strong> for <span class="math inline">\(\rho\in(0,2)\)</span> the sufficiency test is delicate — the principle and TVC yield two candidate paths, only one of which satisfies the “tail” <span class="math inline">\(\limsup_t e^{-\rho t}\lambda(t)\bigl(y(t)-x(t)\bigr)\ge0\)</span> for all feasible <span class="math inline">\(y\)</span>; the one that satisfies it is optimal, and the one that fails it is provably <em>not</em> optimal.</li>
+<li><em>(Supplement 补充作业, Problem 1.)</em> Solve <span class="math inline">\(\max\)</span> of an integral objective subject to a law of motion, an algebraic constraint, and an initial condition. <strong>The objective, constraint, and law of motion are embedded as legacy image formulas in the source <code>.docx</code> and could not be recovered; only the problem’s skeleton (“<span class="math inline">\(\max\)</span>, s.t., with all parameters positive constants”) is legible.</strong></li>
+<li><em>(Supplement 补充作业, Problem 2.)</em> Solve <span class="math inline">\(\max\)</span> of an integral objective subject to a law of motion and two further conditions, with all parameters positive constants. <strong>As with Problem 29, the formulas are unrecoverable legacy images in the source; the statement could not be fully transcribed.</strong></li>
+</ol>
+</section>
+<section id="sec-oc-solutions" class="level2" data-number="4.11">
+<h2 data-number="4.11" class="anchored" data-anchor-id="sec-oc-solutions"><span class="header-section-number">4.11</span> Selected solutions</h2>
+<section id="problem-5-bounded-control-bang-bang" class="level3">
+<h3 class="anchored" data-anchor-id="problem-5-bounded-control-bang-bang">Problem 5 (bounded control, bang-bang)</h3>
+<p><span class="math inline">\(\max\int_0^3(2x-3u-u^2)\,\mathrm{d}t\)</span>, <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(u\in[0,4]\)</span>, <span class="math inline">\(x(0)=5\)</span>. With <span class="math inline">\(H=2x-3u-u^2+\lambda(x+u)\)</span>: the costate equation <span class="math inline">\(-\dot\lambda=H_x=2+\lambda\)</span> gives <span class="math inline">\(\lambda=ce^{-t}-2\)</span>, and with <span class="math inline">\(x(3)\)</span> free the TVC <span class="math inline">\(\lambda(3)=0\)</span> gives <span class="math inline">\(c=2e^{3}\)</span>, so <span class="math inline">\(\lambda=2e^{3-t}-2\)</span>. Maximizing <span class="math inline">\(H\)</span> over <span class="math inline">\(u\in[0,4]\)</span>: <span class="math inline">\(H_u=-3-2u+\lambda=0\)</span> gives the interior candidate <span class="math inline">\(u^\circ=(\lambda-3)/2\)</span>, clipped to <span class="math inline">\([0,4]\)</span>. Thus <span class="math display">\[
+u=\begin{cases}0,&amp;\lambda\le3,\\ (\lambda-3)/2,&amp;3&lt;\lambda&lt;11,\\ 4,&amp;\lambda\ge11.\end{cases}
+\]</span> Since <span class="math inline">\(\lambda=2e^{3-t}-2\)</span> decreases from <span class="math inline">\(2e^3-2\approx38.2\)</span> at <span class="math inline">\(t=0\)</span> to <span class="math inline">\(0\)</span> at <span class="math inline">\(t=3\)</span>, the control starts saturated at <span class="math inline">\(u=4\)</span>, enters the interior arc when <span class="math inline">\(\lambda=11\)</span> (at <span class="math inline">\(t=3-\ln\tfrac{13}{2}\)</span>), and hits <span class="math inline">\(u=0\)</span> when <span class="math inline">\(\lambda=3\)</span> (at <span class="math inline">\(t=3-\ln\tfrac52\)</span>), staying there to <span class="math inline">\(t=3\)</span>. The optimal control is the clipped affine profile above; <span class="math inline">\(H_{uu}=-2&lt;0\)</span> and <span class="math inline">\(g\)</span> linear in <span class="math inline">\((x,u)\)</span> make <span class="math inline">\(H\)</span> concave in <span class="math inline">\((x,u)\)</span>, so <a href="#thm-mangasarian" class="quarto-xref">Theorem&nbsp;<span>4.7</span></a> certifies optimality.</p>
+</section>
+<section id="problem-10-extraction-with-all-five-horizon-cases" class="level3">
+<h3 class="anchored" data-anchor-id="problem-10-extraction-with-all-five-horizon-cases">Problem 10 / extraction with all five horizon cases</h3>
+<p>This is the extraction model <a href="#eq-oc-extraction" class="quarto-xref">Equation&nbsp;<span>4.40</span></a>. As derived in <a href="#sec-oc-extraction" class="quarto-xref"><span>Section 4.9.3</span></a>, the candidate profile is <span class="math inline">\(q(t)=\tfrac12(1-\mu_0 e^{\rho t})\)</span> with exhaustion time <span class="math inline">\(K\in[2,T^\ast]\)</span> and <span class="math inline">\(\mu_0\)</span> fixed by <a href="#eq-oc-extraction-mu" class="quarto-xref">Equation&nbsp;<span>4.42</span></a>. (1) <span class="math inline">\(T\in(0,2)\)</span> fixed: the stock is <em>not</em> exhausted (<span class="math inline">\(\tfrac T2&lt;1\)</span>), the state bound <span class="math inline">\(x\ge0\)</span> is slack, and <span class="math inline">\(q(t)=\tfrac12(1-\mu_0 e^{\rho t})\)</span> with <span class="math inline">\(\mu_0\)</span> set so that <span class="math inline">\(x(T)\ge0\)</span> binds at the boundary of feasibility; concretely the fixed-<span class="math inline">\(T\)</span> optimum extracts the whole deposit only if forced, otherwise leaves a positive remainder. (2) <span class="math inline">\(T=2\)</span>: <span class="math inline">\(\mu_0=0\)</span>, <span class="math inline">\(q\equiv\tfrac12\)</span>, exact exhaustion at <span class="math inline">\(T\)</span>. (3) <span class="math inline">\(T\in(2,T^\ast)\)</span> fixed: exhaustion occurs at an interior <span class="math inline">\(K&lt;T\)</span> with <span class="math inline">\(q(t)=\tfrac12(1-e^{-\rho(K-t)})\)</span> on <span class="math inline">\([0,K]\)</span>, <span class="math inline">\(q=0\)</span> after; <span class="math inline">\(K\)</span> solves <a href="#eq-oc-extraction-mu" class="quarto-xref">Equation&nbsp;<span>4.42</span></a> with the constraint <span class="math inline">\(\mu_0\ge0\)</span>. (4) <span class="math inline">\(T=\infty\)</span> and (5) <span class="math inline">\(T\)</span> free both give the same answer <a href="#eq-oc-extraction-profile" class="quarto-xref">Equation&nbsp;<span>4.43</span></a> with <span class="math inline">\(K=T^\ast\)</span> and the <strong>free-terminal condition</strong> <span class="math inline">\(q(T^\ast)=0\)</span>. The unifying <strong>resource-extraction condition</strong> is the costate path <span class="math inline">\(\mu=\mu_0 e^{\rho t}\)</span> (the shadow price of the in-ground resource rises at the discount rate — <strong>Hotelling’s rule</strong> with convex cost), together with <span class="math inline">\(q(T)=0\)</span> at the optimal stop.</p>
+</section>
+<section id="problem-11-log-utility-growth-phase-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="problem-11-log-utility-growth-phase-diagram">Problem 11 (log-utility growth, phase diagram)</h3>
+<p><span class="math inline">\(\max\int_0^\infty e^{-\rho t}\ln c\,\mathrm{d}t\)</span>, <span class="math inline">\(\dot x=rx-c\)</span>, <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(x(0)=1\)</span>, <span class="math inline">\(r\ge0\)</span>. With <span class="math inline">\(\mathcal H=\ln c+\mu(rx-c)\)</span>: <span class="math inline">\(\mathcal H_c=1/c-\mu=0\)</span> and <span class="math inline">\(\dot\mu=\rho\mu-\mathcal H_x=(\rho-r)\mu\)</span>. Eliminating <span class="math inline">\(\mu=1/c\)</span> (<span class="math inline">\(\dot\mu=-\dot c/c^2\)</span>) gives <span class="math inline">\(\dot c=c(r-\rho)\)</span> and <span class="math inline">\(\dot x=rx-c\)</span>. For <span class="math inline">\(0\le r&lt;\rho\)</span>, <span class="math inline">\(c\)</span> declines and the system has a saddle at the origin in the relevant region; the optimal <span class="math inline">\(c_0\)</span> is chosen on the saddle path so <span class="math inline">\(x\)</span> stays nonnegative and the tail <span class="math inline">\(\limsup_t e^{-\rho t}\mu(y-x)\ge0\)</span> holds. For <span class="math inline">\(r&gt;\rho\)</span> consumption grows; for <span class="math inline">\(r=\rho\)</span>, <span class="math inline">\(c\)</span> is constant. In every case the <strong>saddle path is the unique optimal trajectory</strong> (other initial <span class="math inline">\(c_0\)</span> either waste the resource — dominated in objective — or drive <span class="math inline">\(x\)</span> to <span class="math inline">\(0\)</span> in finite time, after which <span class="math inline">\(c&gt;0\)</span> forces <span class="math inline">\(\dot x&lt;0\)</span> and violates <span class="math inline">\(x\ge0\)</span>). Mangasarian holds because <span class="math inline">\(\mu&gt;0\)</span> and <span class="math inline">\(f,g\)</span> are concave, confirming the saddle path is optimal.</p>
+<p>For the <strong>logistic</strong> variant (Problem 12), <span class="math inline">\(\dot x=rx(1-x)-c\)</span>, the same elimination gives <span class="math inline">\(\dot c=c(r-\rho-2rx)\)</span>, <span class="math inline">\(\dot x=rx(1-x)-c\)</span>, with steady state <span class="math display">\[
+x^\ast=\tfrac12(1-\gamma),\qquad c^\ast=\tfrac r4(1-\gamma^2),\qquad \gamma=\rho/r,
+\]</span> whose linearization has eigenvalues of opposite sign — a <strong>saddle</strong>. The optimal path is the saddle trajectory to <span class="math inline">\((x^\ast,c^\ast)\)</span>, drawn exactly like the Ramsey portrait <a href="#fig-ramsey-phase" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>. The four sub-cases <span class="math inline">\(r=0,\,0&lt;r&lt;\rho,\,r=\rho,\,r&gt;\rho\)</span> change the sign and location of <span class="math inline">\(x^\ast\)</span> but not the saddle structure.</p>
+</section>
+<section id="problem-27-lake-resource-sufficiency" class="level3">
+<h3 class="anchored" data-anchor-id="problem-27-lake-resource-sufficiency">Problem 27 (lake resource, sufficiency)</h3>
+<p>Solved as <a href="#exm-oc-lake" class="quarto-xref">Example&nbsp;<span>4.13</span></a>: <span class="math inline">\(c=e^{-t}\)</span>, <span class="math inline">\(x(t)=t+e^{-t}\)</span>. The candidate from <span class="math inline">\(\mathcal H_c=0\)</span>, <span class="math inline">\(\dot\mu=\mu\)</span> is <span class="math inline">\(c=e^{-t}/\mu_0\)</span>; the convergence of the objective (the tail/transversality condition) selects <span class="math inline">\(\mu_0=1\)</span>, since the bound <span class="math inline">\(x\ge0\)</span> holds automatically here. Integrating <span class="math inline">\(\dot x=1-c=1-e^{-t}\)</span> from <span class="math inline">\(x(0)=1\)</span> gives <span class="math inline">\(x(t)=t+e^{-t}\)</span>, which grows like <span class="math inline">\(t\)</span> and does <strong>not</strong> converge to a finite limit. Mangasarian sufficiency (<span class="math inline">\(\ln c\)</span> concave, <span class="math inline">\(\dot x=1-c\)</span> linear) certifies optimality, so <span class="math inline">\(c(t)=e^{-t}\)</span>, <span class="math inline">\(x(t)=t+e^{-t}\)</span> is the solution.</p>
+</section>
+<section id="problem-28-the-sufficiency-tail-problem" class="level3">
+<h3 class="anchored" data-anchor-id="problem-28-the-sufficiency-tail-problem">Problem 28 (the sufficiency-tail problem)</h3>
+<p><span class="math inline">\(\min\int_0^\infty e^{-\rho t}(x-u)^2\,\mathrm{d}t\)</span>, <span class="math inline">\(\dot x=u\)</span>, <span class="math inline">\(x(0)=1\)</span>, <span class="math inline">\(\rho&gt;0\)</span>. Use the current-value Hamiltonian <span class="math inline">\(\mathcal H=-(x-u)^2+\mu u\)</span> (minimization written as a max of the negative). Then <span class="math inline">\(\mathcal H_u=2(x-u)+\mu=0\)</span> gives <span class="math inline">\(u=x+\tfrac\mu2\)</span> and <span class="math inline">\(x-u=-\tfrac\mu2\)</span>, and <span class="math inline">\(\dot\mu=\rho\mu-\mathcal H_x=\rho\mu+2(x-u)=\rho\mu-\mu=(\rho-1)\mu\)</span>. With <span class="math inline">\(\dot x=u=x+\mu/2\)</span>, the linear system <span class="math display">\[
+\begin{pmatrix}\dot x\\ \dot\mu\end{pmatrix}
+=\begin{pmatrix}1&amp;\tfrac12\\[2pt]0&amp;\rho-1\end{pmatrix}
+\begin{pmatrix}x\\ \mu\end{pmatrix}
+\]</span> has eigenvalues <span class="math inline">\(1\)</span> and <span class="math inline">\(\rho-1\)</span>. The <strong>first candidate</strong> takes <span class="math inline">\(\mu\equiv0\)</span>, giving <span class="math inline">\(u=x\)</span>, <span class="math inline">\(\dot x=x\)</span>, <span class="math inline">\(x=e^{t}\)</span> — but then the integrand <span class="math inline">\((x-u)^2\equiv0\)</span>, so the objective is <span class="math inline">\(0\)</span>, its minimum; this path is optimal. The <strong>second candidate</strong> uses the other eigendirection; for <span class="math inline">\(\rho\in(0,2)\)</span> it also satisfies the maximum principle and the (limit-form) TVC, yet it does <strong>not</strong> satisfy the sufficiency tail <span class="math display">\[
+\limsup_{t\to\infty}e^{-\rho t}\lambda(t)\bigl(y(t)-x(t)\bigr)\ge0\quad\text{for all feasible }y .
+\]</span> The point of the problem (and the source’s note) is methodological: our sufficiency conditions are <em>only sufficient</em>. The path passing the tail test is optimal — no question. The path failing it <strong>might or might not</strong> be optimal in general; here one can check directly that it is <strong>not</strong> (the zero-objective path <span class="math inline">\(x=u=e^t\)</span> already attains the global minimum <span class="math inline">\(0\)</span>, which no other path beats). So the maximum principle plus TVC alone is genuinely insufficient to discriminate, and the tail condition does the work.</p>
+</section>
+<section id="problem-4-bolza-reduction" class="level3">
+<h3 class="anchored" data-anchor-id="problem-4-bolza-reduction">Problem 4 (Bolza reduction)</h3>
+<p><span class="math inline">\(\min\int_0^1 u^2\,\mathrm{d}t+x^2(1)\)</span>, <span class="math inline">\(\dot x=x+u\)</span>, <span class="math inline">\(x(0)=1\)</span>. Using <span class="math inline">\(x^2(1)=x^2(0)+\int_0^1 2x\dot x\,\mathrm{d}t=1+\int_0^1 2x(x+u)\,\mathrm{d}t\)</span>, the Bolza objective becomes the standard <span class="math inline">\(\min\int_0^1\bigl(u^2+2x^2+2xu\bigr)\,\mathrm{d}t+1\)</span>. With <span class="math inline">\(H=-(u^2+2x^2+2xu)+\lambda(x+u)\)</span>: <span class="math inline">\(H_u=-2u-2x+\lambda=0\)</span> gives <span class="math inline">\(u=\tfrac\lambda2-x\)</span>, and <span class="math inline">\(-\dot\lambda=H_x=-4x-2u+\lambda\)</span>. Substituting <span class="math inline">\(u\)</span> leaves the linear system in <span class="math inline">\((x,\lambda)\)</span> solved with <span class="math inline">\(x(0)=1\)</span> and the <em>free</em>-terminal TVC <span class="math inline">\(\lambda(1)=0\)</span> (the salvage term was absorbed, so the reduced problem has <span class="math inline">\(x(1)\)</span> free). The solution is the corresponding stable combination of exponentials; the key step is recognizing the Bolza term as an exact integral, turning a salvage problem into a standard one with a free terminal and zero TVC.</p>
+<p>The remaining problems are left as practice: 1–3 are interior finite-horizon problems solved by <span class="math inline">\(H_u=0\)</span> and the costate; 7–8 are point-to-curve shortest paths solved exactly as <a href="#exm-oc-point-line" class="quarto-xref">Example&nbsp;<span>4.1</span></a> with the terminal-curve TVC of line (d); 13–17, 24 are infinite-horizon problems whose phase diagrams mirror <a href="#sec-oc-ramsey" class="quarto-xref"><span>Section 4.9.1</span></a>; 18–20, 23 are state- or control-constrained problems handled by the multiplier and corner conditions of <a href="#sec-oc-constraints" class="quarto-xref"><span>Section 4.5</span></a>; and 21–22 are isoperimetric problems solved as <a href="#exm-oc-iso" class="quarto-xref">Example&nbsp;<span>4.11</span></a>.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-kamihigashi2001" class="csl-entry" role="listitem">
+Kamihigashi, Takashi. 2001. <span>“Necessity of Transversality Conditions for Infinite Horizon Problems.”</span> <em>Econometrica</em> 69 (4): 995–1012.
+</div>
+<div id="ref-michel1982" class="csl-entry" role="listitem">
+Michel, Philippe. 1982. <span>“On the Transversality Condition in Infinite Horizon Optimal Problems.”</span> <em>Econometrica</em> 50 (4): 975–85.
+</div>
+<div id="ref-pontryagin1962" class="csl-entry" role="listitem">
+Pontryagin, L. S., V. G. Boltyanskii, R. V. Gamkrelidze, and E. F. Mishchenko. 1962. <em>The Mathematical Theory of Optimal Processes</em>. New York: Interscience Publishers.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./03-calculus-of-variations.html" class="pagination-link" aria-label="Calculus of Variations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Calculus of Variations</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./05-dynamic-programming.html" class="pagination-link" aria-label="Dynamic Programming">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Programming</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
