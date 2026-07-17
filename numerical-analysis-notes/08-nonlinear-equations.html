@@ -245,18 +245,18 @@ window.Quarto = {
    
   <ul>
   <li><a href="#sec-8-general" id="toc-sec-8-general" class="nav-link active" data-scroll-target="#sec-8-general"><span class="header-section-number">8.1</span> General nonlinear equations</a></li>
-  <li><a href="#sec-8-fixed-point" id="toc-sec-8-fixed-point" class="nav-link" data-scroll-target="#sec-8-fixed-point"><span class="header-section-number">8.2</span> Fixed-point iteration</a>
+  <li><a href="#sec-8-fixed-point" id="toc-sec-8-fixed-point" class="nav-link" data-scroll-target="#sec-8-fixed-point"><span class="header-section-number">8.2</span> Linearly convergent iterations</a>
   <ul class="collapse">
   <li><a href="#sec-8-fp-motivation" id="toc-sec-8-fp-motivation" class="nav-link" data-scroll-target="#sec-8-fp-motivation">From roots to fixed points</a></li>
-  <li><a href="#sec-8-banach" id="toc-sec-8-banach" class="nav-link" data-scroll-target="#sec-8-banach">The Banach fixed-point theorem</a></li>
-  <li><a href="#sec-8-contraction-test" id="toc-sec-8-contraction-test" class="nav-link" data-scroll-target="#sec-8-contraction-test">A sufficient condition for contraction</a></li>
-  <li><a href="#sec-8-gd" id="toc-sec-8-gd" class="nav-link" data-scroll-target="#sec-8-gd">Convergence of gradient descent for convex optimization</a></li>
+  <li><a href="#sec-8-banach" id="toc-sec-8-banach" class="nav-link" data-scroll-target="#sec-8-banach">When does the iteration converge? The Banach theorem</a></li>
+  <li><a href="#sec-8-contraction-test" id="toc-sec-8-contraction-test" class="nav-link" data-scroll-target="#sec-8-contraction-test">A checkable test via the Jacobian</a></li>
+  <li><a href="#sec-8-gd" id="toc-sec-8-gd" class="nav-link" data-scroll-target="#sec-8-gd">Gradient descent as a contraction</a></li>
   </ul></li>
-  <li><a href="#sec-8-newton" id="toc-sec-8-newton" class="nav-link" data-scroll-target="#sec-8-newton"><span class="header-section-number">8.3</span> Newton’s method</a>
+  <li><a href="#sec-8-newton" id="toc-sec-8-newton" class="nav-link" data-scroll-target="#sec-8-newton"><span class="header-section-number">8.3</span> Superlinear iterations: Newton’s method</a>
   <ul class="collapse">
-  <li><a href="#sec-8-newton-algo" id="toc-sec-8-newton-algo" class="nav-link" data-scroll-target="#sec-8-newton-algo">Motivation and algorithm</a></li>
-  <li><a href="#sec-8-orders" id="toc-sec-8-orders" class="nav-link" data-scroll-target="#sec-8-orders">Orders of convergence</a></li>
-  <li><a href="#sec-8-newton-conv" id="toc-sec-8-newton-conv" class="nav-link" data-scroll-target="#sec-8-newton-conv">Local convergence of Newton’s method</a></li>
+  <li><a href="#sec-8-orders" id="toc-sec-8-orders" class="nav-link" data-scroll-target="#sec-8-orders">How fast is fast: orders of convergence</a></li>
+  <li><a href="#sec-8-newton-algo" id="toc-sec-8-newton-algo" class="nav-link" data-scroll-target="#sec-8-newton-algo">Newton’s method: linearize, then solve</a></li>
+  <li><a href="#sec-8-newton-conv" id="toc-sec-8-newton-conv" class="nav-link" data-scroll-target="#sec-8-newton-conv">Newton’s quadratic rate</a></li>
   </ul></li>
   <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">8.4</span> Chapter summary</a></li>
   </ul>
@@ -312,84 +312,101 @@ window.Quarto = {
 \newcommand{\defeq}{:=}
 \]</span></p>
 </div>
-<p>Every earlier chapter that solved an equation solved a <em>linear</em> one: interpolation coefficients, spline curvatures, least-squares normal equations, and the linear systems of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a> are all <span class="math inline">\(Ax=b\)</span>. Most equations in practice are not linear, and there is no finite formula for their roots. What we have instead is <strong>iteration</strong>: start from a guess and improve it repeatedly, hoping the sequence homes in on a solution. This chapter builds two such iterations — fixed-point iteration and Newton’s method — proves when they converge, and measures <em>how fast</em>. The speed question is the reason we must be careful with the word “order”: here it means <strong>order of convergence</strong> (how the error shrinks step to step), not the order of accuracy <span class="math inline">\(\bigO(h^p)\)</span> of a discretization from <a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>. The two are different ideas and the notes never conflate them (see <a href="./notation.html">Notation</a>).</p>
+<p>Solving an equation has, in every chapter so far, meant solving a <em>linear</em> one. Interpolation coefficients, spline curvatures, least-squares normal equations, and the systems of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a> are all instances of <span class="math inline">\(Ax=b\)</span>, and for those we have finite, exact algorithms. The equations that come up in practice are usually not linear, and once we leave the linear world that comfort disappears: there is, in general, no formula that returns a root. The only general-purpose tool left is <strong>iteration</strong> — start from a guess, apply a rule that (we hope) improves it, and repeat until the sequence settles on a solution.</p>
+<p>This chapter builds the two iterations that do most of the real work — <strong>fixed-point iteration</strong> and <strong>Newton’s method</strong> — and organizes them around one question rather than around the methods themselves: <em>how fast does the error shrink from one step to the next?</em> That rate is the <strong>order of convergence</strong>, and it splits our iterations cleanly into two tiers. Some methods peel off a fixed number of correct digits per step; we collect those in <a href="#sec-8-fixed-point" class="quarto-xref"><span>Section 8.2</span></a>. Others accelerate, so that each step is cheaper than the last in digits per iteration; Newton’s method is the archetype, in <a href="#sec-8-newton" class="quarto-xref"><span>Section 8.3</span></a>.</p>
+<p>One word needs pinning down before we start. “Order” here means <strong>order of convergence</strong> — how the error <span class="math inline">\(\norm{x^{(k)}-x^\star}\)</span> decays as the iteration count <span class="math inline">\(k\to\infty\)</span> — and it is a different quantity from the <strong>order of accuracy</strong> <span class="math inline">\(\bigO(h^p)\)</span> of a discretization as a mesh size <span class="math inline">\(h\to0\)</span> (<a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>). The two share a word and nothing else, and the notes keep them apart (see <a href="./notation.html">Notation</a>).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Two “orders”, one word
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Both live in this book and neither is the other.</p>
+<ul>
+<li><strong>Order of accuracy <span class="math inline">\(p\)</span></strong> (Chs. 2–3): a fixed rule applied at resolution <span class="math inline">\(h\)</span> commits error <span class="math inline">\(\bigO(h^p)\)</span>; you improve it by <em>refining the mesh</em>, <span class="math inline">\(h\to0\)</span>.</li>
+<li><strong>Order of convergence <span class="math inline">\(q\)</span></strong> (this chapter): a single sequence of iterates has error obeying <span class="math inline">\(\norm{x^{(k+1)}-x^\star}\le M\norm{x^{(k)}-x^\star}^{q}\)</span>; you improve it by <em>taking more steps</em>, <span class="math inline">\(k\to\infty\)</span>.</li>
+</ul>
+<p>Order of accuracy grades a discretization; order of convergence grades an iteration.</p>
+</div>
+</div>
 <section id="sec-8-general" class="level2" data-number="8.1">
 <h2 data-number="8.1" class="anchored" data-anchor-id="sec-8-general"><span class="header-section-number">8.1</span> General nonlinear equations</h2>
-<p>A <strong>general system of <span class="math inline">\(n\)</span> nonlinear equations in <span class="math inline">\(n\)</span> unknowns</strong> is the problem of solving <span id="eq-8-system"><span class="math display">\[
+<p>The problem of the chapter is to solve a <strong>system of <span class="math inline">\(n\)</span> nonlinear equations in <span class="math inline">\(n\)</span> unknowns</strong>, <span id="eq-8-system"><span class="math display">\[
 F(x)=0,\qquad F:\R^n\to\R^n .
-\tag{8.1}\]</span></span> It is useful to view <span class="math inline">\(F\)</span> as a stack of scalar-valued <strong>coordinate functions</strong> <span class="math inline">\(f_i:\R^n\to\R\)</span>, <span class="math display">\[
+\tag{8.1}\]</span></span> Stacking the scalar <strong>coordinate functions</strong> <span class="math inline">\(f_i:\R^n\to\R\)</span>, <span class="math display">\[
 F(x)=\begin{pmatrix} f_1(x)\\ \vdots\\ f_n(x)\end{pmatrix},
-\]</span> so that <a href="#eq-8-system" class="quarto-xref">Equation&nbsp;<span>8.1</span></a> is the simultaneous system <span class="math inline">\(f_1(x)=\dots=f_n(x)=0\)</span>. Unlike the linear case, such a system may have any number of solutions — none, one, or many — and there is no direct solver. We therefore look for <strong>iterative methods</strong> that, from an initial guess, converge to <em>some</em> solution (usually the one nearest the guess), assuming one exists.</p>
-<p>Two special cases anchor everything that follows.</p>
-<ul>
-<li><strong>Linear equations</strong> are the case <span class="math inline">\(F(x)=Ax-b\)</span>, treated at length in Chapters 4–5. Newton’s method (<a href="#sec-8-newton" class="quarto-xref"><span>Section 8.3</span></a>) will reduce a nonlinear solve to a <em>sequence</em> of linear solves, so the linear machinery is a building block, not a separate world.</li>
-<li><strong>Optimization.</strong> Minimizing (or otherwise finding critical points of) a scalar objective <span class="math inline">\(u:\R^n\to\R\)</span> means solving <span class="math inline">\(\nabla u(x)=0\)</span>, i.e.&nbsp;taking <span class="math inline">\(F=\nabla u\)</span>. The sharpest guarantees hold when <span class="math inline">\(u\)</span> is <strong>strictly convex</strong> — its Hessian <span class="math inline">\(\nabla^2 u(x)=\bigl[\partial^2 u/\partial
-x_i\partial x_j\bigr]\)</span> is positive definite for all <span class="math inline">\(x\)</span> — a case we return to in <a href="#sec-8-gd" class="quarto-xref"><span>Section 8.2.4</span></a>.</li>
-</ul>
-<p>Nonlinear systems also arise from implicit time-stepping for stiff ODEs (<a href="03-ivp-odes.html" class="quarto-xref"><span>Chapter 3</span></a>), from discretized nonlinear PDEs, and countless other settings; the two methods below are the workhorses for all of them.</p>
+\]</span> turns <a href="#eq-8-system" class="quarto-xref">Equation&nbsp;<span>8.1</span></a> into the simultaneous conditions <span class="math inline">\(f_1(x)=\dots=f_n(x)=0\)</span>. The contrast with <span class="math inline">\(Ax=b\)</span> is sharp: a nonlinear system may have no solution, one, or many, and no direct method returns them. So we settle for <strong>iterative methods</strong> that, launched from an initial guess, home in on <em>some</em> solution — usually the one nearest the guess — when one exists.</p>
+<p>Two families of problems account for most of what follows, and it is worth seeing them as special cases rather than as separate subjects. The first is <strong>linear systems</strong> themselves, <span class="math inline">\(F(x)=Ax-b\)</span>, the entire content of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a>. They are not a world apart from the nonlinear story: Newton’s method will attack a nonlinear <span class="math inline">\(F\)</span> by solving a <em>fresh</em> linear system <span class="math inline">\(Ax=b\)</span> at every step, so the LU machinery of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> is a subroutine inside the nonlinear solver, not a competitor to it. The second is <strong>optimization</strong>: to find a critical point of a scalar objective <span class="math inline">\(u:\R^n\to\R\)</span> is to solve <span class="math inline">\(\nabla u(x)=0\)</span>, i.e.&nbsp;to take <span class="math inline">\(F=\nabla u\)</span>. The guarantees are strongest when <span class="math inline">\(u\)</span> is <strong>strictly convex</strong> — its Hessian <span class="math inline">\(\nabla^2 u(x)=\bigl[\partial^2
+u/\partial x_i\partial x_j\bigr]\)</span> is positive definite everywhere — and that convex case, treated in <a href="#sec-8-gd" class="quarto-xref"><span>Section 8.2.4</span></a>, is where the condition-number story of Chapters 4–5 reappears.</p>
+<p>The same equation <a href="#eq-8-system" class="quarto-xref">Equation&nbsp;<span>8.1</span></a> also governs implicit time-stepping for stiff ODEs (<a href="03-ivp-odes.html" class="quarto-xref"><span>Chapter 3</span></a>) and discretized nonlinear PDEs, among much else; the two methods below serve all of these.</p>
 </section>
 <section id="sec-8-fixed-point" class="level2" data-number="8.2">
-<h2 data-number="8.2" class="anchored" data-anchor-id="sec-8-fixed-point"><span class="header-section-number">8.2</span> Fixed-point iteration</h2>
+<h2 data-number="8.2" class="anchored" data-anchor-id="sec-8-fixed-point"><span class="header-section-number">8.2</span> Linearly convergent iterations</h2>
+<p>Our first tier collects the iterations that converge <strong>linearly</strong>: the error is multiplied by a constant factor below <span class="math inline">\(1\)</span> at each step, so on a log scale it falls along a straight line. Every method here — fixed-point iteration, its Banach guarantee, the Jacobian test that makes the guarantee checkable, and gradient descent — is a single mechanism seen from different angles: an update map that <em>contracts</em> distances. In the language of <a href="#sec-8-orders" class="quarto-xref"><span>Section 8.3.1</span></a>, these are the <span class="math inline">\(q=1\)</span> methods, and their common weakness is that the contraction factor can sit uncomfortably close to <span class="math inline">\(1\)</span>.</p>
 <section id="sec-8-fp-motivation" class="level3">
 <h3 class="anchored" data-anchor-id="sec-8-fp-motivation">From roots to fixed points</h3>
 <div id="def-8-fixed-point" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 8.1 (Fixed point)</strong></span> Given <span class="math inline">\(G:\R^n\to\R^n\)</span>, a point <span class="math inline">\(x\)</span> is a <strong>fixed point</strong> of <span class="math inline">\(G\)</span> if <span class="math inline">\(G(x)=x\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition 8.1 (Fixed point)</strong></span> Given <span class="math inline">\(g:\R^n\to\R^n\)</span>, a point <span class="math inline">\(x\)</span> is a <strong>fixed point</strong> of <span class="math inline">\(g\)</span> if <span class="math inline">\(g(x)=x\)</span>.</p>
 </div>
-<p>The idea of fixed-point iteration is to recast the root problem <span class="math inline">\(F(x)=0\)</span> as a fixed-point problem <span class="math inline">\(G(x)=x\)</span> whose solutions are <em>the same points</em>. One systematic way to build such a <span class="math inline">\(G\)</span>: pick any scalar <span class="math inline">\(\eps\neq 0\)</span> and set <span id="eq-8-fp-map"><span class="math display">\[
-G(x)\defeq x-\eps\,F(x).
-\tag{8.2}\]</span></span> Then <span class="math display">\[
-G(x)=x\iff x-\eps F(x)=x\iff \eps F(x)=0\iff F(x)=0,
-\]</span> using <span class="math inline">\(\eps\neq0\)</span> at the last step, so the fixed points of <span class="math inline">\(G\)</span> are exactly the roots of <span class="math inline">\(F\)</span>, as desired. Any nonzero <span class="math inline">\(\eps\)</span> “works” in this equivalence sense, but — crucially — different choices make the iteration below converge or diverge.</p>
-<p>Given such a <span class="math inline">\(G\)</span>, <strong>fixed-point iteration</strong> is the sequence produced by feeding each output back in as the next input: <span id="eq-8-fp-iter"><span class="math display">\[
-x^{(k+1)}=G(x^{(k)}),\qquad k=0,1,2,\dots,
-\tag{8.3}\]</span></span> from an initial guess <span class="math inline">\(x^{(0)}\in\R^n\)</span>; equivalently <span class="math inline">\(x^{(k)}=\underbrace{G\circ\cdots\circ
-G}_{k\text{ times}}(x^{(0)})\)</span>. To analyze it we assume <span class="math inline">\(G\)</span> is <strong>continuous</strong>: for every <span class="math inline">\(x\)</span> and every sequence <span class="math inline">\(x^{(k)}\to x\)</span> we have <span class="math inline">\(G(x^{(k)})\to G(x)\)</span>.</p>
-<p>The first thing to check is that if the iteration converges at all, it converges to <em>the right kind of point</em>.</p>
+<p>Fixed-point iteration rewrites the root problem <span class="math inline">\(F(x)=0\)</span> as a fixed-point problem <span class="math inline">\(g(x)=x\)</span> with the <em>same</em> solution set, and then iterates the map <span class="math inline">\(g\)</span>. Building such a <span class="math inline">\(g\)</span> takes no cleverness: pick any scalar <span class="math inline">\(\eps\neq0\)</span> and define <span id="eq-8-fp-map"><span class="math display">\[
+g(x)\defeq x-\eps\,F(x).
+\tag{8.2}\]</span></span> The chain of equivalences <span class="math display">\[
+g(x)=x\iff x-\eps F(x)=x\iff \eps F(x)=0\iff F(x)=0
+\]</span> (cancelling <span class="math inline">\(\eps\neq0\)</span> at the last step) shows the fixed points of <span class="math inline">\(g\)</span> are exactly the roots of <span class="math inline">\(F\)</span>, whatever nonzero <span class="math inline">\(\eps\)</span> we chose. That is the easy part. The catch — the whole subject, really — is that the <em>value</em> of <span class="math inline">\(\eps\)</span> decides whether iterating <span class="math inline">\(g\)</span> converges or flies apart, even though every <span class="math inline">\(\eps\)</span> gives the same fixed points.</p>
+<p><strong>Fixed-point iteration</strong> is the sequence obtained by feeding each output back in as the next input, <span id="eq-8-fp-iter"><span class="math display">\[
+x^{(k+1)}=g(x^{(k)}),\qquad k=0,1,2,\dots,
+\tag{8.3}\]</span></span> from a guess <span class="math inline">\(x^{(0)}\in\R^n\)</span>; equivalently <span class="math inline">\(x^{(k)}=\underbrace{g\circ\cdots\circ
+g}_{k\text{ times}}(x^{(0)})\)</span>. We assume <span class="math inline">\(g\)</span> is <strong>continuous</strong>: <span class="math inline">\(x^{(k)}\to x\)</span> forces <span class="math inline">\(g(x^{(k)})\to g(x)\)</span>. Continuity buys a first, cheap guarantee — that <em>if</em> the iteration settles anywhere, it settles on the right kind of point.</p>
 <div id="prp-8-limit-is-fixed" class="theorem proposition">
-<p><span class="theorem-title"><strong>Proposition 8.1 (Limits of fixed-point iteration are fixed points)</strong></span> If <span class="math inline">\(G\)</span> is continuous and the iterates <a href="#eq-8-fp-iter" class="quarto-xref">Equation&nbsp;<span>8.3</span></a> satisfy <span class="math inline">\(x^{(k)}\to x\)</span>, then <span class="math inline">\(x\)</span> is a fixed point of <span class="math inline">\(G\)</span>.</p>
+<p><span class="theorem-title"><strong>Proposition 8.1 (Limits of fixed-point iteration are fixed points)</strong></span> If <span class="math inline">\(g\)</span> is continuous and the iterates <a href="#eq-8-fp-iter" class="quarto-xref">Equation&nbsp;<span>8.3</span></a> satisfy <span class="math inline">\(x^{(k)}\to x\)</span>, then <span class="math inline">\(x\)</span> is a fixed point of <span class="math inline">\(g\)</span>.</p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Take <span class="math inline">\(k\to\infty\)</span> in <span class="math inline">\(x^{(k+1)}=G(x^{(k)})\)</span>. The left side tends to <span class="math inline">\(x\)</span> (a convergent sequence and its shift share a limit); the right side tends to <span class="math inline">\(G(x)\)</span> by continuity of <span class="math inline">\(G\)</span>. Hence <span class="math inline">\(x=G(x)\)</span>. <span class="math inline">\(\square\)</span></p>
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(k\to\infty\)</span> in <span class="math inline">\(x^{(k+1)}=g(x^{(k)})\)</span>. A sequence and its shift share a limit, so the left side tends to <span class="math inline">\(x\)</span>; continuity sends the right side to <span class="math inline">\(g(x)\)</span>. Hence <span class="math inline">\(x=g(x)\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>This settles <em>what</em> the limit is but not <em>whether</em> one exists. That is the content of the Banach theorem.</p>
+<p>The proposition says <em>what</em> a limit must be, not <em>whether</em> one exists. Existence is the Banach theorem’s job.</p>
 </section>
 <section id="sec-8-banach" class="level3">
-<h3 class="anchored" data-anchor-id="sec-8-banach">The Banach fixed-point theorem</h3>
-<p>When does <a href="#eq-8-fp-iter" class="quarto-xref">Equation&nbsp;<span>8.3</span></a> converge? A clean sufficient condition is that <span class="math inline">\(G\)</span> contracts distances. Throughout, fix a norm <span class="math inline">\(\norm{\cdot}\)</span> on <span class="math inline">\(\R^n\)</span> and let <span class="math inline">\(\norm{\cdot}\)</span> also denote the induced (operator) norm on <span class="math inline">\(\R^{n\times n}\)</span>.</p>
+<h3 class="anchored" data-anchor-id="sec-8-banach">When does the iteration converge? The Banach theorem</h3>
+<p>A clean sufficient condition for <a href="#eq-8-fp-iter" class="quarto-xref">Equation&nbsp;<span>8.3</span></a> to converge is that <span class="math inline">\(g\)</span> pulls every pair of points closer together. Fix a norm <span class="math inline">\(\norm{\cdot}\)</span> on <span class="math inline">\(\R^n\)</span> and let <span class="math inline">\(\norm{\cdot}\)</span> also denote the induced operator norm on <span class="math inline">\(\R^{n\times n}\)</span>.</p>
 <div id="def-8-contraction" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 8.2 (Contraction map)</strong></span> A map <span class="math inline">\(G:\R^n\to\R^n\)</span> is a <strong>contraction</strong> with parameter <span class="math inline">\(\alpha\in[0,1)\)</span> if <span id="eq-8-contraction"><span class="math display">\[
-\norm{G(x)-G(y)}\le\alpha\,\norm{x-y}\qquad\text{for all }x,y\in\R^n .
+<p><span class="theorem-title"><strong>Definition 8.2 (Contraction map)</strong></span> A map <span class="math inline">\(g:\R^n\to\R^n\)</span> is a <strong>contraction</strong> with parameter <span class="math inline">\(k\in[0,1)\)</span> if <span id="eq-8-contraction"><span class="math display">\[
+\norm{g(x)-g(y)}\le k\,\norm{x-y}\qquad\text{for all }x,y\in\R^n .
 \tag{8.4}\]</span></span></p>
 </div>
-<p>This is exactly a Lipschitz condition with constant <span class="math inline">\(L=\alpha&lt;1\)</span>: <span class="math inline">\(G\)</span> shrinks every pair of points by at least the fixed factor <span class="math inline">\(\alpha\)</span>. The proof needs one fact from analysis. Call a sequence <span class="math inline">\(\{x^{(k)}\}\)</span> <strong>Cauchy</strong> if for every <span class="math inline">\(\eps&gt;0\)</span> there is <span class="math inline">\(K\)</span> with <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\le\eps\)</span> for all <span class="math inline">\(k,l\ge K\)</span>. The fact we use is that <strong>every Cauchy sequence in <span class="math inline">\(\R^n\)</span> converges</strong> — <span class="math inline">\(\R^n\)</span> under any norm is a complete metric space.</p>
+<p>This is a Lipschitz condition with constant below <span class="math inline">\(1\)</span>: <span class="math inline">\(g\)</span> shrinks every distance by at least the fixed factor <span class="math inline">\(k\)</span>. The proof leans on one analytic fact. Call <span class="math inline">\(\{x^{(k)}\}\)</span> <strong>Cauchy</strong> if for every <span class="math inline">\(\eps&gt;0\)</span> there is <span class="math inline">\(K\)</span> with <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\le\eps\)</span> whenever <span class="math inline">\(k,l\ge K\)</span>; the fact we use is that <strong>every Cauchy sequence in <span class="math inline">\(\R^n\)</span> converges</strong> — under any norm, <span class="math inline">\(\R^n\)</span> is complete.</p>
 <div id="thm-8-banach" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.1 (Banach fixed-point theorem)</strong></span> Suppose <span class="math inline">\(G:\R^n\to\R^n\)</span> is a contraction with parameter <span class="math inline">\(\alpha\in[0,1)\)</span>. Let <span class="math inline">\(x^{(0)}\in\R^n\)</span> and define <span class="math inline">\(x^{(k+1)}=G(x^{(k)})\)</span> for <span class="math inline">\(k=0,1,2,\dots\)</span>. Then:</p>
+<p><span class="theorem-title"><strong>Theorem 8.1 (Banach fixed-point theorem)</strong></span> Suppose <span class="math inline">\(g:\R^n\to\R^n\)</span> is a contraction with parameter <span class="math inline">\(k\in[0,1)\)</span>. Let <span class="math inline">\(x^{(0)}\in\R^n\)</span> and set <span class="math inline">\(x^{(k+1)}=g(x^{(k)})\)</span> for <span class="math inline">\(k=0,1,2,\dots\)</span>. Then:</p>
 <ol type="1">
 <li>the sequence converges, <span class="math inline">\(x^{(k)}\to x^\star\)</span> for some <span class="math inline">\(x^\star\in\R^n\)</span>;</li>
-<li><span class="math inline">\(x^\star\)</span> is the <strong>unique</strong> fixed point of <span class="math inline">\(G\)</span> in <span class="math inline">\(\R^n\)</span>; and</li>
+<li><span class="math inline">\(x^\star\)</span> is the <strong>unique</strong> fixed point of <span class="math inline">\(g\)</span> in <span class="math inline">\(\R^n\)</span>; and</li>
 <li>the error obeys <span id="eq-8-banach-error"><span class="math display">\[
-\norm{x^{(k)}-x^\star}\le\frac{\alpha^{k}}{1-\alpha}\,\norm{x^{(1)}-x^{(0)}}.
+\norm{x^{(k)}-x^\star}\le\frac{k^{\,k}}{1-k}\,\norm{x^{(1)}-x^{(0)}}.
 \tag{8.5}\]</span></span></li>
 </ol>
 </div>
+<p>Read the bound <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a> carefully, since the letter <span class="math inline">\(k\)</span> plays two roles at once: it is the contraction constant and, in the exponent and the superscript <span class="math inline">\(x^{(k)}\)</span>, the iteration count. After <span class="math inline">\(k\)</span> steps the error is at most <span class="math inline">\(\tfrac{1}{1-k}\)</span> times the <em>contraction constant raised to the number of steps</em>, times the length of the very first step.</p>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span><strong>Step 1: the iterates are Cauchy.</strong> For <span class="math inline">\(k\le l\)</span>, telescoping and the triangle inequality give <span class="math display">\[
 \norm{x^{(k)}-x^{(l)}}=\Bigl\|\textstyle\sum_{i=k}^{l-1}\bigl(x^{(i)}-x^{(i+1)}\bigr)\Bigr\|
 \le\sum_{i=k}^{l-1}\norm{x^{(i)}-x^{(i+1)}}.
-\]</span> We bound each term. First note the <span class="math inline">\(j\)</span>-fold composite <span class="math inline">\(G^{j}\)</span> is itself a contraction with parameter <span class="math inline">\(\alpha^{j}\)</span>: by induction, for <span class="math inline">\(j\ge1\)</span>, <span class="math display">\[
-\norm{G^{j}(x)-G^{j}(y)}=\norm{G\bigl(G^{j-1}(x)\bigr)-G\bigl(G^{j-1}(y)\bigr)}
-\le\alpha\,\norm{G^{j-1}(x)-G^{j-1}(y)}\le\cdots\le\alpha^{j}\norm{x-y}.
-\]</span> Since <span class="math inline">\(x^{(i)}=G^{i}(x^{(0)})\)</span> and <span class="math inline">\(x^{(i+1)}=G^{i}(x^{(1)})\)</span>, this yields <span class="math display">\[
-\norm{x^{(i)}-x^{(i+1)}}=\norm{G^{i}(x^{(0)})-G^{i}(x^{(1)})}\le\alpha^{i}\norm{x^{(0)}-x^{(1)}}.
+\]</span> Each summand shrinks geometrically. First, the <span class="math inline">\(j\)</span>-fold composite <span class="math inline">\(g^{j}\)</span> is itself a contraction with parameter <span class="math inline">\(k^{j}\)</span>: by induction, for <span class="math inline">\(j\ge1\)</span>, <span class="math display">\[
+\norm{g^{j}(x)-g^{j}(y)}=\norm{g\bigl(g^{j-1}(x)\bigr)-g\bigl(g^{j-1}(y)\bigr)}
+\le k\,\norm{g^{j-1}(x)-g^{j-1}(y)}\le\cdots\le k^{j}\norm{x-y}.
+\]</span> Since <span class="math inline">\(x^{(i)}=g^{i}(x^{(0)})\)</span> and <span class="math inline">\(x^{(i+1)}=g^{i}(x^{(1)})\)</span>, <span class="math display">\[
+\norm{x^{(i)}-x^{(i+1)}}=\norm{g^{i}(x^{(0)})-g^{i}(x^{(1)})}\le k^{i}\norm{x^{(0)}-x^{(1)}}.
 \]</span> Summing the geometric series and extending it to infinity, <span class="math display">\[
-\norm{x^{(k)}-x^{(l)}}\le\Bigl(\sum_{i=k}^{l-1}\alpha^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
-\le\Bigl(\sum_{i=k}^{\infty}\alpha^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
-=\frac{\alpha^{k}}{1-\alpha}\,\norm{x^{(0)}-x^{(1)}}.
+\norm{x^{(k)}-x^{(l)}}\le\Bigl(\sum_{i=k}^{l-1}k^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
+\le\Bigl(\sum_{i=k}^{\infty}k^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
+=\frac{k^{\,k}}{1-k}\,\norm{x^{(0)}-x^{(1)}}.
 \tag{$\star$}
-\]</span> The right side does not depend on <span class="math inline">\(l\)</span> and, since <span class="math inline">\(\alpha\in[0,1)\)</span>, tends to <span class="math inline">\(0\)</span> as <span class="math inline">\(k\to\infty\)</span>. Hence the sequence is Cauchy.</p>
-<p><strong>Step 2: convergence, uniqueness, and the bound.</strong> Being Cauchy in the complete space <span class="math inline">\(\R^n\)</span>, the sequence has a limit <span class="math inline">\(x^\star=\lim_k x^{(k)}\)</span>. A contraction is continuous, so by <a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a> the limit is a fixed point. It is the only one: if <span class="math inline">\(x^\star\)</span> and <span class="math inline">\(y^\star\)</span> were both fixed, then <span class="math inline">\(\norm{x^\star-y^\star}=\norm{G(x^\star)-G(y^\star)}\le\alpha\norm{x^\star-y^\star}\)</span>, and since <span class="math inline">\(\alpha&lt;1\)</span> this forces <span class="math inline">\(\norm{x^\star-y^\star}=0\)</span>. Finally, hold <span class="math inline">\(k\)</span> fixed in <span class="math inline">\((\star)\)</span> and let <span class="math inline">\(l\to\infty\)</span>; because the norm is continuous, <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\to\norm{x^{(k)}-x^\star}\)</span>, giving 1. <span class="math inline">\(\square\)</span></p>
+\]</span> The right side is free of <span class="math inline">\(l\)</span> and, because <span class="math inline">\(k\in[0,1)\)</span>, tends to <span class="math inline">\(0\)</span> as <span class="math inline">\(k\to\infty\)</span>; the sequence is Cauchy.</p>
+<p><strong>Step 2: convergence, uniqueness, and the bound.</strong> Being Cauchy in the complete space <span class="math inline">\(\R^n\)</span>, the sequence has a limit <span class="math inline">\(x^\star=\lim_k x^{(k)}\)</span>. A contraction is continuous, so <a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a> makes <span class="math inline">\(x^\star\)</span> a fixed point. It is the only one: two fixed points <span class="math inline">\(x^\star,y^\star\)</span> would satisfy <span class="math inline">\(\norm{x^\star-y^\star}=\norm{g(x^\star)-g(y^\star)}\le k\norm{x^\star-y^\star}\)</span>, which forces <span class="math inline">\(\norm{x^\star-y^\star}=0\)</span> since <span class="math inline">\(k&lt;1\)</span>. Finally, hold <span class="math inline">\(k\)</span> fixed in <span class="math inline">\((\star)\)</span> and send <span class="math inline">\(l\to\infty\)</span>; continuity of the norm gives <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\to\norm{x^{(k)}-x^\star}\)</span>, which is <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>The theorem does more than guarantee convergence: 1 is a <strong>rate</strong>. The error decays geometrically, like <span class="math inline">\(\alpha^{k}\)</span>.</p>
+<p>Beyond mere convergence, <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a> is a genuine <strong>rate</strong>: the error decays geometrically, by the factor <span class="math inline">\(k\)</span> each step.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -400,41 +417,54 @@ G}_{k\text{ times}}(x^{(0)})\)</span>. To analyze it we assume <span class="math
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Because <span class="math inline">\(\log\norm{x^{(k)}-x^\star}\)</span> falls linearly in <span class="math inline">\(k\)</span> with slope <span class="math inline">\(\log\alpha&lt;0\)</span>, numerical analysts call the geometric decay of 1 <strong>linear convergence</strong> — this is the <span class="math inline">\(q=1\)</span> case of <a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a> below. One reading: each new correct digit (a <span class="math inline">\(10\times\)</span> error reduction) costs about the <em>same</em> number of iterations as the previous one. Newton’s method will do dramatically better, with <em>superlinear</em> convergence in which each new digit gets cheaper.</p>
+<p>Since <span class="math inline">\(\log\norm{x^{(k)}-x^\star}\)</span> falls linearly in <span class="math inline">\(k\)</span> with slope <span class="math inline">\(\log k&lt;0\)</span>, this geometric decay is what numerical analysts call <strong>linear convergence</strong> — the <span class="math inline">\(q=1\)</span> case of <a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>. Concretely, buying one more correct digit (a tenfold error cut) costs a roughly <em>constant</em> number of extra iterations, no matter how many digits you already have. Newton’s method will break that ceiling, gaining digits ever faster; that is the subject of <a href="#sec-8-newton" class="quarto-xref"><span>Section 8.3</span></a>.</p>
 </div>
 </div>
 </section>
 <section id="sec-8-contraction-test" class="level3">
-<h3 class="anchored" data-anchor-id="sec-8-contraction-test">A sufficient condition for contraction</h3>
-<p>Verifying <a href="#eq-8-contraction" class="quarto-xref">Equation&nbsp;<span>8.4</span></a> directly is awkward. A checkable condition uses first partial derivatives through the <strong>Jacobian</strong>.</p>
+<h3 class="anchored" data-anchor-id="sec-8-contraction-test">A checkable test via the Jacobian</h3>
+<p>Verifying <a href="#eq-8-contraction" class="quarto-xref">Equation&nbsp;<span>8.4</span></a> for every pair <span class="math inline">\(x,y\)</span> is awkward. A pointwise condition on first derivatives is far easier to check, and it goes through the <strong>Jacobian</strong>.</p>
 <div id="def-8-jacobian" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 8.3 (Jacobian)</strong></span> For <span class="math inline">\(G:\R^n\to\R^n\)</span> with coordinate functions <span class="math inline">\(g_1,\dots,g_n\)</span>, the <strong>Jacobian</strong> <span class="math inline">\(DG(x)\)</span> is the <span class="math inline">\(n\times n\)</span> matrix-valued function <span class="math display">\[
-[DG(x)]_{ij}=\pdiff{g_i}{x_j}(x).
+<p><span class="theorem-title"><strong>Definition 8.3 (Jacobian)</strong></span> For a vector field <span class="math inline">\(g:\R^n\to\R^n\)</span> with coordinate functions <span class="math inline">\(g_1,\dots,g_n\)</span>, the <strong>Jacobian</strong> <span class="math inline">\(Dg(x)\)</span> is the <span class="math inline">\(n\times n\)</span> matrix-valued function <span class="math display">\[
+[Dg(x)]_{ij}=\pdiff{g_i}{x_j}(x).
 \]</span></p>
 </div>
 <div id="thm-8-contraction-jacobian" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.2 (Jacobian bound implies contraction)</strong></span> If there is <span class="math inline">\(\alpha\in[0,1)\)</span> with <span class="math inline">\(\norm{DG(x)}\le\alpha\)</span> for all <span class="math inline">\(x\in\R^n\)</span> (induced norm matching the vector norm), then <span class="math inline">\(G\)</span> is a contraction with parameter <span class="math inline">\(\alpha\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem 8.2 (Jacobian bound implies contraction)</strong></span> If there is <span class="math inline">\(k\in[0,1)\)</span> with <span class="math inline">\(\norm{Dg(x)}\le k\)</span> for all <span class="math inline">\(x\in\R^n\)</span> (induced norm matching the vector norm), then <span class="math inline">\(g\)</span> is a contraction with parameter <span class="math inline">\(k\)</span>.</p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(x,y\)</span> and connect them by the segment <span class="math inline">\(z(t)=(1-t)x+ty\)</span>, <span class="math inline">\(t\in[0,1]\)</span>, so <span class="math inline">\(z(0)=x\)</span>, <span class="math inline">\(z(1)=y\)</span>, and <span class="math inline">\(z'(t)=y-x\)</span>. By the fundamental theorem of calculus and the chain rule, <span class="math display">\[
-G(y)-G(x)=\int_0^1\diff{}{t}G(z(t))\,\dd t=\int_0^1 DG(z(t))\,[y-x]\,\dd t.
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(x,y\)</span> and join them by the segment <span class="math inline">\(z(t)=(1-t)x+ty\)</span>, <span class="math inline">\(t\in[0,1]\)</span>, so <span class="math inline">\(z(0)=x\)</span>, <span class="math inline">\(z(1)=y\)</span>, and <span class="math inline">\(z'(t)=y-x\)</span>. The fundamental theorem of calculus and the chain rule give <span class="math display">\[
+g(y)-g(x)=\int_0^1\diff{}{t}g(z(t))\,\dd t=\int_0^1 Dg(z(t))\,[y-x]\,\dd t.
 \]</span> Taking norms and passing the triangle inequality through the integral, <span class="math display">\[
-\norm{G(y)-G(x)}\le\int_0^1\norm{DG(z(t))\,[y-x]}\,\dd t
-\le\int_0^1\norm{DG(z(t))}\,\norm{y-x}\,\dd t
-\le\int_0^1\alpha\,\norm{y-x}\,\dd t=\alpha\,\norm{y-x},
-\]</span> using <span class="math inline">\(\norm{Mv}\le\norm{M}\norm{v}\)</span> and the hypothesis <span class="math inline">\(\norm{DG(z(t))}\le\alpha\)</span> along the segment. <span class="math inline">\(\square\)</span></p>
+\norm{g(y)-g(x)}\le\int_0^1\norm{Dg(z(t))\,[y-x]}\,\dd t
+\le\int_0^1\norm{Dg(z(t))}\,\norm{y-x}\,\dd t
+\le\int_0^1 k\,\norm{y-x}\,\dd t=k\,\norm{y-x},
+\]</span> using <span class="math inline">\(\norm{Mv}\le\norm{M}\norm{v}\)</span> and the hypothesis <span class="math inline">\(\norm{Dg(z(t))}\le k\)</span> along the segment. <span class="math inline">\(\square\)</span></p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The same “the update shrinks errors” as in Chapter 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The condition <span class="math inline">\(\norm{Dg(x)}\le k&lt;1\)</span> says the update map contracts errors by the factor <span class="math inline">\(k\)</span> every step. That is exactly the mechanism behind the stationary-iteration test <span class="math inline">\(\spec(T)&lt;1\)</span> of <a href="05-iterative-linear-systems.html#thm-5-jacobi-gs-conv" class="quarto-xref">Theorem&nbsp;<span>7.1</span></a>: there the error propagates linearly through the iteration matrix <span class="math inline">\(T\)</span>, and its spectral radius <span class="math inline">\(\spec(T)\)</span> (<a href="05-iterative-linear-systems.html#def-5-spectral-radius" class="quarto-xref">Definition&nbsp;<span>6.4</span></a>) plays the role <span class="math inline">\(k\)</span> plays here. Linear solvers and nonlinear ones converge for the <em>same</em> reason — one application of the update shrinks the error — which is why both are governed by “how much below <span class="math inline">\(1\)</span>” a single number sits.</p>
+</div>
 </div>
 </section>
 <section id="sec-8-gd" class="level3">
-<h3 class="anchored" data-anchor-id="sec-8-gd">Convergence of gradient descent for convex optimization</h3>
-<p>Return to minimizing <span class="math inline">\(u:\R^n\to\R\)</span>, i.e.&nbsp;solving <span class="math inline">\(F(x)=\nabla u(x)=0\)</span>. The fixed-point map <a href="#eq-8-fp-map" class="quarto-xref">Equation&nbsp;<span>8.2</span></a> with <span class="math inline">\(G(x)=x-\eps\nabla u(x)\)</span> gives the update <span id="eq-8-gd"><span class="math display">\[
-x^{(k+1)}=x^{(k)}-\eps\,\nabla u(x^{(k)}),
-\tag{8.6}\]</span></span> which is <strong>gradient descent</strong> with <strong>step size</strong> <span class="math inline">\(\eps&gt;0\)</span>. We now use the contraction test to pin down when it converges and how fast.</p>
+<h3 class="anchored" data-anchor-id="sec-8-gd">Gradient descent as a contraction</h3>
+<p>Return to minimizing <span class="math inline">\(u:\R^n\to\R\)</span>, i.e.&nbsp;solving <span class="math inline">\(F(x)=\nabla u(x)=0\)</span>. Specializing the fixed-point map <a href="#eq-8-fp-map" class="quarto-xref">Equation&nbsp;<span>8.2</span></a> to <span class="math inline">\(F=\nabla u\)</span> and renaming the scalar <span class="math inline">\(t&gt;0\)</span> (a <strong>step size</strong>) gives the update <span id="eq-8-gd"><span class="math display">\[
+x^{(k+1)}=x^{(k)}-t\,\nabla u(x^{(k)}),
+\tag{8.6}\]</span></span> which is <strong>gradient descent</strong>. The contraction test tells us exactly when it converges and how fast.</p>
 <div id="def-8-strictly-convex" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 8.4 (Strictly convex function)</strong></span> <span class="math inline">\(u\in C^2(\R^n)\)</span> is <strong>strictly convex</strong> if its Hessian <span class="math inline">\(\nabla^2 u(x)=\bigl[\partial^2 u/\partial
 x_i\partial x_j\bigr]\)</span> is positive definite for all <span class="math inline">\(x\)</span>.</p>
 </div>
-<p>The <span class="math inline">\(C^2\)</span> assumption makes the Hessian exist and be symmetric (mixed partials commute). Strict convexity is equivalent to all eigenvalues of <span class="math inline">\(\nabla^2 u(x)\)</span> being positive, and any critical point of a strictly convex <span class="math inline">\(u\)</span> is its unique global minimizer. For a quantitative rate we assume a uniform two-sided eigenvalue bound.</p>
+<p>The <span class="math inline">\(C^2\)</span> assumption makes the Hessian exist and be symmetric (mixed partials commute); strict convexity is the same as every eigenvalue of <span class="math inline">\(\nabla^2 u(x)\)</span> being positive, and it forces any critical point to be the unique global minimizer. For a <em>quantitative</em> rate we ask for a uniform two-sided eigenvalue bound.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -445,39 +475,116 @@ x_i\partial x_j\bigr]\)</span> is positive definite for all <span class="math in
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>There exist constants <span class="math inline">\(0&lt;c\le C\)</span> such that for all <span class="math inline">\(x\)</span> the eigenvalues of <span class="math inline">\(\nabla^2 u(x)\)</span> lie in <span class="math inline">\([c,C]\)</span>. The lower bound <span class="math inline">\(c&gt;0\)</span> is strong convexity; the upper bound <span class="math inline">\(C\)</span> makes <span class="math inline">\(\nabla u\)</span> Lipschitz. The ratio <span class="math inline">\(C/c\)</span> acts as a <strong>condition number</strong> for the problem — it is the <span class="math inline">\(2\)</span>-norm condition number <span class="math inline">\(\cond_2\)</span> (<a href="04-direct-linear-systems.html#def-4-cond" class="quarto-xref">Definition&nbsp;<span>4.6</span></a>) of a positive-definite Hessian, the ratio of its largest to smallest eigenvalue — and it governs the speed below.</p>
+<p>There are constants <span class="math inline">\(0&lt;c\le C\)</span> with the eigenvalues of <span class="math inline">\(\nabla^2 u(x)\)</span> lying in <span class="math inline">\([c,C]\)</span> for all <span class="math inline">\(x\)</span>. The lower bound <span class="math inline">\(c&gt;0\)</span> is strong convexity; the upper bound <span class="math inline">\(C\)</span> makes <span class="math inline">\(\nabla u\)</span> Lipschitz. The ratio <span class="math inline">\(C/c\)</span> is the <strong>condition number</strong> of the problem — it is exactly the <span class="math inline">\(2\)</span>-norm condition number <span class="math inline">\(\cond_2\)</span> (<a href="04-direct-linear-systems.html#def-4-cond" class="quarto-xref">Definition&nbsp;<span>4.6</span></a>) of the positive-definite Hessian, largest eigenvalue over smallest — and it sets the speed below. This is the same conditioning that governed the linear solves of Chapters 4–5: a large <span class="math inline">\(C/c\)</span> means the level sets of <span class="math inline">\(u\)</span> are long, thin ellipsoids, the identical stretched geometry that made an ill-conditioned <span class="math inline">\(Ax=b\)</span> hard.</p>
 </div>
 </div>
 <div id="thm-8-gd" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.3 (Gradient descent converges linearly)</strong></span> Under the standing assumption, gradient descent <a href="#eq-8-gd" class="quarto-xref">Equation&nbsp;<span>8.6</span></a> with step size <span class="math inline">\(\eps=1/C\)</span> converges to the unique global minimizer <span class="math inline">\(x^\star\)</span> of <span class="math inline">\(u\)</span>. Moreover <span class="math inline">\(G(x)=x-\tfrac1C\nabla u(x)\)</span> is a contraction with parameter <span class="math inline">\(\alpha=1-c/C\)</span>, so by <a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a> <span id="eq-8-gd-error"><span class="math display">\[
+<p><span class="theorem-title"><strong>Theorem 8.3 (Gradient descent converges linearly)</strong></span> Under the standing assumption, gradient descent <a href="#eq-8-gd" class="quarto-xref">Equation&nbsp;<span>8.6</span></a> with step size <span class="math inline">\(t=1/C\)</span> converges to the unique global minimizer <span class="math inline">\(x^\star\)</span> of <span class="math inline">\(u\)</span>. Moreover <span class="math inline">\(g(x)=x-\tfrac1C\nabla u(x)\)</span> is a contraction with parameter <span class="math inline">\(k=1-c/C\)</span>, so by 1 <span id="eq-8-gd-error"><span class="math display">\[
 \ntwo{x^{(k)}-x^\star}\le\Bigl(1-\frac{c}{C}\Bigr)^{k}\frac{C}{c}\,\ntwo{x^{(1)}-x^{(0)}}.
 \tag{8.7}\]</span></span></p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>By <a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a> it suffices to bound <span class="math inline">\(\ntwo{DG(x)}\)</span>. Differentiating <span class="math inline">\(G(x)=x-\tfrac1C\nabla u(x)\)</span> gives <span class="math display">\[
-DG(x)=I_n-\frac1C\,\nabla^2 u(x).
-\]</span> If <span class="math inline">\(\lambda\)</span> is an eigenvalue of <span class="math inline">\(\nabla^2 u(x)\)</span>, then <span class="math inline">\(1-\lambda/C\)</span> is the corresponding eigenvalue of <span class="math inline">\(DG(x)\)</span>. Since <span class="math inline">\(c\le\lambda\le C\)</span>, we get <span class="math inline">\(c/C\le\lambda/C\le1\)</span>, hence every eigenvalue of <span class="math inline">\(DG(x)\)</span> lies in <span class="math inline">\([\,0,\,1-c/C\,]\)</span>. Now <span class="math inline">\(DG(x)\)</span> is symmetric (as <span class="math inline">\(\nabla^2 u\)</span> is), so its <span class="math inline">\(2\)</span>-norm equals its spectral radius (<a href="05-iterative-linear-systems.html#def-5-spectral-radius" class="quarto-xref">Definition&nbsp;<span>5.4</span></a>), <span class="math display">\[
-\ntwo{DG(x)}=\spec(DG(x))=\max_i\abs{\lambda_i(DG(x))}=1-\frac{c}{C},
-\]</span> because the eigenvalues sit in <span class="math inline">\([0,1-c/C]\)</span> with <span class="math inline">\(0\le1-c/C&lt;1\)</span>. Thus <span class="math inline">\(\ntwo{DG(x)}\le\alpha\)</span> with <span class="math inline">\(\alpha=1-c/C\in[0,1)\)</span>, so <span class="math inline">\(G\)</span> is a contraction and <a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a> applies; <a href="#eq-8-gd-error" class="quarto-xref">Equation&nbsp;<span>8.7</span></a> is 1 with <span class="math inline">\(1/(1-\alpha)=C/c\)</span>. <span class="math inline">\(\square\)</span></p>
+<p><span class="proof-title"><em>Proof</em>. </span>By <a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a> it is enough to bound <span class="math inline">\(\ntwo{Dg(x)}\)</span>. Differentiating <span class="math inline">\(g(x)=x-\tfrac1C\nabla u(x)\)</span>, <span class="math display">\[
+Dg(x)=I_n-\frac1C\,\nabla^2 u(x).
+\]</span> An eigenvalue <span class="math inline">\(\lambda\)</span> of <span class="math inline">\(\nabla^2 u(x)\)</span> becomes the eigenvalue <span class="math inline">\(1-\lambda/C\)</span> of <span class="math inline">\(Dg(x)\)</span>. Since <span class="math inline">\(c\le\lambda\le C\)</span> gives <span class="math inline">\(c/C\le\lambda/C\le1\)</span>, every eigenvalue of <span class="math inline">\(Dg(x)\)</span> lies in <span class="math inline">\([\,0,\,1-c/C\,]\)</span>. As <span class="math inline">\(\nabla^2 u\)</span> is symmetric, so is <span class="math inline">\(Dg(x)\)</span>, and its <span class="math inline">\(2\)</span>-norm equals its spectral radius (<a href="05-iterative-linear-systems.html#def-5-spectral-radius" class="quarto-xref">Definition&nbsp;<span>6.4</span></a>), <span class="math display">\[
+\ntwo{Dg(x)}=\spec(Dg(x))=\max_i\abs{\lambda_i(Dg(x))}=1-\frac{c}{C},
+\]</span> the eigenvalues sitting in <span class="math inline">\([0,1-c/C]\)</span> with <span class="math inline">\(0\le1-c/C&lt;1\)</span>. Thus <span class="math inline">\(\ntwo{Dg(x)}\le k\)</span> with <span class="math inline">\(k=1-c/C\in[0,1)\)</span>, <span class="math inline">\(g\)</span> is a contraction, and 1 applies; <a href="#eq-8-gd-error" class="quarto-xref">Equation&nbsp;<span>8.7</span></a> is <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a> with <span class="math inline">\(1/(1-k)=C/c\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>If the condition number <span class="math inline">\(C/c\)</span> is large, then <span class="math inline">\(\alpha=1-c/C\)</span> is close to <span class="math inline">\(1\)</span> and convergence is slow — the ill-conditioned case in <a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>. This is the fundamental limitation of plain gradient descent, and the motivation for the second-derivative method of the next section.</p>
+<p>A concrete case makes the rate tangible. Minimize the quadratic <span class="math display">\[
+u(x)=\tfrac12 x^\top A x,\qquad A=\diag(1,10),
+\]</span> whose gradient is <span class="math inline">\(\nabla u(x)=Ax=(x_1,\,10x_2)\)</span>. The eigenvalues of the (constant) Hessian <span class="math inline">\(A\)</span> are <span class="math inline">\(1\)</span> and <span class="math inline">\(10\)</span>, so <span class="math inline">\(c=1\)</span>, <span class="math inline">\(C=10\)</span>, the step is <span class="math inline">\(t=1/C=0.1\)</span>, and the contraction parameter is <span class="math inline">\(k=1-c/C=0.9\)</span>. The update reads <span class="math display">\[
+x^{(k+1)}=x^{(k)}-0.1\,(x_1^{(k)},\,10x_2^{(k)})=\bigl(0.9\,x_1^{(k)},\,0\bigr),
+\]</span> because the stiff coordinate has <span class="math inline">\(1-t\cdot10=0\)</span>: one step annihilates it. From <span class="math inline">\(x^{(0)}=(1,1)\)</span> the soft coordinate then decays by exactly <span class="math inline">\(0.9\)</span> each step while the stiff one stays pinned at <span class="math inline">\(0\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\(k\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(x^{(k)}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\ntwo{x^{(k)}-x^\star}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\((1,\,1)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\sqrt2\approx1.414\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\((0.9,\,0)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\((0.81,\,0)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.81\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">\(3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\((0.729,\,0)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.729\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Here <span class="math inline">\(x^\star=(0,0)\)</span>, and for <span class="math inline">\(k\ge1\)</span> we get <span class="math inline">\(x^{(k)}=(0.9^{k},0)\)</span> with <span class="math inline">\(\ntwo{x^{(k)}-x^\star}=0.9^{k}\)</span> <em>exactly</em>. The observed rate <span class="math inline">\(0.9\)</span> is precisely the predicted <span class="math inline">\(k=1-c/C\)</span>, and <a href="#eq-8-gd-error" class="quarto-xref">Equation&nbsp;<span>8.7</span></a> holds with room to spare: its right-hand side is <span class="math inline">\(0.9^{k}\cdot(C/c)\cdot\ntwo{x^{(1)}-x^{(0)}}
+=0.9^{k}\cdot10\cdot\sqrt{1.01}\approx10.05\cdot0.9^{k}\)</span>, comfortably above the true <span class="math inline">\(0.9^{k}\)</span>. The lesson is written into the number <span class="math inline">\(0.9\)</span>: a large condition number <span class="math inline">\(C/c=10\)</span> pushes the rate <span class="math inline">\(1-c/C\)</span> toward <span class="math inline">\(1\)</span>, and the iteration crawls — the ill-conditioned line of <a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>. Plain gradient descent cannot escape this; escaping it is the motivation for the second-derivative method of the next section.</p>
 </section>
 </section>
 <section id="sec-8-newton" class="level2" data-number="8.3">
-<h2 data-number="8.3" class="anchored" data-anchor-id="sec-8-newton"><span class="header-section-number">8.3</span> Newton’s method</h2>
+<h2 data-number="8.3" class="anchored" data-anchor-id="sec-8-newton"><span class="header-section-number">8.3</span> Superlinear iterations: Newton’s method</h2>
+<p>The second tier is where iterations <em>accelerate</em>. Instead of a constant per-step factor, the error is raised to a power <span class="math inline">\(q&gt;1\)</span> each step, so the number of correct digits grows without bound per iteration. We first make “order of convergence” precise and prove the striking consequence — the error falls doubly exponentially — and then present Newton’s method as the worked instance that achieves <span class="math inline">\(q=2\)</span>. Deferring the definition until now is deliberate: it is the organizing idea of the whole tier, not a footnote to any one algorithm.</p>
+<section id="sec-8-orders" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-orders">How fast is fast: orders of convergence</h3>
+<div id="def-8-order-convergence" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 8.5 (Order of convergence)</strong></span> Let an iterative method produce <span class="math inline">\(x^{(k)}\to x^\star\)</span>. The method has <strong>order of convergence</strong> <span class="math inline">\(q\)</span> (a positive integer) with <strong>rate</strong> <span class="math inline">\(M&gt;0\)</span> if <span class="math display">\[
+\frac{\norm{x^{(k+1)}-x^\star}}{\norm{x^{(k)}-x^\star}^{q}}\le M
+\qquad\Longleftrightarrow\qquad
+\norm{x^{(k+1)}-x^\star}\le M\,\norm{x^{(k)}-x^\star}^{q}
+\tag{$*$}
+\]</span> holds for all <span class="math inline">\(k\)</span>. The case <span class="math inline">\(q=1\)</span> is <strong>linear convergence</strong>, <span class="math inline">\(q&gt;1\)</span> is <strong>superlinear convergence</strong>, and <span class="math inline">\(q=2\)</span> is <strong>quadratic convergence</strong>.</p>
+</div>
+<p>The two regimes are not just quantitatively but qualitatively different, and the difference is all about the rate <span class="math inline">\(M\)</span>.</p>
+<ul>
+<li><strong>Linear (<span class="math inline">\(q=1\)</span>).</strong> Then <span class="math inline">\((*)\)</span> reads <span class="math inline">\(\norm{x^{(k+1)}-x^\star}\le M\norm{x^{(k)}-x^\star}\)</span>, and only <span class="math inline">\(M&lt;1\)</span> forces the error down — otherwise the bound permits no progress, however close <span class="math inline">\(x^{(0)}\)</span> starts. So <span class="math inline">\(M&lt;1\)</span> is a silent requirement when <span class="math inline">\(q=1\)</span>, mirroring the role of <span class="math inline">\(k\)</span> in 1.</li>
+<li><strong>Superlinear (<span class="math inline">\(q&gt;1\)</span>).</strong> Now <span class="math inline">\(M\)</span> may exceed <span class="math inline">\(1\)</span> freely: provided <span class="math inline">\(x^{(0)}\)</span> lies close enough to <span class="math inline">\(x^\star\)</span>, the inequality <span class="math inline">\((*)\)</span> alone drags the error to zero. A superlinear method may dawdle far from the root and only reveal its speed once the iterate enters a neighborhood of <span class="math inline">\(x^\star\)</span>; the definition captures this <strong>asymptotic</strong> behavior, not the transient.</li>
+</ul>
+<p>Just how fast is superlinear? The next theorem answers precisely: the error decays like <span class="math inline">\(e^{-\alpha q^{k}}\)</span> — doubly exponentially, since the exponent itself grows like <span class="math inline">\(q^{k}\)</span>.</p>
+<div id="thm-8-superlinear" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.4 (Superlinear convergence is doubly exponential)</strong></span> Suppose an iteration satisfies <span class="math inline">\((*)\)</span> with <span class="math inline">\(q&gt;1\)</span>. If the initial error obeys <span class="math inline">\(\norm{x^{(0)}-x^\star}\le M^{-1/(q-1)}\)</span>, then the method converges, and there are constants <span class="math inline">\(\alpha,C&gt;0\)</span> with <span id="eq-8-superlinear"><span class="math display">\[
+\norm{x^{(k)}-x^\star}\le C\,e^{-\alpha q^{k}} .
+\tag{8.8}\]</span></span> One may take <span class="math inline">\(C=M^{-1/(q-1)}\)</span> and <span class="math inline">\(\alpha=-\log\!\bigl(M^{1/(q-1)}\norm{x^{(0)}-x^\star}\bigr)\)</span>, with <span class="math inline">\(\alpha&gt;0\)</span> requiring the strict inequality <span class="math inline">\(\norm{x^{(0)}-x^\star}&lt;M^{-1/(q-1)}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Write <span class="math inline">\(E_k=\norm{x^{(k)}-x^\star}\)</span>, so <span class="math inline">\((*)\)</span> is <span class="math inline">\(E_{k+1}\le M E_k^{q}\)</span>. Logs turn the product into a linear recursion: <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\)</span> with <span class="math inline">\(b=\log M\)</span>. Define <span class="math inline">\(a_0=\log E_0\)</span>, <span class="math inline">\(a_{k+1}=b+q\,a_k\)</span>; then <span class="math inline">\(\log E_k\le a_k\)</span> for all <span class="math inline">\(k\)</span> by induction (the step is <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\le b+q a_k=a_{k+1}\)</span>). Solving the recursion, <span class="math display">\[
+a_k=q^{k}a_0+b\sum_{j=0}^{k-1}q^{j}=q^{k}a_0+b\,\frac{q^{k}-1}{q-1}
+=q^{k}\Bigl(a_0+\frac{b}{q-1}\Bigr)-\frac{b}{q-1}.
+\]</span> Put <span class="math inline">\(\alpha\defeq-\bigl(a_0+\tfrac{b}{q-1}\bigr)\)</span>. With <span class="math inline">\(a_0=\log E_0\)</span> and <span class="math inline">\(b=\log M\)</span>, the condition <span class="math inline">\(\alpha&gt;0\)</span> is <span class="math inline">\(\log\!\bigl(E_0 M^{1/(q-1)}\bigr)&lt;0\)</span>, i.e.&nbsp;<span class="math inline">\(E_0&lt;M^{-1/(q-1)}\)</span> — the hypothesis. Then <span class="math inline">\(\log E_k\le a_k=-\alpha q^{k}-\tfrac{b}{q-1}\)</span>, and exponentiating gives <span class="math inline">\(E_k\le C e^{-\alpha q^{k}}\)</span> with <span class="math inline">\(C=e^{-b/(q-1)}=M^{-1/(q-1)}\)</span>. Since <span class="math inline">\(\alpha&gt;0\)</span> and <span class="math inline">\(q&gt;1\)</span>, the exponent <span class="math inline">\(-\alpha q^{k}\to-\infty\)</span> and <span class="math inline">\(E_k\to0\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The contrast with the first tier is the whole point. Linear convergence adds a <em>fixed</em> number of correct digits per step; quadratic convergence roughly <em>doubles</em> the correct digits every step. <a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> draws both on a log scale, where linear convergence is a straight line — steeper when the contraction constant is smaller — and quadratic convergence peels away downward, each step bending it more sharply.</p>
+<div id="fig-8-convergence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-8-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/08-convergence.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-8-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.1: Error versus iteration count on a logarithmic scale. Linear convergence (1) plots as a straight line whose slope is set by the contraction constant <span class="math inline">\(k\)</span>; a large condition number pushes <span class="math inline">\(k\)</span> toward <span class="math inline">\(1\)</span> and flattens the line. Quadratic convergence (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>) curves ever more steeply — each step roughly squares the error.
+</figcaption>
+</figure>
+</div>
+</section>
 <section id="sec-8-newton-algo" class="level3">
-<h3 class="anchored" data-anchor-id="sec-8-newton-algo">Motivation and algorithm</h3>
-<p>Gradient descent uses only first-order information and pays for it with a condition-number-limited linear rate. <strong>Newton’s method</strong> uses the derivative of <span class="math inline">\(F\)</span> itself. The idea is to alternate two steps: <strong>linearize</strong> the equations near the current guess, then <strong>solve</strong> the linear system for the next guess.</p>
-<p>Near a guess <span class="math inline">\(x^{(k)}\)</span>, the first-order multivariate Taylor expansion is <span class="math display">\[
+<h3 class="anchored" data-anchor-id="sec-8-newton-algo">Newton’s method: linearize, then solve</h3>
+<p>Gradient descent used only first-order information and paid with a condition-number-limited linear rate. <strong>Newton’s method</strong> brings in the derivative of <span class="math inline">\(F\)</span> itself, and its logic is a two-move loop: replace <span class="math inline">\(F\)</span> near the current guess by its tangent (linear) approximation, then solve that linear problem exactly for the next guess.</p>
+<p>Near <span class="math inline">\(x^{(k)}\)</span>, the first-order multivariate Taylor expansion is <span class="math display">\[
 F(x)\approx F(x^{(k)})+DF(x^{(k)})\,(x-x^{(k)}),
-\]</span> with <span class="math inline">\(DF\)</span> the Jacobian of <span class="math inline">\(F\)</span> (<a href="#def-8-jacobian" class="quarto-xref">Definition&nbsp;<span>8.3</span></a>). Replacing <span class="math inline">\(F\)</span> by this linearization in <span class="math inline">\(F(x)=0\)</span> gives the linear system <span class="math inline">\(0=F(x^{(k)})+DF(x^{(k)})(x-x^{(k)})\)</span>; solving it (when <span class="math inline">\(DF(x^{(k)})\)</span> is invertible) and calling the solution <span class="math inline">\(x^{(k+1)}\)</span> yields <strong>Newton’s method</strong>: <span id="eq-8-newton"><span class="math display">\[
+\]</span> with <span class="math inline">\(DF\)</span> the Jacobian of <span class="math inline">\(F\)</span> (<a href="#def-8-jacobian" class="quarto-xref">Definition&nbsp;<span>8.3</span></a>, applied to <span class="math inline">\(F\)</span>). Setting this linear model to zero, <span class="math inline">\(0=F(x^{(k)})+DF(x^{(k)})(x-x^{(k)})\)</span>, and solving for <span class="math inline">\(x\)</span> (whenever <span class="math inline">\(DF(x^{(k)})\)</span> is invertible) names the next iterate — <strong>Newton’s method</strong>: <span id="eq-8-newton"><span class="math display">\[
 x^{(k+1)}=x^{(k)}-DF(x^{(k)})^{-1}F(x^{(k)}).
-\tag{8.8}\]</span></span> In the scalar case <span class="math inline">\(n=1\)</span> this is the familiar <span class="math display">\[
+\tag{8.9}\]</span></span> For <span class="math inline">\(n=1\)</span> this is the schoolbook rule <span class="math display">\[
 x^{(k+1)}=x^{(k)}-\frac{F(x^{(k)})}{F'(x^{(k)})}.
-\]</span> For optimization, <span class="math inline">\(F=\nabla u\)</span> has Jacobian <span class="math inline">\(DF=\nabla^2 u\)</span>, so Newton’s method minimizes <span class="math inline">\(u\)</span> via <span class="math display">\[
+\]</span> In optimization, <span class="math inline">\(F=\nabla u\)</span> has Jacobian <span class="math inline">\(DF=\nabla^2 u\)</span>, so Newton minimizes <span class="math inline">\(u\)</span> by <span class="math display">\[
 x^{(k+1)}=x^{(k)}-\nabla^2 u(x^{(k)})^{-1}\nabla u(x^{(k)}),
-\]</span> which for <span class="math inline">\(n=1\)</span> reads <span class="math inline">\(x^{(k+1)}=x^{(k)}-u'(x^{(k)})/u''(x^{(k)})\)</span>.</p>
-<p>In practice one never forms the inverse <span class="math inline">\(DF(x^{(k)})^{-1}\)</span> — that is an <span class="math inline">\(\bigO(n^3)\)</span>, potentially unstable, and wasteful operation. Instead, compute the <strong>Newton step</strong> <span class="math inline">\(y\)</span> as the solution of a linear system, exactly the <span class="math inline">\(Ax=b\)</span> problem of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>:</p>
+\]</span> which for <span class="math inline">\(n=1\)</span> is <span class="math inline">\(x^{(k+1)}=x^{(k)}-u'(x^{(k)})/u''(x^{(k)})\)</span>.</p>
+<p>One never actually forms <span class="math inline">\(DF(x^{(k)})^{-1}\)</span> — inverting is <span class="math inline">\(\bigO(n^3)\)</span>, potentially unstable, and wasteful. Instead the <strong>Newton step</strong> <span class="math inline">\(y\)</span> is found by solving a linear system, and that system is precisely the <span class="math inline">\(Ax=b\)</span> of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>: each Newton iteration <em>is</em> a linear solve, the exact callback promised in <a href="#sec-8-general" class="quarto-xref"><span>Section 8.1</span></a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -501,85 +608,81 @@ x^{(k+1)}=x^{(k)}-\nabla^2 u(x^{(k)})^{-1}\nabla u(x^{(k)}),
 </ul>
 </div>
 </div>
-<p>Each Newton iteration thus costs one Jacobian evaluation and one linear solve. What buys back that per-step cost is the convergence <em>order</em>, which we define next.</p>
-</section>
-<section id="sec-8-orders" class="level3">
-<h3 class="anchored" data-anchor-id="sec-8-orders">Orders of convergence</h3>
-<p>Before analyzing Newton’s method we make precise how fast an iteration converges. This is the “order of convergence” sense of the word <em>order</em>, distinct from the order of accuracy of a discretization.</p>
-<div id="def-8-order-convergence" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 8.5 (Order of convergence)</strong></span> Let an iterative method produce <span class="math inline">\(x^{(k)}\to x^\star\)</span>. The method has <strong>order of convergence</strong> <span class="math inline">\(q\)</span> (a positive integer) with <strong>rate</strong> <span class="math inline">\(M&gt;0\)</span> if <span class="math display">\[
-\frac{\norm{x^{(k+1)}-x^\star}}{\norm{x^{(k)}-x^\star}^{q}}\le M
-\qquad\Longleftrightarrow\qquad
-\norm{x^{(k+1)}-x^\star}\le M\,\norm{x^{(k)}-x^\star}^{q}
-\tag{$*$}
-\]</span> holds for all <span class="math inline">\(k\)</span>. The case <span class="math inline">\(q=1\)</span> is <strong>linear convergence</strong>, <span class="math inline">\(q&gt;1\)</span> is <strong>superlinear convergence</strong>, and <span class="math inline">\(q=2\)</span> is <strong>quadratic convergence</strong>.</p>
-</div>
-<p>The two regimes behave qualitatively differently.</p>
-<ul>
-<li><strong>Linear (<span class="math inline">\(q=1\)</span>).</strong> Here <span class="math inline">\((*)\)</span> reads <span class="math inline">\(\norm{x^{(k+1)}-x^\star}\le M\norm{x^{(k)}-x^\star}\)</span>, and we need <span class="math inline">\(M&lt;1\)</span> for it to force convergence — no matter how close <span class="math inline">\(x^{(0)}\)</span> starts. So <span class="math inline">\(M&lt;1\)</span> is an implicit requirement when <span class="math inline">\(q=1\)</span> (as with <span class="math inline">\(\alpha\)</span> in <a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>).</li>
-<li><strong>Superlinear (<span class="math inline">\(q&gt;1\)</span>).</strong> Now <span class="math inline">\(M&lt;1\)</span> is <em>not</em> needed: as long as <span class="math inline">\(x^{(0)}\)</span> is close enough to <span class="math inline">\(x^\star\)</span>, inequality <span class="math inline">\((*)\)</span> alone drives the error to zero. In practice a method may crawl at first and only reach its superlinear regime once the iterate enters a neighborhood of <span class="math inline">\(x^\star\)</span>; the definition captures this <strong>asymptotic</strong> behavior.</li>
-</ul>
-<p>The next theorem quantifies just how fast superlinear convergence is: the error decays doubly exponentially, like <span class="math inline">\(e^{-\alpha q^{k}}\)</span>.</p>
-<div id="thm-8-superlinear" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.4 (Superlinear convergence is doubly exponential)</strong></span> Suppose an iteration satisfies <span class="math inline">\((*)\)</span> with <span class="math inline">\(q&gt;1\)</span>. If the initial error obeys <span class="math inline">\(\norm{x^{(0)}-x^\star}\le M^{-1/(q-1)}\)</span>, then the method converges, and there exist constants <span class="math inline">\(\alpha,C&gt;0\)</span> with <span id="eq-8-superlinear"><span class="math display">\[
-\norm{x^{(k)}-x^\star}\le C\,e^{-\alpha q^{k}} .
-\tag{8.9}\]</span></span> In fact one may take <span class="math inline">\(C=M^{-1/(q-1)}\)</span> and <span class="math inline">\(\alpha=-\log\!\bigl(M^{1/(q-1)}\norm{x^{(0)}-x^\star}\bigr)\)</span> (with <span class="math inline">\(\alpha&gt;0\)</span> requiring the strict inequality <span class="math inline">\(\norm{x^{(0)}-x^\star}&lt;M^{-1/(q-1)}\)</span>).</p>
-</div>
-<div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Write <span class="math inline">\(E_k=\norm{x^{(k)}-x^\star}\)</span>, so <span class="math inline">\((*)\)</span> is <span class="math inline">\(E_{k+1}\le M E_k^{q}\)</span>. Taking logs, <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\)</span> with <span class="math inline">\(b=\log M\)</span>. Define the linear recursion <span class="math inline">\(a_0=\log E_0\)</span>, <span class="math inline">\(a_{k+1}=b+q\,a_k\)</span>; by induction <span class="math inline">\(\log E_k\le a_k\)</span> for all <span class="math inline">\(k\)</span> (the step is <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\le b+q a_k=a_{k+1}\)</span>). Solving the recursion, <span class="math display">\[
-a_k=q^{k}a_0+b\sum_{j=0}^{k-1}q^{j}=q^{k}a_0+b\,\frac{q^{k}-1}{q-1}
-=q^{k}\Bigl(a_0+\frac{b}{q-1}\Bigr)-\frac{b}{q-1}.
-\]</span> Set <span class="math inline">\(\alpha\defeq-\bigl(a_0+\tfrac{b}{q-1}\bigr)\)</span>. With <span class="math inline">\(a_0=\log E_0\)</span> and <span class="math inline">\(b=\log M\)</span>, the condition <span class="math inline">\(\alpha&gt;0\)</span> is <span class="math inline">\(\log\!\bigl(E_0 M^{1/(q-1)}\bigr)&lt;0\)</span>, i.e.&nbsp;<span class="math inline">\(E_0&lt;M^{-1/(q-1)}\)</span> — the hypothesis. Then <span class="math inline">\(\log E_k\le a_k=-\alpha q^{k}-\tfrac{b}{q-1}\)</span>, and exponentiating gives <span class="math inline">\(E_k\le C e^{-\alpha q^{k}}\)</span> with <span class="math inline">\(C=e^{-b/(q-1)}=M^{-1/(q-1)}\)</span>. Since <span class="math inline">\(\alpha&gt;0\)</span> and <span class="math inline">\(q&gt;1\)</span>, the exponent <span class="math inline">\(-\alpha q^{k}\to-\infty\)</span>, so <span class="math inline">\(E_k\to0\)</span>. <span class="math inline">\(\square\)</span></p>
-</div>
-<p>The contrast is stark: linear convergence adds a <em>fixed</em> number of digits per step, while quadratic convergence roughly <em>doubles</em> the number of correct digits each step. <a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> shows both on a log scale, where linear convergence is a straight line and quadratic convergence bends sharply downward.</p>
-<div id="fig-8-convergence" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-8-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/08-convergence.svg" class="img-fluid figure-img" style="width:75.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-8-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.1: Error versus iteration count on a logarithmic scale. Linear convergence (<a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>) plots as a straight line whose slope is set by <span class="math inline">\(\alpha\)</span>; a large condition number pushes <span class="math inline">\(\alpha\)</span> toward <span class="math inline">\(1\)</span> and flattens the line. Quadratic convergence (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>) curves ever more steeply — each step roughly squares the error.
-</figcaption>
-</figure>
-</div>
+<p>So a Newton step costs one Jacobian evaluation and one linear solve. What repays that cost is the <em>order</em> of convergence, which we now show is <span class="math inline">\(q=2\)</span>.</p>
 </section>
 <section id="sec-8-newton-conv" class="level3">
-<h3 class="anchored" data-anchor-id="sec-8-newton-conv">Local convergence of Newton’s method</h3>
-<p>We can now state and prove that Newton’s method converges quadratically, provided we start close enough and the Jacobian is nonsingular at the root.</p>
+<h3 class="anchored" data-anchor-id="sec-8-newton-conv">Newton’s quadratic rate</h3>
 <div id="thm-8-newton" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.5 (Local quadratic convergence of Newton’s method)</strong></span> Suppose the coordinate functions of <span class="math inline">\(F:\R^n\to\R^n\)</span> are all twice continuously differentiable. Let <span class="math inline">\(x^\star\)</span> solve <span class="math inline">\(F(x)=0\)</span> and suppose <span class="math inline">\(DF(x^\star)\)</span> is invertible. Then for any initial guess <span class="math inline">\(x^{(0)}\)</span> sufficiently close to <span class="math inline">\(x^\star\)</span>, Newton’s method <a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.8</span></a> converges <strong>quadratically</strong> to <span class="math inline">\(x^\star\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem 8.5 (Local quadratic convergence of Newton’s method)</strong></span> Suppose the coordinate functions of <span class="math inline">\(F:\R^n\to\R^n\)</span> are all twice continuously differentiable. Let <span class="math inline">\(x^\star\)</span> solve <span class="math inline">\(F(x)=0\)</span> and suppose <span class="math inline">\(DF(x^\star)\)</span> is invertible. Then for any initial guess <span class="math inline">\(x^{(0)}\)</span> sufficiently close to <span class="math inline">\(x^\star\)</span>, Newton’s method <a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.9</span></a> converges <strong>quadratically</strong> to <span class="math inline">\(x^\star\)</span>.</p>
 </div>
-<p>The invertibility hypothesis is a <strong>nondegeneracy</strong> condition: in the scalar case it is <span class="math inline">\(F'(x^\star)\neq0\)</span> (the root is simple), and for optimization (<span class="math inline">\(F=\nabla u\)</span>) it says <span class="math inline">\(\nabla^2
-u(x^\star)\)</span> is positive definite — the minimizer is not “flat” in any direction. Where it fails, Newton’s method loses its quadratic rate.</p>
+<p>Invertibility of <span class="math inline">\(DF(x^\star)\)</span> is a <strong>nondegeneracy</strong> hypothesis, and it is exactly what one expects to need. For <span class="math inline">\(n=1\)</span> it is <span class="math inline">\(F'(x^\star)\neq0\)</span>, i.e.&nbsp;a <em>simple</em> root; for optimization (<span class="math inline">\(F=\nabla u\)</span>) it demands <span class="math inline">\(\nabla^2 u(x^\star)\)</span> be positive definite, i.e.&nbsp;the minimizer curve upward in every direction rather than sit in a flat valley. At a degenerate root the tangent model is too poor and the quadratic rate is lost.</p>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>We prove the scalar case <span class="math inline">\(n=1\)</span>; the general case is identical in spirit using multivariate Taylor expansion and matrix norms. Since <span class="math inline">\(F'(x^\star)\neq0\)</span> and <span class="math inline">\(F'\)</span> is continuous (<span class="math inline">\(F\in C^2\)</span>), there are <span class="math inline">\(\eps&gt;0\)</span> and <span class="math inline">\(\delta&gt;0\)</span> with <span class="math inline">\(\abs{F'(x)}\ge\eps\)</span> on <span class="math inline">\(I\defeq(x^\star-\delta,x^\star+\delta)\)</span>; and <span class="math inline">\(F''\)</span> is continuous, hence bounded, <span class="math inline">\(\abs{F''(x)}\le C\)</span> on <span class="math inline">\(I\)</span>. Put <span class="math inline">\(M\defeq C/(2\eps)\)</span> and assume <span class="math inline">\(x^{(0)}\)</span> close enough that <span class="math inline">\(E_0=\abs{x^{(0)}-x^\star}\le\min\{\delta,1/M\}\)</span>, so <span class="math inline">\(x^{(0)}\in I\)</span>.</p>
+<p><span class="proof-title"><em>Proof</em>. </span>We do the scalar case <span class="math inline">\(n=1\)</span>; the vector case runs identically with multivariate Taylor expansion and matrix norms. Since <span class="math inline">\(F'(x^\star)\neq0\)</span> and <span class="math inline">\(F'\)</span> is continuous (<span class="math inline">\(F\in C^2\)</span>), pick <span class="math inline">\(\eps&gt;0\)</span> and <span class="math inline">\(\delta&gt;0\)</span> with <span class="math inline">\(\abs{F'(x)}\ge\eps\)</span> on <span class="math inline">\(I\defeq(x^\star-\delta,x^\star+\delta)\)</span>; and <span class="math inline">\(F''\)</span>, continuous hence bounded, satisfies <span class="math inline">\(\abs{F''(x)}\le C\)</span> on <span class="math inline">\(I\)</span>. Put <span class="math inline">\(M\defeq C/(2\eps)\)</span> and take <span class="math inline">\(x^{(0)}\)</span> close enough that <span class="math inline">\(E_0=\abs{x^{(0)}-x^\star}\le\min\{\delta,1/M\}\)</span>, so <span class="math inline">\(x^{(0)}\in I\)</span>.</p>
 <p>Assume inductively <span class="math inline">\(x^{(k)}\in I\)</span>. Expand <span class="math inline">\(F\)</span> about <span class="math inline">\(x^{(k)}\)</span> to first order with Lagrange remainder and evaluate at <span class="math inline">\(x^\star\)</span>: <span class="math display">\[
 F(x^\star)=F(x^{(k)})+F'(x^{(k)})\bigl(x^\star-x^{(k)}\bigr)
 +\tfrac12 F''(\xi^{(k)})\bigl(x^\star-x^{(k)}\bigr)^2,
-\]</span> for some <span class="math inline">\(\xi^{(k)}\)</span> between <span class="math inline">\(x^\star\)</span> and <span class="math inline">\(x^{(k)}\)</span>, so <span class="math inline">\(\xi^{(k)}\in I\)</span>. Since <span class="math inline">\(F(x^\star)=0\)</span> and <span class="math inline">\(F'(x^{(k)})\neq0\)</span>, divide by <span class="math inline">\(F'(x^{(k)})\)</span> and rearrange: <span class="math display">\[
+\]</span> with <span class="math inline">\(\xi^{(k)}\)</span> between <span class="math inline">\(x^\star\)</span> and <span class="math inline">\(x^{(k)}\)</span>, so <span class="math inline">\(\xi^{(k)}\in I\)</span>. Using <span class="math inline">\(F(x^\star)=0\)</span> and <span class="math inline">\(F'(x^{(k)})\neq0\)</span>, divide by <span class="math inline">\(F'(x^{(k)})\)</span> and rearrange: <span class="math display">\[
 -\frac{\tfrac12 F''(\xi^{(k)})(x^\star-x^{(k)})^2}{F'(x^{(k)})}
 =\frac{F(x^{(k)})}{F'(x^{(k)})}+\bigl(x^\star-x^{(k)}\bigr)
 =x^\star-\Bigl[x^{(k)}-\frac{F(x^{(k)})}{F'(x^{(k)})}\Bigr]
 =x^\star-x^{(k+1)},
-\]</span> recognizing the Newton update <a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.8</span></a> in the bracket. Taking absolute values and using <span class="math inline">\(\abs{F''(\xi^{(k)})}\le C\)</span>, <span class="math inline">\(\abs{F'(x^{(k)})}\ge\eps\)</span>, <span class="math display">\[
+\]</span> the bracket being the Newton update <a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.9</span></a>. Taking absolute values with <span class="math inline">\(\abs{F''(\xi^{(k)})}\le C\)</span> and <span class="math inline">\(\abs{F'(x^{(k)})}\ge\eps\)</span>, <span class="math display">\[
 \abs{x^{(k+1)}-x^\star}\le\frac{C}{2\eps}\,\abs{x^{(k)}-x^\star}^2=M\,\abs{x^{(k)}-x^\star}^2,
-\]</span> which is <span class="math inline">\((*)\)</span> with <span class="math inline">\(q=2\)</span>. Moreover <span class="math inline">\(E_{k+1}\le M E_k^2=(M E_k)E_k\le(M E_0)E_k\le E_k\)</span>, so the error is nonincreasing and <span class="math inline">\(x^{(k+1)}\in I\)</span>, closing the induction. With <span class="math inline">\((*)\)</span> holding for all <span class="math inline">\(k\)</span> and <span class="math inline">\(q=2&gt;1\)</span>, <a href="#thm-8-superlinear" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a> gives convergence, and the order is quadratic. <span class="math inline">\(\square\)</span></p>
+\]</span> which is <span class="math inline">\((*)\)</span> with <span class="math inline">\(q=2\)</span>. Moreover <span class="math inline">\(E_{k+1}\le M E_k^2=(M E_k)E_k\le(M E_0)E_k\le E_k\)</span>, so the error never grows and <span class="math inline">\(x^{(k+1)}\in I\)</span>, closing the induction. With <span class="math inline">\((*)\)</span> holding for all <span class="math inline">\(k\)</span> and <span class="math inline">\(q=2&gt;1\)</span>, <a href="#thm-8-superlinear" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a> gives convergence, and the order is quadratic. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>Quadratic convergence is the payoff for Newton’s per-step cost: near the root, a handful of iterations reach machine precision, in contrast to the many steps a linearly convergent method spends per digit. The price is locality (a poor initial guess may diverge) and the need for the Jacobian and a linear solve each step — trade-offs addressed by globalization strategies and <strong>quasi-Newton</strong> methods (which approximate <span class="math inline">\(DF\)</span> from successive function values), and by the broader optimization toolkit of Lagrangian duality, augmented-Lagrangian/ADMM splitting, and the like, beyond our scope here.</p>
+<p>The rate is easiest to <em>see</em> on the simplest possible root. Take <span class="math inline">\(F(x)=x^2-2\)</span>, whose positive root is <span class="math inline">\(x^\star=\sqrt2=1.41421356\ldots\)</span>; Newton’s rule collapses to the ancient averaging iteration <span class="math display">\[
+x_{k+1}=x_k-\frac{x_k^2-2}{2x_k}=\frac12\Bigl(x_k+\frac{2}{x_k}\Bigr).
+\]</span> Starting from <span class="math inline">\(x_0=1\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\(k\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(x_k\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\abs{x_k-\sqrt2}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4.14\times10^{-1}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.5\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(8.58\times10^{-2}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.41666667\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2.45\times10^{-3}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">\(3\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.41421569\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2.12\times10^{-6}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.41421356\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.59\times10^{-12}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Read the error column: the exponents <span class="math inline">\(-1,-2,-3,-6,-12\)</span> roughly double once the iteration warms up — quadratic convergence <em>doubling the correct digits</em> each step, exactly as <a href="#thm-8-superlinear" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a> promises for <span class="math inline">\(q=2\)</span>. The rate constant is <span class="math inline">\(M=\abs{F''(x^\star)}/\bigl(2\abs{F'(x^\star)}\bigr)
+=2/(2\cdot2\sqrt2)=1/(2\sqrt2)\approx0.354\)</span>, and the numbers obey <span class="math inline">\((*)\)</span> tightly: for instance <span class="math inline">\(M\cdot(2.45\times10^{-3})^2\approx2.1\times10^{-6}\)</span>, matching <span class="math inline">\(\abs{x_3-\sqrt2}\)</span>, and indeed the ratio <span class="math inline">\(\abs{x_{k+1}-\sqrt2}/\abs{x_k-\sqrt2}^2\)</span> marches toward <span class="math inline">\(0.354\)</span> as <span class="math inline">\(k\)</span> grows.</p>
+<p>Quadratic convergence is the payoff for Newton’s per-step cost: from a decent start, a handful of steps reach machine precision, where a linear method would still be grinding out digits one batch at a time. The prices are locality — a poor guess can diverge — and the need for a Jacobian and a linear solve each step. Both are addressed by globalization strategies and by <strong>quasi-Newton</strong> methods, which build up an approximate <span class="math inline">\(DF\)</span> from successive function values, and the wider optimization toolkit (Lagrangian duality, augmented-Lagrangian/ADMM splitting, and the rest) lies beyond our scope.</p>
 </section>
 </section>
 <section id="chapter-summary" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">8.4</span> Chapter summary</h2>
 <ul>
-<li>A <strong>nonlinear system</strong> <span class="math inline">\(F(x)=0\)</span> with <span class="math inline">\(F:\R^n\to\R^n\)</span> (<a href="#eq-8-system" class="quarto-xref">Equation&nbsp;<span>8.1</span></a>) has no direct solver; we iterate from a guess. Optimization is the special case <span class="math inline">\(F=\nabla u\)</span>, best-behaved when <span class="math inline">\(u\)</span> is strictly convex (<a href="#def-8-strictly-convex" class="quarto-xref">Definition&nbsp;<span>8.4</span></a>).</li>
-<li><strong>Fixed-point iteration</strong> <span class="math inline">\(x^{(k+1)}=G(x^{(k)})\)</span> recasts roots of <span class="math inline">\(F\)</span> as fixed points of <span class="math inline">\(G(x)=x-\eps F(x)\)</span> (<a href="#def-8-fixed-point" class="quarto-xref">Definition&nbsp;<span>8.1</span></a>); a convergent iteration lands on a fixed point (<a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a>).</li>
-<li>The <strong>Banach fixed-point theorem</strong> (<a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>): a contraction (<a href="#def-8-contraction" class="quarto-xref">Definition&nbsp;<span>8.2</span></a>) has a unique fixed point, the iteration converges to it, and the error decays like <span class="math inline">\(\alpha^k\)</span>
+<li>A <strong>nonlinear system</strong> <span class="math inline">\(F(x)=0\)</span> with <span class="math inline">\(F:\R^n\to\R^n\)</span> (<a href="#eq-8-system" class="quarto-xref">Equation&nbsp;<span>8.1</span></a>) has no direct solver, so we iterate. Linear systems (<span class="math inline">\(F=Ax-b\)</span>) and optimization (<span class="math inline">\(F=\nabla u\)</span>, best-behaved when <span class="math inline">\(u\)</span> is strictly convex, <a href="#def-8-strictly-convex" class="quarto-xref">Definition&nbsp;<span>8.4</span></a>) are the two anchoring special cases; the chapter sorts its iterations by <strong>order of convergence</strong> (<a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>).</li>
+<li><strong>Tier A — linearly convergent (<span class="math inline">\(q=1\)</span>).</strong> Fixed-point iteration <span class="math inline">\(x^{(k+1)}=g(x^{(k)})\)</span> recasts roots of <span class="math inline">\(F\)</span> as fixed points of <span class="math inline">\(g(x)=x-\eps F(x)\)</span> (<a href="#def-8-fixed-point" class="quarto-xref">Definition&nbsp;<span>8.1</span></a>), and a convergent iteration must land on a fixed point (<a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a>). The <strong>Banach fixed-point theorem</strong>
 <ol class="example" type="1">
-<li>— <strong>linear convergence</strong>. A checkable sufficient condition is <span class="math inline">\(\norm{DG(x)}\le\alpha&lt;1\)</span> (<a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a>).</li>
+<li>makes a contraction (<a href="#def-8-contraction" class="quarto-xref">Definition&nbsp;<span>8.2</span></a>, parameter <span class="math inline">\(k&lt;1\)</span>) converge to its unique fixed point with error decaying like <span class="math inline">\(k^{k}\)</span> (<a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a>); the checkable test is <span class="math inline">\(\norm{Dg(x)}\le k&lt;1\)</span> (<a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a>), the same “update shrinks errors” as the <span class="math inline">\(\spec(T)&lt;1\)</span> test of <a href="05-iterative-linear-systems.html#thm-5-jacobi-gs-conv" class="quarto-xref">Theorem&nbsp;<span>7.1</span></a>. <strong>Gradient descent</strong> with step <span class="math inline">\(t=1/C\)</span> is a contraction of parameter <span class="math inline">\(1-c/C\)</span> (<a href="#thm-8-gd" class="quarto-xref">Theorem&nbsp;<span>8.3</span></a>); the condition number <span class="math inline">\(C/c\)</span> sets the rate, and a large one makes it slow — as the <span class="math inline">\(A=\diag(1,10)\)</span> example, with exact rate <span class="math inline">\(0.9\)</span>, shows.</li>
 </ol></li>
-<li><strong>Gradient descent</strong> <span class="math inline">\(x^{(k+1)}=x^{(k)}-\tfrac1C\nabla u(x^{(k)})\)</span> is a contraction with parameter <span class="math inline">\(1-c/C\)</span> (<a href="#thm-8-gd" class="quarto-xref">Theorem&nbsp;<span>8.3</span></a>); the condition number <span class="math inline">\(C/c\)</span> sets the rate, and a large one makes it slow.</li>
-<li><strong>Newton’s method</strong> (<a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.8</span></a>) linearizes <span class="math inline">\(F\)</span> and solves the linear system <span class="math inline">\(DF(x)\,y=F(x)\)</span> each step. It converges <strong>quadratically</strong> near a root where <span class="math inline">\(DF(x^\star)\)</span> is invertible (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>).</li>
-<li><strong>Order of convergence</strong> <span class="math inline">\(q\)</span> (<a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>): <span class="math inline">\(q=1\)</span> linear (needs rate <span class="math inline">\(M&lt;1\)</span>), <span class="math inline">\(q=2\)</span> quadratic; for <span class="math inline">\(q&gt;1\)</span> the error falls doubly exponentially, <span class="math inline">\(\bigO(e^{-\alpha q^{k}})\)</span> (<a href="#thm-8-superlinear" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a>), so each step roughly doubles the correct digits (<a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>).</li>
+<li><strong>Tier B — superlinearly convergent (<span class="math inline">\(q&gt;1\)</span>).</strong> For <span class="math inline">\(q&gt;1\)</span> the error falls doubly exponentially, <span class="math inline">\(\bigO(e^{-\alpha q^{k}})\)</span> (<a href="#thm-8-superlinear" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a>), so each step gains ever more digits. <strong>Newton’s method</strong> (<a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.9</span></a>) is the archetype: it linearizes <span class="math inline">\(F\)</span> and solves the linear system <span class="math inline">\(DF(x)\,y=F(x)\)</span> each step, converging <strong>quadratically</strong> near a root where <span class="math inline">\(DF(x^\star)\)</span> is invertible (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>) — doubling the correct digits per step, as the <span class="math inline">\(\sqrt2\)</span> example makes visible (<a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>).</li>
 </ul>
 
 
