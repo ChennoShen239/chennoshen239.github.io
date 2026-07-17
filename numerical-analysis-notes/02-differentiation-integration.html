@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>2&nbsp; Numerical Differentiation &amp; Integration – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-ivp-odes.html" rel="next">
+<link href="./01-interpolation.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./02-differentiation-integration.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-2-bezier" id="toc-sec-2-bezier" class="nav-link active" data-scroll-target="#sec-2-bezier"><span class="header-section-number">2.1</span> Parametric and Bézier curves</a></li>
+  <li><a href="#sec-2-numdiff" id="toc-sec-2-numdiff" class="nav-link" data-scroll-target="#sec-2-numdiff"><span class="header-section-number">2.2</span> Numerical differentiation</a>
+  <ul class="collapse">
+  <li><a href="#sec-2-ndd-interp" id="toc-sec-2-ndd-interp" class="nav-link" data-scroll-target="#sec-2-ndd-interp">The general interpolatory formula</a></li>
+  <li><a href="#sec-2-roundoff" id="toc-sec-2-roundoff" class="nav-link" data-scroll-target="#sec-2-roundoff">Round-off instability</a></li>
+  </ul></li>
+  <li><a href="#sec-2-richardson" id="toc-sec-2-richardson" class="nav-link" data-scroll-target="#sec-2-richardson"><span class="header-section-number">2.3</span> Richardson extrapolation</a></li>
+  <li><a href="#sec-2-newton-cotes" id="toc-sec-2-newton-cotes" class="nav-link" data-scroll-target="#sec-2-newton-cotes"><span class="header-section-number">2.4</span> Newton–Cotes quadrature</a>
+  <ul class="collapse">
+  <li><a href="#sec-2-trapezoid" id="toc-sec-2-trapezoid" class="nav-link" data-scroll-target="#sec-2-trapezoid">Trapezoidal rule</a></li>
+  <li><a href="#sec-2-simpson" id="toc-sec-2-simpson" class="nav-link" data-scroll-target="#sec-2-simpson">Simpson’s rule</a></li>
+  <li><a href="#sec-2-dop" id="toc-sec-2-dop" class="nav-link" data-scroll-target="#sec-2-dop">Degree of precision</a></li>
+  </ul></li>
+  <li><a href="#sec-2-composite" id="toc-sec-2-composite" class="nav-link" data-scroll-target="#sec-2-composite"><span class="header-section-number">2.5</span> Composite rules</a></li>
+  <li><a href="#sec-2-romberg" id="toc-sec-2-romberg" class="nav-link" data-scroll-target="#sec-2-romberg"><span class="header-section-number">2.6</span> Romberg integration</a></li>
+  <li><a href="#sec-2-adaptive" id="toc-sec-2-adaptive" class="nav-link" data-scroll-target="#sec-2-adaptive"><span class="header-section-number">2.7</span> Adaptive quadrature</a></li>
+  <li><a href="#sec-2-gauss" id="toc-sec-2-gauss" class="nav-link" data-scroll-target="#sec-2-gauss"><span class="header-section-number">2.8</span> Gaussian quadrature</a>
+  <ul class="collapse">
+  <li><a href="#sec-2-legendre" id="toc-sec-2-legendre" class="nav-link" data-scroll-target="#sec-2-legendre">Legendre polynomials and the exactness theorem</a></li>
+  <li><a href="#sec-2-gauss-error" id="toc-sec-2-gauss-error" class="nav-link" data-scroll-target="#sec-2-gauss-error">Error of Gaussian quadrature</a></li>
+  </ul></li>
+  <li><a href="#sec-2-double" id="toc-sec-2-double" class="nav-link" data-scroll-target="#sec-2-double"><span class="header-section-number">2.9</span> Double integrals</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">2.10</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./02-differentiation-integration.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-diff-int" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>Interpolation (<a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>) gave us a polynomial that stands in for a function known only at nodes. The natural next move is to differentiate and integrate that polynomial in place of <span class="math inline">\(f\)</span>. Differentiation turns out to be delicate — the exact formulas are easy, but finite precision fights back, so shrinking the step size <span class="math inline">\(h\)</span> eventually makes the answer <em>worse</em>. Integration is the happier story: replacing <span class="math inline">\(f\)</span> by an interpolant yields the classical <strong>quadrature</strong> rules, and because integration averages rather than amplifies, these rules are stable and can be pushed to very high accuracy. This chapter develops both, closing the loop on the parametric-curve thread that <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a> deferred here.</p>
+<section id="sec-2-bezier" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="sec-2-bezier"><span class="header-section-number">2.1</span> Parametric and Bézier curves</h2>
+<p>A curve in the plane need not be the graph of a function: it may double back, cross itself, or close up. The device is to treat it <strong>parametrically</strong>, as <span class="math inline">\((x(t),y(t))\)</span> for <span class="math inline">\(t\)</span> in some interval, and to interpolate each coordinate against the parameter <span class="math inline">\(t\)</span> separately. Given <span class="math inline">\(n+1\)</span> data points <span class="math inline">\((x_j,y_j)=(x(t_j),y(t_j))\)</span>, one may fit <span class="math inline">\(x(t)\)</span> and <span class="math inline">\(y(t)\)</span> by any of the tools of <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a> — a single high-degree polynomial for each coordinate, or a spline for each. The polynomial route inherits the Runge oscillations of <a href="01-interpolation.html#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>; splines are steadier but solve a global system. Interactive design wants something local: a handle you can drag that reshapes one stretch of the curve without disturbing the rest.</p>
+<p><strong>Bézier curves</strong> provide exactly that by building the curve from <strong>piecewise cubic Hermite</strong> pieces (<a href="01-interpolation.html#sec-1-hermite" class="quarto-xref"><span>Section 1.4</span></a>), one cubic per pair of adjacent data points. On a single piece, reparametrised to <span class="math inline">\(t\in[0,1]\)</span> with endpoints <span class="math inline">\((x_0,y_0)\)</span> and <span class="math inline">\((x_1,y_1)\)</span>, a cubic Hermite polynomial in each coordinate carries four degrees of freedom: the two endpoint positions and the two endpoint derivatives <span class="math inline">\(x'(0),x'(1)\)</span> and <span class="math inline">\(y'(0),y'(1)\)</span>. Prescribing the endpoints uses two of them; the derivatives are the free handles. Bézier’s idea is to specify those derivatives <em>not</em> as numbers but through two <strong>guidepoints</strong> placed near the ends, <span class="math display">\[
+(x_0+\alpha_0,\;y_0+\beta_0)\quad\text{and}\quad (x_1-\alpha_1,\;y_1-\beta_1),
+\]</span> by setting <span class="math display">\[
+\begin{pmatrix}x'(0)\\ y'(0)\end{pmatrix}=\begin{pmatrix}\alpha_0\\ \beta_0\end{pmatrix},
+\qquad
+\begin{pmatrix}x'(1)\\ y'(1)\end{pmatrix}=\begin{pmatrix}\alpha_1\\ \beta_1\end{pmatrix}.
+\]</span> The tangent direction the eye actually sees is the slope <span class="math inline">\(\dd y/\dd x\)</span>, and by the chain rule at the endpoints it is <span class="math display">\[
+\left.\diff{y}{x}\right|_{t=0}=\frac{y'(0)}{x'(0)}=\frac{\beta_0}{\alpha_0},
+\qquad
+\left.\diff{y}{x}\right|_{t=1}=\frac{y'(1)}{x'(1)}=\frac{\beta_1}{\alpha_1}.
+\]</span> So the guidepoint at each end sits along the tangent there: dragging it swings the slope and stretches the curve, while the neighbouring pieces — anchored at their own endpoints and guidepoints — do not move (<a href="#fig-2-bezier" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>). This locality is why Bézier cubics wrap font outlines and vector-graphics paths.</p>
+<div id="fig-2-bezier" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-bezier-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-bezier.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-bezier-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: A cubic Bézier segment (solid) with its endpoints (circles) and two guidepoints (squares). The dashed control polygon meets the curve tangentially at each end, so each guidepoint sets the endpoint slope <span class="math inline">\(\beta/\alpha\)</span>.
+</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Why guidepoints instead of raw slopes
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A cubic Hermite piece needs a slope at each end, but a slope is an abstract number a designer cannot see. A guidepoint is a <em>point on the screen</em> lying along that slope, so the same four cubic coefficients are fixed by four visible handles — two anchors and two guidepoints. Because each piece depends only on its own four handles, editing one segment leaves the rest of the curve untouched, the property both single high-degree interpolation and global splines lack.</p>
+</div>
+</div>
+</section>
+<section id="sec-2-numdiff" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="sec-2-numdiff"><span class="header-section-number">2.2</span> Numerical differentiation</h2>
+<p>To approximate <span class="math inline">\(f'(x_0)\)</span> from function values, truncate the definition of the derivative: <span class="math display">\[
+f'(x_0)=\lim_{h\to 0}\frac{f(x_0+h)-f(x_0)}{h}\approx\frac{f(x_0+h)-f(x_0)}{h},\qquad \abs{h}\text{ small.}
+\]</span> How good is the approximation? A Taylor expansion with remainder answers it. For <span class="math inline">\(f\in C^2\)</span> near <span class="math inline">\(x_0\)</span> there is <span class="math inline">\(\xi\)</span> between <span class="math inline">\(x_0\)</span> and <span class="math inline">\(x_0+h\)</span> with <span class="math display">\[
+f(x_0+h)=f(x_0)+hf'(x_0)+\tfrac12 h^2 f''(\xi),
+\]</span> so, solving for <span class="math inline">\(f'(x_0)\)</span>, <span id="eq-2-forward-diff"><span class="math display">\[
+f'(x_0)=\frac{f(x_0+h)-f(x_0)}{h}-\tfrac12 h\,f''(\xi).
+\tag{2.1}\]</span></span> This is the <strong>forward-difference</strong> formula (take <span class="math inline">\(h&gt;0\)</span>); with <span class="math inline">\(h&lt;0\)</span> the same identity reads as the <strong>backward-difference</strong> formula. The truncation error is <span class="math inline">\(-\tfrac12 h f''(\xi)=\bigO(h)\)</span>: halving <span class="math inline">\(h\)</span> halves the error. For <span class="math inline">\(f(x)=\ln x\)</span> at <span class="math inline">\(x_0=1.8\)</span>, for instance, <span class="math inline">\(f''(x)=-1/x^2\)</span> gives <span class="math inline">\(\tfrac12\abs{hf''(\xi)}\le \tfrac12\abs{h}/1.8^2\)</span> for <span class="math inline">\(\xi\in[1.8,1.9]\)</span>, so <span class="math inline">\(h=0.1,0.05,0.01\)</span> bound the error by about <span class="math inline">\(0.0154,0.0077,0.0015\)</span>.</p>
+<section id="sec-2-ndd-interp" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-ndd-interp">The general interpolatory formula</h3>
+<p>The one-sided formula is the <span class="math inline">\(n=1\)</span> case of a general recipe: differentiate the interpolation identity of <a href="01-interpolation.html#thm-1-interp-error" class="quarto-xref">Theorem&nbsp;<span>1.2</span></a>. With <span class="math inline">\(n+1\)</span> distinct nodes <span class="math inline">\(x_0,\dots,x_n\)</span>, <span class="math display">\[
+f(x)=\sum_{j=0}^n f(x_j)L_{n,j}(x)+\frac{f^{(n+1)}(\xi(x))}{(n+1)!}\prod_{i=0}^n(x-x_i),
+\]</span> where <span class="math inline">\(L_{n,j}\)</span> is the Lagrange basis <a href="01-interpolation.html#eq-1-lagrange" class="quarto-xref">Equation&nbsp;<span>1.1</span></a>. Differentiating and then evaluating at a node <span class="math inline">\(x=x_k\)</span> kills the term in which the node polynomial <span class="math inline">\(\prod_i(x-x_i)\)</span> appears undifferentiated (it vanishes at <span class="math inline">\(x_k\)</span>), so the unknown derivative of <span class="math inline">\(\xi(x)\)</span> drops out and <span id="eq-2-npoint"><span class="math display">\[
+f'(x_k)=\sum_{j=0}^n f(x_j)\,L_{n,j}'(x_k)
++\frac{f^{(n+1)}(\xi(x_k))}{(n+1)!}\prod_{i\ne k}(x_k-x_i)
+\;\approx\;\sum_{j=0}^n f(x_j)\,L_{n,j}'(x_k).
+\tag{2.2}\]</span></span> This <strong><span class="math inline">\((n+1)\)</span>-point formula</strong> holds for arbitrary nodes; the weights <span class="math inline">\(L_{n,j}'(x_k)\)</span> are computed once from the nodes. For <span class="math inline">\(n=1\)</span> with two nodes, <span class="math inline">\(L_{1,0}'(x)=1/(x_0-x_1)\)</span> and <span class="math inline">\(L_{1,1}'(x)=1/(x_1-x_0)\)</span>, so <a href="#eq-2-npoint" class="quarto-xref">Equation&nbsp;<span>2.2</span></a> recovers <span class="math inline">\(f'(x_0)\approx\bigl(f(x_0)-f(x_1)\bigr)/(x_0-x_1)\)</span>, i.e. <a href="#eq-2-forward-diff" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>.</p>
+<p>For <strong>equispaced</strong> nodes the useful cases fall out of Taylor expansions directly, which also pin down the error constants. Adding the expansions of <span class="math inline">\(f(x_0\pm h)\)</span>, <span class="math display">\[
+f(x_0+h)+f(x_0-h)=2f(x_0)+h^2 f''(x_0)+\frac{h^4}{24}\bigl(f^{(4)}(\xi_+)+f^{(4)}(\xi_-)\bigr),
+\]</span> and applying the intermediate value theorem to average the two fourth derivatives gives the <strong>second-derivative central formula</strong> <span id="eq-2-second-central"><span class="math display">\[
+f''(x_0)=\frac{f(x_0+h)-2f(x_0)+f(x_0-h)}{h^2}-\frac{h^2}{12}f^{(4)}(\xi).
+\tag{2.3}\]</span></span> Subtracting instead cancels the even terms and gives the <strong>three-point midpoint formula</strong> <span id="eq-2-midpoint"><span class="math display">\[
+f'(x_0)=\frac{f(x_0+h)-f(x_0-h)}{2h}-\frac{h^2}{6}f^{(3)}(\xi),
+\tag{2.4}\]</span></span> whose <span class="math inline">\(\bigO(h^2)\)</span> error beats the one-sided <span class="math inline">\(\bigO(h)\)</span> of <a href="#eq-2-forward-diff" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> because the symmetric stencil cancels the <span class="math inline">\(f''\)</span> term.</p>
+</section>
+<section id="sec-2-roundoff" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-roundoff">Round-off instability</h3>
+<p>Every difference formula divides by a power of <span class="math inline">\(h\)</span>, and that division is where finite precision turns dangerous. Suppose the stored values carry round-off error, <span class="math display">\[
+f(x_0\pm h)=\widehat f(x_0\pm h)+e(x_0\pm h),\qquad \abs{e(x_0\pm h)}\le\eps,
+\]</span> and use the three-point midpoint formula <a href="#eq-2-midpoint" class="quarto-xref">Equation&nbsp;<span>2.4</span></a> on the computed values <span class="math inline">\(\widehat f\)</span>. Then <span class="math display">\[
+f'(x_0)-\frac{\widehat f(x_0+h)-\widehat f(x_0-h)}{2h}
+=\frac{e(x_0+h)-e(x_0-h)}{2h}-\frac{h^2}{6}f^{(3)}(\xi),
+\]</span> and with <span class="math inline">\(\abs{f^{(3)}}\le M\)</span> the triangle inequality yields the total error bound <span id="eq-2-total-error"><span class="math display">\[
+\left| f'(x_0)-\frac{\widehat f(x_0+h)-\widehat f(x_0-h)}{2h}\right|
+\le \frac{\eps}{h}+\frac{Mh^2}{6}\;\defeq\; e(h).
+\tag{2.5}\]</span></span> The two terms pull in opposite directions: the truncation term <span class="math inline">\(Mh^2/6\)</span> wants <span class="math inline">\(h\)</span> small, while the <strong>round-off term</strong> <span class="math inline">\(\eps/h\)</span> blows up as <span class="math inline">\(h\to 0\)</span> because the subtraction <span class="math inline">\(\widehat f(x_0+h)-\widehat
+f(x_0-h)\)</span> cancels significant digits and the result is divided by the tiny <span class="math inline">\(2h\)</span>. Minimising <span class="math inline">\(e(h)\)</span> by setting <span class="math inline">\(e'(h)=-\eps/h^2+Mh/3=0\)</span> gives <span class="math display">\[
+h_{\min}=\left(\frac{3\eps}{M}\right)^{1/3}=\bigO(\eps^{1/3}),
+\qquad
+e_{\min}=\tfrac12\bigl(9M\eps^2\bigr)^{1/3}=\bigO(\eps^{2/3}).
+\]</span> So there is an optimal step size (<a href="#fig-2-roundoff" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>): with double precision <span class="math inline">\(\eps\approx 10^{-16}\)</span> the best <span class="math inline">\(h\)</span> is around <span class="math inline">\(10^{-5}\)</span>, and no finite-difference derivative can be trusted to better than about <span class="math inline">\(\eps^{2/3}\approx 10^{-11}\)</span>. Pushing <span class="math inline">\(h\)</span> below <span class="math inline">\(h_{\min}\)</span> <em>increases</em> the error.</p>
+<div id="fig-2-roundoff" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-roundoff-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-roundoff.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-roundoff-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: The total error bound <span class="math inline">\(e(h)=\eps/h+Mh^2/6\)</span> (solid) is the sum of a round-off branch <span class="math inline">\(\eps/h\)</span> that grows as <span class="math inline">\(h\to 0\)</span> and a truncation branch <span class="math inline">\(Mh^2/6\)</span> that grows as <span class="math inline">\(h\)</span> increases. It is minimised at <span class="math inline">\(h_{\min}=(3\eps/M)^{1/3}\)</span>; shrinking <span class="math inline">\(h\)</span> further only amplifies round-off.
+</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Round-off instability is specific to <em>differentiation</em>, where dividing by <span class="math inline">\(h\)</span> magnifies cancellation. Integration, developed next, multiplies function values by weights of size <span class="math inline">\(\bigO(h)\)</span> and <strong>sums</strong> them, so errors average out rather than amplify — the composite rules of <a href="#sec-2-composite" class="quarto-xref"><span>Section 2.5</span></a> are numerically stable.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-2-richardson" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="sec-2-richardson"><span class="header-section-number">2.3</span> Richardson extrapolation</h2>
+<p>A formula like <a href="#eq-2-forward-diff" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> approximates an unknown quantity <span class="math inline">\(M\)</span> (here <span class="math inline">\(f'(x_0)\)</span>) by <span class="math inline">\(N_1(h)\)</span>, with a truncation error that expands in powers of <span class="math inline">\(h\)</span>: <span id="eq-2-rich-series"><span class="math display">\[
+M-N_1(h)=K_1 h+K_2 h^2+K_3 h^3+\cdots=\bigO(h),
+\tag{2.6}\]</span></span> the constants <span class="math inline">\(K_i\)</span> unknown but <em>independent of <span class="math inline">\(h\)</span></em>. <strong>Richardson extrapolation</strong> exploits the one fact we control — the same expansion holds for any nonzero step, in particular <span class="math inline">\(h/2\)</span> — to annihilate the leading term. Writing <a href="#eq-2-rich-series" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> at <span class="math inline">\(h/2\)</span>, <span class="math display">\[
+M-N_1(\tfrac h2)=K_1\tfrac h2+K_2\tfrac{h^2}{4}+K_3\tfrac{h^3}{8}+\cdots,
+\]</span> and forming twice this minus <a href="#eq-2-rich-series" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> cancels <span class="math inline">\(K_1\)</span>: <span class="math display">\[
+M-N_2(h)=-\tfrac12 K_2 h^2-\tfrac34 K_3 h^3-\cdots=\bigO(h^2),
+\qquad
+N_2(h)\defeq N_1(\tfrac h2)+\bigl(N_1(\tfrac h2)-N_1(h)\bigr).
+\]</span> The new formula <span class="math inline">\(N_2\)</span> is one order more accurate, and it is built only from evaluations of <span class="math inline">\(N_1\)</span>. Because <span class="math inline">\(M-N_2(h)\)</span> is again a power series, the process repeats. In general define <span id="eq-2-rich-table"><span class="math display">\[
+N_j(h)=N_{j-1}(\tfrac h2)+\frac{N_{j-1}(h/2)-N_{j-1}(h)}{2^{\,j-1}-1},
+\qquad M-N_j(h)=\bigO(h^{j}),
+\tag{2.7}\]</span></span> which fills a triangular table: column <span class="math inline">\(1\)</span> holds <span class="math inline">\(N_1(h),N_1(h/2),N_1(h/4),\dots\)</span>, and each further column is one order higher.</p>
+<p><strong>Even-power series.</strong> Central-difference formulas such as <a href="#eq-2-midpoint" class="quarto-xref">Equation&nbsp;<span>2.4</span></a> have expansions in <em>even</em> powers only, <span class="math inline">\(M-N_1(h)=K_1 h^2+K_2 h^4+K_3 h^6+\cdots=\bigO(h^2)\)</span>, because the odd terms cancelled in the symmetric stencil. Then each extrapolation step removes two orders at once, and the denominators change accordingly: <span id="eq-2-rich-even"><span class="math display">\[
+N_j(h)=N_{j-1}(\tfrac h2)+\frac{N_{j-1}(h/2)-N_{j-1}(h)}{4^{\,j-1}-1},
+\qquad M-N_j(h)=\bigO(h^{2j}).
+\tag{2.8}\]</span></span></p>
+<div id="exm-2-richardson" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.1 (Extrapolating a central difference)</strong></span> For <span class="math inline">\(f(x)=xe^x\)</span> we have <span class="math inline">\(f'(x)=(1+x)e^x\)</span>, so <span class="math inline">\(f'(2.0)=3e^2\approx 22.167\)</span>. The central difference <a href="#eq-2-midpoint" class="quarto-xref">Equation&nbsp;<span>2.4</span></a> gives <span class="math display">\[
+N_1(0.1)=\frac{f(2.1)-f(1.9)}{0.2}\approx 22.229,
+\qquad
+N_1(0.2)=\frac{f(2.2)-f(1.8)}{0.4}\approx 22.414.
+\]</span> One even-power step <a href="#eq-2-rich-even" class="quarto-xref">Equation&nbsp;<span>2.8</span></a> with <span class="math inline">\(j=2\)</span> (denominator <span class="math inline">\(4^1-1=3\)</span>) combines them into <span class="math display">\[
+N_2(0.2)=N_1(0.1)+\frac{N_1(0.1)-N_1(0.2)}{3}\approx 22.167,
+\]</span> matching <span class="math inline">\(f'(2.0)\)</span> to all shown digits. Written out, this fourth-order formula is <span class="math display">\[
+f'(x)\approx\frac{f(x-2h)-8f(x-h)+8f(x+h)-f(x+2h)}{12h}.
+\]</span></p>
+</div>
+</section>
+<section id="sec-2-newton-cotes" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="sec-2-newton-cotes"><span class="header-section-number">2.4</span> Newton–Cotes quadrature</h2>
+<p>Turn now to <span class="math inline">\(\int_a^b f(x)\,\dd x\)</span>. The <strong>quadrature</strong> strategy is to replace <span class="math inline">\(f\)</span> by its degree-<span class="math inline">\(n\)</span> interpolant on <span class="math inline">\(n+1\)</span> points <span class="math inline">\(a\le x_0&lt;\cdots&lt;x_n\le b\)</span> and integrate the polynomial exactly. From <a href="01-interpolation.html#thm-1-interp-error" class="quarto-xref">Theorem&nbsp;<span>1.2</span></a>, <span id="eq-2-nc-general"><span class="math display">\[
+\int_a^b f(x)\,\dd x
+=\underbrace{\sum_{j=0}^n a_j f(x_j)}_{\int_a^b P(x)\,\dd x}
++\frac{1}{(n+1)!}\int_a^b f^{(n+1)}(\xi(x))\prod_{j=0}^n(x-x_j)\,\dd x,
+\qquad
+a_j=\int_a^b L_{n,j}(x)\,\dd x,
+\tag{2.9}\]</span></span> so the <strong>weights</strong> <span class="math inline">\(a_j\)</span> are the integrals of the Lagrange basis polynomials, computed once from the nodes, and dropping the remainder gives <span class="math inline">\(\int_a^b f\approx\sum_j a_j f(x_j)\)</span>. With equispaced nodes these are the <strong>Newton–Cotes</strong> rules.</p>
+<section id="sec-2-trapezoid" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-trapezoid">Trapezoidal rule</h3>
+<p>Take <span class="math inline">\(n=1\)</span>, <span class="math inline">\(x_0=a\)</span>, <span class="math inline">\(x_1=b\)</span>, <span class="math inline">\(h=b-a\)</span>. Integrating the linear interpolant, <span class="math display">\[
+\int_a^b P_1(x)\,\dd x
+=\int_a^b\!\left[\frac{x-x_1}{x_0-x_1}f(x_0)+\frac{x-x_0}{x_1-x_0}f(x_1)\right]\dd x
+=\frac h2\bigl(f(x_0)+f(x_1)\bigr).
+\]</span> For the error, the node polynomial <span class="math inline">\((x-a)(x-b)\)</span> does <em>not</em> change sign on <span class="math inline">\([a,b]\)</span>, so the weighted mean value theorem for integrals pulls <span class="math inline">\(f''\)</span> out at a single <span class="math inline">\(\xi\)</span>: <span class="math display">\[
+\int_a^b \tfrac12 f''(\xi(x))(x-x_0)(x-x_1)\,\dd x
+=\frac{f''(\xi)}{2}\int_a^b(x-a)(x-b)\,\dd x
+=-\frac{f''(\xi)}{12}(b-a)^3.
+\]</span> Hence the <strong>trapezoidal rule</strong> <span id="eq-2-trapezoid"><span class="math display">\[
+\int_a^b f(x)\,\dd x=\frac h2\bigl(f(a)+f(b)\bigr)-\frac{h^3}{12}f''(\xi),\qquad h=b-a.
+\tag{2.10}\]</span></span></p>
+</section>
+<section id="sec-2-simpson" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-simpson">Simpson’s rule</h3>
+<p>Take <span class="math inline">\(n=2\)</span> with <span class="math inline">\(x_0=a\)</span>, <span class="math inline">\(x_1=\tfrac{a+b}{2}\)</span>, <span class="math inline">\(x_2=b\)</span>, <span class="math inline">\(h=\tfrac{b-a}{2}\)</span>. Integrating the quadratic interpolant <span class="math inline">\(P_2\)</span> gives <span class="math display">\[
+\int_a^b P_2(x)\,\dd x=\frac h3\bigl(f(x_0)+4f(x_1)+f(x_2)\bigr).
+\]</span> The error is subtler than for the trapezoidal rule, and the naïve estimate fails. The degree-<span class="math inline">\(2\)</span> remainder <span class="math inline">\(\tfrac{1}{3!}\int_a^b f^{(3)}(\xi(x))(x-x_0)(x-x_1)(x-x_2)\,\dd x\)</span> looks like it should be the answer, but <span class="math inline">\(\int_a^b(x-x_0)(x-x_1)(x-x_2)\,\dd x=0\)</span> by symmetry about <span class="math inline">\(x_1\)</span>, so this term <em>vanishes</em> and the leading error is hidden one order deeper. The fix is to interpolate at <span class="math inline">\(x_0,x_1,x_2\)</span> with a <strong>double node at the midpoint</strong> <span class="math inline">\(x_1\)</span> — a cubic Hermite interpolant <span class="math inline">\(P_3\)</span> (<a href="01-interpolation.html#sec-1-hermite" class="quarto-xref"><span>Section 1.4</span></a>) matching <span class="math inline">\(P_3(x_j)=f(x_j)\)</span> for <span class="math inline">\(j=0,1,2\)</span> and additionally <span class="math inline">\(P_3'(x_1)=f'(x_1)\)</span>. Its interpolation error carries the squared factor <span class="math display">\[
+f(x)=P_3(x)+\frac{f^{(4)}(\xi(x))}{4!}(x-x_0)(x-x_1)^2(x-x_2).
+\]</span> Two strokes of luck make this pay off. First, <span class="math inline">\(\int_a^b P_3=\int_a^b P_2\)</span>: the added derivative term integrates to zero, so <span class="math inline">\(f'(x_1)\)</span> never appears in the rule. Second, <span class="math inline">\((x-x_0)(x-x_1)^2(x-x_2)\)</span> does not change sign on <span class="math inline">\([a,b]\)</span>, so the mean value theorem again extracts <span class="math inline">\(f^{(4)}\)</span> at a single point: <span class="math display">\[
+\frac{1}{4!}\int_a^b f^{(4)}(\xi(x))(x-x_0)(x-x_1)^2(x-x_2)\,\dd x=-\frac{f^{(4)}(\xi)}{90}h^5.
+\]</span> This yields <strong>Simpson’s rule</strong> <span id="eq-2-simpson"><span class="math display">\[
+\int_a^b f(x)\,\dd x=\frac h3\bigl(f(x_0)+4f(x_1)+f(x_2)\bigr)-\frac{f^{(4)}(\xi)}{90}h^5,
+\qquad h=\frac{b-a}{2}.
+\tag{2.11}\]</span></span> Because the error rides on <span class="math inline">\(f^{(4)}\)</span>, Simpson’s rule is <em>exact for cubics</em> even though it is built from a quadratic — the extra order is a gift of the symmetric midpoint node.</p>
+</section>
+<section id="sec-2-dop" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-dop">Degree of precision</h3>
+<p>The natural yardstick for a quadrature rule is the highest-degree polynomial it integrates exactly.</p>
+<div id="def-2-degree-precision" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.1 (Degree of precision)</strong></span> A quadrature rule <span class="math inline">\(\int_a^b f(x)\,\dd x\approx\sum_{j} a_j f(x_j)\)</span> has <strong>degree of precision</strong> <span class="math inline">\(m\)</span> if it is exact for <span class="math inline">\(f(x)=x^k\)</span> for every <span class="math inline">\(k=0,1,\dots,m\)</span> but not for <span class="math inline">\(f(x)=x^{m+1}\)</span>. By linearity this is equivalent to the rule being exact for <em>all</em> polynomials of degree <span class="math inline">\(\le m\)</span>.</p>
+</div>
+<p>Testing the monomials <span class="math inline">\(1,x,x^2,\dots\)</span> (and, by shift and scale, one may check them on <span class="math inline">\([0,1]\)</span> alone) shows the trapezoidal rule has degree of precision <span class="math inline">\(1\)</span> — its error <a href="#eq-2-trapezoid" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> carries <span class="math inline">\(f''\)</span>, which vanishes for <span class="math inline">\(f=1,x\)</span> — while Simpson’s rule has degree of precision <span class="math inline">\(3\)</span>, its error <a href="#eq-2-simpson" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> carrying <span class="math inline">\(f^{(4)}\)</span>. The table below, integrating a handful of functions over <span class="math inline">\([0,2]\)</span>, shows Simpson’s markedly closer answers.</p>
+<div id="tbl-2-simpson-wins" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-simpson-wins-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.1: Single-panel trapezoidal vs.&nbsp;Simpson on <span class="math inline">\([0,2]\)</span>: higher degree of precision, closer answers.
+</figcaption>
+<div aria-describedby="tbl-2-simpson-wins-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(f(x)\)</span></th>
+<th><span class="math inline">\(x^4\)</span></th>
+<th><span class="math inline">\((x+1)^{-1}\)</span></th>
+<th><span class="math inline">\(\sqrt{1+x^2}\)</span></th>
+<th><span class="math inline">\(\sin x\)</span></th>
+<th><span class="math inline">\(e^{x}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>exact</td>
+<td><span class="math inline">\(6.400\)</span></td>
+<td><span class="math inline">\(1.099\)</span></td>
+<td><span class="math inline">\(2.958\)</span></td>
+<td><span class="math inline">\(1.416\)</span></td>
+<td><span class="math inline">\(6.389\)</span></td>
+</tr>
+<tr class="even">
+<td>trapezoidal</td>
+<td><span class="math inline">\(16.000\)</span></td>
+<td><span class="math inline">\(1.333\)</span></td>
+<td><span class="math inline">\(3.236\)</span></td>
+<td><span class="math inline">\(0.909\)</span></td>
+<td><span class="math inline">\(8.389\)</span></td>
+</tr>
+<tr class="odd">
+<td>Simpson</td>
+<td><span class="math inline">\(6.667\)</span></td>
+<td><span class="math inline">\(1.111\)</span></td>
+<td><span class="math inline">\(2.964\)</span></td>
+<td><span class="math inline">\(1.425\)</span></td>
+<td><span class="math inline">\(6.421\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-2-composite" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="sec-2-composite"><span class="header-section-number">2.5</span> Composite rules</h2>
+<p>A single high-degree Newton–Cotes panel over a wide interval is the Runge trap again: the error constants grow and the equispaced nodes misbehave. The remedy mirrors splines — keep each panel short and low-degree, and sum. Partition <span class="math inline">\([a,b]\)</span> into <span class="math inline">\(n\)</span> equal subintervals of width <span class="math inline">\(h=(b-a)/n\)</span> with nodes <span class="math inline">\(x_j=a+jh\)</span>.</p>
+<p><strong>Composite trapezoidal.</strong> Summing <a href="#eq-2-trapezoid" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> over the <span class="math inline">\(n\)</span> panels and averaging the <span class="math inline">\(n\)</span> values of <span class="math inline">\(f''\)</span> by the intermediate value theorem, <span id="eq-2-comp-trap"><span class="math display">\[
+\int_a^b f(x)\,\dd x
+=\frac h2\!\left(f(a)+2\sum_{j=1}^{n-1}f(x_j)+f(b)\right)-\frac{(b-a)h^2}{12}f''(\mu).
+\tag{2.12}\]</span></span></p>
+<p><strong>Composite Simpson.</strong> Apply Simpson <a href="#eq-2-simpson" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> to each of <span class="math inline">\(m\)</span> adjacent pairs of panels, so <span class="math inline">\(n=2m\)</span> and <span class="math inline">\(h=(b-a)/n\)</span>: <span id="eq-2-comp-simpson"><span class="math display">\[
+\int_a^b f(x)\,\dd x
+=\frac h3\!\left(f(a)+2\sum_{j=1}^{m-1}f(x_{2j})+4\sum_{j=1}^{m}f(x_{2j-1})+f(b)\right)
+-\frac{(b-a)h^4}{180}f^{(4)}(\mu).
+\tag{2.13}\]</span></span> The interior even-indexed nodes carry weight <span class="math inline">\(2\)</span> (shared endpoints of neighbouring Simpson panels), the odd-indexed midpoints carry weight <span class="math inline">\(4\)</span>. The error is <span class="math inline">\(\bigO(h^4)\)</span>, two orders better than the composite trapezoidal’s <span class="math inline">\(\bigO(h^2)\)</span>, and still keyed to <span class="math inline">\(f^{(4)}\)</span>, so the degree of precision stays <span class="math inline">\(3\)</span>.</p>
+<div id="exm-2-comp-simpson" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.2 (Meeting a tolerance)</strong></span> To compute <span class="math inline">\(\int_0^\pi\sin x\,\dd x=2\)</span> with error at most <span class="math inline">\(10^{-5}\)</span>: since <span class="math inline">\(\abs{f^{(4)}}=\abs{\sin
+x}\le 1\)</span>, <a href="#eq-2-comp-simpson" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> bounds the error by <span class="math inline">\(\pi h^4/180=\pi^5/(180\,n^4)\)</span>. Requiring <span class="math inline">\(\pi^5/(180\,n^4)\le 10^{-5}\)</span> gives <span class="math inline">\(n\ge \pi(\pi/(180\cdot 10^{-5}))^{1/4}\approx 20.3\)</span>, so take the even value <span class="math inline">\(n=22\)</span> (<span class="math inline">\(m=11\)</span>, <span class="math inline">\(h=\pi/22\)</span>). The rule then returns <span class="math inline">\(\approx 2.0000046\)</span>, within tolerance.</p>
+</div>
+<p>Composite quadrature is <strong>numerically stable</strong>, in sharp contrast to differentiation. Modelling round-off as <span class="math inline">\(f(x_j)=\widehat f(x_j)+e_j\)</span> with <span class="math inline">\(\abs{e_j}\le\eps\)</span>, the perturbation of the composite Simpson sum is bounded by <span class="math display">\[
+\bigl|\mathcal I(f)-\mathcal I(\widehat f)\bigr|
+\le\frac h3\!\left(\abs{e_0}+2\sum\abs{e_{2j}}+4\sum\abs{e_{2j-1}}+\abs{e_n}\right)
+\le \frac h3\cdot 3n\eps=(b-a)\eps,
+\]</span> independent of <span class="math inline">\(h\)</span>: the total weight is <span class="math inline">\(\sum a_j=b-a\)</span>, so shrinking <span class="math inline">\(h\)</span> never amplifies the input error. This is the payoff flagged in <a href="#sec-2-roundoff" class="quarto-xref"><span>Section 2.2.2</span></a> — summation averages errors, division magnifies them.</p>
+</section>
+<section id="sec-2-romberg" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="sec-2-romberg"><span class="header-section-number">2.6</span> Romberg integration</h2>
+<p>Composite trapezoidal quadrature is cheap but only <span class="math inline">\(\bigO(h^2)\)</span>; its saving grace is that its error, like the central difference, expands in <strong>even</strong> powers of <span class="math inline">\(h\)</span>: <span class="math display">\[
+\int_a^b f(x)\,\dd x=R_{k,1}+\sum_{j=1}^\infty K_j h_{k-1}^{2j},
+\qquad h_{k-1}=\frac{b-a}{2^{k-1}},
+\]</span> where <span class="math inline">\(R_{k,1}\)</span> is the composite trapezoidal estimate on <span class="math inline">\(2^{k-1}\)</span> subintervals. That even-power structure is exactly what Richardson extrapolation <a href="#eq-2-rich-even" class="quarto-xref">Equation&nbsp;<span>2.8</span></a> feeds on. <strong>Romberg integration</strong> is Richardson applied to a sequence of composite trapezoidal estimates on repeatedly halved meshes.</p>
+<p>Two economies make it practical. First, doubling the number of subintervals reuses every old node — the new estimate needs only the values at the freshly inserted midpoints: <span id="eq-2-romberg-recur"><span class="math display">\[
+R_{k,1}=\frac12\!\left(R_{k-1,1}+h_{k-2}\sum_{j=1}^{2^{k-2}}f\bigl(a+(2j-1)h_{k-1}\bigr)\right),
+\qquad R_{1,1}=\frac{b-a}{2}\bigl(f(a)+f(b)\bigr).
+\tag{2.14}\]</span></span> Second, the extrapolation <a href="#eq-2-rich-even" class="quarto-xref">Equation&nbsp;<span>2.8</span></a> fills a triangular table left to right, <span id="eq-2-romberg-extrap"><span class="math display">\[
+R_{k,j}=R_{k,j-1}+\frac{R_{k,j-1}-R_{k-1,j-1}}{4^{\,j-1}-1},\qquad j\ge 2,
+\tag{2.15}\]</span></span> each column one <span class="math inline">\(\bigO(h^2)\)</span> better than the last — column <span class="math inline">\(j\)</span> has error <span class="math inline">\(\bigO(h^{2j})\)</span>. Column <span class="math inline">\(2\)</span> is in fact composite Simpson, and later columns climb higher with no new function evaluations.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Romberg integration
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Compute the first column by the trapezoidal recursion <a href="#eq-2-romberg-recur" class="quarto-xref">Equation&nbsp;<span>2.14</span></a>: <span class="math inline">\(R_{1,1}\)</span>, then <span class="math inline">\(R_{2,1},R_{3,1},\dots\)</span>, each halving the mesh and evaluating <span class="math inline">\(f\)</span> only at the new midpoints.</li>
+<li>Fill each row’s remaining entries by the extrapolation <a href="#eq-2-romberg-extrap" class="quarto-xref">Equation&nbsp;<span>2.15</span></a>.</li>
+<li>Stop when <span class="math inline">\(\abs{R_{k,k}-R_{k-1,k-1}}\)</span> is below tolerance; the diagonal entry <span class="math inline">\(R_{k,k}\)</span> is the answer.</li>
+</ol>
+</div>
+</div>
+<p>For <span class="math inline">\(\int_0^\pi\sin x\,\dd x\)</span>, the first Romberg column is <span class="math inline">\(R_{1,1}=0,\;R_{2,1}=1.5708,\;R_{3,1}=1.8961,\;R_{4,1}=1.9742,\;R_{5,1}=1.9936,\;R_{6,1}=1.9984\)</span>, crawling toward <span class="math inline">\(2\)</span>; the extrapolated diagonal reaches <span class="math inline">\(2.0000000\)</span> after the same <span class="math inline">\(33\)</span> function evaluations.</p>
+</section>
+<section id="sec-2-adaptive" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="sec-2-adaptive"><span class="header-section-number">2.7</span> Adaptive quadrature</h2>
+<p>Composite and Romberg rules spread nodes <em>uniformly</em>. A function like <span class="math inline">\(y(x)=e^{-3x}\sin 4x\)</span> — oscillatory near <span class="math inline">\(x=0\)</span>, nearly flat for large <span class="math inline">\(x\)</span> — wastes effort where it is smooth and starves the region where it wiggles. <strong>Adaptive quadrature</strong> instead refines only where the estimated error is large, subdividing recursively until each piece meets its share of the tolerance.</p>
+<p>The engine is Simpson’s rule with a built-in error estimate. On <span class="math inline">\([a,b]\)</span> with <span class="math inline">\(h=(b-a)/2\)</span>, write the one-panel Simpson value <span class="math inline">\(S(a,b)=\tfrac h3(f(a)+4f(a+h)+f(b))\)</span>, whose error is <span class="math inline">\(-\tfrac{h^5}{90}
+f^{(4)}(\xi)\)</span>. Halving the interval and applying Simpson to each half gives <span class="math inline">\(Q_1=S(a,\tfrac{a+b}{2})+S(\tfrac{a+b}{2},b)\)</span>, whose error, at step <span class="math inline">\(h/2\)</span> on two panels, is about <span class="math inline">\(\tfrac{1}{16}\)</span> of the one-panel error (assuming <span class="math inline">\(f^{(4)}\)</span> roughly constant). Subtracting the two estimates therefore <em>reveals</em> the error: <span class="math display">\[
+\int_a^b f-Q_1\approx\frac{1}{15}\bigl(Q_1-S(a,b)\bigr),
+\]</span> so <span class="math inline">\(\abs{Q_1-S(a,b)}\)</span> is a computable proxy for the error of <span class="math inline">\(Q_1\)</span>, and the Richardson combination <span class="math inline">\(Q=Q_1+\tfrac{1}{15}(Q_1-S(a,b))\)</span> is more accurate still.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — adaptive Simpson <code>quad(f,[a,b],τ)</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Form <span class="math inline">\(S(a,b)\)</span>, <span class="math inline">\(S(a,\tfrac{a+b}{2})\)</span>, <span class="math inline">\(S(\tfrac{a+b}{2},b)\)</span> and set <span class="math inline">\(Q_1=S(a,\tfrac{a+b}{2})+S(\tfrac{a+b}{2},b)\)</span>, <span class="math inline">\(Q=Q_1+\tfrac{1}{15}(Q_1-S(a,b))\)</span>.</li>
+<li><strong>If</strong> <span class="math inline">\(\abs{Q-Q_1}\le\tau\)</span>, accept and return <span class="math inline">\(Q\)</span> (the extrapolated value; plain adaptive Simpson returns <span class="math inline">\(Q_1\)</span>).</li>
+<li><strong>Else</strong> recurse on the halves with the tolerance split evenly: <span class="math inline">\(\texttt{quad}(f,[a,\tfrac{a+b}{2}],\tfrac\tau2)+\texttt{quad}(f,[\tfrac{a+b}{2},b],\tfrac\tau2)\)</span>.</li>
+</ol>
+</div>
+</div>
+<p>The recursion drives points into the oscillatory region and leaves the flat tail coarse — the same accuracy for far fewer evaluations than a uniform mesh fine enough for the worst spot.</p>
+</section>
+<section id="sec-2-gauss" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="sec-2-gauss"><span class="header-section-number">2.8</span> Gaussian quadrature</h2>
+<p>Newton–Cotes fixes the nodes (equispaced) and solves only for the weights, reaching degree of precision <span class="math inline">\(n\)</span> (or <span class="math inline">\(n+1\)</span>) with <span class="math inline">\(n+1\)</span> nodes. <strong>Gaussian quadrature</strong> frees the nodes too. On the reference interval <span class="math inline">\([-1,1]\)</span> we seek <span class="math inline">\(n\)</span> nodes <span class="math inline">\(x_1,\dots,x_n\)</span> <em>and</em> <span class="math inline">\(n\)</span> weights <span class="math inline">\(c_1,\dots,c_n\)</span>, <span id="eq-2-gauss-rule"><span class="math display">\[
+\int_{-1}^1 f(x)\,\dd x\approx\sum_{j=1}^n c_j f(x_j),
+\tag{2.16}\]</span></span> choosing all <span class="math inline">\(2n\)</span> parameters to maximise the degree of precision. With <span class="math inline">\(2n\)</span> free parameters we can hope to match <span class="math inline">\(2n\)</span> conditions — exactness for <span class="math inline">\(1,x,x^2,\dots,x^{2n-1}\)</span> — and indeed this is achievable, giving degree of precision <span class="math inline">\(2n-1\)</span>, nearly double what <span class="math inline">\(n\)</span> Newton–Cotes nodes attain.</p>
+<p>For <span class="math inline">\(n=2\)</span> the four exactness conditions <span class="math display">\[
+c_1+c_2=2,\quad c_1x_1+c_2x_2=0,\quad c_1x_1^2+c_2x_2^2=\tfrac23,\quad c_1x_1^3+c_2x_2^3=0
+\]</span> solve to <span class="math inline">\(x_1=-1/\sqrt3\)</span>, <span class="math inline">\(x_2=1/\sqrt3\)</span>, <span class="math inline">\(c_1=c_2=1\)</span>, so <span class="math inline">\(\int_{-1}^1 f\approx f(-1/\sqrt3)+f(1/\sqrt3)\)</span>, exact for cubics but not for <span class="math inline">\(x^4\)</span> — degree of precision <span class="math inline">\(3=2\cdot2-1\)</span>. Solving this nonlinear system directly is painful for larger <span class="math inline">\(n\)</span>; the <strong>Legendre polynomials</strong> deliver the nodes without it.</p>
+<section id="sec-2-legendre" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-legendre">Legendre polynomials and the exactness theorem</h3>
+<p>The Legendre polynomials are the orthogonal family <span class="math inline">\(\{P_k\}\)</span> on <span class="math inline">\([-1,1]\)</span> (with weight <span class="math inline">\(w\equiv 1\)</span>; see <a href="06-approximation-theory.html#def-6-orthopoly" class="quarto-xref">Definition&nbsp;<span>6.2</span></a> for the general construction) defined by the three-term recurrence <span id="eq-2-legendre-recur"><span class="math display">\[
+P_0(x)=1,\quad P_1(x)=x,\qquad (n+1)P_{n+1}(x)=(2n+1)x\,P_n(x)-n\,P_{n-1}(x).
+\tag{2.17}\]</span></span> Each <span class="math inline">\(P_n\)</span> has degree <span class="math inline">\(n\)</span> with <span class="math inline">\(n\)</span> distinct roots in <span class="math inline">\((-1,1)\)</span>, and the family is <strong>orthogonal</strong>: <span id="eq-2-legendre-orth"><span class="math display">\[
+\int_{-1}^1 P_n(x)Q(x)\,\dd x=0\quad\text{for every polynomial }Q\text{ with }\deg Q&lt;n.
+\tag{2.18}\]</span></span> Gaussian quadrature takes the <strong><span class="math inline">\(n\)</span> roots of <span class="math inline">\(P_n\)</span></strong> as the nodes <span class="math inline">\(x_1,\dots,x_n\)</span> and the weights <span class="math inline">\(c_j=\int_{-1}^1 L_{n-1,j}(x)\,\dd x\)</span> (integrated Lagrange basis, so the rule is at least exact for degree <span class="math inline">\(\le n-1\)</span> by construction). Orthogonality then boosts the exactness all the way to <span class="math inline">\(2n-1\)</span>.</p>
+<div id="thm-2-gauss-quad" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.1 (Gauss–Legendre exactness)</strong></span> The <span class="math inline">\(n\)</span>-point Gaussian quadrature <a href="#eq-2-gauss-rule" class="quarto-xref">Equation&nbsp;<span>2.16</span></a> with nodes at the roots of the Legendre polynomial <span class="math inline">\(P_n\)</span> and weights <span class="math inline">\(c_j=\int_{-1}^1 L_{n-1,j}\,\dd x\)</span> has degree of precision <span class="math inline">\(2n-1\)</span>: it is exact for every polynomial of degree <span class="math inline">\(\le 2n-1\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(P\)</span> be any polynomial with <span class="math inline">\(\deg P\le 2n-1\)</span>. Divide by <span class="math inline">\(P_n\)</span>: <span class="math display">\[
+P(x)=P_n(x)Q(x)+R(x),\qquad \deg Q\le n-1,\ \deg R\le n-1.
+\]</span> Integrating, the first term dies by orthogonality <a href="#eq-2-legendre-orth" class="quarto-xref">Equation&nbsp;<span>2.18</span></a> (since <span class="math inline">\(\deg Q&lt;n\)</span>), leaving <span class="math display">\[
+\int_{-1}^1 P(x)\,\dd x=\int_{-1}^1 R(x)\,\dd x=\sum_{j=1}^n c_j R(x_j),
+\]</span> the last step because the rule is exact for <span class="math inline">\(R\)</span> (degree <span class="math inline">\(\le n-1\)</span>). Finally, at each node <span class="math inline">\(x_j\)</span> we have <span class="math inline">\(P_n(x_j)=0\)</span>, so <span class="math inline">\(P(x_j)=P_n(x_j)Q(x_j)+R(x_j)=R(x_j)\)</span>, and therefore <span class="math inline">\(\sum_j c_j R(x_j)=\sum_j c_j P(x_j)\)</span>. Combining, <span class="math inline">\(\int_{-1}^1 P=\sum_j c_j P(x_j)\)</span>: the rule is exact on all of degree <span class="math inline">\(\le 2n-1\)</span>. Exactness fails at degree <span class="math inline">\(2n\)</span> because <span class="math inline">\(\prod_j(x-x_j)^2\)</span> is a nonnegative degree-<span class="math inline">\(2n\)</span> polynomial with positive integral yet zero at every node. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="sec-2-gauss-error" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2-gauss-error">Error of Gaussian quadrature</h3>
+<p>The error follows from viewing the rule through Hermite interpolation at the Legendre roots. Let <span class="math inline">\(H\)</span> be the degree-<span class="math inline">\(\le 2n-1\)</span> Hermite interpolant (<a href="01-interpolation.html#sec-1-hermite" class="quarto-xref"><span>Section 1.4</span></a>) matching <span class="math inline">\(f\)</span> and <span class="math inline">\(f'\)</span> at <span class="math inline">\(x_1,\dots,x_n\)</span>; by <a href="01-interpolation.html#thm-1-hermite-error" class="quarto-xref">Theorem&nbsp;<span>1.4</span></a>, <span class="math display">\[
+f(x)=H(x)+\frac{f^{(2n)}(\xi(x))}{(2n)!}\prod_{i=1}^n(x-x_i)^2.
+\]</span> Integrating, <span class="math inline">\(\int_{-1}^1 H=\sum_j c_j H(x_j)=\sum_j c_j f(x_j)\)</span> (since <span class="math inline">\(H\)</span> has degree <span class="math inline">\(\le 2n-1\)</span> and <span class="math inline">\(H(x_j)=f(x_j)\)</span>), so the quadrature error is the integral of the remainder. The product does not change sign, so the mean value theorem extracts <span class="math inline">\(f^{(2n)}\)</span> at one point: <span class="math display">\[
+\text{Error}=\frac{f^{(2n)}(\xi)}{(2n)!}\int_{-1}^1\prod_{i=1}^n(x-x_i)^2\,\dd x.
+\]</span> To evaluate that integral, write <span class="math inline">\(P_n(x)=c_n\prod_i(x-x_i)\)</span> where, from the Rodrigues formula <span class="math inline">\(P_n(x)=\tfrac{1}{2^n n!}\tfrac{\dd^n}{\dd x^n}(x^2-1)^n\)</span>, the leading coefficient is <span class="math inline">\(c_n=(2n)!/\bigl(2^n(n!)^2\bigr)\)</span>. Using the normalisation <span class="math inline">\(\int_{-1}^1 P_n^2\,\dd x=2/(2n+1)\)</span>, <span class="math display">\[
+\int_{-1}^1\prod_{i=1}^n(x-x_i)^2\,\dd x=\frac{1}{c_n^2}\int_{-1}^1 P_n(x)^2\,\dd x
+=\frac{2^{2n}(n!)^4}{\bigl[(2n)!\bigr]^2}\cdot\frac{2}{2n+1}.
+\]</span> Substituting and simplifying gives the error of <span class="math inline">\(n\)</span>-point Gauss–Legendre quadrature, <span id="eq-2-gauss-error"><span class="math display">\[
+\text{Error}=\frac{2^{2n}(n!)^3(n-1)!}{(2n+1)!\,(2n)!\,(2n-1)!}\,f^{(2n)}(\xi)
+=\bigO\!\left(\frac{4^{-n}\,\abs{f^{(2n)}(\xi)}}{(2n)!}\right).
+\tag{2.19}\]</span></span> The factorial denominator and the <span class="math inline">\(4^{-n}\)</span> make this collapse extraordinarily fast for smooth <span class="math inline">\(f\)</span>: <span class="math inline">\(n\)</span> Gauss points buy accuracy that no fixed-node rule with <span class="math inline">\(n\)</span> points can match. To integrate over a general <span class="math inline">\([a,b]\)</span>, substitute <span class="math inline">\(x=\tfrac{a+b}{2}+\tfrac{b-a}{2}u\)</span>, mapping <span class="math inline">\([a,b]\to[-1,1]\)</span> and scaling the result by <span class="math inline">\((b-a)/2\)</span>. In practice the nodes and weights are tabulated, or computed as the eigenvalues of the symmetric tridiagonal Jacobi matrix of the recurrence <a href="#eq-2-legendre-recur" class="quarto-xref">Equation&nbsp;<span>2.17</span></a>, whose eigenvector first components give the weights (this is the general orthogonal-family picture of <a href="06-approximation-theory.html#def-6-orthopoly" class="quarto-xref">Definition&nbsp;<span>6.2</span></a>):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> [<span class="va">c</span><span class="op">,</span> <span class="va">x</span>] <span class="op">=</span> <span class="va">Legendre</span>(<span class="va">n</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">b</span> <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span>)<span class="op">';</span>                       <span class="co">% subdiagonal of the Jacobi matrix</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">b</span> <span class="op">=</span> <span class="va">b</span> <span class="op">./</span> <span class="va">sqrt</span>((<span class="fl">2</span><span class="op">*</span><span class="va">b</span><span class="op">-</span><span class="fl">1</span>)<span class="op">.*</span>(<span class="fl">2</span><span class="op">*</span><span class="va">b</span><span class="op">+</span><span class="fl">1</span>))<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">B</span> <span class="op">=</span> <span class="va">diag</span>(<span class="va">b</span><span class="op">,</span><span class="fl">1</span>) <span class="op">+</span> <span class="va">diag</span>(<span class="va">b</span><span class="op">,-</span><span class="fl">1</span>)<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    [<span class="va">Q</span><span class="op">,</span> <span class="va">D</span>] <span class="op">=</span> <span class="va">eig</span>(<span class="va">B</span>)<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">x</span> <span class="op">=</span> <span class="va">diag</span>(<span class="va">D</span>)<span class="op">;</span>                        <span class="co">% nodes  = eigenvalues</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">c</span> <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> (<span class="va">Q</span>(<span class="fl">1</span><span class="op">,:</span>)<span class="op">.^</span><span class="fl">2</span>)<span class="op">';</span>               <span class="co">% weights = 2*(first eigenvector comp.)^2</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Gauss vs.&nbsp;Simpson: which to reach for
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Gaussian quadrature is <em>optimal for a fixed number of evaluations</em> <span class="math inline">\(n\)</span> — nowhere else do <span class="math inline">\(n\)</span> samples achieve degree of precision <span class="math inline">\(2n-1\)</span>. But its nodes move with <span class="math inline">\(n\)</span>, so refining means recomputing from scratch, and it needs the tabulated nodes/weights. Composite Simpson and Romberg reuse nodes as they refine, which makes them the tool when the target is a <em>tolerance</em> rather than a sample budget.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-2-double" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="sec-2-double"><span class="header-section-number">2.9</span> Double integrals</h2>
+<p>Quadrature over a rectangle <span class="math inline">\(R=[a,b]\times[c,d]\)</span> reduces to nested one-dimensional quadrature. Write <span class="math display">\[
+\iint_R f(x,y)\,\dd A=\int_a^b\underbrace{\left(\int_c^d f(x,y)\,\dd y\right)}_{g(x)}\dd x
+=\int_a^b g(x)\,\dd x,
+\]</span> and apply <em>any</em> outer quadrature rule <span class="math inline">\(\int_a^b g\approx\sum_i c_i g(x_i)\)</span>; each value <span class="math inline">\(g(x_i)=\int_c^d f(x_i,y)\,\dd y\)</span> is itself approximated by an inner rule <span class="math inline">\(\sum_j \hat c_j
+f(x_i,y_j)\)</span>. The composition is the <strong>tensor-product</strong> rule <span id="eq-2-double-quad"><span class="math display">\[
+\iint_R f(x,y)\,\dd A\approx\sum_{i=1}^n\sum_{j=1}^m c_i\hat c_j\,f(x_i,y_j),
+\tag{2.20}\]</span></span> with the two one-dimensional error terms adding. Taking the outer and inner rules both to be Simpson (the three-point <span class="math inline">\((x_1,x_2,x_3)=(a,\tfrac{a+b}{2},b)\)</span>, weights <span class="math inline">\(\tfrac h3(1,4,1)\)</span> with <span class="math inline">\(h=\tfrac{b-a}{2}\)</span>; likewise in <span class="math inline">\(y\)</span> with <span class="math inline">\(k=\tfrac{d-c}{2}\)</span>), the errors combine, via the mean value theorem for integrals, into <span id="eq-2-double-simpson"><span class="math display">\[
+\iint_R f\,\dd A=\sum_{i}\sum_{j}c_i\hat c_j f(x_i,y_j)
+-\frac{(b-a)(d-c)}{180}\!\left(k^4\pdiff{^4 f}{y^4}(\hat x,\hat y)+h^4\pdiff{^4 f}{x^4}(\xi,\eta)\right).
+\tag{2.21}\]</span></span> For example <span class="math inline">\(\iint_R\log(x+2y)\,\dd A\)</span> over <span class="math inline">\(R=[1.2,2.4]\times[0.2,1]\)</span> with <span class="math inline">\(n=7,m=5\)</span> (so <span class="math inline">\(h=k=0.2\)</span>): from <span class="math inline">\(\partial^4 f/\partial x^4=-6(x+2y)^{-4}\)</span> and <span class="math inline">\(\partial^4 f/\partial
+y^4=-96(x+2y)^{-4}\)</span>, bounded by <span class="math inline">\(0.916\)</span> and <span class="math inline">\(14.65\)</span> on <span class="math inline">\(R\)</span>, <a href="#eq-2-double-simpson" class="quarto-xref">Equation&nbsp;<span>2.21</span></a> bounds the error by about <span class="math inline">\(1.33\times10^{-4}\)</span>.</p>
+<p><strong>Gaussian tensor product.</strong> The same nesting with Gauss–Legendre rules is more accurate per evaluation. Map both variables to <span class="math inline">\([-1,1]\)</span> by <span class="math inline">\(x=\tfrac{a+b}{2}+\tfrac{b-a}{2}u\)</span>, <span class="math inline">\(y=\tfrac{c+d}{2}+\tfrac{d-c}{2}v\)</span>, so <span class="math display">\[
+\iint_R f\,\dd A=\frac{(b-a)(d-c)}{4}\int_{-1}^1\!\!\int_{-1}^1 f\bigl(x(u),y(v)\bigr)\,\dd v\,\dd u
+\approx\frac{(b-a)(d-c)}{4}\sum_{i=1}^n\sum_{j=1}^m c_i\hat c_j\,f(x_i,y_j),
+\]</span> with <span class="math inline">\(x_i,y_j\)</span> the mapped Legendre roots and <span class="math inline">\(c_i,\hat c_j\)</span> the Gauss weights. The tensor-product idea extends to any region reducible to nested one-dimensional integrals; only the bookkeeping grows.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">2.10</span> Chapter summary</h2>
+<ul>
+<li><strong>Bézier curves</strong> (<a href="#sec-2-bezier" class="quarto-xref"><span>Section 2.1</span></a>) build a parametric curve from piecewise cubic Hermite pieces whose endpoint slopes <span class="math inline">\(\beta/\alpha\)</span> are set by visible <strong>guidepoints</strong>, giving local editing that single high-degree interpolation and global splines lack (<a href="#fig-2-bezier" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>).</li>
+<li><strong>Numerical differentiation</strong> differentiates the interpolant: the <span class="math inline">\((n+1)\)</span>-point formula <a href="#eq-2-npoint" class="quarto-xref">Equation&nbsp;<span>2.2</span></a>, with the central formulas <a href="#eq-2-midpoint" class="quarto-xref">Equation&nbsp;<span>2.4</span></a> and <a href="#eq-2-second-central" class="quarto-xref">Equation&nbsp;<span>2.3</span></a> for equispaced nodes. Dividing by <span class="math inline">\(h\)</span> makes it <strong>round-off unstable</strong> (<a href="#eq-2-total-error" class="quarto-xref">Equation&nbsp;<span>2.5</span></a>): the total error is minimised at <span class="math inline">\(h_{\min}=\bigO(\eps^{1/3})\)</span>, below which shrinking <span class="math inline">\(h\)</span> hurts (<a href="#fig-2-roundoff" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>).</li>
+<li><strong>Richardson extrapolation</strong> (<a href="#eq-2-rich-table" class="quarto-xref">Equation&nbsp;<span>2.7</span></a>, <a href="#eq-2-rich-even" class="quarto-xref">Equation&nbsp;<span>2.8</span></a>) annihilates the leading error term by combining estimates at <span class="math inline">\(h\)</span> and <span class="math inline">\(h/2\)</span>, climbing a triangular table one (or, for even-power series, two) orders per column.</li>
+<li><strong>Newton–Cotes</strong> rules integrate the equispaced interpolant: <strong>trapezoidal</strong> <a href="#eq-2-trapezoid" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> (degree of precision <span class="math inline">\(1\)</span>) and <strong>Simpson</strong> <a href="#eq-2-simpson" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> (degree of precision <span class="math inline">\(3\)</span>, via the double-node trick). <strong>Degree of precision</strong> is <a href="#def-2-degree-precision" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>.</li>
+<li><strong>Composite</strong> rules <a href="#eq-2-comp-trap" class="quarto-xref">Equation&nbsp;<span>2.12</span></a>, <a href="#eq-2-comp-simpson" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> keep panels short and are numerically <strong>stable</strong> (total weight <span class="math inline">\(b-a\)</span>); <strong>Romberg</strong> integration <a href="#eq-2-romberg-extrap" class="quarto-xref">Equation&nbsp;<span>2.15</span></a> is Richardson on halved composite-trapezoidal meshes; <strong>adaptive</strong> quadrature refines only where a Simpson error estimate is large.</li>
+<li><strong>Gaussian quadrature</strong> frees the nodes to the roots of the Legendre polynomials <a href="#eq-2-legendre-recur" class="quarto-xref">Equation&nbsp;<span>2.17</span></a> and attains degree of precision <span class="math inline">\(2n-1\)</span> (<a href="#thm-2-gauss-quad" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>), with the rapidly decaying error <a href="#eq-2-gauss-error" class="quarto-xref">Equation&nbsp;<span>2.19</span></a>; <strong>double integrals</strong> reduce to nested one-dimensional quadrature
+<ol class="example" type="1">
+<li></li>
+</ol></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01-interpolation.html" class="pagination-link" aria-label="Polynomial Interpolation">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03-ivp-odes.html" class="pagination-link" aria-label="Initial-Value Problems for ODEs">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

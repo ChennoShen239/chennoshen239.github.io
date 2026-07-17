@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>4&nbsp; Direct Methods for Linear Systems – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./05-iterative-linear-systems.html" rel="next">
+<link href="./03-ivp-odes.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./04-direct-linear-systems.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#gaussian-elimination" id="toc-gaussian-elimination" class="nav-link active" data-scroll-target="#gaussian-elimination"><span class="header-section-number">4.1</span> Gaussian elimination</a></li>
+  <li><a href="#partial-and-complete-pivoting" id="toc-partial-and-complete-pivoting" class="nav-link" data-scroll-target="#partial-and-complete-pivoting"><span class="header-section-number">4.2</span> Partial and complete pivoting</a></li>
+  <li><a href="#cost-of-gaussian-elimination" id="toc-cost-of-gaussian-elimination" class="nav-link" data-scroll-target="#cost-of-gaussian-elimination"><span class="header-section-number">4.3</span> Cost of Gaussian elimination</a></li>
+  <li><a href="#matrix-algebra" id="toc-matrix-algebra" class="nav-link" data-scroll-target="#matrix-algebra"><span class="header-section-number">4.4</span> Matrix algebra</a>
+  <ul class="collapse">
+  <li><a href="#determinant-via-elimination" id="toc-determinant-via-elimination" class="nav-link" data-scroll-target="#determinant-via-elimination">Determinant via elimination</a></li>
+  </ul></li>
+  <li><a href="#lu-factorization" id="toc-lu-factorization" class="nav-link" data-scroll-target="#lu-factorization"><span class="header-section-number">4.5</span> LU factorization</a>
+  <ul class="collapse">
+  <li><a href="#permutation-matrices-and-palu" id="toc-permutation-matrices-and-palu" class="nav-link" data-scroll-target="#permutation-matrices-and-palu">Permutation matrices and <span class="math inline">\(PA=LU\)</span></a></li>
+  </ul></li>
+  <li><a href="#matrices-that-need-no-pivoting" id="toc-matrices-that-need-no-pivoting" class="nav-link" data-scroll-target="#matrices-that-need-no-pivoting"><span class="header-section-number">4.6</span> Matrices that need no pivoting</a>
+  <ul class="collapse">
+  <li><a href="#strictly-diagonally-dominant-matrices" id="toc-strictly-diagonally-dominant-matrices" class="nav-link" data-scroll-target="#strictly-diagonally-dominant-matrices">Strictly diagonally dominant matrices</a></li>
+  <li><a href="#symmetric-positive-definite-matrices" id="toc-symmetric-positive-definite-matrices" class="nav-link" data-scroll-target="#symmetric-positive-definite-matrices">Symmetric positive definite matrices</a></li>
+  </ul></li>
+  <li><a href="#tridiagonal-systems" id="toc-tridiagonal-systems" class="nav-link" data-scroll-target="#tridiagonal-systems"><span class="header-section-number">4.7</span> Tridiagonal systems</a></li>
+  <li><a href="#conditioning-of-a-linear-system" id="toc-conditioning-of-a-linear-system" class="nav-link" data-scroll-target="#conditioning-of-a-linear-system"><span class="header-section-number">4.8</span> Conditioning of a linear system</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">4.9</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./04-direct-linear-systems.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-direct-linsys" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>Almost every numerical problem eventually reduces to solving a linear system <span class="math inline">\(Ax=b\)</span>: the tridiagonal system for the cubic spline of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a>, the normal equations of least squares (<a href="06-approximation-theory.html" class="quarto-xref"><span>Chapter 6</span></a>), the Jacobian solve inside an implicit ODE step (<a href="03-ivp-odes.html" class="quarto-xref"><span>Chapter 3</span></a>). This chapter develops the <em>direct</em> methods — those that produce the exact answer in finitely many arithmetic operations, up to round-off — starting from Gaussian elimination and refining it into the factorizations (<span class="math inline">\(PA=LU\)</span>, Cholesky, tridiagonal <span class="math inline">\(LU\)</span>) that make solving fast, reusable, and, with pivoting, numerically safe. The <em>iterative</em> methods, which trade exactness for cheap approximate solves on large sparse systems, are the subject of <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a>.</p>
+<p>Throughout, <span class="math inline">\(A=(a_{ij})\in\R^{n\times n}\)</span> is the coefficient matrix, <span class="math inline">\(b\in\R^n\)</span> the right-hand side, and <span class="math inline">\(x\in\R^n\)</span> the unknown, with row <span class="math inline">\(j\)</span> of <span class="math inline">\(A\)</span> standing for the equation <span class="math inline">\(E_j\)</span> and column <span class="math inline">\(k\)</span> for the variable <span class="math inline">\(x_k\)</span>.</p>
+<section id="gaussian-elimination" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="gaussian-elimination"><span class="header-section-number">4.1</span> Gaussian elimination</h2>
+<p>The schoolbook method for a linear system uses two elementary operations that leave the solution set unchanged: adding a multiple of one equation to another, <span class="math inline">\((E_i+\lambda E_j)\to (E_i)\)</span>, and swapping two equations, <span class="math inline">\((E_i)\leftrightarrow(E_j)\)</span>. Gaussian elimination applies the first systematically to drive the system to upper-triangular form, which is then solved by back-substitution.</p>
+<p>Take the <span class="math inline">\(2\times2\)</span> case to fix the pattern. With <span class="math inline">\(a_{11}\ne 0\)</span>, the multiplier <span class="math inline">\(\ell=a_{21}/a_{11}\)</span> makes <span class="math inline">\((E_2-\ell E_1)\to(E_2)\)</span> eliminate <span class="math inline">\(x_1\)</span>: <span class="math display">\[
+a_{22}\leftarrow a_{22}-\ell\,a_{12},\qquad b_2\leftarrow b_2-\ell\,b_1,
+\]</span> after which the system is triangular and <span class="math display">\[
+x_2=\frac{b_2}{a_{22}},\qquad x_1=\frac{b_1-a_{12}x_2}{a_{11}}.
+\]</span> For general <span class="math inline">\(n\)</span> the same step is repeated column by column. At stage <span class="math inline">\(s\)</span> the entries below the diagonal in column <span class="math inline">\(s\)</span> are cleared using row <span class="math inline">\(s\)</span> as the <em>pivot row</em> and <span class="math inline">\(a_{ss}\)</span> as the <em>pivot</em>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Gaussian elimination (no pivoting)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given <span class="math inline">\(A\in\R^{n\times n}\)</span>, <span class="math inline">\(b\in\R^n\)</span>. For <span class="math inline">\(s=1,2,\dots,n-1\)</span>, and for each <span class="math inline">\(j=s+1,\dots,n\)</span>: <span class="math display">\[
+a_{jk}\leftarrow a_{jk}-\frac{a_{js}}{a_{ss}}\,a_{sk}\ \ (s+1\le k\le n),
+\qquad
+b_j\leftarrow b_j-\frac{a_{js}}{a_{ss}}\,b_s .
+\]</span> The array now holds an upper-triangular <span class="math inline">\(U\)</span> and a modified <span class="math inline">\(b\)</span>. Back-substitute: for <span class="math inline">\(s=n,n-1,\dots,1\)</span>, <span class="math display">\[
+x_s=\frac{b_s-\sum_{k=s+1}^{n}a_{sk}x_k}{a_{ss}}.
+\]</span></p>
+</div>
+</div>
+<p>The algorithm breaks down the moment a pivot <span class="math inline">\(a_{ss}\)</span> vanishes, because the multiplier <span class="math inline">\(a_{js}/a_{ss}\)</span> divides by zero. This is not a rare pathology: a perfectly nonsingular system can produce a zero pivot midway through elimination. For instance, <span class="math display">\[
+\begin{aligned}
+E_1&amp;: x_1 - x_2 + 2x_3 - x_4 = -8, &amp; E_2&amp;: 2x_1 - 2x_2 + 3x_3 - 3x_4 = -20,\\
+E_3&amp;: x_1 + x_2 + x_3 = -2,        &amp; E_4&amp;: x_1 - x_2 + 4x_3 + 3x_4 = 4,
+\end{aligned}
+\]</span> after eliminating <span class="math inline">\(x_1\)</span> leaves <span class="math inline">\(E_2\)</span> in the form <span class="math inline">\(-x_3-x_4=(\cdots)\)</span> with <strong>no</strong> <span class="math inline">\(x_2\)</span> term: the pivot in column <span class="math inline">\(2\)</span> is zero. Swapping <span class="math inline">\(E_2\leftrightarrow E_3\)</span> brings a nonzero coefficient into the pivot position, and elimination continues to the solution <span class="math inline">\(x=(-7,3,2,2)^\top\)</span>. Row swaps are therefore not optional; they are part of the method. Deciding <em>which</em> row to swap in is the subject of pivoting.</p>
+</section>
+<section id="partial-and-complete-pivoting" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="partial-and-complete-pivoting"><span class="header-section-number">4.2</span> Partial and complete pivoting</h2>
+<p>Even when <span class="math inline">\(a_{ss}\ne 0\)</span>, a <em>small</em> pivot is dangerous. Dividing by a pivot close to zero amplifies the round-off already present in the entries above it, and the computed solution can be badly wrong even though the system is well posed. The cure is to swap into the pivot position the equation with the largest available coefficient.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Gaussian elimination with partial pivoting (GEPP)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For <span class="math inline">\(s=1,2,\dots,n-1\)</span>:</p>
+<ol type="1">
+<li><strong>Pivot search.</strong> Choose the row of largest magnitude in column <span class="math inline">\(s\)</span> at or below the diagonal, <span class="math display">\[
+\mathrm{piv}\defeq\argmax_{s\le j\le n}\abs{a_{js}},
+\]</span> and swap <span class="math inline">\(E_s\leftrightarrow E_{\mathrm{piv}}\)</span>.</li>
+<li><strong>Eliminate.</strong> For <span class="math inline">\(j=s+1,\dots,n\)</span>, form <span class="math inline">\(\ell_{js}=a_{js}/a_{ss}\)</span> and <span class="math display">\[
+a_{jk}\leftarrow a_{jk}-\ell_{js}\,a_{sk}\ (s+1\le k\le n),\qquad
+b_j\leftarrow b_j-\ell_{js}\,b_s .
+\]</span></li>
+</ol>
+</div>
+</div>
+<p>Because the pivot is now the largest entry in its column, <strong>every multiplier satisfies</strong> <span class="math inline">\(\abs{\ell_{js}}=\abs{a_{js}/a_{ss}}\le 1\)</span>, so elimination never magnifies an entry by more than a bounded factor per step. Partial pivoting also guarantees that a nonsingular matrix always supplies a nonzero pivot, so GEPP runs to completion for any nonsingular <span class="math inline">\(A\)</span>.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Partial pivoting keeps the multipliers bounded, but it does <strong>not</strong> bound the <em>growth</em> of the matrix entries in the worst case. For the <strong>Wilkinson matrix</strong> <span class="math display">\[
+A=\begin{pmatrix}
+1 &amp; &amp; &amp; &amp; 1\\ -1 &amp; 1 &amp; &amp; &amp; 1\\ -1 &amp; -1 &amp; 1 &amp; &amp; 1\\
+\vdots &amp; &amp; \ddots &amp; &amp; \vdots\\ -1 &amp; -1 &amp; \cdots &amp; -1 &amp; 1
+\end{pmatrix},
+\]</span> GEPP performs no swaps yet the trailing entries double at every step, so the largest entry of <span class="math inline">\(U\)</span> reaches <span class="math inline">\(2^{\,n-1}\)</span>. The residual <span class="math inline">\(r=b-A\hat x\)</span> of the computed solution then grows exponentially in <span class="math inline">\(n\)</span> (<a href="#fig-4-wilkinson" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>), even though the <em>problem</em> is not that sensitive. Partial pivoting is stable in practice and unstable only in the worst case.</p>
+</div>
+</div>
+<div id="fig-4-wilkinson" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-wilkinson-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/04-wilkinson.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-wilkinson-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Maximum residual <span class="math inline">\(\max_i\abs{r_i}\)</span> of GEPP (via LAPACK’s <code>solve</code>) as the size <span class="math inline">\(n\)</span> grows. For a generic random <span class="math inline">\(A\)</span> the residual stays near machine precision; for the Wilkinson matrix the <span class="math inline">\(2^{\,n-1}\)</span> growth factor drives it up exponentially — evidence that partial pivoting alone is not worst-case stable.
+</figcaption>
+</figure>
+</div>
+<p><strong>Complete pivoting</strong> removes even this worst-case growth by searching the entire remaining submatrix, not just one column: choose <span class="math display">\[
+(\mathrm{ip},\mathrm{jp})\defeq\argmax_{s\le i,j\le n}\abs{a_{ij}},
+\]</span> swap row <span class="math inline">\(s\leftrightarrow \mathrm{ip}\)</span> <em>and</em> column <span class="math inline">\(s\leftrightarrow \mathrm{jp}\)</span> (the column swap permutes the unknowns and must be undone at the end), then eliminate. Searching an <span class="math inline">\((n-s+1)^2\)</span> block at every stage costs <span class="math inline">\(\bigO(n^3)\)</span> comparisons overall — comparable to the arithmetic itself — so complete pivoting is generally too expensive to be worthwhile. In practice partial pivoting is the default, with the Wilkinson example standing as a reminder that “stable in practice” is not the same as “provably stable.”</p>
+</section>
+<section id="cost-of-gaussian-elimination" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="cost-of-gaussian-elimination"><span class="header-section-number">4.3</span> Cost of Gaussian elimination</h2>
+<p>To compare methods we count floating-point additions and multiplications, ignoring comparisons, index arithmetic, and memory traffic. The work concentrates in the elimination sweep.</p>
+<div id="thm-4-ge-cost" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.1 (Operation count of Gaussian elimination)</strong></span> Solving a single system <span class="math inline">\(Ax=b\)</span> by Gaussian elimination (with or without partial pivoting) costs <span class="math display">\[
+\tfrac23 n^3+\bigO(n^2)
+\]</span> multiplications and additions: <span class="math inline">\(\tfrac23 n^3\)</span> for the elimination and <span class="math inline">\(\bigO(n^2)\)</span> for back-substitution.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>At stage <span class="math inline">\(s\)</span> the elimination updates the <span class="math inline">\((n-s)\times(n-s)\)</span> trailing block of <span class="math inline">\(A\)</span>, each entry costing one multiplication and one subtraction, plus <span class="math inline">\(n-s\)</span> multiplier divisions and the <span class="math inline">\(n-s\)</span> right-hand-side updates. Summing the dominant block-update term, <span class="math display">\[
+\sum_{s=1}^{n-1} 2(n-s)^2=2\sum_{m=1}^{n-1} m^2=2\cdot\frac{(n-1)n(2n-1)}{6}=\frac23 n^3+\bigO(n^2),
+\]</span> using <span class="math inline">\(\sum_{k=1}^{N}k^2=\tfrac16 N(N+1)(2N+1)\)</span>. The multiplier and right-hand-side work, <span class="math inline">\(\sum_s (n-s)\)</span> and <span class="math inline">\(\sum_s 2(n-s)\)</span>, are each <span class="math inline">\(\bigO(n^2)\)</span>. Back-substitution costs <span class="math inline">\(\sum_{s=1}^{n}2(n-s)=n^2+\bigO(n)\)</span>. The cubic term therefore comes entirely from elimination. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The lopsided split — <span class="math inline">\(\bigO(n^3)\)</span> to triangularize but only <span class="math inline">\(\bigO(n^2)\)</span> to back-substitute — is the key economic fact of the whole chapter. If we must solve several systems with the <em>same</em> matrix <span class="math inline">\(A\)</span> but different right-hand sides, we should triangularize <span class="math inline">\(A\)</span> <strong>once</strong> and reuse the result. Storing the elimination as a factorization is exactly what makes that reuse possible, and it is where we turn next.</p>
+</section>
+<section id="matrix-algebra" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="matrix-algebra"><span class="header-section-number">4.4</span> Matrix algebra</h2>
+<p>Elimination is cleanest to reason about in matrix language, so we record the algebra we need. For <span class="math inline">\(A,B\in\R^{n\times m}\)</span> and scalars <span class="math inline">\(\alpha,\beta\)</span>, the linear combination <span class="math inline">\(\alpha A+\beta B\)</span> is formed entrywise. The <strong>matrix–vector product</strong> <span class="math inline">\(Ax\in\R^n\)</span> has <span class="math inline">\(j\)</span>-th component the dot product of row <span class="math inline">\(j\)</span> of <span class="math inline">\(A\)</span> with <span class="math inline">\(x\)</span>, <span class="math display">\[
+(Ax)_j=\sum_{k=1}^{m}a_{jk}x_k,
+\]</span> so the system of equations is precisely <span class="math inline">\(Ax=b\)</span>. The <strong>matrix–matrix product</strong> of <span class="math inline">\(A\in\R^{n\times m}\)</span> and <span class="math inline">\(B\in\R^{m\times p}\)</span> is defined column by column, <span class="math inline">\(AB=(Ab_1\ \cdots\ Ab_p)\)</span>, giving the entrywise formula <span class="math display">\[
+(AB)_{jk}=\sum_{i=1}^{m}a_{ji}b_{ik}.
+\]</span> The single algebraic fact elimination leans on is <strong>associativity</strong>.</p>
+<div id="thm-4-assoc" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.2 (Associativity of matrix multiplication)</strong></span> For <span class="math inline">\(A\in\R^{n\times m}\)</span>, <span class="math inline">\(B\in\R^{m\times p}\)</span>, <span class="math inline">\(C\in\R^{p\times k}\)</span>, <span class="math inline">\(A(BC)=(AB)C\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Expand the <span class="math inline">\((s,t)\)</span> entry and exchange the two finite sums: <span class="math display">\[
+\bigl(A(BC)\bigr)_{st}=\sum_{i=1}^{m}a_{si}\!\sum_{j=1}^{p}b_{ij}c_{jt}
+=\sum_{j=1}^{p}\Bigl(\sum_{i=1}^{m}a_{si}b_{ij}\Bigr)c_{jt}
+=\sum_{j=1}^{p}(AB)_{sj}c_{jt}=\bigl((AB)C\bigr)_{st}.\ \square
+\]</span></p>
+</div>
+<p>Several <strong>special matrices</strong> recur: the identity <span class="math inline">\(I\)</span>; a <strong>diagonal</strong> matrix <span class="math inline">\(D=\diag(d_1,\dots,d_n)\)</span>; <strong>upper-</strong> and <strong>lower-triangular</strong> matrices <span class="math inline">\(U\)</span> (entries <span class="math inline">\(u_{jk}=0\)</span> for <span class="math inline">\(j&gt;k\)</span>) and <span class="math inline">\(L\)</span> (<span class="math inline">\(\ell_{jk}=0\)</span> for <span class="math inline">\(j&lt;k\)</span>); a <strong>unit</strong> lower-triangular matrix additionally has <span class="math inline">\(\ell_{jj}=1\)</span>. The <strong>transpose</strong> <span class="math inline">\(A^\top=(a_{ji})\)</span> obeys <span class="math inline">\((A^\top)^\top=A\)</span> and <span class="math inline">\((AB)^\top=B^\top A^\top\)</span>.</p>
+<p>A square <span class="math inline">\(A\)</span> is <strong>nonsingular</strong> if there is a matrix <span class="math inline">\(A^{-1}\)</span> with <span class="math inline">\(AA^{-1}=A^{-1}A=I\)</span>; otherwise it is <strong>singular</strong>. When <span class="math inline">\(A^{-1}\)</span> exists it is unique, <span class="math inline">\((A^{-1})^{-1}=A\)</span>, <span class="math inline">\((AB)^{-1}=B^{-1}A^{-1}\)</span>, and <span class="math inline">\((A^{-1})^\top=(A^\top)^{-1}\)</span>. It is tempting to solve <span class="math inline">\(Ax=b\)</span> as <span class="math inline">\(x=A^{-1}b\)</span>, but <span class="math inline">\(A^{-1}\)</span> is rarely available and is <em>more</em> expensive to obtain than <span class="math inline">\(x\)</span> itself: computing it means solving <span class="math inline">\(AX=I\)</span>, i.e.&nbsp;<span class="math inline">\(Ax_j=e_j\)</span> for each standard basis vector <span class="math inline">\(e_j\)</span>, which is <span class="math inline">\(n\)</span> systems with the same matrix <span class="math inline">\(A\)</span>. This is precisely the situation the factorization viewpoint is built to exploit — never invert a matrix to solve a system.</p>
+<section id="determinant-via-elimination" class="level3">
+<h3 class="anchored" data-anchor-id="determinant-via-elimination">Determinant via elimination</h3>
+<p>The <strong>determinant</strong> <span class="math inline">\(\det(A)\)</span> can be expanded along any row or column by cofactors, but the cheap way to compute it is to read it off from elimination, using three facts: swapping two rows negates it, <span class="math inline">\(\det(A_e)=-\det(A)\)</span>; adding a multiple of one row to another leaves it unchanged; and for a triangular matrix it is the product of the diagonal. Since GEPP reduces <span class="math inline">\(A\)</span> to an upper-triangular <span class="math inline">\(U\)</span> using only these operations, <span class="math display">\[
+\det(A)=(-1)^{\#\text{ row swaps}}\prod_{j=1}^{n}u_{jj},
+\]</span> a byproduct of an elimination we were doing anyway, at no extra asymptotic cost. In particular <span class="math inline">\(\det(A)\ne 0\)</span> iff every <span class="math inline">\(u_{jj}\ne0\)</span> iff <span class="math inline">\(Ax=b\)</span> has a unique solution. Standard consequences are <span class="math inline">\(\det(A^\top)=\det(A)\)</span>, <span class="math inline">\(\det(AB)=\det(A)\det(B)\)</span>, and <span class="math inline">\(\det(A^{-1})=\det(A)^{-1}\)</span>.</p>
+</section>
+</section>
+<section id="lu-factorization" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="lu-factorization"><span class="header-section-number">4.5</span> LU factorization</h2>
+<p>Return to elimination without pivoting and watch what the multipliers record. The first stage subtracts <span class="math inline">\(\ell_{j1}=a_{j1}/a_{11}\)</span> times row <span class="math inline">\(1\)</span> from row <span class="math inline">\(j\)</span>; in matrix form this is exactly <span class="math display">\[
+A=\begin{pmatrix}1&amp;&amp;&amp;\\ \ell_{21}&amp;1&amp;&amp;\\ \vdots&amp;&amp;\ddots&amp;\\ \ell_{n1}&amp;&amp;&amp;1\end{pmatrix}
+\begin{pmatrix}a_{11}&amp;a_{12}&amp;\cdots&amp;a_{1n}\\ 0&amp;a'_{22}&amp;\cdots&amp;a'_{2n}\\
+\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ 0&amp;a'_{n2}&amp;\cdots&amp;a'_{nn}\end{pmatrix},
+\]</span> the first factor a unit lower-triangular matrix carrying the multipliers, the second the partially eliminated matrix. Applying the same step to the trailing block and iterating, the accumulated multipliers assemble into one unit lower-triangular <span class="math inline">\(L\)</span> and the final triangular matrix is <span class="math inline">\(U\)</span>.</p>
+<div id="def-4-lu" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.1 (LU factorization)</strong></span> An <strong><span class="math inline">\(LU\)</span> factorization</strong> of <span class="math inline">\(A\in\R^{n\times n}\)</span> is a factorization <span class="math inline">\(A=LU\)</span> with <span class="math inline">\(L\)</span> unit lower-triangular (<span class="math inline">\(\ell_{jj}=1\)</span>) and <span class="math inline">\(U\)</span> upper-triangular. Gaussian elimination without pivoting, when it runs to completion, produces one: <span class="math inline">\(U\)</span> is the eliminated matrix and <span class="math inline">\(L=(\ell_{js})\)</span> holds the multipliers <span class="math inline">\(\ell_{js}=a_{js}/a_{ss}\)</span> used at each stage.</p>
+</div>
+<p>For example, <span class="math display">\[
+A=\begin{pmatrix}1&amp;1&amp;0&amp;3\\ 2&amp;1&amp;-1&amp;1\\ 3&amp;-1&amp;-1&amp;2\\ 1&amp;4&amp;3&amp;5\end{pmatrix}
+=\underbrace{\begin{pmatrix}1&amp;0&amp;0&amp;0\\ 2&amp;1&amp;0&amp;0\\ 3&amp;4&amp;1&amp;0\\ 1&amp;-3&amp;0&amp;1\end{pmatrix}}_{L}
+\underbrace{\begin{pmatrix}1&amp;1&amp;0&amp;3\\ 0&amp;-1&amp;-1&amp;-5\\ 0&amp;0&amp;3&amp;13\\ 0&amp;0&amp;0&amp;-13\end{pmatrix}}_{U}.
+\]</span> Once <span class="math inline">\(A=LU\)</span> is in hand, solving <span class="math inline">\(Ax=b\)</span> splits into two triangular solves, each <span class="math inline">\(\bigO(n^2)\)</span>: <span class="math display">\[
+Ly=b\ \text{(forward substitution)},\qquad Ux=y\ \text{(back-substitution)}.
+\]</span> This is where the factorization pays off: the <span class="math inline">\(\tfrac23 n^3\)</span> factorization is done once, and every new right-hand side costs only <span class="math inline">\(2n^2\)</span>.</p>
+<section id="permutation-matrices-and-palu" class="level3">
+<h3 class="anchored" data-anchor-id="permutation-matrices-and-palu">Permutation matrices and <span class="math inline">\(PA=LU\)</span></h3>
+<p>Plain <span class="math inline">\(LU\)</span> fails exactly when elimination needs a row swap. Row swaps are themselves matrix multiplications: the <strong>permutation matrix</strong> <span class="math inline">\(P_{k,s}\)</span>, obtained by exchanging rows <span class="math inline">\(k\)</span> and <span class="math inline">\(s\)</span> of <span class="math inline">\(I_n\)</span>, has the property that <span class="math inline">\(P_{k,s}A\)</span> is <span class="math inline">\(A\)</span> with rows <span class="math inline">\(k\)</span> and <span class="math inline">\(s\)</span> interchanged. A product of permutation matrices is again a permutation matrix. If we collect all the swaps GEPP performs into one permutation <span class="math inline">\(P\)</span>, we can apply them to <span class="math inline">\(A\)</span> up front and then eliminate with no further swaps — which says the pivoted elimination is an ordinary <span class="math inline">\(LU\)</span> factorization of the row-reordered matrix <span class="math inline">\(PA\)</span>.</p>
+<div id="def-4-permutation" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.2 (Permutation matrix)</strong></span> A <strong>permutation matrix</strong> <span class="math inline">\(P\in\R^{n\times n}\)</span> is obtained by reordering the rows of the identity. Left-multiplication <span class="math inline">\(PA\)</span> applies that reordering to the rows of <span class="math inline">\(A\)</span>, and <span class="math inline">\(P^{-1}=P^\top\)</span>.</p>
+</div>
+<div id="thm-4-palu" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.3 (GEPP as a factorization)</strong></span> For every nonsingular <span class="math inline">\(A\in\R^{n\times n}\)</span>, Gaussian elimination with partial pivoting produces a permutation matrix <span class="math inline">\(P\)</span>, a unit lower-triangular <span class="math inline">\(L\)</span>, and an upper-triangular <span class="math inline">\(U\)</span> with <span class="math display">\[
+PA=LU.
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Induct on <span class="math inline">\(n\)</span>. For <span class="math inline">\(n=1\)</span> the statement is trivial; for <span class="math inline">\(n=2\)</span>, the pivot search sets <span class="math inline">\(P=I\)</span> or <span class="math inline">\(P=P_{1,2}\)</span>, one elimination step gives <span class="math inline">\(\ell_{21}\)</span> and the single trailing entry, and directly <span class="math inline">\(PA=LU\)</span>. For the inductive step, let <span class="math inline">\(P_1\)</span> be the initial pivoting permutation. After it the first column has its largest entry on the diagonal, and one elimination step writes <span class="math display">\[
+P_1A=\begin{pmatrix}1&amp;0\\ \ell&amp;I_{n-1}\end{pmatrix}
+\begin{pmatrix}a'_{11}&amp;a'^{\top}\\ 0&amp;\hat A\end{pmatrix},
+\]</span> with <span class="math inline">\(\hat A\in\R^{(n-1)\times(n-1)}\)</span> the eliminated trailing block and <span class="math inline">\(\ell\in\R^{n-1}\)</span> the first-column multipliers. By the induction hypothesis GEPP factors <span class="math inline">\(\hat P\hat A=\hat L\hat U\)</span>. Applying <span class="math inline">\(\hat P\)</span> to the trailing rows on both sides, <span class="math display">\[
+\begin{pmatrix}1&amp;0\\ 0&amp;\hat P\end{pmatrix}P_1A
+=\begin{pmatrix}1&amp;0\\ \hat P\ell&amp;\hat L\end{pmatrix}
+\begin{pmatrix}a'_{11}&amp;a'^{\top}\\ 0&amp;\hat U\end{pmatrix},
+\]</span> because <span class="math inline">\(\hat P\)</span> merely permutes the entries of the multiplier column <span class="math inline">\(\ell\)</span>. Setting <span class="math inline">\(P=\bigl(\begin{smallmatrix}1&amp;0\\0&amp;\hat P\end{smallmatrix}\bigr)P_1\)</span>, <span class="math inline">\(L=\bigl(\begin{smallmatrix}1&amp;0\\\hat P\ell&amp;\hat L\end{smallmatrix}\bigr)\)</span>, and <span class="math inline">\(U=\bigl(\begin{smallmatrix}a'_{11}&amp;a'^{\top}\\0&amp;\hat U\end{smallmatrix}\bigr)\)</span> gives <span class="math inline">\(PA=LU\)</span> with <span class="math inline">\(L\)</span> unit lower-triangular and <span class="math inline">\(U\)</span> upper-triangular. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The block identity used silently in the proof is the one that lets the multiplier column survive a later permutation intact: <span class="math display">\[
+\begin{pmatrix}A_{11}&amp;0\\ A_{21}&amp;I\end{pmatrix}
+\begin{pmatrix}B_{11}&amp;B_{12}\\ 0&amp;LU\end{pmatrix}
+=\begin{pmatrix}A_{11}&amp;0\\ A_{21}&amp;L\end{pmatrix}
+\begin{pmatrix}B_{11}&amp;B_{12}\\ 0&amp;U\end{pmatrix},
+\]</span> valid by the block rules of matrix multiplication. As an example, <span class="math display">\[
+A=\begin{pmatrix}0&amp;0&amp;-1&amp;1\\ 1&amp;1&amp;-1&amp;2\\ -1&amp;-1&amp;2&amp;0\\ 1&amp;2&amp;0&amp;2\end{pmatrix}
+\]</span> has <span class="math inline">\(a_{11}=0\)</span>, so a swap is forced immediately; GEPP returns <span class="math display">\[
+P=\begin{pmatrix}0&amp;1&amp;0&amp;0\\0&amp;0&amp;0&amp;1\\1&amp;0&amp;0&amp;0\\0&amp;0&amp;1&amp;0\end{pmatrix},\
+L=\begin{pmatrix}1&amp;0&amp;0&amp;0\\1&amp;1&amp;0&amp;0\\0&amp;0&amp;1&amp;0\\-1&amp;0&amp;-1&amp;1\end{pmatrix},\
+U=\begin{pmatrix}1&amp;1&amp;-1&amp;2\\0&amp;1&amp;1&amp;0\\0&amp;0&amp;-1&amp;1\\0&amp;0&amp;0&amp;3\end{pmatrix},
+\]</span> with <span class="math inline">\(PA=LU\)</span>. (Even if <span class="math inline">\(A\)</span> were singular the factorization would still be computed; a zero would simply appear on the diagonal of <span class="math inline">\(U\)</span>.)</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — solving <span class="math inline">\(Ax=b\)</span> by GEPP
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Factor <span class="math inline">\(PA=LU\)</span> by GEPP (<span class="math inline">\(\tfrac23 n^3\)</span> operations).</li>
+<li>Permute the right-hand side to <span class="math inline">\(Pb\)</span>.</li>
+<li>Forward-substitute <span class="math inline">\(Ly=Pb\)</span>, then back-substitute <span class="math inline">\(Ux=y\)</span> (<span class="math inline">\(2n^2\)</span> operations total).</li>
+</ol>
+<p>The factorization dominates; solving additional right-hand sides reuses <span class="math inline">\(P,L,U\)</span> at <span class="math inline">\(\bigO(n^2)\)</span> each. This is exactly how one computes <span class="math inline">\(A^{-1}\)</span> when it is truly needed — factor once, then solve <span class="math inline">\(Ax_j=e_j\)</span> for <span class="math inline">\(j=1,\dots,n\)</span>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="matrices-that-need-no-pivoting" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="matrices-that-need-no-pivoting"><span class="header-section-number">4.6</span> Matrices that need no pivoting</h2>
+<p>Pivoting exists to dodge zero and small pivots, but two important classes of matrices are immune: for them elimination never produces a bad pivot, so pivoting can be skipped and the factorization computed faster and in a fixed order.</p>
+<section id="strictly-diagonally-dominant-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="strictly-diagonally-dominant-matrices">Strictly diagonally dominant matrices</h3>
+<div id="def-4-sdd" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.3 (Strictly diagonally dominant matrix)</strong></span> <span class="math inline">\(A\in\R^{n\times n}\)</span> is <strong>strictly diagonally dominant</strong> (SDD) if each diagonal entry exceeds the absolute row sum of the off-diagonal entries: <span class="math display">\[
+\abs{a_{ii}}&gt;\sum_{j\ne i}\abs{a_{ij}},\qquad i=1,\dots,n.
+\]</span></p>
+</div>
+<p>For instance <span class="math inline">\(\bigl(\begin{smallmatrix}7&amp;2&amp;0\\3&amp;5&amp;-1\\0&amp;5&amp;-6\end{smallmatrix}\bigr)\)</span> is SDD (<span class="math inline">\(7&gt;2\)</span>, <span class="math inline">\(5&gt;3+1\)</span>, <span class="math inline">\(6&gt;5\)</span>), whereas <span class="math inline">\(\bigl(\begin{smallmatrix}7&amp;5&amp;0\\3&amp;5&amp;-1\\0&amp;-3&amp;3\end{smallmatrix}\bigr)\)</span> is not, failing <span class="math inline">\(3&gt;3\)</span> in the last row.</p>
+<div id="thm-4-sdd-nopivot" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.4 (SDD matrices need no pivoting)</strong></span> If <span class="math inline">\(A\)</span> is SDD then <span class="math inline">\(a_{11}\ne 0\)</span> and one step of Gaussian elimination (without pivoting) leaves an <span class="math inline">\((n-1)\times(n-1)\)</span> trailing block that is again SDD. Hence elimination runs to completion with no row swaps, and <span class="math inline">\(A\)</span> has an <span class="math inline">\(LU\)</span> factorization.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Diagonal dominance of row <span class="math inline">\(1\)</span> gives <span class="math inline">\(\abs{a_{11}}&gt;\sum_{j\ne1}\abs{a_{1j}}\ge0\)</span>, so <span class="math inline">\(a_{11}\ne0\)</span> and the first multipliers are defined. The eliminated entries are <span class="math inline">\(\hat a_{ij}=a_{ij}-\frac{a_{i1}}{a_{11}}a_{1j}\)</span> for <span class="math inline">\(2\le i,j\le n\)</span>. For a fixed row <span class="math inline">\(i\)</span>, <span class="math display">\[
+\sum_{\substack{j=2\\ j\ne i}}^{n}\abs{\hat a_{ij}}
+\le\sum_{\substack{j=2\\ j\ne i}}^{n}\abs{a_{ij}}
++\left|\frac{a_{i1}}{a_{11}}\right|\sum_{\substack{j=2\\ j\ne i}}^{n}\abs{a_{1j}}.
+\]</span> Now use the SDD hypothesis on the original rows <span class="math inline">\(i\)</span> and <span class="math inline">\(1\)</span>: <span class="math inline">\(\sum_{j\ne i}\abs{a_{ij}}&lt;\abs{a_{ii}}\)</span> gives <span class="math inline">\(\sum_{j\ge2,\,j\ne i}\abs{a_{ij}}&lt;\abs{a_{ii}}-\abs{a_{i1}}\)</span>, and <span class="math inline">\(\sum_{j\ge2,\,j\ne i}\abs{a_{1j}}&lt;\abs{a_{11}}-\abs{a_{1i}}\)</span>. Substituting, <span class="math display">\[
+\sum_{\substack{j=2\\ j\ne i}}^{n}\abs{\hat a_{ij}}
+&lt;\abs{a_{ii}}-\abs{a_{i1}}+\left|\frac{a_{i1}}{a_{11}}\right|\bigl(\abs{a_{11}}-\abs{a_{1i}}\bigr)
+=\abs{a_{ii}}-\left|\frac{a_{i1}}{a_{11}}\right|\abs{a_{1i}}
+\le\left|a_{ii}-\frac{a_{i1}}{a_{11}}a_{1i}\right|=\abs{\hat a_{ii}}.
+\]</span> So the trailing block is SDD. By induction every stage has a nonzero pivot and needs no swap. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Concretely, one step on the SDD example above gives multiplier <span class="math inline">\(3/7\)</span> and trailing block <span class="math inline">\(\bigl(\begin{smallmatrix}29/7&amp;-1\\5&amp;-6\end{smallmatrix}\bigr)\)</span>, still SDD, and the factorization completes with the pivots <span class="math inline">\(u_{jj}=7,\ \tfrac{29}{7},\ -\tfrac{139}{29}\)</span>.</p>
+</section>
+<section id="symmetric-positive-definite-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="symmetric-positive-definite-matrices">Symmetric positive definite matrices</h3>
+<div id="def-4-spd" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.4 (Symmetric positive definite matrix)</strong></span> <span class="math inline">\(A\in\R^{n\times n}\)</span> is <strong>symmetric positive definite</strong> (SPD) if <span class="math inline">\(A=A^\top\)</span> and <span class="math inline">\(x^\top Ax&gt;0\)</span> for every nonzero <span class="math inline">\(x\in\R^n\)</span>.</p>
+</div>
+<p>The tridiagonal matrix <span class="math inline">\(\bigl(\begin{smallmatrix}2&amp;-1&amp;0\\-1&amp;2&amp;-1\\0&amp;-1&amp;2\end{smallmatrix}\bigr)\)</span> is SPD: it is symmetric and, completing squares, <span class="math display">\[
+x^\top Ax=x_1^2+(x_1-x_2)^2+(x_2-x_3)^2+x_3^2&gt;0\quad(x\ne0).
+\]</span> Positive definiteness immediately gives <span class="math inline">\(a_{11}=e_1^\top A e_1&gt;0\)</span>, so no pivoting is needed, and symmetry lets us eliminate on both sides at once.</p>
+<div id="lem-4-spd-schur" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 4.1 (SPD is inherited by elimination)</strong></span> If <span class="math inline">\(A\)</span> is SPD, one symmetric elimination step writes <span class="math display">\[
+A=\begin{pmatrix}1&amp;0\\ \ell_1&amp;I\end{pmatrix}
+\begin{pmatrix}a_{11}&amp;0\\ 0&amp;\hat A\end{pmatrix}
+\begin{pmatrix}1&amp;\ell_1^\top\\ 0&amp;I\end{pmatrix},
+\qquad \ell_1=\tfrac{1}{a_{11}}(a_{21},\dots,a_{n1})^\top,
+\]</span> and the Schur complement <span class="math inline">\(\hat A=A_{22}-a_{11}\,\ell_1\ell_1^\top\)</span> is again SPD.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Symmetry of <span class="math inline">\(\hat A\)</span> is clear. For nonzero <span class="math inline">\(\hat x\in\R^{n-1}\)</span> set <span class="math inline">\(x=(-\ell_1^\top\hat x,\ \hat x^\top)^\top\ne0\)</span>; multiplying out the factored form gives <span class="math inline">\(x^\top Ax=\hat x^\top\hat A\hat x\)</span>, and the left side is <span class="math inline">\(&gt;0\)</span> because <span class="math inline">\(A\)</span> is SPD. Hence <span class="math inline">\(\hat x^\top\hat A\hat x&gt;0\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Iterating the lemma factors <span class="math inline">\(A\)</span> symmetrically, producing the Cholesky family.</p>
+<div id="thm-4-cholesky" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.5 (Cholesky / <span class="math inline">\(LDL^\top\)</span> factorization)</strong></span> Every SPD matrix <span class="math inline">\(A\)</span> has a factorization <span class="math display">\[
+A=LDL^\top,
+\]</span> with <span class="math inline">\(L\)</span> unit lower-triangular and <span class="math inline">\(D=\diag(d_1,\dots,d_n)\)</span> having strictly positive diagonal entries. Equivalently <span class="math inline">\(A=\tilde L\tilde L^\top\)</span> with <span class="math inline">\(\tilde L=LD^{1/2}\)</span> lower-triangular (the <strong>Cholesky factor</strong>), where <span class="math inline">\(D^{1/2}=\diag(\sqrt{d_1},\dots,\sqrt{d_n})\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Induct on <span class="math inline">\(n\)</span>. For <span class="math inline">\(n=1\)</span>, <span class="math inline">\(A=(a_{11})\)</span> with <span class="math inline">\(a_{11}&gt;0\)</span>, so <span class="math inline">\(L=(1)\)</span>, <span class="math inline">\(D=(a_{11})\)</span>. For the step, <a href="#lem-4-spd-schur" class="quarto-xref">Lemma&nbsp;<span>4.1</span></a> gives <span class="math inline">\(A=\bigl(\begin{smallmatrix}1&amp;0\\\ell_1&amp;I\end{smallmatrix}\bigr)
+\bigl(\begin{smallmatrix}a_{11}&amp;0\\0&amp;\hat A\end{smallmatrix}\bigr)
+\bigl(\begin{smallmatrix}1&amp;\ell_1^\top\\0&amp;I\end{smallmatrix}\bigr)\)</span> with <span class="math inline">\(\hat A\)</span> SPD, and by the induction hypothesis <span class="math inline">\(\hat A=\hat L\hat D\hat L^\top\)</span>. Substituting and merging the unit-triangular factors, <span class="math display">\[
+A=\begin{pmatrix}1&amp;0\\ \ell_1&amp;\hat L\end{pmatrix}
+\begin{pmatrix}a_{11}&amp;0\\ 0&amp;\hat D\end{pmatrix}
+\begin{pmatrix}1&amp;\ell_1^\top\\ 0&amp;\hat L^\top\end{pmatrix}=LDL^\top,
+\]</span> with <span class="math inline">\(d_1=a_{11}&gt;0\)</span> and the remaining <span class="math inline">\(d_j&gt;0\)</span> inherited from <span class="math inline">\(\hat D\)</span>. Since every <span class="math inline">\(d_j&gt;0\)</span>, the real square root <span class="math inline">\(D^{1/2}\)</span> exists and <span class="math inline">\(A=LD^{1/2}D^{1/2}L^\top=(LD^{1/2})(LD^{1/2})^\top\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Because <span class="math inline">\(A=LDL^\top=L(DL^\top)\)</span> is a special <span class="math inline">\(LU\)</span> factorization with <span class="math inline">\(U=DL^\top\)</span>, only <span class="math inline">\(L\)</span> and <span class="math inline">\(D\)</span> need to be computed — symmetry halves the work, bringing the cost to about <span class="math inline">\(\tfrac13 n^3\)</span> operations, half that of general <span class="math inline">\(LU\)</span>. For the SPD matrix <span class="math display">\[
+A=\begin{pmatrix}4&amp;-1&amp;1\\ -1&amp;4.25&amp;2.75\\ 1&amp;2.75&amp;3.5\end{pmatrix},\qquad
+L=\begin{pmatrix}1&amp;0&amp;0\\ -\tfrac14&amp;1&amp;0\\ \tfrac14&amp;\tfrac34&amp;1\end{pmatrix},\quad
+D=\diag(4,4,1),
+\]</span> and the Cholesky factor is <span class="math display">\[
+\tilde L=LD^{1/2}=\begin{pmatrix}2&amp;0&amp;0\\ -\tfrac12&amp;2&amp;0\\ \tfrac12&amp;\tfrac32&amp;1\end{pmatrix},
+\qquad A=\tilde L\tilde L^\top.
+\]</span></p>
+</section>
+</section>
+<section id="tridiagonal-systems" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="tridiagonal-systems"><span class="header-section-number">4.7</span> Tridiagonal systems</h2>
+<p>The spline system of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> is the archetype of a sparse structure worth exploiting: a <strong>tridiagonal</strong> matrix, one whose nonzeros sit only on the main diagonal and the two adjacent diagonals.</p>
+<div id="def-4-tridiag" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.5 (Tridiagonal matrix)</strong></span> <span class="math inline">\(A\in\R^{n\times n}\)</span> is <strong>tridiagonal</strong> if <span class="math inline">\(a_{ij}=0\)</span> whenever <span class="math inline">\(\abs{i-j}&gt;1\)</span>.</p>
+</div>
+<p>Elimination preserves the structure. In the first step only <span class="math inline">\(\ell_{21}=a_{21}/a_{11}\)</span> and the single update <span class="math inline">\(a_{22}\leftarrow a_{22}-\ell_{21}a_{12}\)</span> are needed — every other entry below the pivot is already zero — and the trailing matrix is again tridiagonal. Recursing, the whole factorization is the two-line recurrence <span class="math display">\[
+\ell_{j+1,j}=\frac{a_{j+1,j}}{a_{jj}},\qquad
+a_{j+1,j+1}\leftarrow a_{j+1,j+1}-\ell_{j+1,j}\,a_{j,j+1},\qquad j=1,\dots,n-1,
+\]</span> with <span class="math inline">\(L\)</span> <strong>bidiagonal</strong> (one subdiagonal) and <span class="math inline">\(U\)</span> bidiagonal (diagonal plus one superdiagonal). The cost collapses from <span class="math inline">\(\tfrac23 n^3\)</span> to about <span class="math inline">\(3n\)</span> operations, and the forward/back solves are <span class="math inline">\(\bigO(n)\)</span> as well — a linear-time solver, which is why the natural cubic spline of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> is computable in <span class="math inline">\(\bigO(n)\)</span>.</p>
+<p>The natural-spline matrix <span class="math display">\[
+A=\begin{pmatrix}
+2(h_0+h_1)&amp;h_1&amp;&amp;\\
+h_1&amp;2(h_1+h_2)&amp;h_2&amp;\\
+&amp;\ddots&amp;\ddots&amp;\ddots\\
+&amp;&amp;h_{n-2}&amp;2(h_{n-2}+h_{n-1})
+\end{pmatrix}
+\]</span> is not only tridiagonal but also SDD <strong>and</strong> SPD, so by <a href="#thm-4-sdd-nopivot" class="quarto-xref">Theorem&nbsp;<span>4.4</span></a> it needs no pivoting at all: the bare <span class="math inline">\(3n\)</span> recurrence is safe, and the spline coefficients follow in linear time.</p>
+<p>If pivoting <em>is</em> required — a general nonsingular tridiagonal matrix with no special structure — a partial-pivot step compares <span class="math inline">\(\abs{a_{11}}\)</span> with <span class="math inline">\(\abs{a_{21}}\)</span> and swaps the two rows when the subdiagonal entry is larger. A swap pulls the entry <span class="math inline">\(a_{23}\)</span> up into the pivot row, so <span class="math inline">\(U\)</span> can pick up a <em>second</em> superdiagonal (<span class="math inline">\(u_{i,i+2}\ne0\)</span>): its bandwidth grows from <span class="math inline">\(2\)</span> to <span class="math inline">\(3\)</span>. The factor <span class="math inline">\(L\)</span> still has at most one nonzero below the diagonal in each column. The total cost stays linear — at most <span class="math inline">\(4n\)</span> operations and <span class="math inline">\(n\)</span> comparisons — so even with pivoting a tridiagonal solve is <span class="math inline">\(\bigO(n)\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exploit structure before you compute
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The progression <span class="math inline">\(\tfrac23 n^3\to\tfrac13 n^3\to 3n\)</span> across general <span class="math inline">\(LU\)</span>, Cholesky, and tridiagonal elimination is the recurring lesson of direct methods: identifying that a matrix is SPD, SDD, or banded — before touching the arithmetic — can cut the cost by a constant factor or, for banded matrices, by a whole power of <span class="math inline">\(n\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="conditioning-of-a-linear-system" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="conditioning-of-a-linear-system"><span class="header-section-number">4.8</span> Conditioning of a linear system</h2>
+<p>Pivoting controls the <em>algorithm</em>; it says nothing about whether the <em>problem</em> itself is sensitive to perturbations. The numerical experiments motivating pivoting — a computed solution that is wildly wrong when the pivot is tiny — hint that some matrices amplify input error no matter how carefully we eliminate. The quantity that measures this is the condition number. (The 128A notes demonstrate the effect experimentally; we state the standard definition and bound, a classical result, and use it to interpret the experiments.)</p>
+<div id="def-4-cond" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.6 (Condition number)</strong></span> For a nonsingular <span class="math inline">\(A\)</span> and an induced matrix norm <span class="math inline">\(\norm{\cdot}\)</span>, the <strong>condition number</strong> is <span class="math display">\[
+\cond(A)\defeq\norm{A}\,\norm{A^{-1}}\ \ge 1,
+\]</span> written <span class="math inline">\(\cond_2,\cond_\infty,\dots\)</span> to match the norm used. A matrix with <span class="math inline">\(\cond(A)\)</span> large is <strong>ill-conditioned</strong>; one with <span class="math inline">\(\cond(A)\)</span> near <span class="math inline">\(1\)</span> is <strong>well-conditioned</strong>.</p>
+</div>
+<p>The condition number bounds how much a relative perturbation of the data can change the solution.</p>
+<div id="thm-4-cond-bound" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.6 (Perturbation bound)</strong></span> Let <span class="math inline">\(Ax=b\)</span> with <span class="math inline">\(b\ne0\)</span>, and let <span class="math inline">\(A(x+\delta x)=b+\delta b\)</span>. Then <span class="math display">\[
+\frac{\norm{\delta x}}{\norm{x}}\le\cond(A)\,\frac{\norm{\delta b}}{\norm{b}}.
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>This is the standard first-order bound. From <span class="math inline">\(A\,\delta x=\delta b\)</span> we get <span class="math inline">\(\norm{\delta x}\le\norm{A^{-1}}\norm{\delta b}\)</span>, and from <span class="math inline">\(b=Ax\)</span> we get <span class="math inline">\(\norm{b}\le\norm{A}\norm{x}\)</span>, i.e.&nbsp;<span class="math inline">\(1/\norm{x}\le\norm{A}/\norm{b}\)</span>. Multiplying the two inequalities gives <span class="math inline">\(\norm{\delta x}/\norm{x}\le\norm{A}\norm{A^{-1}}\norm{\delta b}/\norm{b}\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>So a system with <span class="math inline">\(\cond(A)\approx10^{k}\)</span> can lose up to <span class="math inline">\(k\)</span> digits of accuracy relative to the precision of the data — independent of the solver. This is what the small-pivot experiments show: driving the <span class="math inline">\((1,1)\)</span> entry toward zero drives <span class="math inline">\(\cond(A)\)</span> up, and the residual <span class="math inline">\(r=b-A\hat x\)</span> grows with it. Pivoting keeps a stable algorithm from making things <em>worse</em>, but no direct method can recover accuracy that the conditioning of the problem has already destroyed; the condition number resurfaces in <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a> as the quantity governing how fast iterative solvers converge.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">4.9</span> Chapter summary</h2>
+<ul>
+<li><strong>Gaussian elimination</strong> triangularizes <span class="math inline">\(A\)</span> in <span class="math inline">\(\tfrac23 n^3\)</span> operations (<a href="#thm-4-ge-cost" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>) and back-substitutes in <span class="math inline">\(\bigO(n^2)\)</span>; a zero or small pivot forces a row swap.</li>
+<li><strong>Partial pivoting</strong> (GEPP) swaps in the largest column entry, keeping all multipliers <span class="math inline">\(\abs{\ell_{js}}\le1\)</span>; it is stable in practice but not in the worst case (the Wilkinson matrix, <a href="#fig-4-wilkinson" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>). <strong>Complete pivoting</strong> is stabler but too costly.</li>
+<li>Elimination <em>is</em> a factorization: <span class="math inline">\(A=LU\)</span> (<a href="#def-4-lu" class="quarto-xref">Definition&nbsp;<span>4.1</span></a>) without swaps, and with swaps <span class="math inline">\(PA=LU\)</span> (<a href="#thm-4-palu" class="quarto-xref">Theorem&nbsp;<span>4.3</span></a>) via permutation matrices (<a href="#def-4-permutation" class="quarto-xref">Definition&nbsp;<span>4.2</span></a>). Factor once at <span class="math inline">\(\tfrac23 n^3\)</span>, then solve each right-hand side by two triangular solves at <span class="math inline">\(2n^2\)</span>; this is also how <span class="math inline">\(A^{-1}\)</span> and <span class="math inline">\(\det(A)=(-1)^{\#\text{swaps}}\prod u_{jj}\)</span> are computed.</li>
+<li><strong>SDD</strong> matrices (<a href="#def-4-sdd" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>) need no pivoting: elimination preserves diagonal dominance (<a href="#thm-4-sdd-nopivot" class="quarto-xref">Theorem&nbsp;<span>4.4</span></a>). <strong>SPD</strong> matrices (<a href="#def-4-spd" class="quarto-xref">Definition&nbsp;<span>4.4</span></a>) have a <strong>Cholesky / <span class="math inline">\(LDL^\top\)</span></strong> factorization (<a href="#thm-4-cholesky" class="quarto-xref">Theorem&nbsp;<span>4.5</span></a>) computed at <span class="math inline">\(\tfrac13 n^3\)</span>, half the general cost.</li>
+<li><strong>Tridiagonal</strong> systems (<a href="#def-4-tridiag" class="quarto-xref">Definition&nbsp;<span>4.5</span></a>) factor in <span class="math inline">\(\bigO(n)\)</span> — <span class="math inline">\(3n\)</span> operations without pivoting, <span class="math inline">\(4n\)</span> with — which is what makes the cubic-spline system of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> a linear-time solve.</li>
+<li>The <strong>condition number</strong> <span class="math inline">\(\cond(A)=\norm{A}\norm{A^{-1}}\)</span> (<a href="#def-4-cond" class="quarto-xref">Definition&nbsp;<span>4.6</span></a>) measures the problem’s sensitivity: relative error is amplified by up to <span class="math inline">\(\cond(A)\)</span> (<a href="#thm-4-cond-bound" class="quarto-xref">Theorem&nbsp;<span>4.6</span></a>), a limit no direct solver can beat.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./03-ivp-odes.html" class="pagination-link" aria-label="Initial-Value Problems for ODEs">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./05-iterative-linear-systems.html" class="pagination-link" aria-label="Iterative Methods for Linear Systems">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

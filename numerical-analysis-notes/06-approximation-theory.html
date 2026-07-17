@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>6&nbsp; Approximation Theory – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./07-eigenvalue-problems.html" rel="next">
+<link href="./05-iterative-linear-systems.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./06-approximation-theory.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-6-lsq" id="toc-sec-6-lsq" class="nav-link active" data-scroll-target="#sec-6-lsq"><span class="header-section-number">6.1</span> Least-squares approximation</a></li>
+  <li><a href="#sec-6-inner" id="toc-sec-6-inner" class="nav-link" data-scroll-target="#sec-6-inner"><span class="header-section-number">6.2</span> Interlude: inner products and Gram–Schmidt</a></li>
+  <li><a href="#sec-6-interval" id="toc-sec-6-interval" class="nav-link" data-scroll-target="#sec-6-interval"><span class="header-section-number">6.3</span> Least squares over an interval</a></li>
+  <li><a href="#sec-6-orthopoly" id="toc-sec-6-orthopoly" class="nav-link" data-scroll-target="#sec-6-orthopoly"><span class="header-section-number">6.4</span> Orthogonal polynomials</a>
+  <ul class="collapse">
+  <li><a href="#sec-6-three-term" id="toc-sec-6-three-term" class="nav-link" data-scroll-target="#sec-6-three-term">The three-term recurrence</a></li>
+  </ul></li>
+  <li><a href="#sec-6-chebyshev" id="toc-sec-6-chebyshev" class="nav-link" data-scroll-target="#sec-6-chebyshev"><span class="header-section-number">6.5</span> Chebyshev polynomials</a></li>
+  <li><a href="#sec-6-econ" id="toc-sec-6-econ" class="nav-link" data-scroll-target="#sec-6-econ"><span class="header-section-number">6.6</span> Economization of power series</a></li>
+  <li><a href="#sec-6-lagrange-cheb" id="toc-sec-6-lagrange-cheb" class="nav-link" data-scroll-target="#sec-6-lagrange-cheb"><span class="header-section-number">6.7</span> Lagrange interpolation meets Chebyshev polynomials</a></li>
+  <li><a href="#sec-6-gauss" id="toc-sec-6-gauss" class="nav-link" data-scroll-target="#sec-6-gauss"><span class="header-section-number">6.8</span> Gauss quadrature from the approximation viewpoint</a></li>
+  <li><a href="#sec-6-connect" id="toc-sec-6-connect" class="nav-link" data-scroll-target="#sec-6-connect"><span class="header-section-number">6.9</span> Connecting interpolation and least-squares projection</a></li>
+  <li><a href="#sec-6-pade" id="toc-sec-6-pade" class="nav-link" data-scroll-target="#sec-6-pade"><span class="header-section-number">6.10</span> Padé approximation</a></li>
+  <li><a href="#sec-6-cheb-rational" id="toc-sec-6-cheb-rational" class="nav-link" data-scroll-target="#sec-6-cheb-rational"><span class="header-section-number">6.11</span> Chebyshev rational approximation</a></li>
+  <li><a href="#sec-6-fourier" id="toc-sec-6-fourier" class="nav-link" data-scroll-target="#sec-6-fourier"><span class="header-section-number">6.12</span> Fourier series</a>
+  <ul class="collapse">
+  <li><a href="#the-complex-exponential-basis" id="toc-the-complex-exponential-basis" class="nav-link" data-scroll-target="#the-complex-exponential-basis">The complex exponential basis</a></li>
+  <li><a href="#sec-6-trap" id="toc-sec-6-trap" class="nav-link" data-scroll-target="#sec-6-trap">Computing the coefficients: the trapezoidal rule</a></li>
+  </ul></li>
+  <li><a href="#sec-6-discrete-trig" id="toc-sec-6-discrete-trig" class="nav-link" data-scroll-target="#sec-6-discrete-trig"><span class="header-section-number">6.13</span> Discrete least squares with trigonometric polynomials</a></li>
+  <li><a href="#sec-6-dft" id="toc-sec-6-dft" class="nav-link" data-scroll-target="#sec-6-dft"><span class="header-section-number">6.14</span> The discrete Fourier transform</a></li>
+  <li><a href="#sec-6-fft" id="toc-sec-6-fft" class="nav-link" data-scroll-target="#sec-6-fft"><span class="header-section-number">6.15</span> The fast Fourier transform</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">6.16</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./06-approximation-theory.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-approximation" class="quarto-section-identifier"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>Interpolation (<a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>) insists that the approximant pass <em>through</em> the data. That is the wrong demand when the data are noisy, when there are far more samples than we want parameters, or when we care about the average error over a whole interval rather than the error at a handful of points. <strong>Approximation theory</strong> relaxes exactness to <em>best fit</em>: choose the member of a restricted class of functions that is closest to <span class="math inline">\(f\)</span> in a chosen norm. Almost everything in this chapter flows from one idea — best approximation in an inner-product norm is <em>orthogonal projection</em>, and the computation collapses to a linear system that becomes trivial once the basis is orthogonal. That observation organizes least squares, orthogonal polynomials, Chebyshev economization, Gauss quadrature, and — through the complex exponentials — Fourier series, the DFT, and the FFT.</p>
+<section id="sec-6-lsq" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="sec-6-lsq"><span class="header-section-number">6.1</span> Least-squares approximation</h2>
+<p>Suppose we are given data <span class="math inline">\((x_i,y_i)\)</span>, <span class="math inline">\(i=1,\dots,m\)</span>, with <span class="math inline">\(x_i,y_i\in\R\)</span>, and we want a function <span class="math inline">\(f\)</span> with <span class="math inline">\(f(x_i)\approx y_i\)</span> drawn from a <em>restricted</em> class (to avoid overfitting). The tractable case is a class spanned by fixed <strong>basis functions</strong> <span class="math inline">\(g_0,\dots,g_{p-1}\)</span>, <span id="eq-6-basis-fit"><span class="math display">\[
+f_{\mathbf a}(x)=\sum_{j=0}^{p-1} a_j\,g_j(x),
+\tag{6.1}\]</span></span> parametrized linearly by <span class="math inline">\(\mathbf a=(a_0,\dots,a_{p-1})\in\R^{p}\)</span> (we zero-index the components). The choice <span class="math inline">\(g_j(x)=x^{j}\)</span> recovers <strong>polynomial least squares</strong>; <span class="math inline">\(g_1(x)=x,\,g_0(x)=1\)</span> recovers straight-line fitting. In <strong>least squares</strong> we minimize the sum of squared residuals <span class="math display">\[
+\min_{\mathbf a\in\R^{p}} F(\mathbf a),\qquad F(\mathbf a)\defeq\sum_{i=1}^{m}\bigl(f_{\mathbf a}(x_i)-y_i\bigr)^2 .
+\]</span> Collecting the basis values into the <span class="math inline">\(m\times p\)</span> matrix <span class="math inline">\(G=(g_{ij})\)</span> with <span class="math inline">\(g_{ij}=g_j(x_i)\)</span> (rows indexed <span class="math inline">\(i=1,\dots,m\)</span>, columns <span class="math inline">\(j=0,\dots,p-1\)</span>), the objective is exactly a squared Euclidean norm, <span class="math display">\[
+\sum_{i=1}^{m}\Bigl(\textstyle\sum_{j=0}^{p-1} g_{ij}a_j-y_i\Bigr)^2
+=\ntwo{G\mathbf a-y}^2 ,
+\]</span> so least squares is the linear-algebra problem <span class="math inline">\(\min_{\mathbf a}\ntwo{G\mathbf a-y}^2\)</span>. We solved exactly this in <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>; the solution is the <strong>normal equations</strong>.</p>
+<div id="thm-6-least-squares" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.1 (Least squares and the normal equations)</strong></span> Let <span class="math inline">\(G\in\R^{m\times p}\)</span> with <span class="math inline">\(g_{ij}=g_j(x_i)\)</span> and <span class="math inline">\(y\in\R^{m}\)</span>. Every minimizer of <span class="math inline">\(\ntwo{G\mathbf a-y}^2\)</span> satisfies the normal equations <span id="eq-6-normal"><span class="math display">\[
+G^\top G\,\mathbf a=G^\top y .
+\tag{6.2}\]</span></span> The matrix <span class="math inline">\(G^\top G\)</span> is symmetric positive semidefinite; it is positive definite — so the minimizer is unique — if and only if <span class="math inline">\(G\)</span> has rank <span class="math inline">\(p\)</span>, which requires <span class="math inline">\(m\ge p\)</span>. For polynomial least squares (<span class="math inline">\(g_j(x)=x^{j}\)</span>), distinctness of the nodes <span class="math inline">\(x_1,\dots,x_m\)</span> already forces <span class="math inline">\(\rank G=p\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><span class="math inline">\(F(\mathbf a)=\ntwo{G\mathbf a-y}^2\)</span> is a smooth convex quadratic with gradient <span class="math inline">\(\nabla F(\mathbf a)=2G^\top(G\mathbf a-y)\)</span>. Setting it to zero gives <a href="#eq-6-normal" class="quarto-xref">Equation&nbsp;<span>6.2</span></a>. For any <span class="math inline">\(v\in\R^{p}\)</span>, <span class="math inline">\(v^\top G^\top G\,v=\ntwo{Gv}^2\ge0\)</span>, with equality iff <span class="math inline">\(Gv=0\)</span>; thus <span class="math inline">\(G^\top G\succ0\)</span> exactly when <span class="math inline">\(G\)</span> has trivial null space, i.e.&nbsp;rank <span class="math inline">\(p\)</span>. For <span class="math inline">\(g_j(x)=x^j\)</span> the matrix <span class="math inline">\(G\)</span> is a Vandermonde matrix, whose columns are independent when the nodes are distinct. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Some nonlinear classes reduce to <a href="#eq-6-basis-fit" class="quarto-xref">Equation&nbsp;<span>6.1</span></a> after a transformation. To fit the exponential model <span class="math inline">\(f_{b,c}(x)=b\,e^{cx}\)</span> we take logarithms, <span class="math inline">\(\log y_i\approx \log b+c\,x_i\)</span>, and run <em>linear</em> least squares on the transformed data <span class="math inline">\(\tilde y_i=\log y_i\)</span> against <span class="math inline">\(x_i\)</span>, recovering <span class="math inline">\(b=e^{a_0}\)</span>, <span class="math inline">\(c=a_1\)</span>. This is not identical to nonlinear least squares on the original residuals — it minimizes error in <span class="math inline">\(\log y\)</span>, not in <span class="math inline">\(y\)</span> — but it avoids a general optimization.</p>
+</section>
+<section id="sec-6-inner" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="sec-6-inner"><span class="header-section-number">6.2</span> Interlude: inner products and Gram–Schmidt</h2>
+<p>To move from discrete data to functions on a whole interval we need the geometry of inner-product spaces, recalled here for continuous functions.</p>
+<div id="def-6-inner-product" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.1 (Inner product and the <span class="math inline">\(L^2\)</span> inner products)</strong></span> An <strong>inner product</strong> <span class="math inline">\(\inner{\cdot}{\cdot}\)</span> on a real vector space <span class="math inline">\(\mathcal V\)</span> is a map <span class="math inline">\(\mathcal V\times\mathcal V\to\R\)</span> that is linear and homogeneous in the first slot (<span class="math inline">\(\inner{u+v}{w}=\inner{u}{w}+\inner{v}{w}\)</span>, <span class="math inline">\(\inner{\lambda u}{v}=\lambda\inner{u}{v}\)</span>), symmetric (<span class="math inline">\(\inner{u}{v}=\inner{v}{u}\)</span>), and positive definite (<span class="math inline">\(\inner{u}{u}\ge0\)</span> with equality iff <span class="math inline">\(u=0\)</span>). It induces the norm <span class="math inline">\(\norm{u}=\sqrt{\inner{u}{u}}\)</span> and the notion of <strong>orthogonality</strong>, <span class="math inline">\(u\perp v\iff\inner{u}{v}=0\)</span>. On <span class="math inline">\(C[a,b]\)</span> the <strong><span class="math inline">\(L^2\)</span> inner product</strong> and its <strong>weighted</strong> version with a nonnegative weight <span class="math inline">\(w:(a,b)\to[0,\infty)\)</span> are <span class="math display">\[
+\inner{f}{g}_{L^2([a,b])}=\int_a^b f(x)g(x)\,\dd x,\qquad
+\inner{f}{g}_{L^2([a,b];w)}=\int_a^b f(x)g(x)\,w(x)\,\dd x .
+\]</span></p>
+</div>
+<p>The dot product on <span class="math inline">\(\R^n\)</span> is the archetype; the <span class="math inline">\(A\)</span>-inner product <span class="math inline">\(\inner{x}{y}_A=x^\top A y\)</span> of conjugate gradient (<a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a>) is another. The space <span class="math inline">\(C[a,b]\)</span> is a vector space under pointwise operations, and the polynomials of degree <span class="math inline">\(\le n\)</span> form a subspace <span class="math inline">\(\mathbb P_n\)</span> with the monomials <span class="math inline">\(M_k(x)=x^{k}\)</span>, <span class="math inline">\(k=0,\dots,n\)</span>, as a basis.</p>
+<p>Given an orthogonal collection <span class="math inline">\(v_1,\dots,v_k\)</span> and a new vector <span class="math inline">\(w\)</span>, the <strong>Gram–Schmidt procedure</strong> appends <span id="eq-6-gram-schmidt"><span class="math display">\[
+v_{k+1}=w-\sum_{i=1}^{k}\frac{\inner{w}{v_i}}{\inner{v_i}{v_i}}\,v_i ,
+\tag{6.3}\]</span></span> which is orthogonal to every <span class="math inline">\(v_i\)</span> (check: <span class="math inline">\(\inner{v_{k+1}}{v_i}=\inner{w}{v_i}-\inner{w}{v_i}=0\)</span>) and preserves the span. This one formula, applied to the monomials under a weighted <span class="math inline">\(L^2\)</span> inner product, manufactures the orthogonal polynomials of <a href="#sec-6-orthopoly" class="quarto-xref"><span>Section 6.4</span></a>.</p>
+</section>
+<section id="sec-6-interval" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="sec-6-interval"><span class="header-section-number">6.3</span> Least squares over an interval</h2>
+<p>Now approximate a function <span class="math inline">\(f\)</span> on an <em>entire</em> interval <span class="math inline">\([a,b]\)</span> by <span class="math inline">\(f_{\mathbf a}\)</span> of the form <a href="#eq-6-basis-fit" class="quarto-xref">Equation&nbsp;<span>6.1</span></a> — “infinitely many data points” <span class="math inline">\((x,f(x))\)</span>. Discretize with the uniform grid <span class="math inline">\(x_i=a+ih\)</span>, <span class="math inline">\(h=(b-a)/m\)</span>, <span class="math inline">\(y_i=f(x_i)\)</span>. Up to the fixed factor <span class="math inline">\(h=(b-a)/m\)</span> (which does not move the minimizer) the discrete least-squares objective is a Riemann sum, <span class="math display">\[
+h\sum_{i=1}^{m}\bigl(f_{\mathbf a}(x_i)-f(x_i)\bigr)^2
+\;\xrightarrow[m\to\infty]{}\;
+\int_a^b\bigl(f_{\mathbf a}(x)-f(x)\bigr)^2\,\dd x=\norm{f_{\mathbf a}-f}_{L^2([a,b])}^2 .
+\]</span> Take the same limit in the normal equations. Multiply <a href="#eq-6-normal" class="quarto-xref">Equation&nbsp;<span>6.2</span></a> by <span class="math inline">\(h\)</span> and pass <span class="math inline">\(m\to\infty\)</span>: each entry is again a Riemann sum, <span class="math display">\[
+[hG^\top G]_{ij}=\sum_{k=1}^{m} g_i(x_k)g_j(x_k)\,h\to\int_a^b g_i(x)g_j(x)\,\dd x=\inner{g_i}{g_j}_{L^2([a,b])},
+\]</span> <span class="math display">\[
+[hG^\top y]_{i}=\sum_{k=1}^{m} g_i(x_k)f(x_k)\,h\to\int_a^b g_i(x)f(x)\,\dd x=\inner{g_i}{f}_{L^2([a,b])} .
+\]</span> So continuous least squares is solved by the <strong>Gram matrix</strong> system <span class="math inline">\(A\mathbf a=b\)</span> with <span id="eq-6-gram-system"><span class="math display">\[
+A_{ij}=\inner{g_i}{g_j}_{L^2([a,b])},\qquad b_i=\inner{g_i}{f}_{L^2([a,b])},
+\tag{6.4}\]</span></span> after which <span class="math inline">\(f_{\mathbf a}=\sum_j a_j g_j\)</span>. The weighted problem <span class="math inline">\(\min_{\mathbf a}\norm{f_{\mathbf a}-f}_{L^2([a,b];w)}^2\)</span> is identical with every inner product replaced by its <span class="math inline">\(w\)</span>-weighted version; <span class="math inline">\(w\equiv1\)</span> recovers the unweighted case. When the entries cannot be integrated in closed form they are estimated by numerical quadrature — a hook we return to in <a href="#sec-6-gauss" class="quarto-xref"><span>Section 6.8</span></a>.</p>
+</section>
+<section id="sec-6-orthopoly" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="sec-6-orthopoly"><span class="header-section-number">6.4</span> Orthogonal polynomials</h2>
+<p>The Gram matrix <a href="#eq-6-gram-system" class="quarto-xref">Equation&nbsp;<span>6.4</span></a> is generally dense, and for the monomial basis it is the notoriously ill-conditioned Hilbert-type matrix. The remedy is to choose a basis that makes <span class="math inline">\(A\)</span> <em>diagonal</em>: an orthogonal basis. Writing <span class="math inline">\(\inner{\cdot}{\cdot}_w\)</span> for <span class="math inline">\(\inner{\cdot}{\cdot}_{L^2([a,b];w)}\)</span>:</p>
+<div id="def-6-orthopoly" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.2 (Orthogonal polynomials)</strong></span> A sequence of polynomials <span class="math inline">\(p_0,p_1,\dots\)</span> with <span class="math inline">\(\deg p_k=k\)</span> is an <strong>orthogonal polynomial sequence</strong> with respect to the weight <span class="math inline">\(w\)</span> on <span class="math inline">\([a,b]\)</span> if <span class="math display">\[
+\inner{p_i}{p_j}_w=0\qquad\text{whenever } i\ne j .
+\]</span> The sequence is <strong>orthonormal</strong> if in addition <span class="math inline">\(\inner{p_k}{p_k}_w=1\)</span> for all <span class="math inline">\(k\)</span>; it is <strong>monic</strong> if each <span class="math inline">\(p_k\)</span> has leading coefficient <span class="math inline">\(1\)</span>, i.e.&nbsp;<span class="math inline">\(p_k(x)=x^{k}+\cdots\)</span>. (The Lindsey notes and this book write the family as <span class="math inline">\(p_0,\dots,p_n\)</span>; the standard textbook symbol is <span class="math inline">\(\phi_0,\dots,\phi_n\)</span>.)</p>
+</div>
+<p>Gram–Schmidt on the monomials builds the monic sequence explicitly.</p>
+<div id="prp-6-gs-construct" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 6.1 (Gram–Schmidt construction)</strong></span> Let <span class="math inline">\(M_k(x)=x^{k}\)</span>. Set <span class="math inline">\(p_0=M_0=1\)</span> and inductively <span id="eq-6-gs-poly"><span class="math display">\[
+p_{k+1}=M_{k+1}-\sum_{i=0}^{k}\frac{\inner{M_{k+1}}{p_i}_w}{\inner{p_i}{p_i}_w}\,p_i .
+\tag{6.5}\]</span></span> Then each <span class="math inline">\(p_k\)</span> is monic of degree <span class="math inline">\(k\)</span>, the sequence is orthogonal with respect to <span class="math inline">\(\inner{\cdot}{\cdot}_w\)</span>, and <span class="math inline">\(\Span(p_0,\dots,p_k)=\Span(M_0,\dots,M_k)=\mathbb P_k\)</span>. Consequently, for <span class="math inline">\(k&gt;\ell\)</span> the polynomial <span class="math inline">\(p_k\)</span> is orthogonal to <em>every</em> element of <span class="math inline">\(\mathbb P_\ell\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Formula <a href="#eq-6-gs-poly" class="quarto-xref">Equation&nbsp;<span>6.5</span></a> is <a href="#eq-6-gram-schmidt" class="quarto-xref">Equation&nbsp;<span>6.3</span></a> applied to <span class="math inline">\(w=M_{k+1}\)</span> against <span class="math inline">\(p_0,\dots,p_k\)</span>, so <span class="math inline">\(p_{k+1}\perp p_i\)</span> for <span class="math inline">\(i\le k\)</span>; by induction the whole sequence is orthogonal. Subtracting a combination of lower-degree polynomials leaves the leading <span class="math inline">\(x^{k+1}\)</span> untouched, so <span class="math inline">\(p_{k+1}\)</span> is monic of degree <span class="math inline">\(k+1\)</span>. Gram–Schmidt preserves spans, and <span class="math inline">\(\Span(M_0,\dots,M_k)=\mathbb P_k\)</span>, giving the span claim; orthogonal (hence independent) polynomials of degrees <span class="math inline">\(0,\dots,k\)</span> form a basis of <span class="math inline">\(\mathbb P_k\)</span>. Finally, if <span class="math inline">\(k&gt;\ell\)</span> then <span class="math inline">\(p_k\perp p_0,\dots,p_\ell\)</span>, and these span <span class="math inline">\(\mathbb P_\ell\)</span>, so <span class="math inline">\(p_k\perp\mathbb P_\ell\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The payoff for least squares is immediate: with <span class="math inline">\(g_i=p_i\)</span> the Gram matrix is diagonal, <span class="math inline">\(A_{ij}=\inner{p_i}{p_i}_w\,\delta_{ij}\)</span>, so the normal equations decouple.</p>
+<div id="thm-6-orthoproj" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.2 (Least-squares projection onto <span class="math inline">\(\mathbb P_n\)</span>)</strong></span> For the weight <span class="math inline">\(w\)</span> on <span class="math inline">\([a,b]\)</span>, the problem <span class="math inline">\(\displaystyle\min_{p\in\mathbb P_n}\norm{p-f}_w^2\)</span> is solved by <span id="eq-6-orthoproj"><span class="math display">\[
+p=\sum_{k=0}^{n}\frac{\inner{f}{p_k}_w}{\inner{p_k}{p_k}_w}\,p_k ,
+\tag{6.6}\]</span></span> where <span class="math inline">\(\{p_k\}\)</span> is any orthogonal polynomial sequence for <span class="math inline">\(w\)</span> on <span class="math inline">\([a,b]\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Since <span class="math inline">\(\{f_{\mathbf a}:\mathbf a\in\R^{n+1}\}=\Span(p_0,\dots,p_n)=\mathbb P_n\)</span>, minimizing over <span class="math inline">\(\mathbb P_n\)</span> is the interval least-squares problem in the basis <span class="math inline">\(\{p_k\}\)</span>. Its Gram matrix is diagonal, so the <span class="math inline">\(i\)</span>-th normal equation is <span class="math inline">\(\inner{p_i}{p_i}_w\,a_i=\inner{f}{p_i}_w\)</span>, giving <span class="math inline">\(a_i=\inner{f}{p_i}_w/\inner{p_i}{p_i}_w\)</span> and <a href="#eq-6-orthoproj" class="quarto-xref">Equation&nbsp;<span>6.6</span></a>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Formula <a href="#eq-6-orthoproj" class="quarto-xref">Equation&nbsp;<span>6.6</span></a> is orthogonal projection: <span class="math inline">\(p\)</span> is the truncated <em>generalized Fourier series</em> of <span class="math inline">\(f\)</span>, and <span class="math inline">\(f-p\perp\mathbb P_n\)</span>.</p>
+<section id="sec-6-three-term" class="level3">
+<h3 class="anchored" data-anchor-id="sec-6-three-term">The three-term recurrence</h3>
+<p>Running <a href="#eq-6-gs-poly" class="quarto-xref">Equation&nbsp;<span>6.5</span></a> literally requires <span class="math inline">\(k+1\)</span> inner products at step <span class="math inline">\(k\)</span>. Almost all of them vanish: orthogonal polynomials obey a <strong>three-term recurrence</strong>, the computational workhorse of the subject.</p>
+<div id="thm-6-three-term" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.3 (Three-term recurrence)</strong></span> Let <span class="math inline">\(\{p_k\}\)</span> be the monic orthogonal polynomial sequence for <span class="math inline">\(w\)</span> on <span class="math inline">\([a,b]\)</span>. Then <span id="eq-6-three-term"><span class="math display">\[
+p_{k+1}(x)=(x-\alpha_k)\,p_k(x)-\beta_k\,p_{k-1}(x),\qquad k\ge1,
+\tag{6.7}\]</span></span> with <span class="math inline">\(p_0=1\)</span>, <span class="math inline">\(p_1(x)=x-\alpha_0\)</span>, and <span class="math display">\[
+\alpha_k=\frac{\inner{xp_k}{p_k}_w}{\inner{p_k}{p_k}_w},\qquad
+\beta_k=\frac{\inner{p_k}{p_k}_w}{\inner{p_{k-1}}{p_{k-1}}_w}&gt;0 .
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The Lindsey notes state this without proof; the standard argument is short. Because <span class="math inline">\(xp_k\)</span> is monic of degree <span class="math inline">\(k+1\)</span>, the difference <span class="math inline">\(xp_k-p_{k+1}\)</span> lies in <span class="math inline">\(\mathbb P_k=\Span(p_0,\dots,p_k)\)</span>, so <span class="math inline">\(xp_k=p_{k+1}+\sum_{j=0}^{k}c_j p_j\)</span> for some coefficients. Taking <span class="math inline">\(\inner{\cdot}{p_i}_w\)</span> and using orthogonality gives <span class="math inline">\(c_i=\inner{xp_k}{p_i}_w/\inner{p_i}{p_i}_w\)</span>. Now <span class="math inline">\(\inner{xp_k}{p_i}_w=
+\inner{p_k}{xp_i}_w\)</span>, and for <span class="math inline">\(i\le k-2\)</span> the polynomial <span class="math inline">\(xp_i\)</span> has degree <span class="math inline">\(\le k-1\)</span>, hence is orthogonal to <span class="math inline">\(p_k\)</span> by 1; so <span class="math inline">\(c_i=0\)</span> for <span class="math inline">\(i\le k-2\)</span>. Only <span class="math inline">\(c_k=\alpha_k\)</span> and <span class="math inline">\(c_{k-1}\)</span> survive. For the last, <span class="math inline">\(xp_{k-1}=p_k+(\text{lower degree})\)</span>, so <span class="math inline">\(\inner{xp_k}{p_{k-1}}_w=\inner{p_k}{xp_{k-1}}_w=\inner{p_k}{p_k}_w\)</span>, whence <span class="math inline">\(c_{k-1}=\inner{p_k}{p_k}_w/\inner{p_{k-1}}{p_{k-1}}_w=\beta_k&gt;0\)</span>. Rearranging <span class="math inline">\(xp_k=p_{k+1}+\alpha_k p_k+\beta_k p_{k-1}\)</span> yields <a href="#eq-6-three-term" class="quarto-xref">Equation&nbsp;<span>6.7</span></a>. <span class="math inline">\(\square\)</span></p>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Evaluate by the recurrence, never by the coefficients
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>One <em>could</em> expand the recurrence into <span class="math inline">\(p_n(x)=a_nx^n+\dots+a_0\)</span> and evaluate that. Do not: the coefficients <span class="math inline">\(a_0,\dots,a_n\)</span> grow so fast that they overflow for moderate <span class="math inline">\(n\)</span>. The numerically stable evaluation builds <span class="math inline">\(p_0(x),\dots,p_n(x)\)</span> from scratch by <a href="#eq-6-three-term" class="quarto-xref">Equation&nbsp;<span>6.7</span></a>, at <span class="math inline">\(\bigO(n)\)</span> cost, given the recurrence coefficients <span class="math inline">\(\alpha_k,\beta_k\)</span>.</p>
+</div>
+</div>
+<p><strong>Legendre polynomials.</strong> For <span class="math inline">\(w\equiv1\)</span> on <span class="math inline">\([-1,1]\)</span> the monic orthogonal polynomials are the (monic) <strong>Legendre polynomials</strong> <span class="math inline">\(P_k\)</span>, satisfying <span class="math display">\[
+P_{k+1}(x)=x\,P_k(x)-\frac{k^{2}}{4k^{2}-1}\,P_{k-1}(x),\qquad k\ge1,
+\]</span> with <span class="math inline">\(P_0=1\)</span>, <span class="math inline">\(P_1(x)=x\)</span>. The recurrence generates <span class="math display">\[
+P_2=x^2-\tfrac13,\qquad P_3=x^3-\tfrac35x,\qquad P_4=x^4-\tfrac67x^2+\tfrac{3}{35},
+\]</span> where e.g.&nbsp;<span class="math inline">\(P_2=xP_1-\tfrac13P_0=x^2-\tfrac13\)</span> using <span class="math inline">\(\alpha_1=0\)</span>, <span class="math inline">\(\beta_1=\tfrac13\)</span>. (These are monic; the classical Legendre polynomials carry a different normalization.)</p>
+</section>
+</section>
+<section id="sec-6-chebyshev" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="sec-6-chebyshev"><span class="header-section-number">6.5</span> Chebyshev polynomials</h2>
+<p>The single most useful orthogonal family in numerical analysis is the Chebyshev polynomials, prized for their <strong>equioscillation</strong> on <span class="math inline">\([-1,1]\)</span>. We <em>define</em> them trigonometrically and only afterward discover that they are orthogonal polynomials.</p>
+<div id="def-6-chebyshev" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.3 (Chebyshev polynomials)</strong></span> For <span class="math inline">\(x\in[-1,1]\)</span> the <span class="math inline">\(n\)</span>-th <strong>Chebyshev polynomial</strong> is <span id="eq-6-cheb-def"><span class="math display">\[
+T_n(x)=\cos\!\bigl(n\arccos x\bigr).
+\tag{6.8}\]</span></span></p>
+</div>
+<p>It is not obvious that <a href="#eq-6-cheb-def" class="quarto-xref">Equation&nbsp;<span>6.8</span></a> is a polynomial. That follows from the three-term recurrence <span id="eq-6-cheb-recur"><span class="math display">\[
+T_{n+1}(x)=2x\,T_n(x)-T_{n-1}(x),\qquad T_0\equiv1,\ T_1(x)=x .
+\tag{6.9}\]</span></span></p>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Write <span class="math inline">\(\theta=\arccos x\)</span>, so <span class="math inline">\(x=\cos\theta\)</span>. The identity <span class="math inline">\(\cos(a+b)+\cos(a-b)=2\cos a\cos b\)</span> with <span class="math inline">\(a=n\theta\)</span>, <span class="math inline">\(b=\theta\)</span> gives <span class="math display">\[
+T_{n+1}(x)=\cos((n+1)\theta)=2\cos\theta\cos(n\theta)-\cos((n-1)\theta)=2x\,T_n(x)-T_{n-1}(x).
+\]</span> Starting from the polynomials <span class="math inline">\(T_0=1\)</span>, <span class="math inline">\(T_1=x\)</span>, the recurrence produces a polynomial at every step. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>From <a href="#eq-6-cheb-def" class="quarto-xref">Equation&nbsp;<span>6.8</span></a>, <span class="math inline">\(\abs{T_n(x)}\le1\)</span> on <span class="math inline">\([-1,1]\)</span>, and the structure of <span class="math inline">\(\cos\)</span> pins down the zeros and extrema exactly. The <strong>zeros</strong> — the <strong>Chebyshev nodes</strong> — are <span id="eq-6-cheb-nodes"><span class="math display">\[
+x_j=\cos\!\Bigl(\frac{2j-1}{2n}\pi\Bigr),\qquad j=1,\dots,n,
+\tag{6.10}\]</span></span> solving <span class="math inline">\(n\arccos x=(j-\tfrac12)\pi\)</span>. The <strong>extrema</strong>, where <span class="math inline">\(n\arccos x=j\pi\)</span>, are at <span class="math inline">\(x=\cos(j\pi/n)\)</span>, <span class="math inline">\(j=0,\dots,n\)</span>, and there <span class="math inline">\(T_n=\pm1\)</span> with alternating sign. This alternation of <span class="math inline">\(+1\)</span> and <span class="math inline">\(-1\)</span> across the interval (<a href="#fig-6-chebyshev" class="quarto-xref">Figure&nbsp;<span>6.1</span></a>) is the <strong>equioscillation property</strong>.</p>
+<div id="fig-6-chebyshev" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-6-chebyshev-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/06-chebyshev.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-6-chebyshev-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.1: Chebyshev polynomials <span class="math inline">\(T_0,\dots,T_4\)</span> on <span class="math inline">\([-1,1]\)</span>. Each <span class="math inline">\(T_n\)</span> with <span class="math inline">\(n\ge1\)</span> oscillates between <span class="math inline">\(-1\)</span> and <span class="math inline">\(+1\)</span>, touching the extreme values <span class="math inline">\(n+1\)</span> times with alternating sign (<span class="math inline">\(T_0\equiv1\)</span> is the flat exception).
+</figcaption>
+</figure>
+</div>
+<p>That they are orthogonal polynomials comes from a change of variables.</p>
+<div id="prp-6-cheb-orth" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 6.2 (Chebyshev orthogonality)</strong></span> The <span class="math inline">\(T_n\)</span> are orthogonal on <span class="math inline">\([-1,1]\)</span> with respect to the weight <span class="math inline">\(w(x)=\dfrac{1}{\sqrt{1-x^2}}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>First, <span class="math inline">\(f_n(y)=\cos(ny)\)</span> are orthogonal on <span class="math inline">\([0,\pi]\)</span> under the unweighted <span class="math inline">\(L^2\)</span> inner product: for <span class="math inline">\(m\ne n\)</span>, using <span class="math inline">\(\cos(my)\cos(ny)=\tfrac12[\cos((m+n)y)+\cos((m-n)y)]\)</span>, <span class="math display">\[
+\int_0^{\pi}\cos(my)\cos(ny)\,\dd y
+=\tfrac12\!\int_0^{\pi}\!\cos((m{+}n)y)\,\dd y+\tfrac12\!\int_0^{\pi}\!\cos((m{-}n)y)\,\dd y=0,
+\]</span> since <span class="math inline">\(\sin(k\pi)=0\)</span> for every integer <span class="math inline">\(k\)</span>. Substituting <span class="math inline">\(y=\arccos x\)</span> (so <span class="math inline">\(\dd y=-\dd x/\sqrt{1-x^2}\)</span>) turns this into <span class="math display">\[
+0=\int_{-1}^{1}T_m(x)T_n(x)\,\frac{1}{\sqrt{1-x^2}}\,\dd x=\inner{T_m}{T_n}_{L^2([-1,1];w)} .\qquad\square
+\]</span></p>
+</div>
+<p>The recurrence <a href="#eq-6-cheb-recur" class="quarto-xref">Equation&nbsp;<span>6.9</span></a> doubles the leading coefficient at each step, so <span class="math inline">\(T_n\)</span> has leading term <span class="math inline">\(2^{\,n-1}x^{n}\)</span> for <span class="math inline">\(n\ge1\)</span> and is <em>not</em> monic. The <strong>monic Chebyshev polynomial</strong> is <span id="eq-6-cheb-monic"><span class="math display">\[
+\tilde T_n(x)=\frac{1}{2^{\,n-1}}\,T_n(x)\quad(n\ge1),\qquad \tilde T_0=1,
+\tag{6.11}\]</span></span> so <span class="math inline">\(\max_{[-1,1]}\abs{\tilde T_n}=2^{-(n-1)}\)</span>. To work on a general <span class="math inline">\([a,b]\)</span>, transport everything through the affine map <span class="math inline">\(\tilde x=\tfrac12[(b-a)x+a+b]\)</span>, which sends <span class="math inline">\([-1,1]\)</span> to <span class="math inline">\([a,b]\)</span>; the nodes, weight, and polynomials carry over unchanged in form.</p>
+</section>
+<section id="sec-6-econ" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="sec-6-econ"><span class="header-section-number">6.6</span> Economization of power series</h2>
+<p>Among all monic degree-<span class="math inline">\(n\)</span> polynomials, the monic Chebyshev polynomial is the flattest on <span class="math inline">\([-1,1]\)</span> — it has the smallest possible maximum modulus. This <strong>minimax</strong> property is what makes Chebyshev polynomials the right tool for shaving the degree off a truncated series.</p>
+<div id="thm-6-minimax" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.4 (Chebyshev minimax property)</strong></span> Let <span class="math inline">\(\tilde{\mathbb P}_n\)</span> be the monic polynomials of degree <span class="math inline">\(n\)</span>. For every <span class="math inline">\(\tilde p_n\in\tilde{\mathbb P}_n\)</span>, <span class="math display">\[
+\frac{1}{2^{\,n-1}}=\max_{x\in[-1,1]}\abs{\tilde T_n(x)}\ \le\ \max_{x\in[-1,1]}\abs{\tilde p_n(x)} .
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The Lindsey notes cite the textbook for the full proof; the standard one-line reason is an equioscillation argument. If some monic <span class="math inline">\(\tilde p_n\)</span> had strictly smaller maximum modulus than <span class="math inline">\(\tilde T_n\)</span>, then <span class="math inline">\(\tilde T_n-\tilde p_n\in\mathbb P_{n-1}\)</span> would inherit the sign of <span class="math inline">\(\tilde T_n\)</span> at each of its <span class="math inline">\(n+1\)</span> alternating extrema, hence change sign <span class="math inline">\(n\)</span> times and have <span class="math inline">\(n\)</span> zeros — impossible for a nonzero polynomial of degree <span class="math inline">\(\le n-1\)</span>. So no such <span class="math inline">\(\tilde p_n\)</span> exists. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Now suppose we hold a polynomial <span class="math inline">\(p_n(x)=\sum_{k=0}^n a_k x^k\)</span> (perhaps a Taylor polynomial truncated at high order) whose degree <span class="math inline">\(n\)</span> is larger than we want, and we seek a lower-degree <span class="math inline">\(p_m\in\mathbb P_m\)</span>, <span class="math inline">\(m&lt;n\)</span>, that stays close on <span class="math inline">\([-1,1]\)</span>. Do it greedily, dropping one degree at a time; it suffices to understand the first step, choosing <span class="math inline">\(p_{n-1}\in\mathbb P_{n-1}\)</span> to minimize <span class="math inline">\(\max_{[-1,1]}\abs{p_n-p_{n-1}}\)</span>. Assuming <span class="math inline">\(a_n\ne0\)</span>, the polynomial <span class="math inline">\((p_n-p_{n-1})/a_n\)</span> is monic of degree <span class="math inline">\(n\)</span>, so minimizing the maximum is equivalent to minimizing <span class="math inline">\(\abs{a_n}\max_{[-1,1]}\abs{(p_n-p_{n-1})/a_n}\)</span>, which by <a href="#thm-6-minimax" class="quarto-xref">Theorem&nbsp;<span>6.4</span></a> is smallest exactly when <span class="math inline">\((p_n-p_{n-1})/a_n=\tilde T_n\)</span>. Solving, <span id="eq-6-econ"><span class="math display">\[
+p_{n-1}(x)=p_n(x)-a_n\,\tilde T_n(x)
+\tag{6.12}\]</span></span> — subtract off the leading coefficient times the monic Chebyshev polynomial. This is <strong>economization</strong>; <a href="#eq-6-econ" class="quarto-xref">Equation&nbsp;<span>6.12</span></a> even works when <span class="math inline">\(a_n=0\)</span> (it does nothing), so no case analysis is needed. Iterating <a href="#eq-6-econ" class="quarto-xref">Equation&nbsp;<span>6.12</span></a> from degree <span class="math inline">\(n\)</span> down to <span class="math inline">\(m\)</span> yields a low-degree approximation whose worst-case error on <span class="math inline">\([-1,1]\)</span> is controlled by the discarded <span class="math inline">\(\abs{a_k}/2^{k-1}\)</span>.</p>
+</section>
+<section id="sec-6-lagrange-cheb" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="sec-6-lagrange-cheb"><span class="header-section-number">6.7</span> Lagrange interpolation meets Chebyshev polynomials</h2>
+<p>The same minimax fact answers a question left open in <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>: <em>where</em> should we place interpolation nodes? Recall (<a href="01-interpolation.html#thm-1-interp-error" class="quarto-xref">Theorem&nbsp;<span>1.2</span></a>) that the Lagrange interpolant <span class="math inline">\(p\in\mathbb P_m\)</span> of <span class="math inline">\(f\in C^{m+1}[a,b]\)</span> at distinct nodes <span class="math inline">\(x_0,\dots,x_m\)</span> satisfies <span id="eq-6-lag-error"><span class="math display">\[
+f(x)-p(x)=\frac{f^{(m+1)}(\xi)}{(m+1)!}\prod_{i=0}^{m}(x-x_i),
+\qquad
+\norm{f-p}_{L^\infty[a,b]}\le\frac{\norm{f^{(m+1)}}_{L^\infty}}{(m+1)!}\,\norm{q_{\mathbf x}}_{L^\infty},
+\tag{6.13}\]</span></span> where <span class="math inline">\(q_{\mathbf x}(x)=\prod_{i=0}^m(x-x_i)\)</span> is the <strong>node polynomial</strong>. The derivative factor is outside our control, but <span class="math inline">\(\norm{q_{\mathbf x}}_{L^\infty}\)</span> is entirely ours to minimize through the node placement. For equispaced nodes it grows explosively near the ends — the Runge phenomenon of <a href="01-interpolation.html#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>. Since <span class="math inline">\(q_{\mathbf x}\)</span> is monic of degree <span class="math inline">\(m+1\)</span>, <a href="#thm-6-minimax" class="quarto-xref">Theorem&nbsp;<span>6.4</span></a> says it is made smallest by making it the <em>monic Chebyshev polynomial</em> <span class="math inline">\(\tilde T_{m+1}\)</span>, i.e.&nbsp;by taking the nodes to be the zeros of <span class="math inline">\(T_{m+1}\)</span>.</p>
+<div id="fig-6-nodes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-6-nodes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/06-nodes.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-6-nodes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.2: The monic node polynomial <span class="math inline">\(\prod_j(x-x_j)\)</span> of degree <span class="math inline">\(10\)</span> on <span class="math inline">\([-1,1]\)</span> (vertical axis clipped to <span class="math inline">\(\pm0.04\)</span>). With equispaced nodes it swings far outside the window near <span class="math inline">\(\pm1\)</span>; with Chebyshev nodes it is the monic <span class="math inline">\(\tilde T_{10}\)</span>, hugging zero with maximum modulus <span class="math inline">\(2^{-9}\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>Concretely, for <span class="math inline">\(m+1\)</span> nodes we use the zeros <a href="#eq-6-cheb-nodes" class="quarto-xref">Equation&nbsp;<span>6.10</span></a> of <span class="math inline">\(T_{m+1}\)</span>, <span class="math display">\[
+x_j=\cos\!\Bigl(\frac{2j+1}{2(m+1)}\pi\Bigr),\qquad j=0,\dots,m .
+\]</span> With this choice <span class="math inline">\(q_{\mathbf x}\)</span> and <span class="math inline">\(\tilde T_{m+1}\)</span> are both monic of degree <span class="math inline">\(m+1\)</span> with the same zeros, hence equal, so <span class="math inline">\(\norm{q_{\mathbf x}}_{L^\infty}=2^{-m}\)</span> (<a href="#fig-6-nodes" class="quarto-xref">Figure&nbsp;<span>6.2</span></a>). Substituting into <a href="#eq-6-lag-error" class="quarto-xref">Equation&nbsp;<span>6.13</span></a> gives a bound that shrinks with <span class="math inline">\(m\)</span> instead of blowing up.</p>
+<div id="thm-6-cheb-interp" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.5 (Chebyshev-node interpolation error)</strong></span> Let <span class="math inline">\(f\in C^{m+1}[-1,1]\)</span> and let <span class="math inline">\(p\)</span> be its Lagrange interpolant at the Chebyshev nodes <span class="math inline">\(x_j=\cos\!\bigl(\tfrac{2j+1}{2(m+1)}\pi\bigr)\)</span>, <span class="math inline">\(j=0,\dots,m\)</span>. Then <span class="math display">\[
+\norm{f-p}_{L^\infty[-1,1]}\le\frac{\norm{f^{(m+1)}}_{L^\infty[-1,1]}}{2^{m}\,(m+1)!}.
+\]</span> On a general interval <span class="math inline">\([a,b]\)</span>, using the transported Chebyshev nodes, <span class="math display">\[
+\norm{f-p}_{L^\infty[a,b]}\le\Bigl(\frac{b-a}{2}\Bigr)^{m+1}\frac{\norm{f^{(m+1)}}_{L^\infty[a,b]}}{2^{m}\,(m+1)!}.
+\]</span></p>
+</div>
+<p>The extra <span class="math inline">\(2^{-m}\)</span> over the generic bound is exactly the equioscillation dividend. Choosing nodes well converts interpolation from a method that can <em>diverge</em> (equispaced) into one that converges geometrically for smooth <span class="math inline">\(f\)</span> — the node-choice payoff promised in <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>.</p>
+</section>
+<section id="sec-6-gauss" class="level2" data-number="6.8">
+<h2 data-number="6.8" class="anchored" data-anchor-id="sec-6-gauss"><span class="header-section-number">6.8</span> Gauss quadrature from the approximation viewpoint</h2>
+<p>Orthogonal polynomials also generate the optimal quadrature rules. Gauss quadrature approximates <span class="math inline">\(\int_a^b g(x)\,w(x)\,\dd x\approx\sum_{i=0}^{m}w_i\,g(x_i)\)</span>; from the present angle the nodes are the zeros of an orthogonal polynomial and the weights are integrals of Lagrange basis functions. This is the same rule established in <a href="02-differentiation-integration.html#thm-2-gauss-quad" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>, restated here for the weighted setting.</p>
+<div id="thm-6-gauss" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.6 (Gauss quadrature (approximation-theory form))</strong></span> Let <span class="math inline">\(a&lt;x_0&lt;\dots&lt;x_m&lt;b\)</span> be the zeros of <span class="math inline">\(p_{m+1}\)</span>, the degree-<span class="math inline">\((m+1)\)</span> orthogonal polynomial for the weight <span class="math inline">\(w\)</span> on <span class="math inline">\([a,b]\)</span>, and set <span class="math inline">\(\mathbf x=(x_0,\dots,x_m)\)</span>. Define the weights <span class="math display">\[
+w_i=\int_a^b L_i(x;\mathbf x)\,w(x)\,\dd x=\inner{L_i}{1}_w,\qquad i=0,\dots,m,
+\]</span> with <span class="math inline">\(L_i\)</span> the Lagrange basis for the nodes <span class="math inline">\(\mathbf x\)</span>. Then <span class="math display">\[
+\int_a^b g(x)\,w(x)\,\dd x=\sum_{i=0}^{m}w_i\,g(x_i)\qquad\text{for all } g\in\mathbb P_{2m+1}.
+\]</span></p>
+</div>
+<p>For <span class="math inline">\(g\in\mathbb P_m\)</span> the rule is exact because <span class="math inline">\(g\)</span> equals its own interpolant on <span class="math inline">\(m+1\)</span> nodes; the striking part — exactness all the way to degree <span class="math inline">\(2m+1\)</span> — holds <em>only</em> for the orthogonal-polynomial nodes (the proof is in <a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>). This is precisely the tool needed to run the projection <a href="#eq-6-orthoproj" class="quarto-xref">Equation&nbsp;<span>6.6</span></a> in practice: the coefficients require inner products <span class="math inline">\(\inner{h_1}{h_2}_w=\int_a^b h_1 h_2\,w\,\dd x\)</span>, which we evaluate as <span class="math display">\[
+\inner{h_1}{h_2}_w\approx\sum_{i=0}^{m}w_i\,h_1(x_i)h_2(x_i) .
+\]</span> When <span class="math inline">\(h_1h_2\in\mathbb P_{2m+1}\)</span> — as it is for the low-degree orthogonal polynomials themselves — this approximation is <em>exact</em>, a fact the next section exploits.</p>
+</section>
+<section id="sec-6-connect" class="level2" data-number="6.9">
+<h2 data-number="6.9" class="anchored" data-anchor-id="sec-6-connect"><span class="header-section-number">6.9</span> Connecting interpolation and least-squares projection</h2>
+<p>Interpolation and least-squares projection look like different problems, yet Gauss quadrature makes them coincide at the right sampling rate. Define the <strong>approximate (discrete) inner product</strong> built from the Gauss nodes and weights for <span class="math inline">\(w\)</span>, <span class="math display">\[
+\inner{\phi}{\psi}_w^{(m)}\defeq\sum_{i=0}^{m}\phi(x_i)\,\psi(x_i)\,w_i .
+\]</span> Replacing the true inner products in <a href="#eq-6-orthoproj" class="quarto-xref">Equation&nbsp;<span>6.6</span></a> by this discrete one gives a computable approximation to the least-squares-optimal <span class="math inline">\(p\)</span>. The surprise is what happens at <span class="math inline">\(m=n\)</span>.</p>
+<div id="thm-6-interp-projection" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.7 (Discrete projection equals interpolation)</strong></span> With the Gauss nodes and weights for <span class="math inline">\(w\)</span> on <span class="math inline">\([a,b]\)</span>, let <span class="math display">\[
+q=\sum_{k=0}^{n}\frac{\inner{f}{p_k}_w^{(n)}}{\inner{p_k}{p_k}_w^{(n)}}\,p_k\in\mathbb P_n .
+\]</span> Then <span class="math inline">\(q\)</span> is exactly the Lagrange interpolant of <span class="math inline">\(f\)</span> at the nodes <span class="math inline">\(x_0,\dots,x_n\)</span>; that is, <span class="math inline">\(q(x_i)=f(x_i)\)</span> for all <span class="math inline">\(i\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(\ell\in\mathbb P_n\)</span> be the Lagrange interpolant, <span class="math inline">\(\ell(x_i)=f(x_i)\)</span>. Three claims chain together.</p>
+<p><em>Claim 1:</em> <span class="math inline">\(\inner{p_k}{p_k}_w^{(n)}=\inner{p_k}{p_k}_w\)</span> for <span class="math inline">\(k\le n\)</span>. Indeed <span class="math inline">\(p_k^2\in\mathbb P_{2n}\)</span>, on which the <span class="math inline">\((n{+}1)\)</span>-node Gauss rule <a href="#thm-6-gauss" class="quarto-xref">Theorem&nbsp;<span>6.6</span></a> is exact, so the discrete and true inner products agree.</p>
+<p><em>Claim 2:</em> <span class="math inline">\(\inner{f}{p_k}_w^{(n)}=\inner{\ell}{p_k}_w^{(n)}\)</span>. Both discrete inner products only see node values, and <span class="math inline">\(f(x_i)=\ell(x_i)\)</span>: <span class="math inline">\(\sum_i f(x_i)p_k(x_i)w_i=\sum_i\ell(x_i)p_k(x_i)w_i\)</span>.</p>
+<p><em>Claim 3:</em> <span class="math inline">\(\inner{\ell}{p_k}_w^{(n)}=\inner{\ell}{p_k}_w\)</span>. Since <span class="math inline">\(\ell p_k\in\mathbb P_{2n}\)</span>, exactness of the Gauss rule again equates the discrete and true inner products.</p>
+<p>Combining, <span class="math inline">\(\inner{f}{p_k}_w^{(n)}=\inner{\ell}{p_k}_w\)</span> and <span class="math inline">\(\inner{p_k}{p_k}_w^{(n)}=\inner{p_k}{p_k}_w\)</span>, so <span class="math display">\[
+q=\sum_{k=0}^{n}\frac{\inner{\ell}{p_k}_w}{\inner{p_k}{p_k}_w}\,p_k ,
+\]</span> which by <a href="#thm-6-orthoproj" class="quarto-xref">Theorem&nbsp;<span>6.2</span></a> is the exact least-squares projection of <span class="math inline">\(\ell\in\mathbb P_n\)</span> onto <span class="math inline">\(\mathbb P_n\)</span> — namely <span class="math inline">\(\ell\)</span> itself. Hence <span class="math inline">\(q=\ell\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Read the other way: Lagrange interpolation can be performed by a “lazy” evaluation of Gauss quadrature, which conveniently expresses the interpolant as a combination of orthogonal polynomials rather than of Lagrange basis functions — especially useful in the Chebyshev case, where it becomes a discrete cosine transform.</p>
+</section>
+<section id="sec-6-pade" class="level2" data-number="6.10">
+<h2 data-number="6.10" class="anchored" data-anchor-id="sec-6-pade"><span class="header-section-number">6.10</span> Padé approximation</h2>
+<p>Polynomials are not always the best approximants; rational functions capture poles and asymptotes that polynomials cannot. A <strong>rational function of degree <span class="math inline">\(N\)</span></strong> is <span class="math inline">\(r=p/q\)</span> with <span class="math inline">\(\deg p+\deg q=N\)</span>. <strong>Padé approximation</strong> is the rational analogue of the Taylor polynomial: match as many derivatives at a base point (taken to be <span class="math inline">\(x=0\)</span>) as the free parameters allow.</p>
+<div id="def-6-pade" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.4 (Padé approximant)</strong></span> Write <span class="math inline">\(p(x)=\sum_{k=0}^{n}p_k x^{k}\)</span> and <span class="math inline">\(q(x)=\sum_{k=0}^{m}q_k x^{k}\)</span> (extend both coefficient sequences by zeros beyond their degrees). Normalizing <span class="math inline">\(q_0=1\)</span> leaves <span class="math inline">\(n+m+1=N+1\)</span> free parameters. The <strong><span class="math inline">\([n/m]\)</span> Padé approximant</strong> of <span class="math inline">\(f\)</span> is the rational <span class="math inline">\(r=p/q\)</span> chosen so that <span class="math display">\[
+r^{(k)}(0)=f^{(k)}(0),\qquad k=0,\dots,N .
+\]</span></p>
+</div>
+<p>To construct it, expand <span class="math inline">\(f(x)=\sum_{k\ge0}a_k x^{k}\)</span> (its Maclaurin series) and note <span class="math display">\[
+f-r=\frac{fq-p}{q},
+\]</span> so matching the first <span class="math inline">\(N\)</span> derivatives of <span class="math inline">\(f-r\)</span> at <span class="math inline">\(0\)</span> is equivalent to killing the terms of order <span class="math inline">\(0,\dots,N\)</span> in the numerator <span class="math inline">\(fq-p\)</span>. Expanding, <span class="math display">\[
+f(x)q(x)-p(x)=\sum_{k=0}^{\infty}\Bigl(\sum_{i=0}^{k}a_i q_{k-i}-p_k\Bigr)x^{k},
+\]</span> so the conditions are the linear equations <span id="eq-6-pade-eqs"><span class="math display">\[
+p_k=\sum_{i=0}^{k}a_i q_{k-i},\qquad k=0,\dots,N,
+\tag{6.14}\]</span></span> which are <span class="math inline">\(N+1\)</span> equations in the <span class="math inline">\(N+1\)</span> unknowns <span class="math inline">\(p_0,\dots,p_n,q_1,\dots,q_m\)</span>. To cast <a href="#eq-6-pade-eqs" class="quarto-xref">Equation&nbsp;<span>6.14</span></a> as a matrix system, use <span class="math inline">\(q_0=1\)</span> to write <span class="math inline">\(p_k-\sum_{i=1}^{k}a_{k-i}q_i=a_k\)</span> and define the <span class="math inline">\((N+1)\times m\)</span> matrix <span class="math inline">\(C=(C_{ki})\)</span> (rows <span class="math inline">\(0,\dots,N\)</span>, columns <span class="math inline">\(1,\dots,m\)</span>) with <span class="math inline">\(C_{ki}=a_{k-i}\)</span> for <span class="math inline">\(i\le k\)</span> and <span class="math inline">\(0\)</span> otherwise, together with the <span class="math inline">\((N+1)\times(n+1)\)</span> selector <span class="math inline">\(E=\bigl(\begin{smallmatrix}I_{n+1}\\ 0\end{smallmatrix}\bigr)\)</span> picking out <span class="math inline">\(p_0,\dots,p_n\)</span>. Then, with <span class="math inline">\(\mathbf a=(a_0,\dots,a_N)^\top\)</span>, <span class="math inline">\(\mathbf p=(p_0,\dots,p_n)^\top\)</span>, <span class="math inline">\(\mathbf q=(q_1,\dots,q_m)^\top\)</span>, <span id="eq-6-pade-system"><span class="math display">\[
+E\mathbf p-C\mathbf q=\mathbf a
+\quad\Longleftrightarrow\quad
+\underbrace{\begin{pmatrix}E &amp; -C\end{pmatrix}}_{=:A}\begin{pmatrix}\mathbf p\\ \mathbf q\end{pmatrix}=\mathbf a ,
+\tag{6.15}\]</span></span> an ordinary linear system for the coefficients. For instance, <span class="math inline">\(n=m=3\)</span> (<span class="math inline">\(N=6\)</span>) gives the <span class="math inline">\(7\times3\)</span> lower-triangular Toeplitz <span class="math inline">\(C\)</span> with rows <span class="math inline">\((0,0,0),(a_0,0,0),(a_1,a_0,0),\dots,(a_5,a_4,a_3)\)</span>.</p>
+</section>
+<section id="sec-6-cheb-rational" class="level2" data-number="6.11">
+<h2 data-number="6.11" class="anchored" data-anchor-id="sec-6-cheb-rational"><span class="header-section-number">6.11</span> Chebyshev rational approximation</h2>
+<p>Padé, like Taylor, is anchored at one point, so its quality is uneven across <span class="math inline">\([-1,1]\)</span>. For roughly <em>uniform</em> rational quality on <span class="math inline">\([-1,1]\)</span> (reduce a general <span class="math inline">\([a,b]\)</span> by the affine map of <a href="#sec-6-chebyshev" class="quarto-xref"><span>Section 6.5</span></a>) replace the power-series expansions by Chebyshev expansions: <span class="math display">\[
+r(x)=\frac{\sum_{k=0}^{n}p_k T_k(x)}{\sum_{k=0}^{m}q_k T_k(x)},\qquad q_0=1,
+\]</span> and expand <span class="math inline">\(f(x)=\sum_{k\ge0}a_k T_k(x)\)</span> with <span class="math inline">\(a_k=\inner{f}{T_k}_w/\inner{T_k}{T_k}_w\)</span> under the Chebyshev weight <span class="math inline">\(w=1/\sqrt{1-x^2}\)</span>. The numerators <span class="math inline">\(\inner{f}{T_k}_w\)</span> come from Gauss–Chebyshev quadrature (<a href="#sec-6-gauss" class="quarto-xref"><span>Section 6.8</span></a>); the denominators are universal, <span class="math display">\[
+\inner{T_k}{T_k}_w=\begin{cases}\pi,&amp;k=0,\\[2pt]\pi/2,&amp;k\ge1.\end{cases}
+\]</span> As before we force the low-order terms of <span class="math inline">\(fq-p\)</span> to vanish, but now <span class="math inline">\(T_iT_j\)</span> is not a single Chebyshev polynomial. The saving identity (from homework) is <span id="eq-6-cheb-product"><span class="math display">\[
+T_iT_j=\tfrac12\bigl[T_{i+j}+T_{\abs{i-j}}\bigr],
+\tag{6.16}\]</span></span> which lets the product <span class="math inline">\(fq\)</span> be re-expanded in the <span class="math inline">\(T_k\)</span>. Collecting the coefficient of each <span class="math inline">\(T_k\)</span> in <span class="math inline">\(fq-p\)</span> and setting orders <span class="math inline">\(0,\dots,N\)</span> to zero yields, after the bookkeeping, a linear system of the same shape as <a href="#eq-6-pade-system" class="quarto-xref">Equation&nbsp;<span>6.15</span></a>: form the <span class="math inline">\((N+1)\times(m+1)\)</span> matrices <span class="math inline">\(B^{(1)},B^{(2)},B^{(3)}\)</span> with entries <span class="math inline">\(a_{k-i}\)</span> (for <span class="math inline">\(i\le k\)</span>), <span class="math inline">\(a_{i-k}\)</span> (for <span class="math inline">\(i\ge k\)</span>), and <span class="math inline">\(a_{i+k}\)</span> (for <span class="math inline">\(k\ge1\)</span>) respectively, and <span class="math inline">\(\tilde C=\tfrac12(B^{(1)}+B^{(2)}+B^{(3)})\)</span>, so that the conditions read <span class="math inline">\(E\mathbf p-\tilde C\tilde{\mathbf q}=0\)</span>. Splitting off the <span class="math inline">\(q_0=1\)</span> column, <span class="math inline">\(\tilde C=(\mathbf c\ \ C)\)</span> and <span class="math inline">\(\tilde{\mathbf q}=(1,\mathbf q^\top)^\top\)</span>, leaves <span class="math display">\[
+\begin{pmatrix}E &amp; -C\end{pmatrix}\begin{pmatrix}\mathbf p\\ \mathbf q\end{pmatrix}=\mathbf c ,
+\]</span> again an <span class="math inline">\(A\mathbf x=\mathbf c\)</span> system. The three-term identity <a href="#eq-6-cheb-product" class="quarto-xref">Equation&nbsp;<span>6.16</span></a> is the only new ingredient; everything else parallels <a href="#sec-6-pade" class="quarto-xref"><span>Section 6.10</span></a>.</p>
+</section>
+<section id="sec-6-fourier" class="level2" data-number="6.12">
+<h2 data-number="6.12" class="anchored" data-anchor-id="sec-6-fourier"><span class="header-section-number">6.12</span> Fourier series</h2>
+<p>For periodic functions the natural basis is trigonometric. Consider <span class="math inline">\(f:[-\pi,\pi]\to\R\)</span>, extended <span class="math inline">\(2\pi\)</span>-periodically to <span class="math inline">\(\R\)</span> (<span class="math inline">\(f(x+2\pi k)=f(x)\)</span>). Throughout this and the following sections <span class="math inline">\(i\)</span> denotes the imaginary unit (<span class="math inline">\(i^2=-1\)</span>). The functions <span class="math display">\[
+\phi_k(x)=\cos(kx)\ (k=0,\dots,n),\qquad \psi_k(x)=\sin(kx)\ (k=1,\dots,n)
+\]</span> are orthogonal under <span class="math inline">\(\inner{\cdot}{\cdot}=\inner{\cdot}{\cdot}_{L^2([-\pi,\pi])}\)</span>: all cross inner products vanish, and <span class="math display">\[
+\inner{\phi_0}{\phi_0}=2\pi,\qquad \inner{\phi_k}{\phi_k}=\inner{\psi_k}{\psi_k}=\pi\ (k\ge1),
+\]</span> verified as in <a href="#prp-6-cheb-orth" class="quarto-xref">Proposition&nbsp;<span>6.2</span></a>.</p>
+<div id="def-6-trig-poly" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.5 (Trigonometric polynomials)</strong></span> <span class="math inline">\(\mathcal T_n\defeq\Span(\phi_0,\dots,\phi_n,\psi_1,\dots,\psi_n)\)</span> is the space of <strong>trigonometric polynomials</strong> of degree <span class="math inline">\(\le n\)</span>; a member has degree <span class="math inline">\(n\)</span> if the coefficient of <span class="math inline">\(\phi_n\)</span> or <span class="math inline">\(\psi_n\)</span> is nonzero.</p>
+</div>
+<p>Orthogonality makes the best <span class="math inline">\(\mathcal T_n\)</span>-approximation another projection (<a href="#thm-6-orthoproj" class="quarto-xref">Theorem&nbsp;<span>6.2</span></a> in trigonometric dress): <span class="math inline">\(\min_{\phi\in\mathcal T_n}\norm{\phi-f}^2\)</span> is solved by <span id="eq-6-fourier-real"><span class="math display">\[
+\phi(x)=\frac{a_0}{2}+\sum_{k=1}^{n}\bigl[a_k\cos(kx)+b_k\sin(kx)\bigr],
+\tag{6.17}\]</span></span> <span class="math display">\[
+a_k=\frac1\pi\int_{-\pi}^{\pi} f(x)\cos(kx)\,\dd x\ (k\ge0),\qquad
+b_k=\frac1\pi\int_{-\pi}^{\pi} f(x)\sin(kx)\,\dd x\ (k\ge1) .
+\]</span> These are the truncated <strong>Fourier series</strong> coefficients, each <span class="math inline">\(a_k=\inner{f}{\phi_k}/\inner{\phi_k}{\phi_k}\)</span> (the <span class="math inline">\(a_0/2\)</span> absorbs the factor-of-two difference <span class="math inline">\(\inner{\phi_0}{\phi_0}=2\pi\)</span>).</p>
+<section id="the-complex-exponential-basis" class="level3">
+<h3 class="anchored" data-anchor-id="the-complex-exponential-basis">The complex exponential basis</h3>
+<p>The real basis is clarified by going complex. Extend the inner product to <span class="math inline">\(g,h:[-\pi,\pi]\to\C\)</span> by <span class="math display">\[
+\inner{g}{h}=\int_{-\pi}^{\pi} g(x)\,\overline{h(x)}\,\dd x,
+\]</span> linear in the first slot with conjugate symmetry <span class="math inline">\(\inner{g}{h}=\overline{\inner{h}{g}}\)</span> (hence conjugate-linear in the second). The exponentials <span class="math inline">\(e_k(x)=e^{ikx}\)</span>, <span class="math inline">\(k\in\Z\)</span>, are orthogonal: <span class="math display">\[
+\inner{e_k}{e_l}=\int_{-\pi}^{\pi} e^{i(k-l)x}\,\dd x=2\pi\,\delta_{kl},
+\]</span> since for <span class="math inline">\(k\ne l\)</span> the antiderivative <span class="math inline">\(e^{i(k-l)x}/[i(k-l)]\)</span> is <span class="math inline">\(2\pi\)</span>-periodic.</p>
+<div id="thm-6-fourier-complex" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 6.8 (Real and complex trigonometric spans coincide)</strong></span> <span class="math inline">\(\mathcal T_n\subset\mathcal T_n^{\C}\defeq\Span_{\C}(\phi_0,\dots,\phi_n,\psi_1,\dots,\psi_n)=\Span_{\C}(e_{-n},\dots,e_n)\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><span class="math inline">\(\phi_0=e_0\)</span>, so it suffices to show <span class="math inline">\(\Span(\phi_k,\psi_k)=\Span(e_k,e_{-k})\)</span> for <span class="math inline">\(k\ge1\)</span>. Euler’s formula <span class="math inline">\(e^{\pm ikx}=\cos(kx)\pm i\sin(kx)\)</span> puts <span class="math inline">\(e_{\pm k}\in\Span(\phi_k,\psi_k)\)</span>; conversely <span class="math inline">\(\cos(kx)=(e^{ikx}+e^{-ikx})/2\)</span> and <span class="math inline">\(\sin(kx)=(e^{ikx}-e^{-ikx})/(2i)\)</span> put <span class="math inline">\(\phi_k,\psi_k\in\Span(e_k,e_{-k})\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Consequently <span class="math inline">\(\min_{\phi\in\mathcal T_n^{\C}}\norm{\phi-f}^2\)</span> is solved by <span id="eq-6-fourier-complex"><span class="math display">\[
+\phi(x)=\sum_{k=-n}^{n} c_k e^{ikx},\qquad c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(x)\,e^{-ikx}\,\dd x .
+\tag{6.18}\]</span></span> For real <span class="math inline">\(f\)</span> the two minimizers agree, and the coefficients are related by <span class="math display">\[
+c_0=\frac{a_0}{2},\quad c_k=\frac{a_k-ib_k}{2},\quad c_{-k}=\frac{a_k+ib_k}{2},
+\qquad a_k=c_k+c_{-k},\quad b_k=i(c_k-c_{-k}).
+\]</span></p>
+</section>
+<section id="sec-6-trap" class="level3">
+<h3 class="anchored" data-anchor-id="sec-6-trap">Computing the coefficients: the trapezoidal rule</h3>
+<p>The integrals for <span class="math inline">\(a_k,b_k,c_k\)</span> usually need numerical quadrature, and for periodic integrands the <strong>trapezoidal rule</strong> is the right choice. On the grid <span class="math inline">\(x_k=-\pi+kh\)</span>, <span class="math inline">\(h=2\pi/(M+1)\)</span>, <span class="math display">\[
+\int_{-\pi}^{\pi} g(x)\,\dd x\approx\frac h2\bigl[g(x_0)+g(x_{M+1})\bigr]+h\sum_{k=1}^{M}g(x_k),
+\]</span> which is exact for every trigonometric polynomial in <span class="math inline">\(\mathcal T_M\)</span> — the periodic analogue of Gauss quadrature’s exactness on <span class="math inline">\(\mathbb P_{2M+1}\)</span>. When <span class="math inline">\(g\)</span> is <span class="math inline">\(2\pi\)</span>-periodic, <span class="math inline">\(g(x_0)=g(x_{M+1})\)</span> and the rule collapses to the left-endpoint Riemann sum <span class="math inline">\(h\sum_{k=0}^{M}g(x_k)\)</span>, which is why the trapezoidal rule converges <em>spectrally</em> fast for smooth periodic integrands. Choosing <span class="math inline">\(M\gg n\)</span> makes the coefficient errors negligible.</p>
+</section>
+</section>
+<section id="sec-6-discrete-trig" class="level2" data-number="6.13">
+<h2 data-number="6.13" class="anchored" data-anchor-id="sec-6-discrete-trig"><span class="header-section-number">6.13</span> Discrete least squares with trigonometric polynomials</h2>
+<p>In practice we often have only a sampling of a periodic <span class="math inline">\(f\)</span> on the equispaced grid <span class="math display">\[
+x_j=-\pi+jh,\qquad j=0,\dots,2m-1,\qquad h=\frac{\pi}{m},
+\]</span> with <span class="math inline">\(y_j=f(x_j)\)</span> (the point <span class="math inline">\(x_{2m}=\pi\)</span> is redundant by periodicity). We fit these <span class="math inline">\(2m\)</span> data points by the exponentials <span class="math inline">\(e_k(x)=e^{ikx}\)</span> in discrete least squares. On the grid the exponentials alias: for all <span class="math inline">\(j\)</span>, <span class="math display">\[
+e_{k+2m}(x_j)=e^{ikx_j}\,e^{i\,2m(-\pi+j\pi/m)}=e^{ikx_j}\,e^{-2\pi i m}e^{2\pi i j}=e_k(x_j),
+\]</span> so more than <span class="math inline">\(2m\)</span> consecutive frequencies are redundant. Taking <span class="math inline">\(k=-m,\dots,m-1\)</span> gives <span class="math inline">\(2m\)</span> parameters for <span class="math inline">\(2m\)</span> points — enough to fit exactly. The normal equations <span class="math inline">\(A\mathbf c=\mathbf b\)</span> use the <em>discrete</em> inner product <span class="math inline">\(A_{kl}=\sum_{j}\overline{e_k(x_j)}\,e_l(x_j)\)</span>, <span class="math inline">\(\mathbf b_k=\sum_j\overline{e_k(x_j)}\,y_j\)</span>. The matrix is a scaled identity: <span class="math display">\[
+A_{kl}=\sum_{j=0}^{2m-1}e^{i(l-k)x_j}=\sum_{j=0}^{2m-1}\Bigl(e^{\frac{2\pi i(l-k)}{2m}}\Bigr)^{j}=2m\,\delta_{kl},
+\]</span> because the geometric sum vanishes unless <span class="math inline">\(k-l\)</span> is a multiple of <span class="math inline">\(2m\)</span>, which within <span class="math inline">\(-m,\dots,m-1\)</span> happens only at <span class="math inline">\(k=l\)</span>. Hence <span class="math inline">\(A=2m\,I\)</span> and <span class="math inline">\(\mathbf c=\tfrac{1}{2m}\mathbf b\)</span>: <span id="eq-6-discrete-coeff"><span class="math display">\[
+c_k=\frac{e^{ik\pi}}{2m}\sum_{j=0}^{2m-1}e^{-\frac{2\pi i kj}{2m}}\,y_j,\qquad k=-m,\dots,m-1,
+\tag{6.19}\]</span></span> and the fit is <span class="math inline">\(\phi(x)=\sum_{k=-m}^{m-1}c_k e^{ikx}\)</span>. Zeroing the high-frequency <span class="math inline">\(c_k\)</span> afterward recovers the least-squares fit in any smaller basis <span class="math inline">\(e_{-n},\dots,e_n\)</span>, <span class="math inline">\(n&lt;m\)</span>. The whole cost sits in the sums <a href="#eq-6-discrete-coeff" class="quarto-xref">Equation&nbsp;<span>6.19</span></a>.</p>
+</section>
+<section id="sec-6-dft" class="level2" data-number="6.14">
+<h2 data-number="6.14" class="anchored" data-anchor-id="sec-6-dft"><span class="header-section-number">6.14</span> The discrete Fourier transform</h2>
+<p>The sums in <a href="#eq-6-discrete-coeff" class="quarto-xref">Equation&nbsp;<span>6.19</span></a> are a <strong>discrete Fourier transform (DFT)</strong>. First clear the negative indices using the aliasing <span class="math inline">\(e_{k+2m}=e_k\)</span>: define, for <span class="math inline">\(k=0,\dots,2m-1\)</span>, <span class="math display">\[
+\tilde c_k=\frac{e^{ik\pi}}{2m}\sum_{j=0}^{2m-1}e^{-\frac{2\pi i kj}{2m}}\,y_j,
+\]</span> and recover the wanted coefficients by stacking the last <span class="math inline">\(m\)</span> entries on top: <span class="math inline">\(c_0=\tilde c_0,\dots,c_{m-1}=\tilde c_{m-1}\)</span> and <span class="math inline">\(c_{-m}=\tilde c_m,\dots,c_{-1}=\tilde c_{2m-1}\)</span>. Peeling off the prefactor, define <span id="eq-6-dft"><span class="math display">\[
+\hat y_k=\sum_{j=0}^{2m-1}e^{-\frac{2\pi i kj}{2m}}\,y_j,\qquad k=0,\dots,2m-1,
+\tag{6.20}\]</span></span> so <span class="math inline">\(\tilde c_k=\tfrac{e^{ik\pi}}{2m}\hat y_k\)</span>. With <span class="math inline">\(N=2m\)</span>, <a href="#eq-6-dft" class="quarto-xref">Equation&nbsp;<span>6.20</span></a> is the matrix–vector product in the following definition.</p>
+<div id="def-6-dft" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 6.6 (Discrete Fourier transform)</strong></span> The <strong>DFT</strong> of <span class="math inline">\(y\in\C^{N}\)</span> is <span class="math inline">\(\hat y=\mathbf F y\)</span>, where <span class="math inline">\(\mathbf F=(F_{kl})\)</span> is the <span class="math inline">\(N\times N\)</span> matrix with zero-indexed entries <span class="math display">\[
+F_{kl}=e^{-\frac{2\pi i kl}{N}} .
+\]</span></p>
+</div>
+<p>The entire pipeline for discrete trigonometric least squares is now: (i) form <span class="math inline">\(\hat y=\mathbf F y\)</span>; (ii) set <span class="math inline">\(\tilde c_k=\tfrac{e^{ik\pi}}{2m}\hat y_k\)</span>; (iii) restack to get <span class="math inline">\(\mathbf c\)</span>; (iv) read off <span class="math inline">\(\phi(x)=\sum_{k=-n}^{n}c_k e^{ikx}\)</span>. A naïve matvec by <span class="math inline">\(\mathbf F\)</span> costs <span class="math inline">\(\bigO(N^2)\)</span> — which the next section removes.</p>
+</section>
+<section id="sec-6-fft" class="level2" data-number="6.15">
+<h2 data-number="6.15" class="anchored" data-anchor-id="sec-6-fft"><span class="header-section-number">6.15</span> The fast Fourier transform</h2>
+<p>Forming <span class="math inline">\(\mathbf F\)</span> and multiplying costs <span class="math inline">\(\bigO(N^2)\)</span>, but the DFT never needs the explicit matrix: the <strong>fast Fourier transform (FFT)</strong> computes <span class="math inline">\(\hat y=\mathbf F^{(N)}y\)</span> in <span class="math inline">\(\bigO(N\log N)\)</span>. It is, plausibly, the most important numerical algorithm ever devised — known to Gauss in 1805 and rediscovered by Cooley and Tukey in 1965. Whenever periodic functions, trigonometric polynomials, or Fourier coefficients appear, the goal is to reduce the computation to the right FFTs.</p>
+<p>Assume <span class="math inline">\(N=2^{n}\)</span> (a general <span class="math inline">\(N\)</span> reduces to this case). Split the DFT sum <a href="#eq-6-dft" class="quarto-xref">Equation&nbsp;<span>6.20</span></a> into even- and odd-indexed terms, writing <span class="math inline">\(\omega_N=e^{-2\pi i/N}\)</span> and using <span class="math inline">\(\omega_N^{2}=\omega_{N/2}\)</span>: <span class="math display">\[
+\hat y_k=\sum_{l=0}^{N-1}\omega_N^{\,kl}y_l
+=\sum_{r=0}^{N/2-1}\omega_{N/2}^{\,kr}y_{2r}
++\omega_N^{\,k}\sum_{r=0}^{N/2-1}\omega_{N/2}^{\,kr}y_{2r+1}.
+\]</span> Each sum is a DFT of length <span class="math inline">\(N/2\)</span> — on the even part <span class="math inline">\(y^{(e)}\)</span> and the odd part <span class="math inline">\(y^{(o)}\)</span>. Let <span class="math inline">\(\mathbf D^{(N)}=\diag(\omega_N^{0},\dots,\omega_N^{N/2-1})\)</span> be the <strong>twiddle factors</strong> and set <span class="math inline">\(u=\mathbf F^{(N/2)}y^{(e)}\)</span>, <span class="math inline">\(v=\mathbf D^{(N)}\mathbf F^{(N/2)}y^{(o)}\)</span>. Because the length-<span class="math inline">\(N/2\)</span> transforms are <span class="math inline">\(N/2\)</span>-periodic in <span class="math inline">\(k\)</span>, the two halves of <span class="math inline">\(\hat y\)</span> share these vectors: <span id="eq-6-butterfly"><span class="math display">\[
+\hat y_k=u_k+v_k,\qquad \hat y_{k+N/2}=u_k-v_k,\qquad k=0,\dots,N/2-1 .
+\tag{6.21}\]</span></span> The <span class="math inline">\(\pm\)</span> pair <a href="#eq-6-butterfly" class="quarto-xref">Equation&nbsp;<span>6.21</span></a> is the <strong>butterfly</strong>: two half-size DFTs plus one diagonal matvec and <span class="math inline">\(N\)</span> additions.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — recursive radix-2 FFT
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To compute <span class="math inline">\(\hat y=\mathbf F^{(N)}y\)</span>:</p>
+<ol type="1">
+<li>If <span class="math inline">\(N=1\)</span>, return <span class="math inline">\(\hat y=y\)</span>.</li>
+<li>Otherwise split <span class="math inline">\(y\)</span> into its even part <span class="math inline">\(y^{(e)}\)</span> and odd part <span class="math inline">\(y^{(o)}\)</span>.</li>
+<li>Recursively compute <span class="math inline">\(u=\mathbf F^{(N/2)}y^{(e)}\)</span> and <span class="math inline">\(v=\mathbf D^{(N)}\bigl[\mathbf F^{(N/2)}y^{(o)}\bigr]\)</span>.</li>
+<li>Return <span class="math inline">\(\hat y=\bigl(\begin{smallmatrix}u+v\\ u-v\end{smallmatrix}\bigr)\)</span>.</li>
+</ol>
+</div>
+</div>
+<p>Each call does <span class="math inline">\(\bigO(N)\)</span> work outside its recursive calls. Summed over the recursion tree there are <span class="math inline">\(1\)</span> call of size <span class="math inline">\(N\)</span>, <span class="math inline">\(2\)</span> of size <span class="math inline">\(N/2\)</span>, <span class="math inline">\(4\)</span> of size <span class="math inline">\(N/4\)</span>, and so on — <span class="math inline">\(\bigO(N)\)</span> work at each of the <span class="math inline">\(\log_2 N+1\)</span> levels — for a total of <span class="math inline">\(\bigO(N\log N)\)</span>. That speedup is what makes Fourier methods, spectral differentiation, and fast convolution practical.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="6.16">
+<h2 data-number="6.16" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">6.16</span> Chapter summary</h2>
+<ul>
+<li><strong>Best approximation in an inner-product norm is orthogonal projection.</strong> Discrete least squares reduces to the normal equations <span class="math inline">\(G^\top G\mathbf a=G^\top y\)</span> (<a href="#thm-6-least-squares" class="quarto-xref">Theorem&nbsp;<span>6.1</span></a>); over an interval it becomes the Gram-matrix system <a href="#eq-6-gram-system" class="quarto-xref">Equation&nbsp;<span>6.4</span></a> with <span class="math inline">\(L^2\)</span> (or weighted-<span class="math inline">\(L^2\)</span>) inner products.</li>
+<li>Choosing an <strong>orthogonal polynomial basis</strong> (<a href="#def-6-orthopoly" class="quarto-xref">Definition&nbsp;<span>6.2</span></a>) diagonalizes the Gram matrix, so the projection is the term-by-term formula <a href="#eq-6-orthoproj" class="quarto-xref">Equation&nbsp;<span>6.6</span></a>. The basis is built by Gram–Schmidt
+<ol class="example" type="1">
+<li>and evaluated stably by the <strong>three-term recurrence</strong> <a href="#eq-6-three-term" class="quarto-xref">Equation&nbsp;<span>6.7</span></a>, never through its expanded coefficients.</li>
+</ol></li>
+<li><strong>Chebyshev polynomials</strong> <span class="math inline">\(T_n(x)=\cos(n\arccos x)\)</span> (<a href="#def-6-chebyshev" class="quarto-xref">Definition&nbsp;<span>6.3</span></a>) equioscillate on <span class="math inline">\([-1,1]\)</span>, are orthogonal for <span class="math inline">\(w=1/\sqrt{1-x^2}\)</span>, and their monic versions are the minimax-flattest monic polynomials (<a href="#thm-6-minimax" class="quarto-xref">Theorem&nbsp;<span>6.4</span></a>). This drives <strong>economization</strong> <a href="#eq-6-econ" class="quarto-xref">Equation&nbsp;<span>6.12</span></a> and, by minimizing the node polynomial, makes <strong>Chebyshev nodes</strong> the cure for the Runge phenomenon (<a href="#thm-6-cheb-interp" class="quarto-xref">Theorem&nbsp;<span>6.5</span></a>, <a href="#fig-6-nodes" class="quarto-xref">Figure&nbsp;<span>6.2</span></a>, <a href="01-interpolation.html#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>).</li>
+<li><strong>Gauss quadrature</strong> (<a href="#thm-6-gauss" class="quarto-xref">Theorem&nbsp;<span>6.6</span></a>, cf. <a href="02-differentiation-integration.html#thm-2-gauss-quad" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>) uses orthogonal-polynomial zeros as nodes and is exact on <span class="math inline">\(\mathbb P_{2m+1}\)</span>; sampling the least-squares projection at <span class="math inline">\(n+1\)</span> Gauss nodes reproduces the <strong>Lagrange interpolant exactly</strong> (<a href="#thm-6-interp-projection" class="quarto-xref">Theorem&nbsp;<span>6.7</span></a>).</li>
+<li><strong>Rational approximation:</strong> Padé (<a href="#def-6-pade" class="quarto-xref">Definition&nbsp;<span>6.4</span></a>) matches derivatives at a point via the linear system <a href="#eq-6-pade-system" class="quarto-xref">Equation&nbsp;<span>6.15</span></a>; Chebyshev rational approximation trades the power series for a Chebyshev expansion, using <span class="math inline">\(T_iT_j=\tfrac12[T_{i+j}+T_{\abs{i-j}}]\)</span>, for uniform quality on <span class="math inline">\([-1,1]\)</span>.</li>
+<li><strong>Fourier series</strong> project onto trigonometric polynomials (<a href="#def-6-trig-poly" class="quarto-xref">Definition&nbsp;<span>6.5</span></a>); the complex exponentials <span class="math inline">\(e^{ikx}\)</span> (<a href="#thm-6-fourier-complex" class="quarto-xref">Theorem&nbsp;<span>6.8</span></a>) give the cleanest basis. Discrete trigonometric least squares has the scaled-identity normal matrix <span class="math inline">\(A=2mI\)</span>, reducing to a <strong>DFT</strong> (<a href="#def-6-dft" class="quarto-xref">Definition&nbsp;<span>6.6</span></a>), which the <strong>FFT</strong> evaluates in <span class="math inline">\(\bigO(N\log N)\)</span> via the butterfly <a href="#eq-6-butterfly" class="quarto-xref">Equation&nbsp;<span>6.21</span></a>.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./05-iterative-linear-systems.html" class="pagination-link" aria-label="Iterative Methods for Linear Systems">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./07-eigenvalue-problems.html" class="pagination-link" aria-label="Eigenvalue Problems">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>3&nbsp; Initial-Value Problems for ODEs – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./04-direct-linear-systems.html" rel="next">
+<link href="./02-differentiation-integration.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./03-ivp-odes.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#well-posedness-when-does-a-solution-exist-and-depend-stably-on-data" id="toc-well-posedness-when-does-a-solution-exist-and-depend-stably-on-data" class="nav-link active" data-scroll-target="#well-posedness-when-does-a-solution-exist-and-depend-stably-on-data"><span class="header-section-number">3.1</span> Well-posedness: when does a solution exist and depend stably on data?</a></li>
+  <li><a href="#eulers-method-and-its-error" id="toc-eulers-method-and-its-error" class="nav-link" data-scroll-target="#eulers-method-and-its-error"><span class="header-section-number">3.2</span> Euler’s method and its error</a></li>
+  <li><a href="#local-truncation-error-and-consistency" id="toc-local-truncation-error-and-consistency" class="nav-link" data-scroll-target="#local-truncation-error-and-consistency"><span class="header-section-number">3.3</span> Local truncation error and consistency</a></li>
+  <li><a href="#taylor-methods-higher-order-by-more-derivatives" id="toc-taylor-methods-higher-order-by-more-derivatives" class="nav-link" data-scroll-target="#taylor-methods-higher-order-by-more-derivatives"><span class="header-section-number">3.4</span> Taylor methods: higher order by more derivatives</a>
+  <ul class="collapse">
+  <li><a href="#sec-3-taylor-example" id="toc-sec-3-taylor-example" class="nav-link" data-scroll-target="#sec-3-taylor-example">The running example, worked</a></li>
+  </ul></li>
+  <li><a href="#runge-kutta-methods" id="toc-runge-kutta-methods" class="nav-link" data-scroll-target="#runge-kutta-methods"><span class="header-section-number">3.5</span> Runge-Kutta methods</a></li>
+  <li><a href="#adaptive-step-size-control" id="toc-adaptive-step-size-control" class="nav-link" data-scroll-target="#adaptive-step-size-control"><span class="header-section-number">3.6</span> Adaptive step-size control</a></li>
+  <li><a href="#multistep-methods" id="toc-multistep-methods" class="nav-link" data-scroll-target="#multistep-methods"><span class="header-section-number">3.7</span> Multistep methods</a>
+  <ul class="collapse">
+  <li><a href="#local-truncation-error-of-multistep-methods" id="toc-local-truncation-error-of-multistep-methods" class="nav-link" data-scroll-target="#local-truncation-error-of-multistep-methods">Local truncation error of multistep methods</a></li>
+  <li><a href="#predictor-corrector-schemes" id="toc-predictor-corrector-schemes" class="nav-link" data-scroll-target="#predictor-corrector-schemes">Predictor-corrector schemes</a></li>
+  <li><a href="#zero-stability-and-the-root-condition" id="toc-zero-stability-and-the-root-condition" class="nav-link" data-scroll-target="#zero-stability-and-the-root-condition">Zero-stability and the root condition</a></li>
+  </ul></li>
+  <li><a href="#systems-and-higher-order-equations" id="toc-systems-and-higher-order-equations" class="nav-link" data-scroll-target="#systems-and-higher-order-equations"><span class="header-section-number">3.8</span> Systems and higher-order equations</a>
+  <ul class="collapse">
+  <li><a href="#sec-3-lotka" id="toc-sec-3-lotka" class="nav-link" data-scroll-target="#sec-3-lotka">Application: the predator-prey model</a></li>
+  </ul></li>
+  <li><a href="#stiff-equations-and-implicit-methods" id="toc-stiff-equations-and-implicit-methods" class="nav-link" data-scroll-target="#stiff-equations-and-implicit-methods"><span class="header-section-number">3.9</span> Stiff equations and implicit methods</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">3.10</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./03-ivp-odes.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-ivp-odes" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>Most laws of change are written as differential equations, and most of them cannot be solved in closed form. This chapter builds the numerical machinery for the <strong>initial-value problem</strong> (IVP) <span id="eq-3-ivp"><span class="math display">\[
+\diff{y}{t}=f(t,y),\qquad a\le t\le b,\qquad y(a)=\alpha ,
+\tag{3.1}\]</span></span> which asks for the trajectory <span class="math inline">\(y(t)\)</span> that starts at <span class="math inline">\(\alpha\)</span> and obeys the slope field <span class="math inline">\(f\)</span>. We first pin down when <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> even has a well-behaved solution — the Lipschitz condition and well-posedness — then march that solution forward on a mesh with Euler’s method, measure the error it commits, and systematically improve it: Taylor and Runge-Kutta one-step methods, adaptive step-size control, multistep Adams methods and predictor-correctors, and finally the implicit methods that alone cope with <em>stiff</em> problems. Throughout, <span class="math inline">\(w_i\approx y(t_i)\)</span> denotes the computed approximation at the mesh point <span class="math inline">\(t_i=a+ih\)</span>, <span class="math inline">\(h=(b-a)/N\)</span> (see <a href="./notation.html">Notation</a>).</p>
+<section id="well-posedness-when-does-a-solution-exist-and-depend-stably-on-data" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="well-posedness-when-does-a-solution-exist-and-depend-stably-on-data"><span class="header-section-number">3.1</span> Well-posedness: when does a solution exist and depend stably on data?</h2>
+<p>A numerical method chases the true solution, so we should first know that a true solution exists, is unique, and does not swing wildly under small perturbations. The single hypothesis that buys all three is a one-sided smoothness bound on <span class="math inline">\(f\)</span> in its second argument.</p>
+<div id="def-3-lipschitz" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.1 (Lipschitz condition)</strong></span> A function <span class="math inline">\(f(t,y)\)</span> satisfies a <strong>Lipschitz condition</strong> in <span class="math inline">\(y\)</span> on a set <span class="math inline">\(D\subset\R^2\)</span> if there is a constant <span class="math inline">\(L&gt;0\)</span> with <span class="math display">\[
+\abs{f(t,y_1)-f(t,y_2)}\le L\,\abs{y_1-y_2}
+\qquad\text{whenever }(t,y_1),(t,y_2)\in D .
+\]</span> <span class="math inline">\(L\)</span> is the <strong>Lipschitz constant</strong>.</p>
+</div>
+<p>For example <span class="math inline">\(f(t,y)=t\abs{y}\)</span> on <span class="math inline">\(D=\{(t,y):0\le t\le T\}\)</span> satisfies the condition with <span class="math inline">\(L=T\)</span>, because <span class="math inline">\(\abs{t\abs{y_1}-t\abs{y_2}}\le t\,\abs{y_1-y_2}\le T\abs{y_1-y_2}\)</span>. By contrast <span class="math inline">\(f(t,y)=ty^2\)</span> satisfies <em>no</em> Lipschitz condition on that unbounded strip: since <span class="math inline">\(\abs{ty_1^2-ty_2^2}=t\abs{y_1+y_2}\,\abs{y_1-y_2}\)</span> and <span class="math inline">\(t\abs{y_1+y_2}\)</span> is unbounded, no single <span class="math inline">\(L\)</span> works — though restricting <span class="math inline">\(y\)</span> to a bounded band <span class="math inline">\(\abs{y}\le Y\)</span> restores it with <span class="math inline">\(L=2TY\)</span>.</p>
+<p>Verifying the inequality directly is awkward; on a <strong>convex</strong> domain a bound on the partial derivative is equivalent and far easier to check.</p>
+<div id="def-3-convex" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.2 (Convex set)</strong></span> A set <span class="math inline">\(D\subset\R^2\)</span> is <strong>convex</strong> if for all <span class="math inline">\((t_1,y_1),(t_2,y_2)\in D\)</span> and all <span class="math inline">\(\lambda\in[0,1]\)</span>, <span class="math inline">\((1-\lambda)(t_1,y_1)+\lambda(t_2,y_2)\in D\)</span> — the whole segment joining any two of its points lies in <span class="math inline">\(D\)</span>.</p>
+</div>
+<div id="thm-3-lipschitz-bound" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.1 (Derivative bound implies Lipschitz)</strong></span> Suppose <span class="math inline">\(f(t,y)\)</span> is defined on a convex set <span class="math inline">\(D\subset\R^2\)</span> and there is <span class="math inline">\(L&gt;0\)</span> with <span class="math inline">\(\bigl\lvert \pdiff{f}{y}(t,y)\bigr\rvert\le L\)</span> for all <span class="math inline">\((t,y)\in D\)</span>. Then <span class="math inline">\(f\)</span> satisfies a Lipschitz condition in <span class="math inline">\(y\)</span> on <span class="math inline">\(D\)</span> with constant <span class="math inline">\(L\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\((t,y_1),(t,y_2)\in D\)</span>. Convexity keeps the horizontal segment between them inside <span class="math inline">\(D\)</span>, so the mean value theorem applies to <span class="math inline">\(y\mapsto f(t,y)\)</span>: there is <span class="math inline">\(\xi\)</span> between <span class="math inline">\(y_1\)</span> and <span class="math inline">\(y_2\)</span> with <span class="math inline">\(f(t,y_1)-f(t,y_2)=\pdiff{f}{y}(t,\xi)\,(y_1-y_2)\)</span>. Taking absolute values and using the bound gives <span class="math inline">\(\abs{f(t,y_1)-f(t,y_2)}\le L\,\abs{y_1-y_2}\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>With this we can state precisely what it means for <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> to be a sensible problem to solve numerically.</p>
+<div id="def-3-wellposed" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.3 (Well-posed problem)</strong></span> The IVP <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> is <strong>well-posed</strong> if (i) it has a unique solution <span class="math inline">\(y(t)\)</span>, and (ii) there exist <span class="math inline">\(\eps_0&gt;0\)</span> and <span class="math inline">\(k&gt;0\)</span> such that for every <span class="math inline">\(\eps\in(0,\eps_0)\)</span>, every continuous perturbation <span class="math inline">\(\delta(t)\)</span> with <span class="math inline">\(\ninf{\delta}&lt;\eps\)</span>, and every <span class="math inline">\(\abs{\delta_0}&lt;\eps\)</span>, the perturbed problem <span class="math display">\[
+\diff{z}{t}=f(t,z)+\delta(t),\qquad z(a)=\alpha+\delta_0
+\]</span> has a unique solution <span class="math inline">\(z(t)\)</span> with <span class="math inline">\(\abs{z(t)-y(t)}&lt;k\eps\)</span> for all <span class="math inline">\(t\in[a,b]\)</span>.</p>
+</div>
+<p>In words: a unique solution exists, and small changes to the equation or the initial value produce only proportionally small changes to the solution. The Lipschitz condition delivers both.</p>
+<div id="thm-3-wellposed" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.2 (Lipschitz implies well-posed)</strong></span> Let <span class="math inline">\(D=[a,b]\times\R\)</span>. If <span class="math inline">\(f\)</span> is continuous on <span class="math inline">\(D\)</span> and satisfies a Lipschitz condition in <span class="math inline">\(y\)</span> on <span class="math inline">\(D\)</span>, then the IVP <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> is well-posed.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Existence and uniqueness are the Picard–Lindelöf theorem; stability follows from a Grönwall argument. If <span class="math inline">\(y,z\)</span> solve the original and perturbed problems, then <span class="math inline">\(e(t)=z(t)-y(t)\)</span> satisfies <span class="math inline">\(e(a)=\delta_0\)</span> and <span class="math inline">\(e'(t)=f(t,z)-f(t,y)+\delta(t)\)</span>, so <span class="math inline">\(\abs{e'}\le L\abs{e}+\eps\)</span>. Grönwall’s inequality integrates this to <span class="math inline">\(\abs{e(t)}\le\bigl(\abs{\delta_0}+\tfrac{\eps}{L}\bigr)e^{L(t-a)}\)</span>, which is bounded by <span class="math inline">\(k\eps\)</span> with <span class="math inline">\(k=(1+\tfrac1L)e^{L(b-a)}\)</span>. We reproduce the full technical proof only for the discrete analogue below (<a href="#thm-3-euler-conv" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a>), which is what a numerical method actually needs. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>As a check, <span class="math inline">\(y'=y-t^2+1\)</span> on <span class="math inline">\([0,2]\)</span> has <span class="math inline">\(\pdiff{f}{y}\equiv 1\)</span>, so <span class="math inline">\(L=1\)</span> and the problem is well-posed; its exact solution is <span class="math inline">\(y(t)=(t+1)^2-\tfrac12 e^{t}\)</span>, which we use as a running test case.</p>
+</section>
+<section id="eulers-method-and-its-error" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="eulers-method-and-its-error"><span class="header-section-number">3.2</span> Euler’s method and its error</h2>
+<p>The simplest solver replaces the derivative in <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> by a forward difference. Expanding the exact solution to two terms about <span class="math inline">\(t_j\)</span>, <span class="math display">\[
+y(t_{j+1})=y(t_j)+h\,y'(t_j)+\tfrac{h^2}{2}y''(\xi_j)
+=y(t_j)+h\,f\bigl(t_j,y(t_j)\bigr)+\tfrac{h^2}{2}y''(\xi_j),
+\]</span> and dropping the <span class="math inline">\(\bigO(h^2)\)</span> remainder gives <strong>Euler’s method</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Euler’s method
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Set <span class="math inline">\(w_0=\alpha\)</span>. For <span class="math inline">\(j=0,1,\dots,N-1\)</span>, <span id="eq-3-euler"><span class="math display">\[
+w_{j+1}=w_j+h\,f(t_j,w_j).
+\tag{3.2}\]</span></span> Each step costs a single evaluation of <span class="math inline">\(f\)</span>.</p>
+</div>
+</div>
+<p>Geometrically we follow the slope field’s tangent for one step of length <span class="math inline">\(h\)</span>, then re-read the slope and repeat. The error accumulates, but in a controlled way.</p>
+<div id="thm-3-euler-conv" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.3 (Euler convergence bound)</strong></span> Let <span class="math inline">\(f\)</span> be continuous and Lipschitz in <span class="math inline">\(y\)</span> with constant <span class="math inline">\(L\)</span> on <span class="math inline">\([a,b]\times\R\)</span>, and let <span class="math inline">\(y\in
+C^2[a,b]\)</span> solve <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> with <span class="math inline">\(M=\max_{t\in[a,b]}\abs{y''(t)}\)</span>. Then the Euler iterates <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> satisfy, for each <span class="math inline">\(j\)</span>, <span id="eq-3-euler-bound"><span class="math display">\[
+\abs{y(t_j)-w_j}\le \frac{hM}{2L}\Bigl(e^{L(t_j-a)}-1\Bigr).
+\tag{3.3}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Subtract <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> from the two-term expansion to get, with the error <span class="math inline">\(E_j\defeq\abs{y(t_j)-w_j}\)</span>, <span class="math display">\[
+y(t_{j+1})-w_{j+1}
+=\bigl(y(t_j)-w_j\bigr)+h\bigl[f(t_j,y(t_j))-f(t_j,w_j)\bigr]+\tfrac{h^2}{2}y''(\xi_j).
+\]</span> The triangle inequality and the Lipschitz bound give <span class="math inline">\(E_{j+1}\le(1+hL)E_j+\tfrac{h^2}{2}M\)</span>. Adding <span class="math inline">\(\tfrac{hM}{2L}\)</span> to both sides and factoring shows the shifted quantity <span class="math inline">\(p_j\defeq E_j+\tfrac{hM}{2L}\)</span> obeys <span class="math inline">\(p_{j+1}\le(1+hL)p_j\)</span>, hence <span class="math inline">\(p_j\le(1+hL)^jp_0\)</span>. Since <span class="math inline">\(E_0=0\)</span>, <span class="math inline">\(p_0=\tfrac{hM}{2L}\)</span>, and using <span class="math inline">\(1+hL\le e^{hL}\)</span> so that <span class="math inline">\((1+hL)^j\le e^{jhL}=e^{L(t_j-a)}\)</span>, <span class="math display">\[
+E_j\le p_j-\tfrac{hM}{2L}\le \tfrac{hM}{2L}\bigl((1+hL)^j-1\bigr)\le\tfrac{hM}{2L}\bigl(e^{L(t_j-a)}-1\bigr). \qquad\square
+\]</span></p>
+</div>
+<p>The bound is <span class="math inline">\(\bigO(h)\)</span>: halving the step halves the error, so Euler is a <strong>first-order</strong> method, and it <em>converges</em>, <span class="math inline">\(E_j\to0\)</span> as <span class="math inline">\(h\to0\)</span>. Two caveats temper the good news. The constant grows exponentially in <span class="math inline">\(t_j\)</span>, so long time intervals or large <span class="math inline">\(L\)</span> demand very small <span class="math inline">\(h\)</span>; and chaotic problems can defeat any fixed-precision method entirely.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Round-off sets a floor on accuracy
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Formula <a href="#eq-3-euler-bound" class="quarto-xref">Equation&nbsp;<span>3.3</span></a> suggests taking <span class="math inline">\(h\to0\)</span>, but on a real machine each step also injects a round-off error <span class="math inline">\(\delta_{j+1}\)</span> with <span class="math inline">\(\abs{\delta_{j+1}}\le\delta\)</span>. Repeating the proof with this extra term gives <span class="math display">\[
+\abs{y(t_j)-u_j}\le\Bigl(\delta+\frac{hM}{2L}+\frac{\delta}{hL}\Bigr)\bigl(e^{L(t_j-a)}-1\bigr).
+\]</span> The bracket <span class="math inline">\(\tfrac{hM}{2}+\tfrac{\delta}{h}\)</span> (dropping constants) <em>increases</em> as <span class="math inline">\(h\to0\)</span> because of the <span class="math inline">\(\delta/h\)</span> term: too many steps accumulate too much round-off. Minimizing over <span class="math inline">\(h\)</span> gives the optimal step <span class="math display">\[
+h_{\mathrm{opt}}=\sqrt{\frac{2\delta}{M}}=\bigO(\sqrt\delta),
+\]</span> below which finite precision makes the answer <em>worse</em>, not better.</p>
+</div>
+</div>
+</section>
+<section id="local-truncation-error-and-consistency" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="local-truncation-error-and-consistency"><span class="header-section-number">3.3</span> Local truncation error and consistency</h2>
+<p>To compare methods we need a per-step measure of fidelity that ignores accumulated error. Write a general one-step method as <span class="math inline">\(w_{j+1}=w_j+h\,\phi(t_j,w_j,h)\)</span>, where <span class="math inline">\(\phi\)</span> is the method’s slope estimate — <span class="math inline">\(\phi=f\)</span> for Euler.</p>
+<div id="def-3-lte" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.4 (Local truncation error)</strong></span> The <strong>local truncation error</strong> (LTE) of the one-step method <span class="math inline">\(w_{j+1}=w_j+h\,\phi(t_j,w_j,h)\)</span> at step <span class="math inline">\(j+1\)</span> is <span id="eq-3-lte"><span class="math display">\[
+\tau_{j+1}(h)\defeq\frac{y(t_{j+1})-y(t_j)}{h}-\phi\bigl(t_j,y(t_j),h\bigr),
+\tag{3.4}\]</span></span> the amount by which the <em>exact</em> solution fails to satisfy the update, per unit step. It is the error made in one step from exact data.</p>
+</div>
+<p>For Euler, <span class="math inline">\(\phi=f=y'\)</span>, so <a href="#eq-3-lte" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> and the two-term expansion give <span class="math inline">\(\tau_{j+1}(h)=\tfrac{h}{2}y''(\xi_j)\)</span>, whence <span class="math inline">\(\abs{\tau_{j+1}(h)}\le\tfrac{hM}{2}=\bigO(h)\)</span> — Euler’s LTE is first order, consistent with <a href="#eq-3-euler-bound" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>. The minimal demand on any method is that this per-step error vanish in the limit.</p>
+<div id="def-3-consistency" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.5 (Consistency)</strong></span> A one-step method is <strong>consistent</strong> with the ODE if its LTE vanishes uniformly as <span class="math inline">\(h\to0\)</span>: <span class="math display">\[
+\lim_{h\to0}\ \max_{0\le j\le N}\ \abs{\tau_{j+1}(h)}=0 .
+\]</span> Equivalently, <span class="math inline">\(\phi(t,y,0)=f(t,y)\)</span> for all <span class="math inline">\(t\)</span>: as the step shrinks, the method’s slope estimate reduces to the true slope.</p>
+</div>
+<p>Consistency alone is not convergence, but for one-step methods it is nearly the whole story. If in addition <span class="math inline">\(\phi\)</span> is Lipschitz in <span class="math inline">\(w\)</span> (uniformly in <span class="math inline">\(h\)</span> on <span class="math inline">\(0&lt;h&lt;h_0\)</span>), then the method is <strong>stable</strong>, and the global error inherits the local one: <span class="math display">\[
+\abs{y(t_j)-w_j}\le\frac{\tau(h)}{L}\,e^{L(t_j-a)},\qquad \tau(h)\defeq\max_j\abs{\tau_{j+1}(h)} .
+\]</span> Thus <strong>consistency plus stability implies convergence</strong> (the Lax equivalence principle for ODEs), and for one-step methods stability is automatic once <span class="math inline">\(\phi\)</span> is Lipschitz — exactly the Euler proof, now abstracted. As an illustration, the modified-Euler slope <span class="math inline">\(\phi(t,w,h)=\tfrac12\bigl[f(t,w)+f(t+h,w+hf(t,w))\bigr]\)</span> is Lipschitz in <span class="math inline">\(w\)</span> with constant <span class="math inline">\(L=\widehat L+\tfrac12 h\widehat L^2\)</span> whenever <span class="math inline">\(\abs{\pdiff{f}{y}}\le\widehat L\)</span>, so it too is convergent.</p>
+</section>
+<section id="taylor-methods-higher-order-by-more-derivatives" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="taylor-methods-higher-order-by-more-derivatives"><span class="header-section-number">3.4</span> Taylor methods: higher order by more derivatives</h2>
+<p>If <span class="math inline">\(\tau=\bigO(h)\)</span> is too crude, keep more Taylor terms. Since <span class="math inline">\(y'=f\)</span>, differentiating along the solution gives <span class="math inline">\(y''=f'\)</span>, <span class="math inline">\(y'''=f''\)</span>, and so on, where <span class="math inline">\(f'\)</span> is the <strong>total</strong> derivative <span class="math display">\[
+f'(t,y)=\pdiff{f}{t}(t,y)+\pdiff{f}{y}(t,y)\,f(t,y).
+\]</span> Matching the <span class="math inline">\((n+1)\)</span>-term expansion of <span class="math inline">\(y(t_{j+1})\)</span> defines the <strong>Taylor method of order <span class="math inline">\(n\)</span></strong>: <span id="eq-3-taylor"><span class="math display">\[
+w_{j+1}=w_j+h\,T^{(n)}(t_j,w_j),\qquad
+T^{(n)}(t,w)=f(t,w)+\tfrac{h}{2}f'(t,w)+\dots+\tfrac{h^{n-1}}{n!}f^{(n-1)}(t,w).
+\tag{3.5}\]</span></span> Subtracting from the Taylor expansion, the <span class="math inline">\(y',\dots,y^{(n)}\)</span> terms cancel and the first survivor is the <span class="math inline">\((n+1)\)</span>-st, divided by the extra <span class="math inline">\(h\)</span> in <a href="#eq-3-lte" class="quarto-xref">Equation&nbsp;<span>3.4</span></a>: <span class="math display">\[
+\tau_{j+1}(h)=\frac{h^{n}}{(n+1)!}\,y^{(n+1)}(\xi_j)=\bigO(h^{n}),
+\]</span> so a Taylor method of order <span class="math inline">\(n\)</span> has an order-<span class="math inline">\(n\)</span> LTE. The catch is the <span class="math inline">\(f^{(k)}\)</span>: even <span class="math inline">\(T^{(2)}(t,w)=f+\tfrac{h}{2}\bigl(\pdiff{f}{t}+\pdiff{f}{y}f\bigr)\)</span> requires two hand-coded partial derivatives, and higher orders quickly become intractable. Runge-Kutta methods buy the same order using only extra evaluations of <span class="math inline">\(f\)</span> itself.</p>
+<section id="sec-3-taylor-example" class="level3">
+<h3 class="anchored" data-anchor-id="sec-3-taylor-example">The running example, worked</h3>
+<p>Take the running test case <span class="math inline">\(y'=y-t^2+1\)</span> on <span class="math inline">\([0,2]\)</span>, <span class="math inline">\(y(0)=0.5\)</span>. Here <span class="math inline">\(\pdiff{f}{t}=-2t\)</span> and <span class="math inline">\(\pdiff{f}{y}=1\)</span>, so the order-<span class="math inline">\(2\)</span> slope is <span class="math display">\[
+T^{(2)}(t,w)=(w-t^2+1)+\tfrac{h}{2}\bigl(-2t+(w-t^2+1)\bigr),
+\]</span> and substituting into <span class="math inline">\(w_{j+1}=w_j+hT^{(2)}(t_j,w_j)\)</span> and collecting terms gives an explicit recursion in <span class="math inline">\(w_j,t_j\)</span> alone: <span id="eq-3-taylor-example"><span class="math display">\[
+w_{j+1}=\Bigl(1+h+\tfrac{h^2}{2}\Bigr)w_j-\Bigl(h+\tfrac{h^2}{2}\Bigr)t_j^2-h^2 t_j+h+\tfrac{h^2}{2}.
+\tag{3.6}\]</span></span> With <span class="math inline">\(h=0.2\)</span> the coefficients are <span class="math inline">\(1.22,\,0.22,\,0.04,\,0.22\)</span>, so <span class="math inline">\(w_{j+1}=1.22\,w_j-0.22\,t_j^2-0.04\,t_j+0.22\)</span>. Starting from <span class="math inline">\(w_0=0.5\)</span> at <span class="math inline">\(t_0=0\)</span>, <span class="math display">\[
+w_1=1.22(0.5)+0.22=0.83,\qquad
+w_2=1.22(0.83)-0.22(0.04)-0.04(0.2)+0.22=1.2158.
+\]</span> The exact solution <span class="math inline">\(y(t)=(t+1)^2-\tfrac12 e^{t}\)</span> gives <span class="math inline">\(y(0.2)=0.8292986\)</span> and <span class="math inline">\(y(0.4)=1.2140877\)</span>, so the errors after one and two steps are <span class="math inline">\(7.0\times10^{-4}\)</span> and <span class="math inline">\(1.7\times10^{-3}\)</span> — a marked gain on Euler, whose first step <span class="math inline">\(w_1=0.8\)</span> already errs by <span class="math inline">\(2.9\times10^{-2}\)</span>, forty times larger at the same <span class="math inline">\(h\)</span>.</p>
+</section>
+</section>
+<section id="runge-kutta-methods" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="runge-kutta-methods"><span class="header-section-number">3.5</span> Runge-Kutta methods</h2>
+<p>The idea is to imitate the Taylor slope <span class="math inline">\(T^{(n)}\)</span> by sampling <span class="math inline">\(f\)</span> at cleverly chosen interior points, so no derivatives of <span class="math inline">\(f\)</span> are ever formed. The prototype is second order.</p>
+<div id="thm-3-rk2" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.4 (Midpoint method is second order)</strong></span> The <strong>second-order Runge-Kutta (midpoint) method</strong> <span id="eq-3-rk2"><span class="math display">\[
+w_{j+1}=w_j+h\,f\!\left(t_j+\tfrac{h}{2},\,w_j+\tfrac{h}{2}f(t_j,w_j)\right)
+\tag{3.7}\]</span></span> has LTE <span class="math inline">\(\bigO(h^2)\)</span>, using two evaluations of <span class="math inline">\(f\)</span> per step and no derivatives.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The two-variable Taylor expansion of <span class="math inline">\(f\)</span> about <span class="math inline">\((t,y)\)</span> gives <span class="math display">\[
+f\!\left(t+\tfrac{h}{2},y+\tfrac{h}{2}f\right)
+=f+\tfrac{h}{2}\pdiff{f}{t}+\tfrac{h}{2}f\pdiff{f}{y}+R_1
+=T^{(2)}(t,y)+R_1,
+\]</span> where the remainder <span class="math inline">\(R_1=\tfrac{h^2}{8}\pdiff{^2f}{t^2}+\tfrac{h^2f}{4}\pdiff{^2f}{t\,\partial y}
++\tfrac{h^2f^2}{8}\pdiff{^2f}{y^2}=\bigO(h^2)\)</span> collects the second-order terms. Thus <a href="#eq-3-rk2" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> reproduces the order-<span class="math inline">\(2\)</span> Taylor slope <span class="math inline">\(T^{(2)}\)</span> up to <span class="math inline">\(\bigO(h^2)\)</span>, and dropping <span class="math inline">\(R_1\)</span> leaves the method second order. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>In implementation form one writes <span class="math inline">\(k_1=f(t_j,w_j)\)</span>, <span class="math inline">\(k_2=f(t_j+\tfrac h2,w_j+\tfrac h2 k_1)\)</span>, and <span class="math inline">\(w_{j+1}=w_j+hk_2\)</span>. Adding stages raises the order. The <strong>third-order</strong> method uses three: <span class="math display">\[
+k_1=f(t_j,w_j),\quad
+k_2=f\!\left(t_j+\tfrac h3,w_j+\tfrac h3 k_1\right),\quad
+k_3=f\!\left(t_j+\tfrac{2h}{3},w_j+\tfrac{2h}{3}k_2\right),
+\]</span> <span id="eq-3-rk3"><span class="math display">\[
+w_{j+1}=w_j+\tfrac{h}{4}\bigl(k_1+3k_3\bigr),\qquad \tau_{j+1}(h)=\bigO(h^3).
+\tag{3.8}\]</span></span> The workhorse of practical computation is the classical four-stage, fourth-order method.</p>
+<div id="thm-3-rk4" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.5 (Classical fourth-order Runge-Kutta (RK4))</strong></span> Set <span class="math inline">\(w_0=\alpha\)</span>. For <span class="math inline">\(j=0,1,\dots,N-1\)</span> compute <span class="math display">\[
+\begin{aligned}
+k_1&amp;=f(t_j,w_j), &amp;
+k_2&amp;=f\!\left(t_j+\tfrac h2,\,w_j+\tfrac h2 k_1\right),\\
+k_3&amp;=f\!\left(t_j+\tfrac h2,\,w_j+\tfrac h2 k_2\right), &amp;
+k_4&amp;=f\!\left(t_j+h,\,w_j+h k_3\right),
+\end{aligned}
+\]</span> <span id="eq-3-rk4"><span class="math display">\[
+w_{j+1}=w_j+\frac{h}{6}\bigl(k_1+2k_2+2k_3+k_4\bigr).
+\tag{3.9}\]</span></span> The method uses four evaluations of <span class="math inline">\(f\)</span> per step and its LTE is <span class="math inline">\(\bigO(h^4)\)</span>.</p>
+</div>
+<p>The update is a weighted Simpson-like average of four slopes: one at the left endpoint, two probes at the midpoint, and one at the right endpoint, with the midpoint slopes weighted double. Matching the order-<span class="math inline">\(4\)</span> Taylor expansion term by term fixes the weights <span class="math inline">\(\tfrac16(1,2,2,1)\)</span> and the nodes; the derivation is the same two-variable-Taylor bookkeeping as <a href="#thm-3-rk2" class="quarto-xref">Theorem&nbsp;<span>3.4</span></a> carried to fourth order, which we do not repeat. RK4’s accuracy per evaluation makes it the default one-step solver and the initializer for the multistep methods below.</p>
+</section>
+<section id="adaptive-step-size-control" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="adaptive-step-size-control"><span class="header-section-number">3.6</span> Adaptive step-size control</h2>
+<p>A fixed <span class="math inline">\(h\)</span> wastes work where the solution is smooth and loses accuracy where it is not — the “crying babies get more candy” principle: put mesh points where the error demands them. The difficulty is that the true error is unknown. The remedy is to run two methods of consecutive orders and let their disagreement estimate the error.</p>
+<p>Let <span class="math inline">\(\phi\)</span> be order <span class="math inline">\(n\)</span> with iterate <span class="math inline">\(w_{j+1}\)</span>, and <span class="math inline">\(\widetilde\phi\)</span> order <span class="math inline">\(n+1\)</span> with iterate <span class="math inline">\(\widetilde w_{j+1}\)</span>, both stepping from the (assumed exact) common value <span class="math inline">\(w_j\approx y(t_j)\)</span>. From <a href="#eq-3-lte" class="quarto-xref">Equation&nbsp;<span>3.4</span></a>, <span class="math display">\[
+\tau_{j+1}(h)=\frac{y(t_{j+1})-w_{j+1}}{h}
+=\underbrace{\frac{y(t_{j+1})-\widetilde w_{j+1}}{h}}_{\bigO(h^{n+1})}
++\frac{\widetilde w_{j+1}-w_{j+1}}{h},
+\]</span> so the higher-order term is negligible and <span id="eq-3-lte-estimate"><span class="math display">\[
+\tau_{j+1}(h)\approx\frac{\widetilde w_{j+1}-w_{j+1}}{h} .
+\tag{3.10}\]</span></span> The two solutions estimate their own error by differencing. Now choose a new step <span class="math inline">\(qh\)</span> to meet a tolerance <span class="math inline">\(\eps\)</span>. Since <span class="math inline">\(\tau_{j+1}(h)\approx Kh^n\)</span> with <span class="math inline">\(K\)</span> independent of <span class="math inline">\(h\)</span>, <span id="eq-3-stepsize"><span class="math display">\[
+\abs{\tau_{j+1}(qh)}\approx q^n\left\lvert\frac{\widetilde w_{j+1}-w_{j+1}}{h}\right\rvert\le\eps
+\quad\Longrightarrow\quad
+q\le\left\lvert\frac{\eps h}{\widetilde w_{j+1}-w_{j+1}}\right\rvert^{1/n}.
+\tag{3.11}\]</span></span> The <strong>Runge-Kutta-Fehlberg (RKF45)</strong> method is the standard realization: an embedded pair of order-<span class="math inline">\(4\)</span> and order-<span class="math inline">\(5\)</span> formulas that <em>share</em> their stage evaluations, so the error estimate is almost free.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — RKF45 step-size selection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>At each step, with tolerance <span class="math inline">\(\eps\)</span> and current <span class="math inline">\(h\)</span>:</p>
+<ol type="1">
+<li>Compute both estimates <span class="math inline">\(w_{j+1}\)</span> (order 4) and <span class="math inline">\(\widetilde w_{j+1}\)</span> (order 5) and form the conservative scale factor <span class="math display">\[
+q=\left\lvert\frac{\eps h}{2\,(\widetilde w_{j+1}-w_{j+1})}\right\rvert^{1/4}.
+\]</span></li>
+<li>Accept the step if the error is within tolerance; otherwise reject and recompute with the smaller <span class="math inline">\(h\)</span>.</li>
+<li>Update the step with a <strong>restricted</strong> change to avoid violent swings: <span class="math inline">\(h\leftarrow 0.1\,h\)</span> if <span class="math inline">\(q\le0.1\)</span>, <span class="math inline">\(\ h\leftarrow 4\,h\)</span> if <span class="math inline">\(q\ge4\)</span>, else <span class="math inline">\(h\leftarrow qh\)</span>.</li>
+<li>Cap it: <span class="math inline">\(h\leftarrow\min(h,h_{\max})\)</span>; and if <span class="math inline">\(h&lt;h_{\min}\)</span>, <strong>declare failure</strong>.</li>
+</ol>
+</div>
+</div>
+<p>The factor <span class="math inline">\(2\)</span> and the <span class="math inline">\(0.1\)</span>–<span class="math inline">\(4\)</span> clamps are deliberate conservatism: the LTE estimate is only approximate, so the method under-reaches the tolerance and never trusts a single step to change <span class="math inline">\(h\)</span> by more than a bounded factor.</p>
+</section>
+<section id="multistep-methods" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="multistep-methods"><span class="header-section-number">3.7</span> Multistep methods</h2>
+<p>Runge-Kutta discards its interior slopes after each step. Multistep methods instead <strong>reuse</strong> the slopes already computed at past mesh points, spending only one new evaluation of <span class="math inline">\(f\)</span> per step. The starting point is the exact integral form of <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a>, <span id="eq-3-integral"><span class="math display">\[
+y(t_{j+1})-y(t_j)=\int_{t_j}^{t_{j+1}} f\bigl(t,y(t)\bigr)\,\dd t,
+\tag{3.12}\]</span></span> and the idea is to replace <span class="math inline">\(f\)</span> under the integral by a polynomial interpolating its known past values (<a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>) and integrate that exactly.</p>
+<p><strong>Explicit (Adams-Bashforth).</strong> Interpolating <span class="math inline">\(f\)</span> through the two points <span class="math inline">\(t_{j-1},t_j\)</span> and integrating over <span class="math inline">\([t_j,t_{j+1}]\)</span> gives the two-step method. Writing <span class="math inline">\(f_i\defeq f(t_i,y(t_i))\)</span> and carrying out the integral, <span class="math display">\[
+\int_{t_j}^{t_{j+1}}\frac{(t-t_{j-1})f_j+(t_j-t)f_{j-1}}{h}\,\dd t=\frac{h}{2}\bigl(3f_j-f_{j-1}\bigr),
+\]</span> so <span id="eq-3-ab2"><span class="math display">\[
+w_{j+1}=w_j+\tfrac{h}{2}\bigl(3f(t_j,w_j)-f(t_{j-1},w_{j-1})\bigr).
+\tag{3.13}\]</span></span> Only past values appear, so <span class="math inline">\(w_{j+1}\)</span> is obtained by one evaluation — the method is <strong>explicit</strong>.</p>
+<p><strong>Implicit (Adams-Moulton).</strong> Interpolating instead through <span class="math inline">\(t_j\)</span> and the <em>new</em> point <span class="math inline">\(t_{j+1}\)</span> gives the trapezoidal rule for the integral, <span id="eq-3-am1"><span class="math display">\[
+w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
+\tag{3.14}\]</span></span> in which <span class="math inline">\(w_{j+1}\)</span> appears on both sides: the method is <strong>implicit</strong> and each step requires solving an equation for <span class="math inline">\(w_{j+1}\)</span>. Both <a href="#eq-3-ab2" class="quarto-xref">Equation&nbsp;<span>3.13</span></a> and <a href="#eq-3-am1" class="quarto-xref">Equation&nbsp;<span>3.14</span></a> are second order.</p>
+<p>In general, interpolating <span class="math inline">\(f\)</span> through the last <span class="math inline">\(m\)</span> known points yields the <strong>explicit <span class="math inline">\(m\)</span>-step</strong> method <span class="math inline">\(w_{j+1}=w_j+h\sum_{i=0}^{m-1}b_i\,f(t_{j-m+1+i},w_{j-m+1+i})\)</span>; including <span class="math inline">\(t_{j+1}\)</span> among the nodes yields the <strong>implicit <span class="math inline">\((m-1)\)</span>-step</strong> method. The workhorse fourth-order pair is <span id="eq-3-ab4"><span class="math display">\[
+\text{AB4:}\quad w_{j+1}=w_j+\tfrac{h}{24}\bigl(55f_j-59f_{j-1}+37f_{j-2}-9f_{j-3}\bigr),
+\tag{3.15}\]</span></span> <span id="eq-3-am4"><span class="math display">\[
+\text{AM4:}\quad w_{j+1}=w_j+\tfrac{h}{24}\bigl(9f_{j+1}+19f_j-5f_{j-1}+f_{j-2}\bigr).
+\tag{3.16}\]</span></span> Both need starting values <span class="math inline">\(w_0,\dots\)</span> that a single-step method (usually RK4) must supply.</p>
+<section id="local-truncation-error-of-multistep-methods" class="level3">
+<h3 class="anchored" data-anchor-id="local-truncation-error-of-multistep-methods">Local truncation error of multistep methods</h3>
+<p>The LTE comes straight from the interpolation error of <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>. If <span class="math inline">\(P\)</span> interpolates <span class="math inline">\(f(\cdot,y(\cdot))\)</span> at the <span class="math inline">\(m\)</span> nodes, then <span class="math inline">\(f=P+R\)</span> with <span class="math inline">\(R(t)=\tfrac{1}{m!}f^{(m)}(\xi_t)\prod_k(t-t_k)\)</span>, and since the method integrates <span class="math inline">\(P\)</span> exactly, <span id="eq-3-multistep-lte"><span class="math display">\[
+\tau_{j+1}(h)=\frac1h\int_{t_j}^{t_{j+1}}R(t)\,\dd t
+=\frac{f^{(m)}(\xi,y(\xi))}{m!\,h}\int_{t_j}^{t_{j+1}}\prod_{k}(t-t_k)\,\dd t=\bigO(h^{m}).
+\tag{3.17}\]</span></span> For the fourth-order pair the constants follow from the substitution <span class="math inline">\(t=t_j+s\)</span>. Adams-Bashforth uses the nodes <span class="math inline">\(t_{j-3},\dots,t_j\)</span>, giving <span class="math inline">\(\int_0^h s(s+h)(s+2h)(s+3h)\,\dd s\)</span> and <span class="math display">\[
+\tau_{j+1}^{\mathrm{AB}}(h)=\frac{251}{720}\,f^{(4)}(\xi,y(\xi))\,h^4 ;
+\]</span> Adams-Moulton uses <span class="math inline">\(t_{j-2},\dots,t_{j+1}\)</span>, giving <span class="math inline">\(\int_0^h(s-h)s(s+h)(s+2h)\,\dd s\)</span> and <span class="math display">\[
+\tau_{j+1}^{\mathrm{AM}}(h)=-\frac{19}{720}\,f^{(4)}(\xi,y(\xi))\,h^4 .
+\]</span> Both are <span class="math inline">\(\bigO(h^4)\)</span>, but the implicit AM4 has the far smaller error constant <span class="math inline">\(\tfrac{19}{720}\)</span> versus <span class="math inline">\(\tfrac{251}{720}\)</span>: at equal order and equal work the implicit method is more accurate as well as more stable. This is the recurring trade — implicit methods cost a solve per step but are worth it.</p>
+</section>
+<section id="predictor-corrector-schemes" class="level3">
+<h3 class="anchored" data-anchor-id="predictor-corrector-schemes">Predictor-corrector schemes</h3>
+<p>Solving the implicit AM4 equation exactly each step is expensive; a predictor-corrector performs <strong>one</strong> fixed-point sweep instead. Predict with the explicit method, then correct once with the implicit formula evaluated at the predicted value.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — fourth-order Adams predictor-corrector (Adams4PC)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Initialize <span class="math inline">\(w_0,w_1,w_2,w_3\)</span> with RK4. For <span class="math inline">\(j=3,4,\dots\)</span>:</p>
+<ol type="1">
+<li><strong>Predict</strong> (AB4): <span class="math inline">\(\displaystyle w_{j+1}^{\mathrm p}=w_j+\tfrac{h}{24}\bigl(55f_j-59f_{j-1}+37f_{j-2}-9f_{j-3}\bigr).\)</span></li>
+<li><strong>Correct</strong> (AM4 with the prediction): <span class="math inline">\(\displaystyle w_{j+1}=w_j+\tfrac{h}{24}\bigl(9f(t_{j+1},w_{j+1}^{\mathrm p})+19f_j-5f_{j-1}+f_{j-2}\bigr).\)</span></li>
+</ol>
+</div>
+</div>
+<p>The predictor and corrector also furnish a <em>free</em> error estimate. Since <span class="math inline">\(w_{j+1}^{\mathrm p}\approx y_{j+1}-\tfrac{251}{720}f^{(4)}h^5\)</span> and <span class="math inline">\(w_{j+1}\approx y_{j+1}+\tfrac{19}{720}f^{(4)}h^5\)</span>, subtracting eliminates <span class="math inline">\(y_{j+1}\)</span> and gives <span class="math display">\[
+\tau_{j+1}(h)=\frac{y_{j+1}-w_{j+1}}{h}\approx-\frac{19}{270}\cdot\frac{w_{j+1}-w_{j+1}^{\mathrm p}}{h},
+\]</span> so the predictor-corrector difference drives adaptive step control exactly as <a href="#eq-3-stepsize" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> did for RKF, here with <span class="math inline">\(q=1.5\,\lvert\eps h/(w_{j+1}-w_{j+1}^{\mathrm p})\rvert^{1/4}\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Multistep versus Runge-Kutta
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Multistep methods are <strong>cheaper</strong> — one new <span class="math inline">\(f\)</span>-evaluation per step by reusing history — but every step-size change invalidates that history and forces a <strong>restart</strong> with a single-step method like RK4. Runge-Kutta changes <span class="math inline">\(h\)</span> freely but pays several evaluations per step. Adaptive codes therefore combine them: RK4 to start and to restart, Adams4PC to cruise.</p>
+</div>
+</div>
+</section>
+<section id="zero-stability-and-the-root-condition" class="level3">
+<h3 class="anchored" data-anchor-id="zero-stability-and-the-root-condition">Zero-stability and the root condition</h3>
+<p>Multistep methods carry a stability hazard that one-step methods lack: the recurrence has several past terms, and parasitic solutions of that recurrence can grow even when the ODE’s solution does not. Consider the trivial problem <span class="math inline">\(y'=0\)</span>, <span class="math inline">\(y\equiv\alpha\)</span>. A general <span class="math inline">\(m\)</span>-step method reduces to the linear recurrence <span class="math inline">\(w_{j+1}=a_{m-1}w_j+\dots+a_0w_{j+1-m}\)</span>, whose solutions are governed by the roots of the <strong>characteristic polynomial</strong> <span class="math display">\[
+P(\mu)=\mu^m-\bigl(a_{m-1}\mu^{m-1}+\dots+a_0\bigr).
+\]</span> Seeking <span class="math inline">\(w_j=\mu^j\)</span> gives <span class="math inline">\(P(\mu)=0\)</span>; with distinct roots the general solution is <span class="math inline">\(w_j=\sum_i c_i\mu_i^j\)</span>. For the constant solution to survive, <span class="math inline">\(\mu=1\)</span> must be a root; for no spurious mode to blow up, every root must lie in the closed unit disk.</p>
+<div id="def-3-root-condition" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.6 (Root condition (zero-stability))</strong></span> A multistep method satisfies the <strong>root condition</strong> if every root <span class="math inline">\(\mu_i\)</span> of <span class="math inline">\(P(\mu)\)</span> has <span class="math inline">\(\abs{\mu_i}\le1\)</span>, and any root with <span class="math inline">\(\abs{\mu_i}=1\)</span> is simple. It is <strong>strongly stable</strong> if <span class="math inline">\(\mu=1\)</span> is the only root on the unit circle, <strong>weakly stable</strong> if there are others on it, and <strong>unstable</strong> if some <span class="math inline">\(\abs{\mu_i}&gt;1\)</span>.</p>
+</div>
+<p>The Adams methods all have <span class="math inline">\(P(\mu)=\mu^{m}-\mu^{m-1}=\mu^{m-1}(\mu-1)\)</span>, roots <span class="math inline">\(0,\dots,0,1\)</span>: strongly stable. By contrast Milne’s method has <span class="math inline">\(P(\mu)=\mu^4-1\)</span>, roots <span class="math inline">\(\pm1,\pm i\)</span>, all on the unit circle: only weakly stable, and prone to oscillation under round-off. The payoff is the multistep analogue of the Lax principle.</p>
+<div id="thm-3-dahlquist" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.6 (Dahlquist equivalence)</strong></span> For a consistent multistep method, the following are equivalent: the method is stable; it satisfies the root condition; it is convergent.</p>
+</div>
+<p>We state this without proof; it is the multistep counterpart of the one-step consistency-plus-stability theorem of 1.</p>
+</section>
+</section>
+<section id="systems-and-higher-order-equations" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="systems-and-higher-order-equations"><span class="header-section-number">3.8</span> Systems and higher-order equations</h2>
+<p>Nothing above used that <span class="math inline">\(y\)</span> is scalar. A system of <span class="math inline">\(m\)</span> first-order equations is written in vector form <span class="math display">\[
+\diff{\mathbf u}{t}=\mathbf f(t,\mathbf u),\qquad \mathbf u(a)=\boldsymbol\alpha,\qquad
+\mathbf u,\boldsymbol\alpha\in\R^m,
+\]</span> and every method of this chapter applies verbatim with <span class="math inline">\(w_j,f\)</span> replaced by vectors — RK4, for instance, is <a href="#eq-3-rk4" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> read componentwise, the <span class="math inline">\(k_i\)</span> now vectors. Existence and uniqueness hold under a vector Lipschitz condition <span class="math inline">\(\norm{\mathbf f(t,\mathbf u)-\mathbf f(t,\mathbf z)}\le
+L\norm{\mathbf u-\mathbf z}\)</span>, again implied by bounded partials <span class="math inline">\(\lvert\pdiff{f_j}{u_k}\rvert\le L\)</span>, with uniqueness following from Grönwall exactly as in <a href="#thm-3-wellposed" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>.</p>
+<p>A single <span class="math inline">\(m\)</span>-th order equation <span class="math inline">\(y^{(m)}=f(t,y,y',\dots,y^{(m-1)})\)</span> reduces to such a system by the standard substitution <span class="math inline">\(u_1=y,\ u_2=y',\ \dots,\ u_m=y^{(m-1)}\)</span>, whence <span class="math display">\[
+\mathbf u'=(u_2,\,u_3,\,\dots,\,f(t,u_1,\dots,u_m))^\top .
+\]</span> So one solver handles every order: reduce to a first-order system, then march.</p>
+<section id="sec-3-lotka" class="level3">
+<h3 class="anchored" data-anchor-id="sec-3-lotka">Application: the predator-prey model</h3>
+<p>The <strong>Lotka-Volterra</strong> equations model a prey population <span class="math inline">\(x(t)\)</span> and a predator population <span class="math inline">\(y(t)\)</span>: <span id="eq-3-lotka"><span class="math display">\[
+\begin{aligned}
+x'&amp;=\alpha x-\beta xy,\\
+y'&amp;=-\gamma y+\delta xy .
+\end{aligned}
+\tag{3.18}\]</span></span> Prey grow exponentially when alone (<span class="math inline">\(\alpha x\)</span>) but are eaten on encounter (<span class="math inline">\(-\beta xy\)</span>); predators starve without prey (<span class="math inline">\(-\gamma y\)</span>) but thrive on encounter (<span class="math inline">\(+\delta xy\)</span>). This is a coupled nonlinear system with no elementary solution — a natural target for RK4. Solving <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> and plotting <span class="math inline">\(y\)</span> against <span class="math inline">\(x\)</span> traces the <strong>phase portrait</strong> (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>): the trajectories are closed loops circling the coexistence equilibrium <span class="math inline">\((\gamma/\delta,\ \alpha/\beta)\)</span>, the mathematical signature of the perpetual boom-and-bust cycle of the two populations.</p>
+<div id="fig-3-lotka" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-lotka-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/03-lotka.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-lotka-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Phase portrait of the Lotka-Volterra system <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> (<span class="math inline">\(\alpha=\gamma=1,\ \beta=0.01,\ \delta=0.02\)</span>), integrated with RK4 from three initial states. Each orbit is a closed loop around the equilibrium (red): predator and prey populations oscillate indefinitely, larger initial imbalances giving larger swings.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="stiff-equations-and-implicit-methods" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="stiff-equations-and-implicit-methods"><span class="header-section-number">3.9</span> Stiff equations and implicit methods</h2>
+<p>Some problems force explicit methods to take absurdly small steps not for accuracy but for <strong>stability</strong>. The diagnostic is the linear test equation <span id="eq-3-test"><span class="math display">\[
+\diff{y}{t}=\lambda y,\qquad y(0)=\alpha,\qquad \lambda&lt;0,
+\tag{3.19}\]</span></span> whose solution <span class="math inline">\(y(t)=\alpha e^{\lambda t}\)</span> decays to <span class="math inline">\(0\)</span>. Its Lipschitz constant is <span class="math inline">\(L=\abs\lambda\)</span>, which can be enormous even as the solution vanishes — the hallmark of <strong>stiffness</strong>: widely separated time scales, a fast-decaying transient riding on slow dynamics.</p>
+<p>Apply Euler <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a>: <span class="math inline">\(w_{j+1}=(1+\lambda h)w_j\)</span>, so <span class="math inline">\(w_j=(1+\lambda h)^j\alpha\)</span>. A round-off error <span class="math inline">\(\delta\)</span> in <span class="math inline">\(w_0\)</span> propagates as <span class="math inline">\((1+\lambda h)^j\delta\)</span>, so the computed solution stays bounded — is <strong>absolutely stable</strong> — only when <span class="math display">\[
+\abs{1+\lambda h}&lt;1,\qquad\text{i.e.}\qquad -2&lt;\lambda h&lt;0 .
+\]</span> For <span class="math inline">\(\lambda=-10^6\)</span> this demands <span class="math inline">\(h&lt;2\times10^{-6}\)</span> throughout, long after the transient is dead: the step is dictated by stability, not accuracy. Implicit methods break this tyranny. The <strong>implicit trapezoid</strong> (the Adams-Moulton rule <a href="#eq-3-am1" class="quarto-xref">Equation&nbsp;<span>3.14</span></a>) applied to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a> gives <span class="math display">\[
+w_{j+1}=w_j+\tfrac{\lambda h}{2}(w_{j+1}+w_j)
+\ \Longrightarrow\
+w_j=\left(\frac{1+\lambda h/2}{1-\lambda h/2}\right)^{\!j}\alpha,
+\]</span> and the amplification factor satisfies <span class="math inline">\(\bigl\lvert\frac{1+\lambda h/2}{1-\lambda h/2}\bigr\rvert&lt;1\)</span> for <em>every</em> <span class="math inline">\(\lambda h\)</span> with <span class="math inline">\(\operatorname{Re}(\lambda h)&lt;0\)</span>. The method is stable for all step sizes: <span class="math inline">\(h\)</span> can be chosen purely for accuracy (<a href="#fig-3-stability" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>). This unconditional stability is what makes implicit methods indispensable for stiff systems.</p>
+<div id="fig-3-stability" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-stability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/03-stability.svg" class="img-fluid figure-img" style="width:72.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-stability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: Amplification factor <span class="math inline">\(\abs{R(z)}\)</span> on the test equation <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a> as a function of <span class="math inline">\(z=\lambda h&lt;0\)</span>. Forward Euler (<span class="math inline">\(\abs{1+z}\)</span>, red) leaves the stable band <span class="math inline">\(\abs R&lt;1\)</span> once <span class="math inline">\(z&lt;-2\)</span> and then blows up; the implicit trapezoid (blue) tracks the true decay <span class="math inline">\(e^z\)</span> and stays stable for all <span class="math inline">\(z&lt;0\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>The price is that each step of the implicit trapezoid <span class="math inline">\(w_{j+1}=w_j+\tfrac h2\bigl(f(t_{j+1},w_{j+1})+f(t_j,w_j)\bigr)\)</span> requires solving the nonlinear equation <span class="math inline">\(F(w)=0\)</span> where <span class="math display">\[
+F(w)\defeq w-w_j-\tfrac h2\bigl(f(t_{j+1},w)+f(t_j,w_j)\bigr).
+\]</span> Newton’s method (<a href="08-nonlinear-equations.html" class="quarto-xref"><span>Chapter 8</span></a>) does this efficiently. Starting from <span class="math inline">\(w_{j+1}^{(0)}=w_j\)</span>, iterate <span class="math display">\[
+w_{j+1}^{(\ell+1)}=w_{j+1}^{(\ell)}-\frac{w_{j+1}^{(\ell)}-w_j-\tfrac h2\bigl(f(t_{j+1},w_{j+1}^{(\ell)})+f(t_j,w_j)\bigr)}
+{1-\tfrac h2\,\pdiff{f}{y}(t_{j+1},w_{j+1}^{(\ell)})} ,
+\]</span> which converges quadratically in a few iterations. The extra Newton solves per step are a small price for stability that decouples <span class="math inline">\(h\)</span> from <span class="math inline">\(\abs\lambda\)</span> entirely — on a stiff problem the implicit trapezoid is dramatically more reliable, and cheaper overall, than any explicit method.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">3.10</span> Chapter summary</h2>
+<ul>
+<li>The IVP <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> is <strong>well-posed</strong> — unique solution, stable under perturbation — whenever <span class="math inline">\(f\)</span> is continuous and <strong>Lipschitz</strong> in <span class="math inline">\(y\)</span> (<a href="#def-3-lipschitz" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>, <a href="#thm-3-wellposed" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>); on a convex domain a bound <span class="math inline">\(\lvert\pdiff{f}{y}\rvert\le L\)</span> suffices (<a href="#thm-3-lipschitz-bound" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a>).</li>
+<li><strong>Euler’s method</strong> <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> is first order with global error <span class="math inline">\(\le\tfrac{hM}{2L}(e^{L(t_j-a)}-1)\)</span> (<a href="#thm-3-euler-conv" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a>); round-off puts a floor on accuracy at <span class="math inline">\(h_{\mathrm{opt}}=\bigO(\sqrt\delta)\)</span>.</li>
+<li>The <strong>local truncation error</strong> (<a href="#def-3-lte" class="quarto-xref">Definition&nbsp;<span>3.4</span></a>) measures per-step fidelity; <strong>consistency</strong>
+<ol class="example" type="1">
+<li>plus stability gives convergence. <strong>Taylor methods</strong> <a href="#eq-3-taylor" class="quarto-xref">Equation&nbsp;<span>3.5</span></a> reach order <span class="math inline">\(n\)</span> but need derivatives of <span class="math inline">\(f\)</span>.</li>
+</ol></li>
+<li><strong>Runge-Kutta</strong> methods hit high order using only evaluations of <span class="math inline">\(f\)</span>: midpoint (<a href="#thm-3-rk2" class="quarto-xref">Theorem&nbsp;<span>3.4</span></a>), RK3 <a href="#eq-3-rk3" class="quarto-xref">Equation&nbsp;<span>3.8</span></a>, and the classical <strong>RK4</strong> <a href="#eq-3-rk4" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> (<a href="#thm-3-rk4" class="quarto-xref">Theorem&nbsp;<span>3.5</span></a>), the default one-step solver.</li>
+<li><strong>Adaptive control</strong> estimates the LTE by differencing two orders (<a href="#eq-3-lte-estimate" class="quarto-xref">Equation&nbsp;<span>3.10</span></a>) and rescales the step by <a href="#eq-3-stepsize" class="quarto-xref">Equation&nbsp;<span>3.11</span></a>; <strong>RKF45</strong> realizes this with an embedded 4–5 pair.</li>
+<li><strong>Multistep</strong> Adams methods reuse past slopes (one evaluation/step): explicit <strong>Adams-Bashforth</strong> <a href="#eq-3-ab4" class="quarto-xref">Equation&nbsp;<span>3.15</span></a> and implicit <strong>Adams-Moulton</strong> <a href="#eq-3-am4" class="quarto-xref">Equation&nbsp;<span>3.16</span></a>, with LTE constants <span class="math inline">\(\tfrac{251}{720}\)</span> and <span class="math inline">\(-\tfrac{19}{720}\)</span>; the <strong>predictor-corrector</strong> Adams4PC pairs them and self-estimates its error. Stability requires the <strong>root condition</strong> (<a href="#def-3-root-condition" class="quarto-xref">Definition&nbsp;<span>3.6</span></a>, <a href="#thm-3-dahlquist" class="quarto-xref">Theorem&nbsp;<span>3.6</span></a>).</li>
+<li>Systems and higher-order equations reduce to first-order vector form; RK4 applies verbatim, as in the <strong>Lotka-Volterra</strong> phase portrait (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>).</li>
+<li><strong>Stiff</strong> problems force explicit methods to tiny steps for stability, not accuracy; the <strong>implicit trapezoid</strong> is stable for all <span class="math inline">\(h\)</span> (<a href="#fig-3-stability" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>), solved each step by Newton iteration.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./02-differentiation-integration.html" class="pagination-link" aria-label="Numerical Differentiation &amp; Integration">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./04-direct-linear-systems.html" class="pagination-link" aria-label="Direct Methods for Linear Systems">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

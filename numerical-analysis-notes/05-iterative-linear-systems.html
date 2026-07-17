@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>5&nbsp; Iterative Methods for Linear Systems – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./06-approximation-theory.html" rel="next">
+<link href="./04-direct-linear-systems.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#vector-norms" id="toc-vector-norms" class="nav-link active" data-scroll-target="#vector-norms"><span class="header-section-number">5.1</span> Vector norms</a></li>
+  <li><a href="#matrix-norms" id="toc-matrix-norms" class="nav-link" data-scroll-target="#matrix-norms"><span class="header-section-number">5.2</span> Matrix norms</a></li>
+  <li><a href="#sec-5-spectral-radius" id="toc-sec-5-spectral-radius" class="nav-link" data-scroll-target="#sec-5-spectral-radius"><span class="header-section-number">5.3</span> Spectral radius</a></li>
+  <li><a href="#the-jacobi-method" id="toc-the-jacobi-method" class="nav-link" data-scroll-target="#the-jacobi-method"><span class="header-section-number">5.4</span> The Jacobi method</a></li>
+  <li><a href="#the-gaussseidel-method" id="toc-the-gaussseidel-method" class="nav-link" data-scroll-target="#the-gaussseidel-method"><span class="header-section-number">5.5</span> The Gauss–Seidel method</a></li>
+  <li><a href="#sec-5-jacobi-gs-convergence" id="toc-sec-5-jacobi-gs-convergence" class="nav-link" data-scroll-target="#sec-5-jacobi-gs-convergence"><span class="header-section-number">5.6</span> Convergence of Jacobi and Gauss–Seidel</a></li>
+  <li><a href="#relaxation-and-sor" id="toc-relaxation-and-sor" class="nav-link" data-scroll-target="#relaxation-and-sor"><span class="header-section-number">5.7</span> Relaxation and SOR</a></li>
+  <li><a href="#sec-5-condition" id="toc-sec-5-condition" class="nav-link" data-scroll-target="#sec-5-condition"><span class="header-section-number">5.8</span> Condition numbers and error sensitivity</a></li>
+  <li><a href="#sec-5-positive-definite" id="toc-sec-5-positive-definite" class="nav-link" data-scroll-target="#sec-5-positive-definite"><span class="header-section-number">5.9</span> Positive definite systems</a></li>
+  <li><a href="#steepest-descent" id="toc-steepest-descent" class="nav-link" data-scroll-target="#steepest-descent"><span class="header-section-number">5.10</span> Steepest descent</a></li>
+  <li><a href="#the-conjugate-gradient-method" id="toc-the-conjugate-gradient-method" class="nav-link" data-scroll-target="#the-conjugate-gradient-method"><span class="header-section-number">5.11</span> The conjugate gradient method</a></li>
+  <li><a href="#sec-5-cg-convergence" id="toc-sec-5-cg-convergence" class="nav-link" data-scroll-target="#sec-5-cg-convergence"><span class="header-section-number">5.12</span> Convergence of CG</a></li>
+  <li><a href="#preconditioning" id="toc-preconditioning" class="nav-link" data-scroll-target="#preconditioning"><span class="header-section-number">5.13</span> Preconditioning</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">5.14</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-iterative-linsys" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>The direct methods of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> solve <span class="math inline">\(Ax=b\)</span> exactly (up to rounding) in a fixed <span class="math inline">\(\bigO(n^3)\)</span> number of operations. For the large, sparse systems that arise from discretized differential equations that cost is prohibitive, and it throws away the one piece of structure we have: multiplying by <span class="math inline">\(A\)</span> is cheap, often <span class="math inline">\(\bigO(n)\)</span>, even when factoring <span class="math inline">\(A\)</span> is not. <strong>Iterative methods</strong> exploit exactly this. They never touch the entries of <span class="math inline">\(A\)</span> except through matrix–vector products (they are <em>matrix-free</em>), they produce a sequence <span class="math inline">\(x^{(0)},x^{(1)},\dots\)</span> that we hope converges to the solution, and we stop as soon as the approximation is good enough. The aim is to trade the <span class="math inline">\(\bigO(n^3)\)</span> of a factorization for <span class="math inline">\(\bigO(n)\)</span> per iteration and few enough iterations to win.</p>
+<p>To speak of convergence we first need to measure the size of vectors and matrices, so the chapter opens with norms and the spectral radius, then builds the two classical <em>stationary</em> iterations (Jacobi and Gauss–Seidel) and their relaxed variant (SOR), analyzes when they converge, and turns to the sensitivity of <span class="math inline">\(Ax=b\)</span> through the condition number. The second half specializes to symmetric positive definite systems, where solving <span class="math inline">\(Ax=b\)</span> becomes a minimization problem and the <em>steepest descent</em> and <em>conjugate gradient</em> methods emerge, closing with the convergence rate of conjugate gradient and the idea of preconditioning.</p>
+<section id="vector-norms" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="vector-norms"><span class="header-section-number">5.1</span> Vector norms</h2>
+<p>A norm turns the vector space <span class="math inline">\(\R^n\)</span> into a metric space, giving us the language of distance and convergence.</p>
+<div id="def-5-vector-norm" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.1 (Vector norm)</strong></span> A <strong>vector norm</strong> on <span class="math inline">\(\R^n\)</span> is a function <span class="math inline">\(\norm{\cdot}:\R^n\to\R\)</span> such that for all <span class="math inline">\(x,y\in\R^n\)</span> and <span class="math inline">\(\alpha\in\R\)</span>:</p>
+<ol type="1">
+<li><span class="math inline">\(\norm{x}\ge 0\)</span>, with <span class="math inline">\(\norm{x}=0\)</span> if and only if <span class="math inline">\(x=0\)</span> (nonnegativity and definiteness);</li>
+<li><span class="math inline">\(\norm{\alpha x}=\abs{\alpha}\,\norm{x}\)</span> (homogeneity);</li>
+<li><span class="math inline">\(\norm{x+y}\le\norm{x}+\norm{y}\)</span> (triangle inequality).</li>
+</ol>
+</div>
+<p>Writing <span class="math inline">\(x=(x_1,\dots,x_n)^\top\)</span>, the three norms we use throughout are the <strong><span class="math inline">\(2\)</span>-norm</strong> (or Euclidean norm), the <strong><span class="math inline">\(\infty\)</span>-norm</strong> (or max norm), and the <strong><span class="math inline">\(1\)</span>-norm</strong>, <span id="eq-5-pnorms"><span class="math display">\[
+\ntwo{x}=\Bigl(\sum_{i=1}^n x_i^2\Bigr)^{1/2},\qquad
+\ninf{x}=\max_{1\le i\le n}\abs{x_i},\qquad
+\none{x}=\sum_{i=1}^n\abs{x_i},
+\tag{5.1}\]</span></span> all special cases of the <span class="math inline">\(p\)</span>-norm <span class="math inline">\(\norm{x}_p=(\sum_i\abs{x_i}^p)^{1/p}\)</span>. The <span class="math inline">\(2\)</span>-norm is special: it comes from the inner product <span class="math inline">\(\inner{x}{y}=x^\top y\)</span> through <span class="math inline">\(\ntwo{x}=\sqrt{\inner{x}{x}}\)</span>, and that extra structure is what makes its triangle inequality subtle. For the <span class="math inline">\(1\)</span>- and <span class="math inline">\(\infty\)</span>-norms the triangle inequality follows termwise from <span class="math inline">\(\abs{a+b}\le\abs{a}+\abs{b}\)</span>; for the <span class="math inline">\(2\)</span>-norm it rests on the Cauchy–Schwarz inequality.</p>
+<div id="thm-5-cauchy-schwarz" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.1 (Cauchy–Schwarz inequality)</strong></span> For all <span class="math inline">\(x,y\in\R^n\)</span>, <span class="math inline">\(\;\abs{x^\top y}\le\ntwo{x}\,\ntwo{y}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>If <span class="math inline">\(y=0\)</span> both sides vanish, so assume <span class="math inline">\(x,y\ne 0\)</span>. For any <span class="math inline">\(\lambda\in\R\)</span>, expanding the nonnegative quantity <span class="math inline">\(\ntwo{x-\lambda y}^2\)</span> gives <span class="math display">\[
+0\le\ntwo{x-\lambda y}^2=(x-\lambda y)^\top(x-\lambda y)
+=\ntwo{x}^2-2\lambda\,(x^\top y)+\lambda^2\ntwo{y}^2 .
+\]</span> Choosing <span class="math inline">\(\lambda=\ntwo{x}/\ntwo{y}\)</span> makes the two outer terms equal to <span class="math inline">\(\ntwo{x}^2\)</span>, so the inequality collapses to <span class="math inline">\(2\ntwo{x}^2-2\lambda\,(x^\top y)\ge 0\)</span>, i.e. <span class="math inline">\(x^\top y\le\ntwo{x}\ntwo{y}\)</span>. Applying the same bound to <span class="math inline">\(-x\)</span> gives the absolute value. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Cauchy–Schwarz yields the triangle inequality for the <span class="math inline">\(2\)</span>-norm at once: <span class="math inline">\(\ntwo{x+y}^2=\ntwo{x}^2+2x^\top y+\ntwo{y}^2\le(\ntwo{x}+\ntwo{y})^2\)</span>. A sequence <span class="math inline">\(\{x^{(k)}\}\)</span> <strong>converges</strong> to <span class="math inline">\(x\)</span> in a norm if <span class="math inline">\(\norm{x^{(k)}-x}\to 0\)</span>. The reassuring first fact is that convergence in the <span class="math inline">\(\infty\)</span>-norm is exactly componentwise convergence, since <span class="math inline">\(\ninf{x^{(k)}-x}\to 0\)</span> if and only if each coordinate <span class="math inline">\(x_i^{(k)}\to x_i\)</span>.</p>
+<p>One might worry that the choice of norm changes what “converges” means. On a finite-dimensional space it does not.</p>
+<div id="thm-5-norm-equivalence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.2 (Equivalence of norms)</strong></span> All norms on <span class="math inline">\(\R^n\)</span> are <strong>equivalent</strong>: for any two norms <span class="math inline">\(\norm{\cdot}_a\)</span> and <span class="math inline">\(\norm{\cdot}_b\)</span> there are constants <span class="math inline">\(0&lt;c\le C\)</span> with <span class="math inline">\(c\,\norm{x}_a\le\norm{x}_b\le C\,\norm{x}_a\)</span> for all <span class="math inline">\(x\)</span>. Consequently a sequence converges in one norm if and only if it converges in every norm, and to the same limit, so we may write <span class="math inline">\(\lim_{k\to\infty}x^{(k)}\)</span> unambiguously.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>This is a standard compactness result (a continuous positive function attains a positive minimum on the unit sphere), stated here without full proof. A concrete instance we use directly is <span id="eq-5-2-vs-inf"><span class="math display">\[
+\ninf{x}\le\ntwo{x}\le\sqrt{n}\,\ninf{x},
+\tag{5.2}\]</span></span> whose right inequality is <span class="math inline">\(\ntwo{x}^2=\sum_i x_i^2\le n\,(\max_j\abs{x_j})^2=n\,\ninf{x}^2\)</span> and whose left inequality picks out a single maximizing coordinate. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="matrix-norms" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="matrix-norms"><span class="header-section-number">5.2</span> Matrix norms</h2>
+<p>To measure a matrix we ask how much it can stretch a vector. Any function <span class="math inline">\(\norm{\cdot}:\R^{n\times n}\to\R\)</span> satisfying nonnegativity/definiteness, homogeneity, and the triangle inequality is a candidate, but matrices compose, so we demand one more property.</p>
+<div id="def-5-matrix-norm" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.2 (Matrix norm)</strong></span> A <strong>matrix norm</strong> on <span class="math inline">\(\R^{n\times n}\)</span> is a function <span class="math inline">\(\norm{\cdot}\)</span> obeying the three vector-norm axioms together with <strong>submultiplicativity</strong>, <span class="math inline">\(\norm{AB}\le\norm{A}\,\norm{B}\)</span>.</p>
+</div>
+<p>The most useful matrix norms are those <em>induced</em> by a vector norm: they measure the largest factor by which <span class="math inline">\(A\)</span> can lengthen a unit vector.</p>
+<div id="def-5-induced-norm" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.3 (Induced (natural) matrix norm)</strong></span> Given a vector norm <span class="math inline">\(\norm{\cdot}\)</span> on <span class="math inline">\(\R^n\)</span>, the <strong>induced</strong> (or <strong>natural</strong>) matrix norm is <span id="eq-5-induced"><span class="math display">\[
+\norm{A}=\max_{\norm{x}=1}\norm{Ax}=\max_{z\ne 0}\frac{\norm{Az}}{\norm{z}} .
+\tag{5.3}\]</span></span></p>
+</div>
+<p>The two forms in <a href="#eq-5-induced" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> agree by homogeneity (<span class="math inline">\(z=x/\norm{x}\)</span>). By its very definition an induced norm satisfies <span class="math inline">\(\norm{Az}\le\norm{A}\,\norm{z}\)</span> for every <span class="math inline">\(z\)</span>, and this is what makes it submultiplicative: <span class="math inline">\(\norm{ABz}\le\norm{A}\,\norm{Bz}\le\norm{A}\,\norm{B}\,\norm{z}\)</span> for all <span class="math inline">\(z\)</span>, so <span class="math inline">\(\norm{AB}\le\norm{A}\,\norm{B}\)</span> (and the bound chains, e.g. <span class="math inline">\(\norm{ABCz}\le\norm{A}\norm{B}\norm{C}\norm{z}\)</span>). We write <span class="math inline">\(\norm{A}_p\)</span> for the norm induced by the vector <span class="math inline">\(p\)</span>-norm. The <span class="math inline">\(\infty\)</span>-norm has a clean closed form as the <strong>maximum absolute row sum</strong>.</p>
+<div id="thm-5-inf-matrix-norm" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.3 (Infinity matrix norm)</strong></span> For <span class="math inline">\(A=(a_{ij})\)</span>, <span class="math inline">\(\;\displaystyle\ninf{A}=\max_{1\le i\le n}\sum_{j=1}^n\abs{a_{ij}}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Set <span class="math inline">\(C=\max_i\sum_j\abs{a_{ij}}\)</span>. For any <span class="math inline">\(x\)</span> with <span class="math inline">\(\ninf{x}\le 1\)</span>, <span class="math display">\[
+\ninf{Ax}=\max_i\Bigl|\sum_j a_{ij}x_j\Bigr|\le\max_i\sum_j\abs{a_{ij}}\,\abs{x_j}
+\le\max_i\sum_j\abs{a_{ij}}\;\ninf{x}=C\,\ninf{x},
+\]</span> so <span class="math inline">\(\ninf{A}\le C\)</span>. For the reverse, let <span class="math inline">\(i\)</span> be a row attaining the maximum and set <span class="math inline">\(x_j=\operatorname{sign}(a_{ij})\)</span>, a unit <span class="math inline">\(\infty\)</span>-norm vector; then the <span class="math inline">\(i\)</span>-th component of <span class="math inline">\(Ax\)</span> is <span class="math inline">\(\sum_j a_{ij}\operatorname{sign}(a_{ij})=\sum_j\abs{a_{ij}}=C\)</span>, so <span class="math inline">\(\ninf{Ax}\ge C\)</span> and hence <span class="math inline">\(\ninf{A}\ge C\)</span>. Therefore <span class="math inline">\(\ninf{A}=C\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The Euclidean matrix norm has no such elementary formula; it is the largest <strong>singular value</strong>, <span id="eq-5-2-matrix-norm"><span class="math display">\[
+\ntwo{A}=\sqrt{\spec(A^\top A)}=\sigma_1(A),
+\tag{5.4}\]</span></span> where <span class="math inline">\(\spec(\cdot)\)</span> is the spectral radius of the next section. To see why, note <span class="math inline">\(\ntwo{A}^2=\max_{\norm{x}=1}x^\top(A^\top A)x\)</span>; by the Courant–Fischer maximum principle applied to the symmetric positive-semidefinite matrix <span class="math inline">\(A^\top A\)</span> this maximum is its largest eigenvalue, and since an SVD <span class="math inline">\(A=U\Sigma V^\top\)</span> gives <span class="math inline">\(A^\top A=V\Sigma^2 V^\top\)</span>, that eigenvalue is <span class="math inline">\(\sigma_1(A)^2\)</span>. We take <a href="#eq-5-2-matrix-norm" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> on faith here; the eigen/singular-value machinery behind it is developed in <a href="07-eigenvalue-problems.html" class="quarto-xref"><span>Chapter 7</span></a>.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Not every “matrix norm” is induced. Stacking the entries of <span class="math inline">\(A\)</span> into a long vector and applying a vector <span class="math inline">\(p\)</span>-norm inherits every axiom <strong>except</strong> submultiplicativity — except in one case, the <strong>Frobenius norm</strong> <span class="math inline">\(\norm{A}_F=(\sum_{ij}a_{ij}^2)^{1/2}=\sqrt{\tr(A^\top A)}\)</span>, which <em>is</em> submultiplicative and hence a genuine matrix norm, yet is <strong>not</strong> induced by any vector norm. In particular <span class="math inline">\(\norm{A}_F\ne\ntwo{A}\)</span>; do not conflate them.</p>
+</div>
+</div>
+</section>
+<section id="sec-5-spectral-radius" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="sec-5-spectral-radius"><span class="header-section-number">5.3</span> Spectral radius</h2>
+<p>Convergence of every stationary iteration below is governed by a single number attached to a matrix: the largest magnitude of its eigenvalues. Recall <span class="math inline">\(\lambda\in\C\)</span> is an <strong>eigenvalue</strong> of <span class="math inline">\(A\)</span> if <span class="math inline">\(Ax=\lambda x\)</span> for some <span class="math inline">\(x\ne 0\)</span>; the eigenvalues are the roots of the characteristic polynomial <span class="math inline">\(\det(A-\lambda I)\)</span> and may be complex even for real <span class="math inline">\(A\)</span>.</p>
+<div id="def-5-spectral-radius" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.4 (Spectral radius)</strong></span> The <strong>spectral radius</strong> of <span class="math inline">\(A\in\R^{n\times n}\)</span> is <span class="math display">\[
+\spec(A)=\max\bigl\{\,\abs{\lambda}\;:\;\lambda\text{ an eigenvalue of }A\,\bigr\},
+\]</span> the maximum taken over all (possibly complex) eigenvalues.</p>
+</div>
+<p>The spectral radius is never larger than any induced norm, and it is the exact rate at which powers of <span class="math inline">\(A\)</span> grow or decay.</p>
+<div id="prp-5-rho-le-norm" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 5.1 (Spectral radius bounds)</strong></span> For any induced matrix norm, <span class="math inline">\(\spec(A)\le\norm{A}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(\lambda\)</span> attain the spectral radius, with eigenvector <span class="math inline">\(x\ne 0\)</span>, and let <span class="math inline">\(X\)</span> be the matrix whose columns are all <span class="math inline">\(x\)</span>, so <span class="math inline">\(AX=\lambda X\)</span> and <span class="math inline">\(X\ne 0\)</span>. Taking any induced norm and using homogeneity and submultiplicativity, <span class="math inline">\(\abs{\lambda}\,\norm{X}=\norm{AX}\le\norm{A}\,\norm{X}\)</span>; dividing by <span class="math inline">\(\norm{X}&gt;0\)</span> gives <span class="math inline">\(\abs{\lambda}\le\norm{A}\)</span>, hence <span class="math inline">\(\spec(A)\le\norm{A}\)</span>. If <span class="math inline">\(\lambda\)</span> is complex the eigenvector <span class="math inline">\(x\)</span> (and hence <span class="math inline">\(X\)</span>) is complex; the same estimate goes through verbatim once the induced norm is extended to <span class="math inline">\(\C^{n\times n}\)</span> in the usual way, so no generality is lost. <span class="math inline">\(\square\)</span></p>
+</div>
+<div id="def-5-convergent-matrix" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.5 (Convergent matrix)</strong></span> A matrix <span class="math inline">\(A\)</span> is <strong>convergent</strong> if <span class="math inline">\(\lim_{k\to\infty}(A^k)_{ij}=0\)</span> for all <span class="math inline">\(i,j\)</span>, equivalently (by equivalence of norms on <span class="math inline">\(\R^{n\times n}\)</span>) if <span class="math inline">\(\norm{A^k}\to 0\)</span> for some — hence every — matrix norm.</p>
+</div>
+<p>The following equivalence is the analytic heart of the chapter: it converts “the iteration converges” into the checkable condition <span class="math inline">\(\spec(T)&lt;1\)</span>.</p>
+<div id="thm-5-convergent-equiv" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.4 (Characterization of convergent matrices)</strong></span> For <span class="math inline">\(A\in\R^{n\times n}\)</span> the following are equivalent: (i) <span class="math inline">\(A\)</span> is convergent; (ii) <span class="math inline">\(\lim_{k\to\infty}\norm{A^k}=0\)</span> for some (equivalently every) matrix norm; (iii) <span class="math inline">\(\spec(A)&lt;1\)</span>; (iv) <span class="math inline">\(\lim_{k\to\infty}A^k x=0\)</span> for every <span class="math inline">\(x\in\R^n\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Equivalence of (i), (ii), (iv) is the equivalence of norms applied to the vectorized powers, together with the observations that (iv)<span class="math inline">\(\Rightarrow\)</span>(i) by plugging in the standard basis vectors <span class="math inline">\(e_j\)</span>, and (i)<span class="math inline">\(\Rightarrow\)</span>(iv) by expanding <span class="math inline">\(A^kx\)</span> coordinatewise and taking limits. That <span class="math inline">\(\spec(A)&lt;1\)</span> is equivalent to convergence is the standard spectral criterion (via the Jordan form, <span class="math inline">\(\norm{A^k}\to 0\)</span> iff every eigenvalue has modulus <span class="math inline">\(&lt;1\)</span>); we take this direction as known. The one-line intuition: if some <span class="math inline">\(\abs{\lambda}\ge 1\)</span> then <span class="math inline">\(A^k\)</span> does not shrink the corresponding eigenvector, while if all <span class="math inline">\(\abs{\lambda}&lt;1\)</span> the powers decay geometrically at rate <span class="math inline">\(\spec(A)\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="the-jacobi-method" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="the-jacobi-method"><span class="header-section-number">5.4</span> The Jacobi method</h2>
+<p>We now build the first iteration for <span class="math inline">\(Ax=b\)</span>. <strong>Split</strong> <span class="math inline">\(A\)</span> into its diagonal, strictly lower, and strictly upper triangular parts, <span id="eq-5-splitting"><span class="math display">\[
+A=D-L-U,
+\tag{5.5}\]</span></span> where <span class="math inline">\(D=\diag(a_{11},\dots,a_{nn})\)</span>, <span class="math inline">\(-L\)</span> is the strictly lower part, and <span class="math inline">\(-U\)</span> the strictly upper part. (Beware: these <span class="math inline">\(L,U\)</span> are <strong>not</strong> the factors of an <span class="math inline">\(LU\)</span> factorization from <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>; they are fixed pieces of <span class="math inline">\(A\)</span>, not computed.) Assume every diagonal entry <span class="math inline">\(a_{ii}\ne 0\)</span>, so <span class="math inline">\(D\)</span> is invertible.</p>
+<p>Rewriting <span class="math inline">\(Ax=b\)</span> as <span class="math inline">\((D-L-U)x=b\)</span>, i.e.&nbsp;<span class="math inline">\(Dx=b+(L+U)x\)</span>, exhibits the solution as a <strong>fixed point</strong> of the map <span class="math display">\[
+F(x)=D^{-1}\bigl[b+(L+U)x\bigr] .
+\]</span> The <strong>Jacobi method</strong> is the fixed-point iteration <span class="math inline">\(x^{(k+1)}=F(x^{(k)})\)</span>: pick <span class="math inline">\(x^{(0)}\)</span> and iterate. If the iterates converge, continuity of <span class="math inline">\(F\)</span> forces the limit to satisfy <span class="math inline">\(x^\star=F(x^\star)\)</span>, i.e.&nbsp;to solve <span class="math inline">\(Ax=b\)</span>. Whether they converge is the subject of <a href="#sec-5-jacobi-gs-convergence" class="quarto-xref"><span>Section 5.6</span></a>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Jacobi iteration
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given <span class="math inline">\(A\)</span> (with <span class="math inline">\(a_{ii}\ne 0\)</span>), <span class="math inline">\(b\)</span>, and <span class="math inline">\(x^{(0)}\)</span>, iterate for <span class="math inline">\(k=0,1,\dots\)</span> <span id="eq-5-jacobi"><span class="math display">\[
+x^{(k+1)}=D^{-1}\bigl[b+(L+U)x^{(k)}\bigr],
+\qquad\text{componentwise}\qquad
+x_i^{(k+1)}=\frac{1}{a_{ii}}\Bigl(b_i-\sum_{\substack{j=1\\ j\ne i}}^{n}a_{ij}x_j^{(k)}\Bigr).
+\tag{5.6}\]</span></span> Each new component uses only <em>old</em> components <span class="math inline">\(x_j^{(k)}\)</span>, so the updates are independent and the sweep parallelizes trivially.</p>
+</div>
+</div>
+</section>
+<section id="the-gaussseidel-method" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="the-gaussseidel-method"><span class="header-section-number">5.5</span> The Gauss–Seidel method</h2>
+<p>Jacobi computes an entire new vector from the old one. But while sweeping <span class="math inline">\(i=1,\dots,n\)</span> we have <em>already improved</em> <span class="math inline">\(x_1^{(k+1)},\dots,x_{i-1}^{(k+1)}\)</span> by the time we reach component <span class="math inline">\(i\)</span> — why not use them? Grouping the splitting <a href="#eq-5-splitting" class="quarto-xref">Equation&nbsp;<span>5.5</span></a> as <span class="math inline">\((D-L)x=b+Ux\)</span> instead does exactly that, suggesting the iteration <span id="eq-5-gs-matrix"><span class="math display">\[
+x^{(k+1)}=(D-L)^{-1}\bigl[b+Ux^{(k)}\bigr],
+\tag{5.7}\]</span></span> the <strong>Gauss–Seidel method</strong>. Implementing it does not require inverting <span class="math inline">\(D-L\)</span>: it is the lower-triangular system <span class="math inline">\((D-L)x^{(k+1)}=b+Ux^{(k)}\)</span>, solved by forward substitution. Expanding the <span class="math inline">\(i\)</span>-th equation <span class="math inline">\(a_{ii}x_i^{(k+1)}+\sum_{j&lt;i}a_{ij}x_j^{(k+1)}=b_i-\sum_{j&gt;i}a_{ij}x_j^{(k)}\)</span> and solving for <span class="math inline">\(x_i^{(k+1)}\)</span> gives the in-place formula.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Gauss–Seidel iteration
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given <span class="math inline">\(A\)</span> (with <span class="math inline">\(a_{ii}\ne 0\)</span>), <span class="math inline">\(b\)</span>, and <span class="math inline">\(x^{(0)}\)</span>, iterate for <span class="math inline">\(k=0,1,\dots\)</span> and <span class="math inline">\(i=1,\dots,n\)</span> in order <span id="eq-5-gauss-seidel"><span class="math display">\[
+x_i^{(k+1)}=\frac{1}{a_{ii}}\Bigl(b_i-\sum_{j=1}^{i-1}a_{ij}x_j^{(k+1)}
+-\sum_{j=i+1}^{n}a_{ij}x_j^{(k)}\Bigr).
+\tag{5.8}\]</span></span> The right-hand side uses the <em>already updated</em> <span class="math inline">\(x_j^{(k+1)}\)</span> for <span class="math inline">\(j&lt;i\)</span>, so components are computed sequentially with no extra work — like forward substitution for a triangular matrix.</p>
+</div>
+</div>
+<p>Jacobi and Gauss–Seidel cost the same number of flops per iteration (ignoring parallelism); which one converges in fewer iterations has no clean general answer, though sufficient conditions for Gauss–Seidel to win are given by the Stein–Rosenberg theorem (see the textbook).</p>
+</section>
+<section id="sec-5-jacobi-gs-convergence" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="sec-5-jacobi-gs-convergence"><span class="header-section-number">5.6</span> Convergence of Jacobi and Gauss–Seidel</h2>
+<p>Both iterations have the <strong>stationary</strong> form <span id="eq-5-stationary"><span class="math display">\[
+x^{(k+1)}=Tx^{(k)}+c,
+\tag{5.9}\]</span></span> with <strong>iteration matrix</strong> <span class="math inline">\(T\)</span> and constant <span class="math inline">\(c\)</span> read off from <a href="#eq-5-jacobi" class="quarto-xref">Equation&nbsp;<span>5.6</span></a> and <a href="#eq-5-gs-matrix" class="quarto-xref">Equation&nbsp;<span>5.7</span></a>: <span id="eq-5-iteration-matrices"><span class="math display">\[
+\text{Jacobi:}\quad T=D^{-1}(L+U),\ \ c=D^{-1}b;\qquad
+\text{Gauss–Seidel:}\quad T=(D-L)^{-1}U,\ \ c=(D-L)^{-1}b .
+\tag{5.10}\]</span></span> The convergence of <em>any</em> iteration of the form <a href="#eq-5-stationary" class="quarto-xref">Equation&nbsp;<span>5.9</span></a> depends only on <span class="math inline">\(T\)</span>, through the spectral criterion of <a href="#thm-5-convergent-equiv" class="quarto-xref">Theorem&nbsp;<span>5.4</span></a>.</p>
+<div id="thm-5-jacobi-gs-conv" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.5 (Convergence of stationary iterations)</strong></span> Let <span class="math inline">\(T\in\R^{n\times n}\)</span> and <span class="math inline">\(c\in\R^n\)</span>. The iteration <span class="math inline">\(x^{(k+1)}=Tx^{(k)}+c\)</span> converges to the unique solution of <span class="math inline">\(x=Tx+c\)</span> for <strong>every</strong> starting point <span class="math inline">\(x^{(0)}\)</span> and every <span class="math inline">\(c\)</span> if and only if <span class="math display">\[
+\spec(T)&lt;1 .
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Suppose <span class="math inline">\(\spec(T)&lt;1\)</span>. Then <span class="math inline">\(1\)</span> is not an eigenvalue of <span class="math inline">\(T\)</span>, so <span class="math inline">\(I-T\)</span> is invertible and <span class="math inline">\(x=Tx+c\)</span> has the unique solution <span class="math inline">\(x=(I-T)^{-1}c\)</span>. Define the error <span class="math inline">\(y^{(k)}=x^{(k)}-x\)</span>. Subtracting <span class="math inline">\(x=Tx+c\)</span> from <span class="math inline">\(x^{(k+1)}=Tx^{(k)}+c\)</span> gives <span class="math display">\[
+y^{(k+1)}=x^{(k+1)}-x=T x^{(k)}-Tx=T\,y^{(k)},
+\]</span> hence <span class="math inline">\(y^{(k)}=T^k y^{(0)}\)</span>. By <a href="#thm-5-convergent-equiv" class="quarto-xref">Theorem&nbsp;<span>5.4</span></a>, <span class="math inline">\(\spec(T)&lt;1\)</span> makes <span class="math inline">\(T\)</span> convergent, so <span class="math inline">\(y^{(k)}=T^k y^{(0)}\to 0\)</span>, i.e.&nbsp;<span class="math inline">\(x^{(k)}\to x\)</span> for every <span class="math inline">\(x^{(0)}\)</span>.</p>
+<p>Conversely, suppose the iteration converges for every <span class="math inline">\(x^{(0)}\)</span> and every <span class="math inline">\(c\)</span>. Take <span class="math inline">\(c=0\)</span>: the fixed point is <span class="math inline">\(x=0\)</span> and <span class="math inline">\(x^{(k)}=T^k x^{(0)}\to 0\)</span> for every <span class="math inline">\(x^{(0)}\)</span>, which is precisely condition (iv) of <a href="#thm-5-convergent-equiv" class="quarto-xref">Theorem&nbsp;<span>5.4</span></a>. Hence <span class="math inline">\(T\)</span> is convergent and <span class="math inline">\(\spec(T)&lt;1\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>When an induced norm of <span class="math inline">\(T\)</span> is already below <span class="math inline">\(1\)</span> we get convergence <em>and</em> a quantitative rate, directly from <span class="math inline">\(\spec(T)\le\norm{T}\)</span> (<a href="#prp-5-rho-le-norm" class="quarto-xref">Proposition&nbsp;<span>5.1</span></a>).</p>
+<div id="cor-5-rate" class="theorem corollary">
+<p><span class="theorem-title"><strong>Corollary 5.1 (Error estimates)</strong></span> If <span class="math inline">\(\norm{T}&lt;1\)</span> for some induced norm, the iteration converges for every <span class="math inline">\(x^{(0)}\)</span>, and <span id="eq-5-rate"><span class="math display">\[
+\norm{x^{(k)}-x}\le\norm{T}^{k}\,\norm{x^{(0)}-x},
+\qquad
+\norm{x^{(k)}-x}\le\frac{\norm{T}^{k}}{1-\norm{T}}\,\norm{x^{(1)}-x^{(0)}} .
+\tag{5.11}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The first bound is <span class="math inline">\(\norm{y^{(k)}}=\norm{T^ky^{(0)}}\le\norm{T}^k\norm{y^{(0)}}\)</span>. For the second, telescope <span class="math inline">\(x^{(k)}-x^{(l)}=\sum_{j=0}^{l-k-1}\bigl(x^{(k+j)}-x^{(k+j+1)}\bigr)\)</span> for <span class="math inline">\(l&gt;k\)</span> and use <span class="math inline">\(x^{(k+j)}-x^{(k+j+1)}=T^{k+j}(x^{(0)}-x^{(1)})\)</span> to get <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\le\norm{T}^k\bigl(\sum_{j\ge 0}\norm{T}^j\bigr)\norm{x^{(1)}-x^{(0)}}\)</span>; letting <span class="math inline">\(l\to\infty\)</span> and summing the geometric series <span class="math inline">\(\sum_j\norm{T}^j=1/(1-\norm{T})\)</span> yields the claim. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>For Jacobi in the <span class="math inline">\(\infty\)</span>-norm this criterion becomes a condition on <span class="math inline">\(A\)</span> alone. With <span class="math inline">\(T=D^{-1}(L+U)\)</span> we have <span class="math inline">\(T_{ij}=-a_{ij}/a_{ii}\)</span> for <span class="math inline">\(i\ne j\)</span> and <span class="math inline">\(T_{ii}=0\)</span>, so by <a href="#thm-5-inf-matrix-norm" class="quarto-xref">Theorem&nbsp;<span>5.3</span></a>, <span class="math display">\[
+\ninf{T}=\max_i\sum_{j\ne i}\frac{\abs{a_{ij}}}{\abs{a_{ii}}}&lt;1
+\iff
+\abs{a_{ii}}&gt;\sum_{j\ne i}\abs{a_{ij}}\ \text{ for all }i .
+\]</span></p>
+<div id="def-5-sdd" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.6 (Strict diagonal dominance)</strong></span> A matrix <span class="math inline">\(A=(a_{ij})\)</span> is <strong>strictly diagonally dominant</strong> if <span class="math inline">\(\abs{a_{ii}}&gt;\sum_{j\ne i}\abs{a_{ij}}\)</span> for every <span class="math inline">\(i\)</span>.</p>
+</div>
+<div id="thm-5-sdd-convergence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.6 (Convergence under diagonal dominance)</strong></span> If <span class="math inline">\(A\)</span> is strictly diagonally dominant, then for any <span class="math inline">\(b\)</span> and any <span class="math inline">\(x^{(0)}\)</span> both the Jacobi and the Gauss–Seidel iterations converge to the solution of <span class="math inline">\(Ax=b\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For Jacobi the computation above gives <span class="math inline">\(\ninf{T}&lt;1\)</span>, so <a href="#cor-5-rate" class="quarto-xref">Corollary&nbsp;<span>5.1</span></a> applies. Gauss–Seidel also converges under the same hypothesis; the standard argument bounds the eigenvalues of <span class="math inline">\((D-L)^{-1}U\)</span> below <span class="math inline">\(1\)</span> using diagonal dominance, which we state without proof. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="relaxation-and-sor" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="relaxation-and-sor"><span class="header-section-number">5.7</span> Relaxation and SOR</h2>
+<p>Even when Gauss–Seidel converges, its iteration matrix may have spectral radius close to <span class="math inline">\(1\)</span>, so convergence is slow. <strong>Relaxation</strong> introduces a parameter <span class="math inline">\(\omega\ne 0\)</span> that scales how far each step moves. Multiplying <span class="math inline">\(Ax=b\)</span> by <span class="math inline">\(\omega\)</span> and splitting <span class="math inline">\(\omega D=D-(1-\omega)D\)</span> turns the system into <span class="math inline">\(\bigl(D-(1-\omega)D-\omega L-\omega U\bigr)x=\omega b\)</span>, which rearranges to <span class="math inline">\(Dx=\omega\bigl[b+(L+U)x\bigr]+(1-\omega)Dx\)</span> and hence to the <strong>weighted Jacobi</strong> update <span id="eq-5-weighted-jacobi"><span class="math display">\[
+x^{(k+1)}=\omega D^{-1}\bigl[b+(L+U)x^{(k)}\bigr]+(1-\omega)x^{(k)}
+=T_\omega x^{(k)}+c_\omega,
+\tag{5.12}\]</span></span> where <span class="math inline">\(T_\omega=(1-\omega)I+\omega D^{-1}(L+U)=I-\omega D^{-1}A\)</span> (using <span class="math inline">\(L+U=D-A\)</span>) and <span class="math inline">\(c_\omega=\omega D^{-1}b\)</span>. For <span class="math inline">\(\omega\in(0,1)\)</span> this is a weighted average of a Jacobi step and “do nothing” (<strong>under-relaxation</strong>); for <span class="math inline">\(\omega&gt;1\)</span> it overshoots the Jacobi direction (<strong>over-relaxation</strong>); <span class="math inline">\(\omega=1\)</span> recovers Jacobi. Grouping the <em>lower</em>-triangular part with the update instead — rearranging <span class="math inline">\((D-\omega L)x=\bigl[(1-\omega)D+\omega U\bigr]x+\omega b\)</span> — gives the relaxed Gauss–Seidel iteration, <strong>successive over-relaxation (SOR)</strong>: <span id="eq-5-sor"><span class="math display">\[
+x^{(k+1)}=(D-\omega L)^{-1}\bigl\{\bigl[(1-\omega)D+\omega U\bigr]x^{(k)}+\omega b\bigr\}
+=T_\omega x^{(k)}+c_\omega,
+\tag{5.13}\]</span></span> now with <span class="math inline">\(T_\omega=(D-\omega L)^{-1}\bigl[(1-\omega)D+\omega U\bigr]\)</span> and <span class="math inline">\(c_\omega=\omega(D-\omega L)^{-1}b\)</span>. Like every stationary iteration it converges iff <span class="math inline">\(\spec(T_\omega)&lt;1\)</span>, and the parameter <span class="math inline">\(\omega\)</span> is a knob to make that spectral radius small.</p>
+<p>Two facts frame the search for a good <span class="math inline">\(\omega\)</span>. First, <span class="math inline">\(\omega\)</span> cannot be chosen freely.</p>
+<div id="thm-5-kahan" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.7 (Kahan’s theorem)</strong></span> If <span class="math inline">\(a_{ii}\ne 0\)</span> for all <span class="math inline">\(i\)</span>, then <span class="math inline">\(\spec(T_\omega)\ge\abs{\omega-1}\)</span> for SOR. Consequently SOR can converge only if <span class="math inline">\(\omega\in(0,2)\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The determinant of <span class="math inline">\(T_\omega\)</span> equals the product of its eigenvalues, and a short computation with the triangular factors gives <span class="math inline">\(\det T_\omega=(1-\omega)^n\)</span>; hence <span class="math inline">\(\spec(T_\omega)^n\ge\abs{\det T_\omega}=\abs{1-\omega}^n\)</span>, so <span class="math inline">\(\spec(T_\omega)\ge\abs{1-\omega}\)</span>. This is <span class="math inline">\(&lt;1\)</span> only for <span class="math inline">\(\omega\in(0,2)\)</span>. (Full computation left as in the source.) <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Second, within that window symmetry pins down convergence. Recall a symmetric matrix <span class="math inline">\(A\)</span> is <strong>positive definite</strong>, written <span class="math inline">\(A\succ 0\)</span>, if <span class="math inline">\(x^\top Ax&gt;0\)</span> for all <span class="math inline">\(x\ne 0\)</span> (see <a href="#sec-5-positive-definite" class="quarto-xref"><span>Section 5.9</span></a>); such <span class="math inline">\(A\)</span> has a unique positive definite square root <span class="math inline">\(A^{1/2}\)</span>.</p>
+<div id="thm-5-ostrowski-reich" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.8 (Ostrowski–Reich theorem)</strong></span> If <span class="math inline">\(A\)</span> is positive definite and <span class="math inline">\(\omega\in(0,2)\)</span>, then SOR converges for every <span class="math inline">\(b\)</span> and every <span class="math inline">\(x^{(0)}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Stated without proof (see the textbook). For the special case of weighted Jacobi one shows directly that <span class="math inline">\(D^{-1}A\)</span> is diagonalizable with positive eigenvalues when <span class="math inline">\(A\)</span> is positive definite, so the eigenvalues <span class="math inline">\(1-\omega\lambda\)</span> of <span class="math inline">\(T_\omega=I-\omega D^{-1}A\)</span> lie in <span class="math inline">\((-1,1)\)</span> precisely when <span class="math inline">\(0&lt;\omega&lt;2/\spec(D^{-1}A)\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Choosing the <em>optimal</em> <span class="math inline">\(\omega\)</span> is hard in general; a closed-form optimum is known for tridiagonal positive definite matrices (see the textbook).</p>
+</section>
+<section id="sec-5-condition" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="sec-5-condition"><span class="header-section-number">5.8</span> Condition numbers and error sensitivity</h2>
+<p>Iterative methods stop when the <strong>residual</strong> <span class="math inline">\(r=b-A\tilde{x}\)</span> of the current guess <span class="math inline">\(\tilde{x}\)</span> is small. But a small residual is not the same as a small error <span class="math inline">\(\tilde{x}-x\)</span>. Consider <span class="math display">\[
+\begin{pmatrix}1&amp;0\\0&amp;0.0001\end{pmatrix}\!\begin{pmatrix}x_1\\x_2\end{pmatrix}
+=\begin{pmatrix}1\\0\end{pmatrix},
+\qquad x=(1,0)^\top .
+\]</span> The guess <span class="math inline">\(\tilde{x}=(1,10)^\top\)</span> has residual <span class="math inline">\(r=(0,-0.001)^\top\)</span>, tiny, yet the error is enormous. The gap between “residual small” and “error small” is measured by the <strong>condition number</strong>.</p>
+<div id="thm-5-residual-error" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.9 (Residual–error bound)</strong></span> Let <span class="math inline">\(A\)</span> be invertible, <span class="math inline">\(Ax=b\)</span>, and <span class="math inline">\(\tilde{x}\)</span> a guess with residual <span class="math inline">\(r=b-A\tilde{x}\)</span>. Then in any induced norm <span id="eq-5-residual-error"><span class="math display">\[
+\norm{x-\tilde{x}}\le\norm{r}\,\norm{A^{-1}},
+\qquad\text{and, if }x,b\ne 0,\qquad
+\frac{\norm{x-\tilde{x}}}{\norm{x}}\le\norm{A}\,\norm{A^{-1}}\,\frac{\norm{r}}{\norm{b}} .
+\tag{5.14}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Since <span class="math inline">\(x=A^{-1}b\)</span> and <span class="math inline">\(\tilde{x}=A^{-1}(b-r)\)</span>, we get <span class="math inline">\(x-\tilde{x}=A^{-1}r\)</span>, so <span class="math inline">\(\norm{x-\tilde{x}}\le\norm{A^{-1}}\norm{r}\)</span>. For the relative bound, <span class="math inline">\(b=Ax\)</span> gives <span class="math inline">\(\norm{b}\le\norm{A}\norm{x}\)</span>, i.e.&nbsp;<span class="math inline">\(1/\norm{x}\le\norm{A}/\norm{b}\)</span>; multiplying the two inequalities yields the result. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The amplification factor <span class="math inline">\(\norm{A}\norm{A^{-1}}\)</span> is exactly the condition number <span class="math inline">\(\cond(A)\)</span> introduced in 2.</p>
+<div id="def-5-condition-number" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.7 (Condition number)</strong></span> The <strong>condition number</strong> of an invertible <span class="math inline">\(A\)</span> relative to a norm is <span class="math inline">\(\cond(A)=\norm{A}\,\norm{A^{-1}}\)</span>. A matrix is <strong>well-conditioned</strong> if <span class="math inline">\(\cond(A)\approx 1\)</span> and <strong>ill-conditioned</strong> if <span class="math inline">\(\cond(A)\gg 1\)</span>.</p>
+</div>
+<div id="prp-5-cond-ge-1" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 5.2 (Condition number is at least one)</strong></span> <span class="math inline">\(\cond(A)\ge 1\)</span> for every invertible <span class="math inline">\(A\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>From <span class="math inline">\(AA^{-1}=I\)</span> and submultiplicativity, <span class="math inline">\(1=\norm{I}\le\norm{A}\,\norm{A^{-1}}=\cond(A)\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>For the <span class="math inline">\(2\)</span>-norm, <a href="#eq-5-2-matrix-norm" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> makes <span class="math inline">\(\cond_2(A)=\sigma_1(A)/\sigma_n(A)\)</span> the ratio of largest to smallest singular value; for symmetric positive definite <span class="math inline">\(A\)</span> this is the ratio of largest to smallest eigenvalue. This is the quantity that will control the speed of conjugate gradient in <a href="#sec-5-cg-convergence" class="quarto-xref"><span>Section 5.12</span></a>.</p>
+</section>
+<section id="sec-5-positive-definite" class="level2" data-number="5.9">
+<h2 data-number="5.9" class="anchored" data-anchor-id="sec-5-positive-definite"><span class="header-section-number">5.9</span> Positive definite systems</h2>
+<p>The rest of the chapter specializes to <strong>symmetric positive definite (SPD)</strong> matrices, the setting where the sharpest iterative methods live.</p>
+<div id="def-5-positive-definite" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.8 (Positive (semi)definite matrix)</strong></span> A symmetric <span class="math inline">\(A\)</span> is <strong>positive definite</strong> (<span class="math inline">\(A\succ 0\)</span>) if <span class="math inline">\(x^\top Ax&gt;0\)</span> for all <span class="math inline">\(x\ne 0\)</span>, and <strong>positive semidefinite</strong> (<span class="math inline">\(A\succeq 0\)</span>) if <span class="math inline">\(x^\top Ax\ge 0\)</span> for all <span class="math inline">\(x\)</span>.</p>
+</div>
+<p>The following characterizations are used repeatedly; each is standard linear algebra (<a href="07-eigenvalue-problems.html" class="quarto-xref"><span>Chapter 7</span></a> develops the eigenvalue side).</p>
+<div id="prp-5-spd-equiv" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 5.3 (Characterizations of positive definiteness)</strong></span> For symmetric <span class="math inline">\(A\)</span> the following are equivalent: (i) <span class="math inline">\(A\succ 0\)</span>; (ii) <span class="math inline">\(A=B^\top B\)</span> for some invertible <span class="math inline">\(B\)</span>; (iii) <span class="math inline">\(A\)</span> has strictly positive eigenvalues; (iv) <span class="math inline">\(A\)</span> has a unique positive definite square root <span class="math inline">\(A^{1/2}\)</span>. When <span class="math inline">\(A\succ 0\)</span>, the spectral theorem gives <span class="math inline">\(A=U\Lambda U^\top\)</span> with <span class="math inline">\(U\)</span> orthogonal and <span class="math inline">\(\Lambda\succ 0\)</span> diagonal, and <span class="math inline">\(A^{1/2}=U\Lambda^{1/2}U^\top\)</span>.</p>
+</div>
+<p>The key structural fact is that solving an SPD system is the <em>same problem</em> as minimizing a quadratic. This is what opens the door to optimization methods.</p>
+<div id="thm-5-quadratic-min" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.10 (SPD solve as minimization)</strong></span> Let <span class="math inline">\(A\succ 0\)</span>. The unique solution <span class="math inline">\(x\)</span> of <span class="math inline">\(Ax=b\)</span> is the unique minimizer of the quadratic <span id="eq-5-quadratic"><span class="math display">\[
+g(x)=\tfrac12\,x^\top Ax-b^\top x .
+\tag{5.15}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Using <span class="math inline">\(\nabla(x^\top Cx)=2Cx\)</span> for symmetric <span class="math inline">\(C\)</span> and <span class="math inline">\(\nabla(a^\top x)=a\)</span>, the gradient is <span class="math display">\[
+\nabla g(x)=Ax-b,
+\]</span> so <span class="math inline">\(\nabla g(x)=0\)</span> iff <span class="math inline">\(Ax=b\)</span>: the unique critical point is the solution. The Hessian is <span class="math inline">\(\nabla^2 g\equiv A\succ 0\)</span>, so <span class="math inline">\(g\)</span> is strictly convex and its only critical point is the global minimizer. <span class="math inline">\(\square\)</span></p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Any linear system reduces to an SPD one
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a general invertible <span class="math inline">\(B\)</span>, the least-squares reformulation <span class="math inline">\(\min_x\ntwo{Bx-c}^2\)</span> has gradient condition <span class="math inline">\(B^\top Bx=B^\top c\)</span>, the <strong>normal equations</strong>, whose matrix <span class="math inline">\(B^\top B\succ 0\)</span>. So “once you can solve SPD systems, you can solve every system.” For a <em>square</em> invertible <span class="math inline">\(B\)</span> solving <span class="math inline">\(Bx=c\)</span> directly is usually better, but for rectangular <span class="math inline">\(B\in\R^{m\times n}\)</span> with full column rank the normal equations are the natural route (revisited in <a href="06-approximation-theory.html" class="quarto-xref"><span>Chapter 6</span></a>).</p>
+</div>
+</div>
+<p>The graph of <span class="math inline">\(g\)</span> is a bowl whose level sets are ellipsoids; their eccentricity is set by <span class="math inline">\(\cond_2(A)\)</span>. A well-conditioned <span class="math inline">\(A\)</span> gives nearly circular level sets, an ill-conditioned <span class="math inline">\(A\)</span> gives long thin valleys — the geometry that makes naive descent struggle, as we see next.</p>
+</section>
+<section id="steepest-descent" class="level2" data-number="5.10">
+<h2 data-number="5.10" class="anchored" data-anchor-id="steepest-descent"><span class="header-section-number">5.10</span> Steepest descent</h2>
+<p>To minimize <span class="math inline">\(g\)</span> we can walk downhill. Given the current guess <span class="math inline">\(x^{(k-1)}\)</span>, move along the direction of <strong>steepest descent</strong> and pick the step length optimally, <span class="math display">\[
+x^{(k)}=x^{(k-1)}+t^{(k)}v^{(k)} .
+\]</span> Multivariable calculus says the steepest-descent direction is the negative gradient, which here is exactly the residual, <span id="eq-5-sd-direction"><span class="math display">\[
+v^{(k)}=-\nabla g(x^{(k-1)})=b-Ax^{(k-1)}=:r^{(k-1)} .
+\tag{5.16}\]</span></span> Given a search direction <span class="math inline">\(v\)</span>, the optimal step solves the one-variable problem <span class="math inline">\(\min_t g(x^{(k-1)}+t v)\)</span>. Writing <span class="math inline">\(x=x^{(k-1)}\)</span>, <span class="math inline">\(r=r^{(k-1)}\)</span>, <span class="math inline">\(v=v^{(k)}\)</span> and expanding, <span class="math display">\[
+h(t)=g(x+tv)=\tfrac{t^2}{2}v^\top Av+t\,(v^\top Ax)-t\,(v^\top b)+g(x),
+\]</span> so <span class="math inline">\(h'(t)=0\)</span> gives the <strong>exact line-search</strong> step <span id="eq-5-linesearch"><span class="math display">\[
+t^{(k)}=\frac{v^\top(b-Ax)}{v^\top Av}
+=\frac{\inner{v^{(k)}}{r^{(k-1)}}}{\inner{v^{(k)}}{Av^{(k)}}} .
+\tag{5.17}\]</span></span> This formula for <span class="math inline">\(t^{(k)}\)</span> holds for <em>any</em> direction <span class="math inline">\(v^{(k)}\)</span>, a fact the conjugate gradient method will reuse; for steepest descent specifically <span class="math inline">\(v^{(k)}=r^{(k-1)}\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Steepest descent
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given <span class="math inline">\(x^{(0)}\)</span>, <span class="math inline">\(b\)</span>, matvecs by <span class="math inline">\(A\succ 0\)</span>, a cap <span class="math inline">\(m\)</span>, and a relative tolerance <span class="math inline">\(\eps\)</span>: set <span class="math inline">\(r^{(0)}=b-Ax^{(0)}\)</span>; for <span class="math inline">\(k=1,2,\dots,m\)</span>:</p>
+<ol type="1">
+<li><span class="math inline">\(v^{(k)}=r^{(k-1)}\)</span>;</li>
+<li><span class="math inline">\(t^{(k)}=\dfrac{\inner{v^{(k)}}{r^{(k-1)}}}{\inner{v^{(k)}}{Av^{(k)}}}\)</span>;</li>
+<li><span class="math inline">\(x^{(k)}=x^{(k-1)}+t^{(k)}v^{(k)}\)</span>;</li>
+<li><span class="math inline">\(r^{(k)}=b-Ax^{(k)}\)</span>;</li>
+<li>if <span class="math inline">\(\ntwo{r^{(k)}}/\ntwo{b}\le\eps\)</span>, <strong>stop</strong>.</li>
+</ol>
+</div>
+</div>
+<p>Steepest descent makes the <em>same mistake repeatedly</em>: on an ill-conditioned bowl it zig-zags across the narrow valley, each step partly undoing the last. Its residual directions ignore the history of directions already explored. Fixing this is the idea of conjugate gradient.</p>
+</section>
+<section id="the-conjugate-gradient-method" class="level2" data-number="5.11">
+<h2 data-number="5.11" class="anchored" data-anchor-id="the-conjugate-gradient-method"><span class="header-section-number">5.11</span> The conjugate gradient method</h2>
+<p>Imagine first <span class="math inline">\(A=I\)</span>: the level sets are spheres and steepest descent points straight at the minimum. More generally, if we could make our search directions <em>orthogonal</em> we would finish in <span class="math inline">\(n\)</span> steps. The change of variables <span class="math inline">\(y=Bx\)</span> with <span class="math inline">\(B^\top B=A\)</span> (for instance <span class="math inline">\(B=A^{1/2}\)</span>) turns <span class="math inline">\(g\)</span> into <span class="math inline">\(\tilde g(y)=\tfrac12 y^\top y-\tilde b^\top y\)</span>, the identity-matrix problem — so the directions <span class="math inline">\(v^{(k)}\)</span> should be orthogonal <em>after</em> transformation, i.e.&nbsp;<span class="math inline">\((Bv^{(k)})^\top(Bv^{(l)})=0\)</span>. Since <span class="math inline">\((Bv^{(k)})^\top(Bv^{(l)})=v^{(k)\top}A v^{(l)}\)</span>, the right notion is orthogonality in the <span class="math inline">\(A\)</span>-inner product.</p>
+<div id="def-5-A-orthogonal" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 5.9 (A-orthogonality)</strong></span> For <span class="math inline">\(A\succ 0\)</span> the <strong><span class="math inline">\(A\)</span>-inner product</strong> is <span class="math inline">\(\inner{u}{v}_A:=u^\top Av\)</span>. Vectors <span class="math inline">\(v^{(1)},\dots,v^{(m)}\)</span> are <strong><span class="math inline">\(A\)</span>-orthogonal</strong> (conjugate) if <span class="math inline">\(\inner{v^{(k)}}{v^{(l)}}_A=0\)</span> for all <span class="math inline">\(k\ne l\)</span>.</p>
+</div>
+<p>Conjugate gradient (CG) builds such directions on the fly. At step <span class="math inline">\(k\)</span> it takes the steepest-descent starter <span class="math inline">\(r^{(k-1)}\)</span> and <strong><span class="math inline">\(A\)</span>-orthogonalizes</strong> it against the previous directions by Gram–Schmidt in the <span class="math inline">\(A\)</span>-inner product: <span class="math display">\[
+v^{(k)}=r^{(k-1)}-\sum_{j=1}^{k-1}
+\frac{\inner{r^{(k-1)}}{v^{(j)}}_A}{\inner{v^{(j)}}{v^{(j)}}_A}\,v^{(j)} .
+\]</span> The remarkable fact — the engine of CG’s efficiency — is that in this construction the new residual <span class="math inline">\(r^{(k-1)}\)</span> is <em>already</em> <span class="math inline">\(A\)</span>-orthogonal to every earlier direction except the immediately preceding one, so the long sum collapses to a single term. The full orthogonalization then costs nothing beyond a <strong>short two-term recurrence</strong>, <span id="eq-5-cg-recurrence"><span class="math display">\[
+v^{(1)}=r^{(0)},\qquad
+v^{(k)}=r^{(k-1)}+s^{(k-1)}v^{(k-1)},\qquad
+s^{(k-1)}=-\frac{\inner{r^{(k-1)}}{Av^{(k-1)}}}{\inner{v^{(k-1)}}{Av^{(k-1)}}} .
+\tag{5.18}\]</span></span> The step length is the same exact line search <a href="#eq-5-linesearch" class="quarto-xref">Equation&nbsp;<span>5.17</span></a>. One more trick keeps the cost at a single matrix–vector product (“matvec”) per iteration: never recompute <span class="math inline">\(Ax^{(k)}\)</span> from scratch, but carry <span class="math inline">\(w^{(k)}:=Ax^{(k)}\)</span> forward via <span class="math inline">\(w^{(k)}=w^{(k-1)}+t^{(k)}u^{(k)}\)</span> where <span class="math inline">\(u^{(k)}:=Av^{(k)}\)</span> is the one matvec of the step. Then <span class="math inline">\(r^{(k)}=b-w^{(k)}\)</span> needs no new matvec.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Conjugate gradient (one matvec per step)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given <span class="math inline">\(x^{(0)}\)</span>, <span class="math inline">\(b\)</span>, matvecs by <span class="math inline">\(A\succ 0\)</span>, a cap <span class="math inline">\(m\)</span>, and tolerance <span class="math inline">\(\eps\)</span>: compute <span class="math inline">\(w^{(0)}=Ax^{(0)}\)</span>, set <span class="math inline">\(r^{(0)}=b-w^{(0)}\)</span>. For <span class="math inline">\(k=1,2,\dots,m\)</span>:</p>
+<ol type="1">
+<li>if <span class="math inline">\(k=1\)</span>, <span class="math inline">\(v^{(1)}=r^{(0)}\)</span>; else <span class="math inline">\(v^{(k)}=r^{(k-1)}+s^{(k-1)}v^{(k-1)}\)</span>;</li>
+<li><span class="math inline">\(u^{(k)}=Av^{(k)}\)</span> (the only matvec);</li>
+<li><span class="math inline">\(t^{(k)}=\dfrac{\inner{v^{(k)}}{r^{(k-1)}}}{\inner{v^{(k)}}{u^{(k)}}}\)</span>;</li>
+<li><span class="math inline">\(x^{(k)}=x^{(k-1)}+t^{(k)}v^{(k)}\)</span> and <span class="math inline">\(w^{(k)}=w^{(k-1)}+t^{(k)}u^{(k)}\)</span>;</li>
+<li><span class="math inline">\(r^{(k)}=b-w^{(k)}\)</span>; if <span class="math inline">\(\ntwo{r^{(k)}}/\ntwo{b}\le\eps\)</span>, <strong>stop</strong>;</li>
+<li><span class="math inline">\(s^{(k)}=-\dfrac{\inner{r^{(k)}}{u^{(k)}}}{\inner{v^{(k)}}{u^{(k)}}}\)</span>.</li>
+</ol>
+</div>
+</div>
+<p>The cost per iteration is therefore one matvec — the same as steepest descent — but the directions now account for the whole history, which is what buys the dramatically faster convergence of <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>5.1</span></a>. A minimal implementation of the loop:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conjugate_gradient(A, b, x0, m, eps):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x0.copy()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> b <span class="op">-</span> A <span class="op">@</span> x                    <span class="co"># residual</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    nb <span class="op">=</span> np.linalg.norm(b)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> r.copy()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(m):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> k <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            v <span class="op">=</span> r <span class="op">+</span> s <span class="op">*</span> v            <span class="co"># A-orthogonalize (two-term recurrence)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        u <span class="op">=</span> A <span class="op">@</span> v                    <span class="co"># the one matvec</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        t <span class="op">=</span> (v <span class="op">@</span> r) <span class="op">/</span> (v <span class="op">@</span> u)        <span class="co"># exact line search</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x <span class="op">+</span> t <span class="op">*</span> v</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> r <span class="op">-</span> t <span class="op">*</span> u                <span class="co"># r = b - A x, updated without a new matvec</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.linalg.norm(r) <span class="op">/</span> nb <span class="op">&lt;=</span> eps:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> <span class="op">-</span>(r <span class="op">@</span> u) <span class="op">/</span> (v <span class="op">@</span> u)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="sec-5-cg-convergence" class="level2" data-number="5.12">
+<h2 data-number="5.12" class="anchored" data-anchor-id="sec-5-cg-convergence"><span class="header-section-number">5.12</span> Convergence of CG</h2>
+<p>Because the <span class="math inline">\(n\)</span> directions CG produces are <span class="math inline">\(A\)</span>-orthogonal, they form a basis and CG reaches the exact minimizer once it has searched all <span class="math inline">\(n\)</span> of them.</p>
+<div id="thm-5-cg-finite" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.11 (Finite termination of CG)</strong></span> Applied to <span class="math inline">\(Ax=b\)</span> with <span class="math inline">\(A\succ 0\)</span>, conjugate gradient recovers the exact solution in at most <span class="math inline">\(n\)</span> iterations: <span class="math inline">\(x^{(k)}=x\)</span> for all <span class="math inline">\(k\ge n\)</span> (in exact arithmetic).</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The search directions <span class="math inline">\(v^{(1)},\dots,v^{(n)}\)</span> are <span class="math inline">\(A\)</span>-orthogonal, hence linearly independent, hence a basis of <span class="math inline">\(\R^n\)</span>. Exact line search along each makes the error <span class="math inline">\(A\)</span>-orthogonal to that direction, so after <span class="math inline">\(n\)</span> steps the error is <span class="math inline">\(A\)</span>-orthogonal to a full basis and must be zero. (Handwavy version of the source’s picture-proof.) <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Finite termination alone already gives an <span class="math inline">\(\bigO(n^2)\)</span> solver when each matvec costs <span class="math inline">\(\bigO(n)\)</span> (as for sparse <span class="math inline">\(A\)</span>), beating the <span class="math inline">\(\bigO(n^3)\)</span> of a direct factorization. But the real power of CG is that it usually converges to good accuracy in <strong>far fewer than <span class="math inline">\(n\)</span></strong> iterations, at a rate set by the condition number.</p>
+<div id="thm-5-cg-convergence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 5.12 (Convergence rate of conjugate gradient)</strong></span> If <span class="math inline">\(A\succ 0\)</span> has <span class="math inline">\(2\)</span>-norm condition number <span class="math inline">\(\cond(A)=\cond_2(A)\)</span>, then the CG iterates for <span class="math inline">\(Ax=b\)</span> satisfy <span id="eq-5-cg-rate"><span class="math display">\[
+\ntwo{x^{(k)}-x}\le 2\,\cond(A)\left(\frac{\sqrt{\cond(A)}-1}{\sqrt{\cond(A)}+1}\right)^{k}
+\ntwo{x^{(0)}-x} .
+\tag{5.19}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Stated without proof (the standard argument bounds the <span class="math inline">\(A\)</span>-norm of the error by a Chebyshev polynomial on the spectrum of <span class="math inline">\(A\)</span>). For SPD <span class="math inline">\(A\)</span>, <span class="math inline">\(\cond_2(A)\)</span> is the ratio of largest to smallest eigenvalue. The important reading is the base: when <span class="math inline">\(\cond(A)\)</span> is large, <span class="math display">\[
+\frac{\sqrt{\cond(A)}-1}{\sqrt{\cond(A)}+1}\approx 1-\frac{2}{\sqrt{\cond(A)}},
+\]</span> so CG’s error decays geometrically at a rate governed by <span class="math inline">\(\sqrt{\cond(A)}\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The contrast with the stationary methods is the whole point: Jacobi and Gauss–Seidel decay with base roughly <span class="math inline">\(1-2/\cond(A)\)</span>, whereas CG decays with base roughly <span class="math inline">\(1-2/\sqrt{\cond(A)}\)</span> — a square-root improvement in the condition number that translates into far fewer iterations on ill-conditioned problems. <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> shows the two descent methods on the same SPD system: steepest descent crawls while CG plunges.</p>
+<div id="fig-5-cg-vs-sd" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-5-cg-vs-sd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/05-cg-vs-sd.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-5-cg-vs-sd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Relative residual <span class="math inline">\(\ntwo{r^{(k)}}/\ntwo{b}\)</span> versus iteration for a random SPD system of size <span class="math inline">\(n=100\)</span> with <span class="math inline">\(\cond_2(A)=10^3\)</span>. Steepest descent zig-zags down the ill-conditioned bowl and stalls; conjugate gradient, reusing the history of search directions, drives the residual down many orders of magnitude in a fraction of the iterations.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="preconditioning" class="level2" data-number="5.13">
+<h2 data-number="5.13" class="anchored" data-anchor-id="preconditioning"><span class="header-section-number">5.13</span> Preconditioning</h2>
+<p>The rate <a href="#eq-5-cg-rate" class="quarto-xref">Equation&nbsp;<span>5.19</span></a> says everything hinges on <span class="math inline">\(\cond(A)\)</span>: shrink it and CG converges faster. <strong>Preconditioning</strong> does exactly that by solving an equivalent, better-conditioned system. Suppose we can find <span class="math inline">\(C\)</span> with <span class="math inline">\(A\approx CC^\top\)</span> and with <span class="math inline">\(C\)</span>, <span class="math inline">\(C^\top\)</span> easy to invert. Then <span class="math display">\[
+\tilde A:=C^{-1}AC^{-\top}\approx I
+\]</span> is well-conditioned and still SPD, and <span class="math inline">\(A=C\tilde A C^\top\)</span> gives the equivalent system <span id="eq-5-precond"><span class="math display">\[
+\tilde A\,\tilde x=\tilde b,\qquad \tilde x=C^\top x,\quad \tilde b=C^{-1}b .
+\tag{5.20}\]</span></span> <strong>Preconditioned CG</strong> applies CG to <a href="#eq-5-precond" class="quarto-xref">Equation&nbsp;<span>5.20</span></a>, then recovers <span class="math inline">\(x=C^{-\top}\tilde x\)</span>; each matvec by <span class="math inline">\(\tilde A\)</span> is realized as a matvec by <span class="math inline">\(A\)</span> sandwiched between solves with <span class="math inline">\(C^{-1}\)</span> and <span class="math inline">\(C^{-\top}\)</span>. Finding <span class="math inline">\(C\)</span> with <span class="math inline">\(C^{-1}AC^{-\top}\approx I\)</span> <em>and</em> cheap solves is hard in general, and it is the central art of practical iterative solving. One cheap default is the <strong>diagonal (Jacobi) preconditioner</strong> <span class="math display">\[
+C=D^{1/2},
+\]</span> with <span class="math inline">\(D\)</span> the diagonal of <span class="math inline">\(A\)</span>: then <span class="math inline">\(C^{-1}=C^{-\top}\)</span> is a diagonal matrix with entries <span class="math inline">\(1/\sqrt{a_{ii}}\)</span>, and the preconditioned matrix <span class="math inline">\(\tilde A=(\tilde a_{ij})\)</span> has <span class="math inline">\(\tilde a_{ii}=1\)</span> for all <span class="math inline">\(i\)</span> — a simple rescaling that already helps when <span class="math inline">\(A\)</span>’s diagonal varies widely.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="5.14">
+<h2 data-number="5.14" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">5.14</span> Chapter summary</h2>
+<ul>
+<li>Vector norms (<a href="#def-5-vector-norm" class="quarto-xref">Definition&nbsp;<span>5.1</span></a>) and induced matrix norms (<a href="#def-5-induced-norm" class="quarto-xref">Definition&nbsp;<span>5.3</span></a>) measure convergence; on <span class="math inline">\(\R^n\)</span> all norms are equivalent (<a href="#thm-5-norm-equivalence" class="quarto-xref">Theorem&nbsp;<span>5.2</span></a>), and useful closed forms are <span class="math inline">\(\ninf{A}=\max_i\sum_j\abs{a_{ij}}\)</span> (<a href="#thm-5-inf-matrix-norm" class="quarto-xref">Theorem&nbsp;<span>5.3</span></a>) and <span class="math inline">\(\ntwo{A}=\sigma_1(A)\)</span> (<a href="#eq-5-2-matrix-norm" class="quarto-xref">Equation&nbsp;<span>5.4</span></a>).</li>
+<li>The <strong>spectral radius</strong> <span class="math inline">\(\spec(A)\)</span> (<a href="#def-5-spectral-radius" class="quarto-xref">Definition&nbsp;<span>5.4</span></a>) satisfies <span class="math inline">\(\spec(A)\le\norm{A}\)</span> and controls powers of <span class="math inline">\(A\)</span>: <span class="math inline">\(A\)</span> is convergent iff <span class="math inline">\(\spec(A)&lt;1\)</span> (<a href="#thm-5-convergent-equiv" class="quarto-xref">Theorem&nbsp;<span>5.4</span></a>).</li>
+<li><strong>Jacobi</strong> (<a href="#eq-5-jacobi" class="quarto-xref">Equation&nbsp;<span>5.6</span></a>) and <strong>Gauss–Seidel</strong> (<a href="#eq-5-gauss-seidel" class="quarto-xref">Equation&nbsp;<span>5.8</span></a>) split <span class="math inline">\(A=D-L-U\)</span> and iterate <span class="math inline">\(x^{(k+1)}=Tx^{(k)}+c\)</span>; such an iteration converges for all data iff <span class="math inline">\(\spec(T)&lt;1\)</span> (<a href="#thm-5-jacobi-gs-conv" class="quarto-xref">Theorem&nbsp;<span>5.5</span></a>), which holds whenever <span class="math inline">\(A\)</span> is strictly diagonally dominant (<a href="#thm-5-sdd-convergence" class="quarto-xref">Theorem&nbsp;<span>5.6</span></a>), with rate <span class="math inline">\(\norm{T}^k\)</span> (<a href="#cor-5-rate" class="quarto-xref">Corollary&nbsp;<span>5.1</span></a>).</li>
+<li><strong>SOR</strong> (<a href="#eq-5-sor" class="quarto-xref">Equation&nbsp;<span>5.13</span></a>) relaxes Gauss–Seidel by <span class="math inline">\(\omega\)</span>; convergence requires <span class="math inline">\(\omega\in(0,2)\)</span>
+<ol class="example" type="1">
+<li>and is guaranteed there when <span class="math inline">\(A\succ 0\)</span> (<a href="#thm-5-ostrowski-reich" class="quarto-xref">Theorem&nbsp;<span>5.8</span></a>).</li>
+</ol></li>
+<li>A small residual need not mean a small error; the gap is the <strong>condition number</strong> <span class="math inline">\(\cond(A)=\norm{A}\norm{A^{-1}}\ge 1\)</span> (<a href="#def-5-condition-number" class="quarto-xref">Definition&nbsp;<span>5.7</span></a>, <a href="#thm-5-residual-error" class="quarto-xref">Theorem&nbsp;<span>5.9</span></a>), matching
+<ol start="2" class="example" type="1">
+<li></li>
+</ol></li>
+<li>For <span class="math inline">\(A\succ 0\)</span>, solving <span class="math inline">\(Ax=b\)</span> equals minimizing <span class="math inline">\(g(x)=\tfrac12x^\top Ax-b^\top x\)</span> (<a href="#thm-5-quadratic-min" class="quarto-xref">Theorem&nbsp;<span>5.10</span></a>). <strong>Steepest descent</strong> follows the residual with exact line search <a href="#eq-5-linesearch" class="quarto-xref">Equation&nbsp;<span>5.17</span></a> but zig-zags on ill-conditioned bowls.</li>
+<li><strong>Conjugate gradient</strong> builds <span class="math inline">\(A\)</span>-orthogonal directions by a two-term recurrence
+<ol start="3" class="example" type="1">
+<li>at one matvec per step, terminates exactly in <span class="math inline">\(\le n\)</span> steps (<a href="#thm-5-cg-finite" class="quarto-xref">Theorem&nbsp;<span>5.11</span></a>), and converges at rate <span class="math inline">\(\bigl(\tfrac{\sqrt{\cond}-1}{\sqrt{\cond}+1}\bigr)^k\)</span> (<a href="#thm-5-cg-convergence" class="quarto-xref">Theorem&nbsp;<span>5.12</span></a>) — a square-root improvement over the stationary methods (<a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>5.1</span></a>).</li>
+</ol></li>
+<li><strong>Preconditioning</strong> replaces <span class="math inline">\(A\)</span> by <span class="math inline">\(\tilde A=C^{-1}AC^{-\top}\approx I\)</span> to shrink the condition number; the diagonal choice <span class="math inline">\(C=D^{1/2}\)</span> is the cheap default.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./04-direct-linear-systems.html" class="pagination-link" aria-label="Direct Methods for Linear Systems">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./06-approximation-theory.html" class="pagination-link" aria-label="Approximation Theory">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

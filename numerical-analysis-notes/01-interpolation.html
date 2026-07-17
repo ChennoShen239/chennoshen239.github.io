@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>1&nbsp; Polynomial Interpolation – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02-differentiation-integration.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./01-interpolation.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-interpolation-problem-and-its-error" id="toc-the-interpolation-problem-and-its-error" class="nav-link active" data-scroll-target="#the-interpolation-problem-and-its-error"><span class="header-section-number">1.1</span> The interpolation problem and its error</a>
+  <ul class="collapse">
+  <li><a href="#sec-1-error-example" id="toc-sec-1-error-example" class="nav-link" data-scroll-target="#sec-1-error-example">A worked error bound</a></li>
+  </ul></li>
+  <li><a href="#nevilles-method-interpolation-as-a-recursion" id="toc-nevilles-method-interpolation-as-a-recursion" class="nav-link" data-scroll-target="#nevilles-method-interpolation-as-a-recursion"><span class="header-section-number">1.2</span> Neville’s method: interpolation as a recursion</a></li>
+  <li><a href="#divided-differences-and-the-newton-form" id="toc-divided-differences-and-the-newton-form" class="nav-link" data-scroll-target="#divided-differences-and-the-newton-form"><span class="header-section-number">1.3</span> Divided differences and the Newton form</a></li>
+  <li><a href="#sec-1-hermite" id="toc-sec-1-hermite" class="nav-link" data-scroll-target="#sec-1-hermite"><span class="header-section-number">1.4</span> Hermite interpolation: matching derivatives</a></li>
+  <li><a href="#sec-1-splines" id="toc-sec-1-splines" class="nav-link" data-scroll-target="#sec-1-splines"><span class="header-section-number">1.5</span> Cubic splines: piecewise, but globally smooth</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">1.6</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-interpolation.html">Interpolation, Quadrature &amp; ODEs (Math 128A)</a></li><li class="breadcrumb-item"><a href="./01-interpolation.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-interpolation" class="quarto-section-identifier"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>The most basic approximation problem is this: we know a function <span class="math inline">\(f\)</span> only at finitely many points <span class="math inline">\(x_0,\dots,x_n\)</span> — perhaps because <span class="math inline">\(f\)</span> is expensive to evaluate, or known only from data — and we want a simple function that agrees with <span class="math inline">\(f\)</span> there and can be evaluated, differentiated, and integrated everywhere. Polynomials are the natural candidates: they are cheap, smooth, and by the Weierstrass theorem dense in <span class="math inline">\(C[a,b]\)</span>. This chapter builds the polynomial that passes through given data, measures the error it commits, and then confronts the ways plain polynomial interpolation fails — motivating divided differences, Hermite interpolation, and splines.</p>
+<p>Throughout, “<span class="math inline">\(n+1\)</span> nodes <span class="math inline">\(x_0,\dots,x_n\)</span>” go with a polynomial of degree at most <span class="math inline">\(n\)</span>; keeping that correspondence straight (see <a href="./notation.html">Notation</a>) avoids most off-by-one errors.</p>
+<section id="the-interpolation-problem-and-its-error" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="the-interpolation-problem-and-its-error"><span class="header-section-number">1.1</span> The interpolation problem and its error</h2>
+<p>Given <span class="math inline">\(n+1\)</span> distinct nodes <span class="math inline">\(x_0,\dots,x_n\)</span> in <span class="math inline">\([a,b]\)</span> and the values <span class="math inline">\(f(x_0),\dots,f(x_n)\)</span>, an <strong>interpolating polynomial</strong> is a <span class="math inline">\(P\)</span> with <span class="math inline">\(\deg P\le n\)</span> and <span class="math inline">\(P(x_i)=f(x_i)\)</span> for every <span class="math inline">\(i\)</span>. Two facts make the problem well posed: such a <span class="math inline">\(P\)</span> always exists, and it is unique.</p>
+<div id="thm-1-uniqueness" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.1 (Existence and uniqueness)</strong></span> For distinct nodes <span class="math inline">\(x_0,\dots,x_n\)</span> there is exactly one polynomial <span class="math inline">\(P\)</span> of degree <span class="math inline">\(\le n\)</span> with <span class="math inline">\(P(x_i)=f(x_i)\)</span>, <span class="math inline">\(i=0,\dots,n\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><em>Existence</em> is exhibited by the Lagrange form <span id="eq-1-lagrange"><span class="math display">\[
+P(x)=\sum_{k=0}^{n} f(x_k)\,L_{n,k}(x),
+\qquad
+L_{n,k}(x)=\prod_{i\ne k}\frac{x-x_i}{x_k-x_i},
+\tag{1.1}\]</span></span> since each Lagrange basis polynomial satisfies <span class="math inline">\(L_{n,k}(x_i)=\delta_{ik}\)</span>, so <span class="math inline">\(P(x_i)=f(x_i)\)</span>. <em>Uniqueness</em>: if <span class="math inline">\(P\)</span> and <span class="math inline">\(\tilde P\)</span> both interpolate, their difference <span class="math inline">\(P-\tilde P\)</span> has degree <span class="math inline">\(\le n\)</span> yet vanishes at the <span class="math inline">\(n+1\)</span> distinct nodes, so it is the zero polynomial. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Interpolation would be useless if we could not say how far <span class="math inline">\(P\)</span> strays from <span class="math inline">\(f\)</span> between the nodes. The error is controlled by the <span class="math inline">\((n+1)\)</span>-st derivative of <span class="math inline">\(f\)</span> and by the <strong>node polynomial</strong> <span class="math inline">\(\prod_j (x-x_j)\)</span>. The proof rests on a repeated-zeros argument, so we isolate that first.</p>
+<div id="lem-1-rolle" class="theorem lemma">
+<p><span class="theorem-title"><strong>Lemma 1.1 (Generalized Rolle’s theorem)</strong></span> If <span class="math inline">\(g\in C^{n}[a,b]\)</span> vanishes at <span class="math inline">\(n+1\)</span> distinct points of <span class="math inline">\([a,b]\)</span>, then <span class="math inline">\(g^{(n)}(\xi)=0\)</span> for some <span class="math inline">\(\xi\in(a,b)\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Ordinary Rolle gives a zero of <span class="math inline">\(g'\)</span> strictly between each adjacent pair of zeros of <span class="math inline">\(g\)</span>: from <span class="math inline">\(n+1\)</span> zeros of <span class="math inline">\(g\)</span> we get <span class="math inline">\(n\)</span> zeros of <span class="math inline">\(g'\)</span>, then <span class="math inline">\(n-1\)</span> of <span class="math inline">\(g''\)</span>, and so on, until <span class="math inline">\(g^{(n)}\)</span> has at least one zero. <span class="math inline">\(\square\)</span></p>
+</div>
+<div id="thm-1-interp-error" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.2 (Polynomial interpolation error)</strong></span> Let <span class="math inline">\(f\in C^{n+1}[a,b]\)</span> and let <span class="math inline">\(P\)</span> be the degree-<span class="math inline">\(\le n\)</span> interpolant at distinct nodes <span class="math inline">\(x_0,\dots,x_n\in[a,b]\)</span>. Then for each <span class="math inline">\(x\in[a,b]\)</span> there is <span class="math inline">\(\xi(x)\in(a,b)\)</span> with <span id="eq-1-error"><span class="math display">\[
+f(x)-P(x)=\frac{f^{(n+1)}(\xi(x))}{(n+1)!}\prod_{j=0}^{n}(x-x_j).
+\tag{1.2}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>At a node <span class="math inline">\(x=x_i\)</span> both sides vanish, so fix <span class="math inline">\(x\)</span> not equal to any node and define, for <span class="math inline">\(t\in[a,b]\)</span>, <span class="math display">\[
+g(t)=\bigl(f(t)-P(t)\bigr)-\bigl(f(x)-P(x)\bigr)\,
+\prod_{j=0}^{n}\frac{t-x_j}{x-x_j}\;\in C^{n+1}[a,b].
+\]</span> By construction <span class="math inline">\(g\)</span> vanishes at the <span class="math inline">\(n+2\)</span> distinct points <span class="math inline">\(x,x_0,\dots,x_n\)</span>. Applying the generalized Rolle theorem (<a href="#lem-1-rolle" class="quarto-xref">Lemma&nbsp;<span>1.1</span></a>) one order higher, there is <span class="math inline">\(\xi\in(a,b)\)</span> with <span class="math inline">\(g^{(n+1)}(\xi)=0\)</span>. Now <span class="math inline">\(P\)</span> has degree <span class="math inline">\(\le n\)</span> so <span class="math inline">\(P^{(n+1)}\equiv 0\)</span>, and the product is a monic degree-<span class="math inline">\((n+1)\)</span> polynomial in <span class="math inline">\(t\)</span> divided by the constant <span class="math inline">\(\prod_j(x-x_j)\)</span>, whose <span class="math inline">\((n+1)\)</span>-st derivative is <span class="math inline">\((n+1)!/\prod_j(x-x_j)\)</span>. Hence <span class="math display">\[
+0=g^{(n+1)}(\xi)=f^{(n+1)}(\xi)-\bigl(f(x)-P(x)\bigr)\frac{(n+1)!}{\prod_j(x-x_j)},
+\]</span> which rearranges to <a href="#eq-1-error" class="quarto-xref">Equation&nbsp;<span>1.2</span></a>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>An immediate consequence: if <span class="math inline">\(f\)</span> is itself a polynomial of degree <span class="math inline">\(\le n\)</span>, then <span class="math inline">\(f^{(n+1)}\equiv0\)</span> and <a href="#eq-1-error" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> forces <span class="math inline">\(P=f\)</span>. Interpolation reproduces low-degree polynomials exactly.</p>
+<section id="sec-1-error-example" class="level3">
+<h3 class="anchored" data-anchor-id="sec-1-error-example">A worked error bound</h3>
+<p>The two factors in <a href="#eq-1-error" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> are bounded separately. Suppose <span class="math inline">\(f(x)=1/x\)</span> is interpolated on <span class="math inline">\([2,4]\)</span> at the three nodes <span class="math inline">\(2,\,2.75,\,4\)</span>, so <span class="math inline">\(n=2\)</span> and <span class="math display">\[
+f(x)-P(x)=\frac{f^{(3)}(\xi(x))}{3!}\,(x-2)(x-2.75)(x-4).
+\]</span> For the derivative factor, <span class="math inline">\(f^{(3)}(x)=-6x^{-4}\)</span> is largest in modulus at the left endpoint, so <span class="math inline">\(\abs{f^{(3)}(\xi)}\le 6\cdot 2^{-4}=\tfrac{3}{8}\)</span> on <span class="math inline">\([2,4]\)</span>. For the node polynomial <span class="math inline">\(g(x)=(x-2)(x-2.75)(x-4)=x^3-\tfrac{35}{4}x^2+\tfrac{49}{2}x-22\)</span>, set <span class="math inline">\(g'(x)=\tfrac12(3x-7)(2x-7)=0\)</span> to get critical points <span class="math inline">\(x=\tfrac73\)</span> and <span class="math inline">\(x=\tfrac72\)</span>; comparing <span class="math inline">\(\abs{g(7/2)}=\tfrac{9}{16}\)</span> with <span class="math inline">\(\abs{g(7/3)}=\tfrac{25}{108}\)</span> and the vanishing endpoints gives <span class="math inline">\(\max_{[2,4]}\abs{g}=\tfrac{9}{16}\)</span>. Combining, <span class="math display">\[
+\max_{x\in[2,4]}\abs{f(x)-P(x)}\le \frac{1}{3!}\cdot\frac38\cdot\frac{9}{16}
+=\frac{9}{256}\approx 0.035.
+\]</span></p>
+</section>
+</section>
+<section id="nevilles-method-interpolation-as-a-recursion" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="nevilles-method-interpolation-as-a-recursion"><span class="header-section-number">1.2</span> Neville’s method: interpolation as a recursion</h2>
+<p>Formula <a href="#eq-1-lagrange" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> is theoretically clean but awkward to evaluate and impossible to update when a node is added. <strong>Neville’s method</strong> instead builds high-degree interpolants by combining low-degree ones, which is exactly what we want when the goal is a <em>value</em> <span class="math inline">\(P(x)\)</span> at one point (e.g.&nbsp;extrapolating a sequence of estimates to a limit, as in <a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>).</p>
+<div id="prp-1-neville" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 1.1 (Neville combination)</strong></span> Let <span class="math inline">\(Q\)</span> interpolate <span class="math inline">\(f\)</span> at <span class="math inline">\(x_i,\dots,x_j\)</span> and <span class="math inline">\(\hat Q\)</span> interpolate <span class="math inline">\(f\)</span> at <span class="math inline">\(x_{i+1},\dots,x_{j+1}\)</span>. Then <span id="eq-1-neville"><span class="math display">\[
+P(x)=\frac{(x-x_{j+1})\,Q(x)-(x-x_i)\,\hat Q(x)}{x_i-x_{j+1}}
+\tag{1.3}\]</span></span> interpolates <span class="math inline">\(f\)</span> at all of <span class="math inline">\(x_i,\dots,x_{j+1}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>At <span class="math inline">\(x_i\)</span> the second term’s factor <span class="math inline">\((x-x_i)\)</span> kills <span class="math inline">\(\hat Q\)</span>, leaving <span class="math inline">\(P(x_i)=Q(x_i)=f(x_i)\)</span>; at <span class="math inline">\(x_{j+1}\)</span> symmetrically <span class="math inline">\(P(x_{j+1})=\hat Q(x_{j+1})=f(x_{j+1})\)</span>. At an interior shared node <span class="math inline">\(x_\ell\)</span> (<span class="math inline">\(i&lt;\ell\le j\)</span>) both <span class="math inline">\(Q(x_\ell)=\hat Q(x_\ell)=f(x_\ell)\)</span>, and the weights <span class="math inline">\((x_\ell-x_{j+1})-(x_\ell-x_i)=x_i-x_{j+1}\)</span> sum to the denominator, so <span class="math inline">\(P(x_\ell)=f(x_\ell)\)</span>. Since <span class="math inline">\(\deg P\le j+1-i\)</span>, it is <em>the</em> interpolant on those nodes. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Writing <span class="math inline">\(Q_{i,\dots,j}\)</span> for the interpolant on <span class="math inline">\(x_i,\dots,x_j\)</span>, <a href="#eq-1-neville" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> is the recursion <span class="math display">\[
+Q_{i,\dots,j+1}(x)=\frac{(x-x_{j+1})Q_{i,\dots,j}(x)-(x-x_i)Q_{i+1,\dots,j+1}(x)}{x_i-x_{j+1}},
+\qquad Q_i\defeq f(x_i),
+\]</span> filling a triangular table whose apex <span class="math inline">\(Q_{0,\dots,n}(x)\)</span> is the answer. The subscripts are exactly the nodes the entry interpolates — a useful mnemonic. Overwriting the table in place collapses the storage to a single vector:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Neville (in-place, <span class="math inline">\(\bigO(n)\)</span> memory)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Store <span class="math inline">\(Q_i\leftarrow f(x_i)\)</span>. For <span class="math inline">\(k=1,\dots,n\)</span> and <span class="math inline">\(i=0,\dots,n-k\)</span>: <span class="math display">\[
+Q_i \leftarrow \frac{(x-x_{i+k})\,Q_i-(x-x_i)\,Q_{i+1}}{x_i-x_{i+k}}.
+\]</span> After the sweep, <span class="math inline">\(Q_0=P(x)\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="divided-differences-and-the-newton-form" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="divided-differences-and-the-newton-form"><span class="header-section-number">1.3</span> Divided differences and the Newton form</h2>
+<p>Neville gives a number; often we want the <em>polynomial</em> in a form cheap to evaluate and, crucially, extensible when a node is appended. The <strong>Newton form</strong> achieves this by writing <span id="eq-1-newton"><span class="math display">\[
+P(x)=a_0+a_1(x-x_0)+a_2(x-x_0)(x-x_1)+\dots+a_n\prod_{j=0}^{n-1}(x-x_j),
+\tag{1.4}\]</span></span> whose coefficients turn out to be the <strong>divided differences</strong> of <span class="math inline">\(f\)</span>.</p>
+<div id="def-1-divided-diff" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.1 (Divided differences)</strong></span> The zeroth divided difference is <span class="math inline">\(f[x_i]=f(x_i)\)</span>, and recursively <span id="eq-1-dd-recursion"><span class="math display">\[
+f[x_i,\dots,x_{j+1}]=\frac{f[x_{i+1},\dots,x_{j+1}]-f[x_i,\dots,x_j]}{x_{j+1}-x_i}.
+\tag{1.5}\]</span></span></p>
+</div>
+<p>Matching <a href="#eq-1-newton" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> against the interpolation conditions one node at a time shows <span class="math inline">\(a_0=f[x_0]\)</span>, then <span class="math inline">\(a_1=f[x_0,x_1]\)</span>, and in general <span class="math inline">\(a_k=f[x_0,\dots,x_k]\)</span>: evaluating the difference quotient of <span class="math inline">\(P\)</span> at successive nodes reproduces exactly the recursion <a href="#eq-1-dd-recursion" class="quarto-xref">Equation&nbsp;<span>1.5</span></a>. Thus <span class="math display">\[
+P(x)=\sum_{k=0}^{n} f[x_0,\dots,x_k]\prod_{j=0}^{k-1}(x-x_j).
+\]</span> Appending a node <span class="math inline">\(x_{n+1}\)</span> costs one more term <span class="math inline">\(f[x_0,\dots,x_{n+1}]\prod_{j=0}^{n}(x-x_j)\)</span> and leaves the earlier coefficients untouched — the property Lagrange’s form lacks.</p>
+<p>The divided differences are computed by filling a table with <a href="#eq-1-dd-recursion" class="quarto-xref">Equation&nbsp;<span>1.5</span></a>; the Newton coefficients are read off the top edge. Two standard implementations trade memory for clarity:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Newton divided differences (in-place, <span class="math inline">\(\bigO(n)\)</span> memory)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given nodes <code>x</code> and values <code>f</code> (length <code>N</code>), overwrite <code>F &lt;- f</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="va">F</span> <span class="op">=</span> <span class="va">NDD1</span>(<span class="va">x</span><span class="op">,</span> <span class="va">f</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">N</span> <span class="op">=</span> <span class="va">length</span>(<span class="va">x</span>)<span class="op">;</span>  <span class="va">F</span> <span class="op">=</span> <span class="va">f</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span> <span class="va">k</span> <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="va">N</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">for</span> <span class="va">j</span> <span class="op">=</span> <span class="va">N</span><span class="op">:-</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">F</span>(<span class="va">j</span>) <span class="op">=</span> (<span class="va">F</span>(<span class="va">j</span>) <span class="op">-</span> <span class="va">F</span>(<span class="va">j</span><span class="op">-</span><span class="fl">1</span>)) <span class="op">/</span> (<span class="va">x</span>(<span class="va">j</span>) <span class="op">-</span> <span class="va">x</span>(<span class="va">j</span><span class="op">-</span><span class="va">k</span><span class="op">+</span><span class="fl">1</span>))<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>On return <code>F(k)</code> <span class="math inline">\(=f[x_0,\dots,x_{k-1}]\)</span>, the Newton coefficients of <a href="#eq-1-newton" class="quarto-xref">Equation&nbsp;<span>1.4</span></a>. The backward <code>j</code> loop is what lets the update overwrite in place without clobbering values still needed.</p>
+</div>
+</div>
+<p>Divided differences are not merely bookkeeping: the top one is a rescaled derivative, which is why the Newton and Lagrange error terms agree.</p>
+<div id="thm-1-dd-derivative" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.3 (Divided difference as a derivative)</strong></span> If <span class="math inline">\(f\in C^{n}[a,b]\)</span> and <span class="math inline">\(x_0,\dots,x_n\)</span> are distinct in <span class="math inline">\([a,b]\)</span>, then <span class="math inline">\(f[x_0,\dots,x_n]=f^{(n)}(\xi)/n!\)</span> for some <span class="math inline">\(\xi\in(a,b)\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(g=f-P\)</span> with <span class="math inline">\(P\)</span> the degree-<span class="math inline">\(\le n\)</span> interpolant. Then <span class="math inline">\(g\)</span> vanishes at the <span class="math inline">\(n+1\)</span> nodes, so by <a href="#lem-1-rolle" class="quarto-xref">Lemma&nbsp;<span>1.1</span></a> there is <span class="math inline">\(\xi\)</span> with <span class="math inline">\(g^{(n)}(\xi)=0\)</span>. The leading coefficient of <span class="math inline">\(P\)</span> in <a href="#eq-1-newton" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> is <span class="math inline">\(a_n=f[x_0,\dots,x_n]\)</span>, so <span class="math inline">\(P^{(n)}\equiv n!\,f[x_0,\dots,x_n]\)</span>, and <span class="math inline">\(0=g^{(n)}(\xi)=f^{(n)}(\xi)-n!\,f[x_0,\dots,x_n]\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="sec-1-hermite" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="sec-1-hermite"><span class="header-section-number">1.4</span> Hermite interpolation: matching derivatives</h2>
+<p>Sometimes we know not just <span class="math inline">\(f(x_j)\)</span> but also the slope <span class="math inline">\(f'(x_j)\)</span>, and we want the interpolant to match both. The clean way to see the resulting formulas is to let two nodes <strong>coalesce</strong>. With two nodes, <span class="math inline">\(a_1=f[x_0,x_1]=(f(x_1)-f(x_0))/(x_1-x_0)\)</span>; as <span class="math inline">\(x_1\to x_0\)</span> this difference quotient tends to the derivative, which we record as the <strong>repeated-node convention</strong> <span class="math display">\[
+f[x_0,x_0]\defeq f'(x_0),
+\]</span> and more generally <span class="math inline">\(f[\underbrace{x,\dots,x}_{k+1}]=f^{(k)}(x)/k!\)</span>, consistent with <a href="#thm-1-dd-derivative" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a>. Feeding double nodes into the Newton machinery produces the Hermite interpolant. For one double node at each of <span class="math inline">\(x_0,x_2\)</span> (degree <span class="math inline">\(3\)</span>), the divided-difference table built on <span class="math inline">\(z=(x_0,x_0,x_2,x_2)\)</span> yields <span class="math display">\[
+H(x)=f(x_0)+f'(x_0)(x-x_0)+f[x_0,x_0,x_2](x-x_0)^2+f[x_0,x_0,x_2,x_2](x-x_0)^2(x-x_2),
+\]</span> which satisfies the four conditions <span class="math inline">\(H(x_0)=f(x_0)\)</span>, <span class="math inline">\(H'(x_0)=f'(x_0)\)</span>, <span class="math inline">\(H(x_2)=f(x_2)\)</span>, <span class="math inline">\(H'(x_2)=f'(x_2)\)</span>. In general:</p>
+<div id="def-1-hermite" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.2 (Hermite interpolant)</strong></span> Given <span class="math inline">\(f(x_j),f'(x_j)\)</span> at <span class="math inline">\(n+1\)</span> distinct nodes, the Hermite interpolant <span class="math inline">\(H\)</span> is the unique polynomial of degree <span class="math inline">\(\le 2n+1\)</span> with <span class="math inline">\(H(x_j)=f(x_j)\)</span> and <span class="math inline">\(H'(x_j)=f'(x_j)\)</span> for all <span class="math inline">\(j\)</span> — that is <span class="math inline">\(2n+2\)</span> conditions fixing <span class="math inline">\(2n+2\)</span> coefficients.</p>
+</div>
+<p>Besides the divided-difference construction there is an explicit basis form, convenient for analysis: <span class="math display">\[
+H(x)=\sum_{j=0}^n f(x_j)\,H_j(x)+\sum_{j=0}^n f'(x_j)\,\hat H_j(x),
+\]</span> <span class="math display">\[
+H_j(x)=\bigl(1-2(x-x_j)L_j'(x_j)\bigr)L_j(x)^2,\qquad \hat H_j(x)=(x-x_j)L_j(x)^2,
+\]</span> with <span class="math inline">\(L_j\)</span> the Lagrange basis <a href="#eq-1-lagrange" class="quarto-xref">Equation&nbsp;<span>1.1</span></a>. One checks <span class="math inline">\(H_j(x_i)=\delta_{ij}\)</span>, <span class="math inline">\(H_j'(x_i)=0\)</span>, <span class="math inline">\(\hat H_j(x_i)=0\)</span>, <span class="math inline">\(\hat H_j'(x_i)=\delta_{ij}\)</span>, so the two conditions decouple cleanly. The error mirrors <a href="#thm-1-interp-error" class="quarto-xref">Theorem&nbsp;<span>1.2</span></a> but with the node polynomial <em>squared</em>, reflecting the doubled nodes.</p>
+<div id="thm-1-hermite-error" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1.4 (Hermite interpolation error)</strong></span> If <span class="math inline">\(f\in C^{2n+2}[a,b]\)</span> then for each <span class="math inline">\(x\)</span> there is <span class="math inline">\(\xi(x)\in(a,b)\)</span> with <span class="math display">\[
+f(x)-H(x)=\frac{f^{(2n+2)}(\xi(x))}{(2n+2)!}\prod_{j=0}^{n}(x-x_j)^2 .
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Identical in spirit to <a href="#thm-1-interp-error" class="quarto-xref">Theorem&nbsp;<span>1.2</span></a>: fix a non-node <span class="math inline">\(x\)</span>, form <span class="math inline">\(g(t)=(f-H)(t)-(f-H)(x)\prod_j\frac{(t-x_j)^2}{(x-x_j)^2}\)</span>, and note <span class="math inline">\(g\)</span> has <span class="math inline">\(n+2\)</span> zeros (at <span class="math inline">\(x\)</span> and the nodes) while <span class="math inline">\(g'\)</span> has an extra zero at each node because <span class="math inline">\(H\)</span> matches <span class="math inline">\(f'\)</span> there. Counting multiplicities gives <span class="math inline">\(g\)</span> enough zeros to apply Rolle <span class="math inline">\(2n+2\)</span> times, and evaluating <span class="math inline">\(g^{(2n+2)}(\xi)=0\)</span> isolates the stated remainder. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="sec-1-splines" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="sec-1-splines"><span class="header-section-number">1.5</span> Cubic splines: piecewise, but globally smooth</h2>
+<p>Raising the degree to fit more data is a trap: for equispaced nodes the interpolant of <span class="math inline">\(f(x)=1/(1+25x^2)\)</span> oscillates ever more wildly near the ends as <span class="math inline">\(n\)</span> grows — the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>). High-degree global polynomials are the wrong tool. The fix is to keep the pieces low-degree and stitch them together smoothly: a <strong>cubic spline</strong> uses a different cubic on each subinterval but forces the joins to agree in value and in the first two derivatives.</p>
+<div id="fig-1-runge" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-runge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/01-runge.svg" class="img-fluid figure-img" style="width:78.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-runge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: Equispaced polynomial interpolation of the Runge function. The degree-6 interpolant already overshoots near the endpoints, and the degree-10 interpolant diverges there — raising the degree makes matters worse, not better.
+</figcaption>
+</figure>
+</div>
+<div id="def-1-spline" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.3 (Cubic spline interpolant)</strong></span> Given nodes <span class="math inline">\(x_0&lt;\dots&lt;x_n\)</span>, a cubic spline <span class="math inline">\(S\)</span> is a function that on each <span class="math inline">\([x_j,x_{j+1}]\)</span> equals a cubic <span class="math display">\[
+S_j(x)=a_j+b_j(x-x_j)+c_j(x-x_j)^2+d_j(x-x_j)^3,
+\]</span> with <span class="math inline">\(S(x_j)=f(x_j)\)</span> for all <span class="math inline">\(j\)</span> (interpolation) and <span class="math inline">\(S\in C^2[x_0,x_n]\)</span> (matching value, slope, and curvature at every interior node).</p>
+</div>
+<p>The bookkeeping is what makes splines work out to a solvable system. There are <span class="math inline">\(4n\)</span> unknown coefficients. Interpolation and the requirement that adjacent pieces agree in value give, with <span class="math inline">\(h_j=x_{j+1}-x_j\)</span>, <span class="math display">\[
+a_j=f(x_j),\qquad a_{j+1}=a_j+b_jh_j+c_jh_j^2+d_jh_j^3 .
+\]</span> Matching first and second derivatives at the interior nodes adds <span class="math display">\[
+b_{j+1}=b_j+2c_jh_j+3d_jh_j^2,\qquad c_{j+1}=c_j+3d_jh_j,
+\]</span> which is <span class="math inline">\(n+1\)</span> plus <span class="math inline">\(3(n-1)\)</span> conditions, i.e.&nbsp;<span class="math inline">\(4n-2\)</span> in all — two short of the <span class="math inline">\(4n\)</span> unknowns. Eliminating the <span class="math inline">\(b_j,d_j\)</span> in favor of the curvatures <span class="math inline">\(c_j\)</span> turns the whole system into a single <strong>tridiagonal</strong> linear system for <span class="math inline">\(c_0,\dots,c_n\)</span>: <span class="math display">\[
+h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_j c_{j+1}
+=3\!\left(\frac{a_{j+1}-a_j}{h_j}-\frac{a_j-a_{j-1}}{h_{j-1}}\right),
+\quad j=1,\dots,n-1.
+\]</span> The two missing conditions are boundary choices: the <strong>natural</strong> spline sets <span class="math inline">\(c_0=c_n=0\)</span> (<span class="math inline">\(S''=0\)</span> at the ends), while the <strong>clamped</strong> spline instead prescribes <span class="math inline">\(S'(x_0),S'(x_n)\)</span>. Either way the resulting tridiagonal system is strictly diagonally dominant, hence uniquely solvable in <span class="math inline">\(\bigO(n)\)</span> by the tridiagonal elimination of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> — splines are both smoother than a single high-degree polynomial and cheaper to compute.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Why <span class="math inline">\(C^2\)</span> and not more
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Cubics carry exactly four degrees of freedom per piece, which is what matching value, slope, and curvature at both ends of a subinterval consumes. Demanding <span class="math inline">\(C^3\)</span> would over-determine the pieces; allowing only <span class="math inline">\(C^1\)</span> wastes the curvature information that makes splines look smooth to the eye. Cubic <span class="math inline">\(C^2\)</span> is the sweet spot, which is why it wraps car bodies and font outlines alike.</p>
+</div>
+</div>
+<p>Parametric data — a curve <span class="math inline">\((x(t),y(t))\)</span> that need not be a graph — is handled by interpolating each coordinate against the parameter <span class="math inline">\(t\)</span> separately; the piecewise-cubic version with slopes chosen from guide points is the <strong>Bézier</strong> curve of computer graphics, taken up alongside numerical differentiation in <a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
+</section>
+<section id="chapter-summary" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">1.6</span> Chapter summary</h2>
+<ul>
+<li>For <span class="math inline">\(n+1\)</span> distinct nodes there is a <strong>unique</strong> interpolating polynomial of degree <span class="math inline">\(\le n\)</span> (<a href="#thm-1-uniqueness" class="quarto-xref">Theorem&nbsp;<span>1.1</span></a>); the Lagrange form <a href="#eq-1-lagrange" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> exhibits it and the Newton form <a href="#eq-1-newton" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> makes it extensible.</li>
+<li>The interpolation error <a href="#eq-1-error" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> is <span class="math inline">\(\dfrac{f^{(n+1)}(\xi)}{(n+1)!}\prod_j(x-x_j)\)</span>; bounding the derivative factor and the node polynomial separately gives usable error bounds (<a href="#sec-1-error-example" class="quarto-xref"><span>Section 1.1.1</span></a>).</li>
+<li><strong>Neville’s method</strong> builds the interpolant’s <em>value</em> by a recursion on low-degree pieces (<a href="#eq-1-neville" class="quarto-xref">Equation&nbsp;<span>1.3</span></a>); <strong>divided differences</strong> build the <em>polynomial</em>, with <span class="math inline">\(f[x_0,\dots,x_n]=f^{(n)}(\xi)/n!\)</span> (<a href="#thm-1-dd-derivative" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a>).</li>
+<li><strong>Hermite interpolation</strong> matches values and slopes by coalescing nodes, giving a degree <span class="math inline">\(2n+1\)</span> polynomial with the squared-node error term of <a href="#thm-1-hermite-error" class="quarto-xref">Theorem&nbsp;<span>1.4</span></a>.</li>
+<li>Increasing the polynomial degree invites the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>); <strong>cubic splines</strong> avoid it with low-degree pieces joined in <span class="math inline">\(C^2\)</span>, reducing to a tridiagonal system solved in <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02-differentiation-integration.html" class="pagination-link" aria-label="Numerical Differentiation &amp; Integration">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

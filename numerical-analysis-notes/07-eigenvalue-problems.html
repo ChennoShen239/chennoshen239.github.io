@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>7&nbsp; Eigenvalue Problems – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./08-nonlinear-equations.html" rel="next">
+<link href="./06-approximation-theory.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./07-eigenvalue-problems.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-7-power" id="toc-sec-7-power" class="nav-link active" data-scroll-target="#sec-7-power"><span class="header-section-number">7.1</span> The power method</a>
+  <ul class="collapse">
+  <li><a href="#the-idea-and-why-it-converges" id="toc-the-idea-and-why-it-converges" class="nav-link" data-scroll-target="#the-idea-and-why-it-converges">The idea and why it converges</a></li>
+  <li><a href="#estimating-the-eigenvalue-and-stopping" id="toc-estimating-the-eigenvalue-and-stopping" class="nav-link" data-scroll-target="#estimating-the-eigenvalue-and-stopping">Estimating the eigenvalue and stopping</a></li>
+  </ul></li>
+  <li><a href="#sec-7-markov" id="toc-sec-7-markov" class="nav-link" data-scroll-target="#sec-7-markov"><span class="header-section-number">7.2</span> Application: Markov chains</a></li>
+  <li><a href="#sec-7-pagerank" id="toc-sec-7-pagerank" class="nav-link" data-scroll-target="#sec-7-pagerank"><span class="header-section-number">7.3</span> Sub-application: PageRank</a></li>
+  <li><a href="#sec-7-linalg-review" id="toc-sec-7-linalg-review" class="nav-link" data-scroll-target="#sec-7-linalg-review"><span class="header-section-number">7.4</span> Linear-algebra review</a></li>
+  <li><a href="#sec-7-pca" id="toc-sec-7-pca" class="nav-link" data-scroll-target="#sec-7-pca"><span class="header-section-number">7.5</span> Principal component analysis (PCA)</a></li>
+  <li><a href="#sec-7-subspace" id="toc-sec-7-subspace" class="nav-link" data-scroll-target="#sec-7-subspace"><span class="header-section-number">7.6</span> Subspace iteration</a>
+  <ul class="collapse">
+  <li><a href="#sec-7-subspace-basic" id="toc-sec-7-subspace-basic" class="nav-link" data-scroll-target="#sec-7-subspace-basic">Basic algorithm</a></li>
+  <li><a href="#sec-7-subspace-proof" id="toc-sec-7-subspace-proof" class="nav-link" data-scroll-target="#sec-7-subspace-proof">Convergence proof</a></li>
+  <li><a href="#sec-7-subspace-distance" id="toc-sec-7-subspace-distance" class="nav-link" data-scroll-target="#sec-7-subspace-distance">Distance between subspaces</a></li>
+  <li><a href="#sec-7-subspace-full" id="toc-sec-7-subspace-full" class="nav-link" data-scroll-target="#sec-7-subspace-full">Full pseudocode</a></li>
+  <li><a href="#sec-7-rayleigh-ritz" id="toc-sec-7-rayleigh-ritz" class="nav-link" data-scroll-target="#sec-7-rayleigh-ritz">Recovering eigenpairs via Rayleigh–Ritz</a></li>
+  </ul></li>
+  <li><a href="#sec-7-randsvd" id="toc-sec-7-randsvd" class="nav-link" data-scroll-target="#sec-7-randsvd"><span class="header-section-number">7.7</span> Randomized SVD</a>
+  <ul class="collapse">
+  <li><a href="#sec-7-randsvd-toy" id="toc-sec-7-randsvd-toy" class="nav-link" data-scroll-target="#sec-7-randsvd-toy">Toy problem: the exact rank-<span class="math inline">\(k\)</span> case</a></li>
+  <li><a href="#sec-7-randsvd-beyond" id="toc-sec-7-randsvd-beyond" class="nav-link" data-scroll-target="#sec-7-randsvd-beyond">Beyond rank <span class="math inline">\(k\)</span></a></li>
+  </ul></li>
+  <li><a href="#sec-7-spectral" id="toc-sec-7-spectral" class="nav-link" data-scroll-target="#sec-7-spectral"><span class="header-section-number">7.8</span> Spectral clustering</a>
+  <ul class="collapse">
+  <li><a href="#sec-7-spectral-graph" id="toc-sec-7-spectral-graph" class="nav-link" data-scroll-target="#sec-7-spectral-graph">A weighted graph from data</a></li>
+  <li><a href="#sec-7-spectral-laplacian" id="toc-sec-7-spectral-laplacian" class="nav-link" data-scroll-target="#sec-7-spectral-laplacian">Graph Laplacians</a></li>
+  <li><a href="#sec-7-spectral-embedding" id="toc-sec-7-spectral-embedding" class="nav-link" data-scroll-target="#sec-7-spectral-embedding">Spectral embedding</a></li>
+  <li><a href="#sec-7-spectral-clustering" id="toc-sec-7-spectral-clustering" class="nav-link" data-scroll-target="#sec-7-spectral-clustering">Clustering</a></li>
+  </ul></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">7.9</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./07-eigenvalue-problems.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-eigenvalues" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>Eigenvalues and eigenvectors are constructed in linear-algebra courses through the characteristic polynomial <span class="math inline">\(\det(A-\lambda I)=0\)</span>, but that route is useless numerically: root-finding on a degree-<span class="math inline">\(n\)</span> polynomial is unstable, and a full diagonalization costs <span class="math inline">\(\bigO(n^3)\)</span>. In practice one rarely wants the <em>whole</em> spectrum. A handful of extreme eigenpairs already answers the questions that matter — the stationary distribution of a Markov chain, the PageRank of a web graph, the leading directions of a data cloud, a low-rank compression of a matrix, a clustering of a point set. This chapter builds the tools that extract those few eigenpairs cheaply, using nothing but repeated <strong>matrix–vector products</strong>. We start from the simplest such idea, the power method, and grow it into subspace iteration, the randomized SVD, and spectral clustering.</p>
+<p>Throughout, <span class="math inline">\(A\in\R^{n\times n}\)</span> has eigenvalues <span class="math inline">\(\lambda_1,\dots,\lambda_n\)</span> with eigenvectors <span class="math inline">\(v_1,\dots,v_n\)</span>; <span class="math inline">\(\spec(A)=\max_i\abs{\lambda_i}\)</span> is the spectral radius (<a href="05-iterative-linear-systems.html#def-5-spectral-radius" class="quarto-xref">Definition&nbsp;<span>5.4</span></a>), and <span class="math inline">\(\sigma_1\ge\sigma_2\ge\dots\)</span> are singular values. We freely reuse the norm and condition-number conventions of <a href="./notation.html">Notation</a>.</p>
+<section id="sec-7-power" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="sec-7-power"><span class="header-section-number">7.1</span> The power method</h2>
+<p>The <strong>power method</strong> is the simplest <em>iterative</em> method for an eigenvector: it constructs the dominant eigenvector as the limit of a sequence of vectors. It is also the simplest <strong>matrix-free</strong> method, meaning it needs only the ability to compute <span class="math inline">\(Au\)</span> for a given <span class="math inline">\(u\)</span> — never the entries of <span class="math inline">\(A\)</span>. This matters because a matrix–vector product (“matvec”) is often far cheaper than forming <span class="math inline">\(A\)</span>: a sparse or “sparse-plus-low-rank” <span class="math inline">\(A\)</span> costs <span class="math inline">\(\bigO(n)\)</span> per matvec, so a few eigenpairs can be had in <span class="math inline">\(\bigO(n)\)</span> time, against the <span class="math inline">\(\bigO(n^3)\)</span> of a full diagonalization.</p>
+<section id="the-idea-and-why-it-converges" class="level3">
+<h3 class="anchored" data-anchor-id="the-idea-and-why-it-converges">The idea and why it converges</h3>
+<p>Start from any vector <span class="math inline">\(x\in\R^n\)</span> and look at the sequence <span class="math inline">\(Ax, A^2x, A^3x,\dots\)</span>. On its own this usually either blows up or collapses to zero, so it does not converge; but if we renormalize at each step, the <em>direction</em> settles down. Suppose <span class="math inline">\(A\)</span> is diagonalizable with a <strong>strictly dominant</strong> eigenpair <span class="math inline">\((\lambda_1,v_1)\)</span>, meaning <span id="eq-7-dominant"><span class="math display">\[
+\abs{\lambda_1}&gt;\abs{\lambda_2}\ge\dots\ge\abs{\lambda_n}.
+\tag{7.1}\]</span></span> (If <span class="math inline">\(A\)</span> is real, the dominant <span class="math inline">\(\lambda_1\)</span> must itself be real, since complex eigenvalues come in conjugate pairs of equal modulus.) Expand the start vector in the eigenbasis, <span class="math inline">\(x=\sum_{i=1}^n c_iv_i\)</span>. Then <span class="math display">\[
+A^kx=\sum_{i=1}^n c_i\lambda_i^k v_i,
+\qquad
+\lambda_1^{-k}A^kx=\sum_{i=1}^n c_i\Bigl(\tfrac{\lambda_i}{\lambda_1}\Bigr)^k v_i .
+\]</span> Every ratio <span class="math inline">\(\abs{\lambda_i/\lambda_1}&lt;1\)</span> for <span class="math inline">\(i&gt;1\)</span>, so those terms vanish geometrically and <span class="math inline">\(\lambda_1^{-k}A^kx\to c_1v_1\)</span>. The iteration finds <span class="math inline">\(v_1\)</span> — <em>provided</em> <span class="math inline">\(c_1\ne0\)</span>, i.e.&nbsp;the start vector has a nonzero component along <span class="math inline">\(v_1\)</span> (a random <span class="math inline">\(x\)</span> satisfies this with probability one).</p>
+<p>We do not know <span class="math inline">\(\lambda_1\)</span>, so we cannot form <span class="math inline">\(\lambda_1^{-k}A^kx\)</span>; instead we simply normalize to keep the iterate at unit length. Define <span id="eq-7-power-iterate"><span class="math display">\[
+u^{(k)}\defeq\frac{A^kx}{\ntwo{A^kx}} .
+\tag{7.2}\]</span></span> Factoring out the dominant term, <span class="math display">\[
+u^{(k)}=\frac{\sum_i c_i\lambda_i^k v_i}{\bigl\lVert\sum_i c_i\lambda_i^k v_i\bigr\rVert}
+\;\longrightarrow\;
+\underbrace{\frac{c_1}{\abs{c_1}}\Bigl(\frac{\lambda_1}{\abs{\lambda_1}}\Bigr)^k}_{=:z^{(k)}}
+\,\frac{v_1}{\ntwo{v_1}},
+\]</span> where <span class="math inline">\(\abs{z^{(k)}}=1\)</span> (in the real case <span class="math inline">\(z^{(k)}=\pm1\)</span>). The unit scalar <span class="math inline">\(z^{(k)}\)</span> records an unavoidable phase/sign ambiguity — an eigenvector is only defined up to scaling.</p>
+<div id="thm-7-power-method" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.1 (Power method convergence)</strong></span> Let <span class="math inline">\(A\in\R^{n\times n}\)</span> be diagonalizable with a strictly dominant eigenpair <span class="math inline">\((\lambda_1,v_1)\)</span> as in <a href="#eq-7-dominant" class="quarto-xref">Equation&nbsp;<span>7.1</span></a>, and let <span class="math inline">\(x=\sum_i c_iv_i\)</span> with <span class="math inline">\(c_1\ne0\)</span>. With <span class="math inline">\(u^{(k)}\)</span> as in <a href="#eq-7-power-iterate" class="quarto-xref">Equation&nbsp;<span>7.2</span></a> there exist unit scalars <span class="math inline">\(z^{(k)}\)</span> (<span class="math inline">\(z^{(k)}=\pm1\)</span> when <span class="math inline">\(A\)</span> is real) such that <span class="math display">\[
+\lim_{k\to\infty}\frac{u^{(k)}}{z^{(k)}}=\frac{v_1}{\ntwo{v_1}} .
+\]</span> The convergence is geometric: the error decays like <span class="math inline">\(\bigl(\abs{\lambda_2}/\abs{\lambda_1}\bigr)^k\)</span>, governed by the <strong>spectral gap</strong> <span class="math inline">\(\abs{\lambda_1}-\abs{\lambda_2}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The displayed limit is the computation above: <span class="math inline">\(\lambda_1^{-k}A^kx\to c_1v_1\)</span> term by term, and normalizing removes the divergent scalar <span class="math inline">\(\lambda_1^k\)</span> while leaving the unit phase <span class="math inline">\(z^{(k)}\)</span>. The rate is set by the largest surviving ratio, <span class="math inline">\(\abs{\lambda_2/\lambda_1}\)</span>, since that term dominates the deviation <span class="math inline">\(u^{(k)}-z^{(k)}v_1/\ntwo{v_1}\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The rate claim is exactly what <a href="#fig-7-power" class="quarto-xref">Figure&nbsp;<span>7.1</span></a> shows: a spectral gap ratio of <span class="math inline">\(0.5\)</span> gains roughly one digit every two steps, while a ratio of <span class="math inline">\(0.9\)</span> crawls. The method also works when <span class="math inline">\(A\)</span> is <em>not</em> diagonalizable, as long as a strictly dominant eigenvector exists; the proof is more delicate and goes through the Jordan normal form.</p>
+<div id="fig-7-power" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-7-power-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/07-power-convergence.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-power-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.1: Alignment error <span class="math inline">\(\sqrt{1-(u^{(k)}\cdot v_1)^2}\)</span> of the power method on a symmetric <span class="math inline">\(4\times4\)</span> matrix, for two spectra. The decay is geometric with rate <span class="math inline">\(\abs{\lambda_2/\lambda_1}\)</span> (dashed reference lines); a small spectral gap makes the method slow.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="estimating-the-eigenvalue-and-stopping" class="level3">
+<h3 class="anchored" data-anchor-id="estimating-the-eigenvalue-and-stopping">Estimating the eigenvalue and stopping</h3>
+<p>To terminate we want a residual, ideally the relative residual norm <span class="math inline">\(\ntwo{Au^{(k)}-\lambda_1u^{(k)}}/\lambda_1\)</span> — but that needs <span class="math inline">\(\lambda_1\)</span>. Given an eigenvector guess <span class="math inline">\(u\)</span> we recover the matching eigenvalue by the <strong>Rayleigh quotient</strong>: if <span class="math inline">\(Au=\lambda u\)</span> then <span class="math inline">\(u\cdot(Au)=\lambda\ntwo{u}^2\)</span>, so <span id="eq-7-rayleigh-quotient"><span class="math display">\[
+\lambda=\frac{u^\top Au}{\ntwo{u}^2},
+\qquad\text{and for unit }u,\quad \lambda=u^\top Au .
+\tag{7.3}\]</span></span> This furnishes the running estimate <span class="math inline">\(\lambda_1^{(k)}=u^{(k)}\cdot(Au^{(k)})\)</span> and the computable stopping test <span class="math inline">\(\ntwo{Au^{(k)}-\lambda_1^{(k)}u^{(k)}}/\lambda_1^{(k)}\le\eps\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Power method
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given a start vector <span class="math inline">\(x^{(0)}\in\R^n\)</span>, a matvec routine for <span class="math inline">\(A\)</span>, a maximum count <span class="math inline">\(m\)</span>, and a tolerance <span class="math inline">\(\eps\)</span>. For <span class="math inline">\(k=0,1,\dots,m\)</span>:</p>
+<ol type="1">
+<li>Normalize: <span class="math inline">\(u^{(k)}\leftarrow x^{(k)}/\ntwo{x^{(k)}}\)</span>.</li>
+<li>Matvec: <span class="math inline">\(x^{(k+1)}\leftarrow Au^{(k)}\)</span>.</li>
+<li>Rayleigh-quotient estimate: <span class="math inline">\(\lambda_1^{(k)}\leftarrow u^{(k)}\cdot x^{(k+1)}\)</span>.</li>
+<li>If <span class="math inline">\(\ntwo{x^{(k+1)}-\lambda_1^{(k)}u^{(k)}}/\lambda_1^{(k)}\le\eps\)</span>, <strong>break</strong>.</li>
+</ol>
+<p>Return <span class="math inline">\((\lambda_1^{(k)},u^{(k)})\)</span>. Each step is one matvec plus <span class="math inline">\(\bigO(n)\)</span> work.</p>
+</div>
+</div>
+<p>The power method generalizes, from one dominant eigenvector to the <span class="math inline">\(k\)</span> most dominant ones, as <strong>subspace iteration</strong> (<a href="#sec-7-subspace" class="quarto-xref"><span>Section 7.6</span></a>). First we spend three sections on where the dominant eigenvector of a <em>specific</em> matrix is exactly the quantity of interest.</p>
+</section>
+</section>
+<section id="sec-7-markov" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="sec-7-markov"><span class="header-section-number">7.2</span> Application: Markov chains</h2>
+<p>Consider a system with <span class="math inline">\(n\)</span> states <span class="math inline">\(1,\dots,n\)</span> making random transitions at discrete times. For each state <span class="math inline">\(j\)</span> we are given a column of probabilities <span class="math inline">\(p_j=(p_{1j},\dots,p_{nj})^\top\)</span>, where <span class="math inline">\(p_{ij}\)</span> is the probability of moving to state <span class="math inline">\(i\)</span> next, given that we are in state <span class="math inline">\(j\)</span> now — transitions depend only on the current state (the <strong>Markov property</strong>). For these to be probabilities we need <span class="math inline">\(p_{ij}\ge0\)</span> and <span class="math inline">\(\sum_i p_{ij}=1\)</span> for every <span class="math inline">\(j\)</span>; the latter reads <span class="math inline">\(\mathbf 1^\top p_j=1\)</span> with <span class="math inline">\(\mathbf 1\)</span> the all-ones vector.</p>
+<div id="def-7-stochastic" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 7.1 (Column-stochastic matrix)</strong></span> <span class="math inline">\(P=(p_{ij})\)</span> is <strong>(column) stochastic</strong> if <span class="math inline">\(P\ge0\)</span> entrywise and <span class="math inline">\(P^\top\mathbf 1=\mathbf 1\)</span> (every column sums to <span class="math inline">\(1\)</span>). It is <strong>positive</strong>, written <span class="math inline">\(P&gt;0\)</span>, if <span class="math inline">\(p_{ij}&gt;0\)</span> for all <span class="math inline">\(i,j\)</span>.</p>
+</div>
+<p>A vector <span class="math inline">\(\pi\in\R^n\)</span> is a <strong>probability distribution</strong> over the states if <span class="math inline">\(\pi\ge0\)</span> and <span class="math inline">\(\mathbf 1^\top\pi=1\)</span>. The point of the stochastic matrix is that it <em>advances</em> distributions in time.</p>
+<div id="prp-7-markov-evolution" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 7.1 (Distributions evolve by <span class="math inline">\(P\)</span>)</strong></span> If <span class="math inline">\(\pi\)</span> is the distribution of the state <span class="math inline">\(X_t\)</span> at time <span class="math inline">\(t\)</span>, then <span class="math inline">\(P\pi\)</span> is its distribution at time <span class="math inline">\(t+1\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Conditioning on the current state and using the Markov property, <span class="math display">\[
+\Pr(X_{t+1}=i)=\sum_{j=1}^n\Pr(X_{t+1}=i\mid X_t=j)\,\Pr(X_t=j)=\sum_{j=1}^n p_{ij}\pi_j=[P\pi]_i .
+\]</span> Moreover <span class="math inline">\(P\)</span> preserves distributions: <span class="math inline">\(\mathbf 1^\top(P\pi)=(P^\top\mathbf 1)^\top\pi=\mathbf 1^\top\pi=1\)</span>, and <span class="math inline">\(\pi\ge0\Rightarrow P\pi\ge0\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>So the evolution of the state distribution is just repeated application of <span class="math inline">\(P\)</span>, and we care about the long-run limit <span class="math display">\[
+\pi_\infty=\lim_{k\to\infty}P^k\pi .
+\]</span> If this limit exists it is again a probability vector, and passing to the limit in <span class="math inline">\(\pi_{k+1}=P\pi_k\)</span> shows it is a fixed point, <span id="eq-7-invariant"><span class="math display">\[
+\pi_\infty=P\pi_\infty ,
+\tag{7.4}\]</span></span> the <strong>equilibrium</strong> or <strong>invariant distribution</strong>. Two observations connect this to <a href="#sec-7-power" class="quarto-xref"><span>Section 7.1</span></a>. First, <a href="#eq-7-invariant" class="quarto-xref">Equation&nbsp;<span>7.4</span></a> says <span class="math inline">\(\pi_\infty\)</span> is an eigenvector of <span class="math inline">\(P\)</span> with eigenvalue <span class="math inline">\(1\)</span>. Second, <span class="math inline">\(P^k\pi\)</span> is precisely the (already-normalized) power-method sequence for <span class="math inline">\(P\)</span>. So <span class="math inline">\(\pi_\infty\)</span> is the dominant eigenvector of <span class="math inline">\(P\)</span> — <em>if</em> the power method’s hypotheses hold. They do, under positivity.</p>
+<div id="thm-7-perron-frobenius" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.2 (Perron–Frobenius)</strong></span> Let <span class="math inline">\(P\)</span> be a positive stochastic matrix. Then <span class="math inline">\(P\)</span> has a strictly dominant eigenvalue equal to <span class="math inline">\(1\)</span>, with an eigenvector that can be scaled to a probability distribution. Hence the power method converges to the invariant distribution <span class="math inline">\(\pi_\infty\)</span>.</p>
+</div>
+<p>We take <a href="#thm-7-perron-frobenius" class="quarto-xref">Theorem&nbsp;<span>7.2</span></a> as given — its proof (positivity forces a unique largest-modulus eigenvalue with a positive eigenvector) belongs to a matrix-analysis course; refined versions weaken positivity to irreducibility and aperiodicity.</p>
+</section>
+<section id="sec-7-pagerank" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="sec-7-pagerank"><span class="header-section-number">7.3</span> Sub-application: PageRank</h2>
+<p>The web is a directed graph: pages <span class="math inline">\(1,\dots,n\)</span> and edges <span class="math inline">\(E\)</span>, where <span class="math inline">\((i,j)\in E\)</span> means page <span class="math inline">\(i\)</span> links to page <span class="math inline">\(j\)</span>. Equivalently it is an <strong>adjacency matrix</strong> <span class="math inline">\(A\)</span> with <span class="math inline">\(A_{ij}=1\)</span> if <span class="math inline">\((i,j)\in E\)</span> and <span class="math inline">\(0\)</span> otherwise. We want to <em>rank</em> pages by a centrality score. Merely counting inbound links is unsatisfactory — a link from an important page should count for more than a link from an obscure one — so PageRank uses an <strong>eigenvector-centrality</strong> score: a page is important if important pages link to it, a self-referential definition that an eigenvector resolves.</p>
+<p><strong>From adjacency to a Markov chain.</strong> This is an instance of a general recipe for turning a nonnegative matrix into a stochastic one: normalize each column to sum to one. Assuming every page has at least one inbound link (drop any that do not), define <span class="math inline">\(\tilde P\)</span> by <span id="eq-7-pagerank-P"><span class="math display">\[
+\tilde P^\top=\diag(A\mathbf 1)^{-1}A,
+\qquad
+\tilde P_{ji}=\begin{cases}\dfrac{1}{\deg^-(i)}, &amp; (i,j)\in E,\\[2pt] 0,&amp;(i,j)\notin E,\end{cases}
+\tag{7.5}\]</span></span> where <span class="math inline">\(\deg^-(i)\)</span> is the outdegree of page <span class="math inline">\(i\)</span>. The random-walk reading: from the current page, click a uniformly random outgoing link.</p>
+<p><strong>Damping.</strong> Plain <span class="math inline">\(\tilde P\)</span> can make the power method converge very slowly, and dangling structure can spoil the hypotheses. The fix is a <strong>damping factor</strong> <span class="math inline">\(\tau\in(0,1)\)</span>: with probability <span class="math inline">\(\tau\)</span> follow a random link, and with probability <span class="math inline">\(1-\tau\)</span> jump to a page chosen uniformly at random from all <span class="math inline">\(n\)</span>. This defines the new chain <span id="eq-7-pagerank-damped"><span class="math display">\[
+P=\tau\tilde P+(1-\tau)\tfrac1n\mathbf 1\mathbf 1^\top ,
+\tag{7.6}\]</span></span> where <span class="math inline">\(\mathbf 1\mathbf 1^\top\)</span> is the all-ones matrix. Now <span class="math inline">\(P\)</span> is stochastic <em>and</em> positive, so by <a href="#thm-7-perron-frobenius" class="quarto-xref">Theorem&nbsp;<span>7.2</span></a> it has a dominant eigenvector <span class="math inline">\(\pi^{\star}\)</span> with eigenvalue <span class="math inline">\(1\)</span>; scaled to <span class="math inline">\(\pi^{\star}\ge0\)</span>, <span class="math inline">\(\mathbf 1^\top\pi^{\star}=1\)</span>, the entry <span class="math inline">\(\pi^{\star}_i\)</span> is the <strong>PageRank</strong> of page <span class="math inline">\(i\)</span> — the long-run fraction of time the random surfer spends there.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — PageRank
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>PageRank is the power method applied to <span class="math inline">\(P\)</span> of <a href="#eq-7-pagerank-damped" class="quarto-xref">Equation&nbsp;<span>7.6</span></a>, only simpler: because the dominant eigenvalue is <em>exactly</em> <span class="math inline">\(1\)</span>, no renormalization is needed. Start from any distribution <span class="math inline">\(\pi^{(0)}\)</span> and iterate <span class="math inline">\(\pi^{(k+1)}=P\pi^{(k)}\)</span>. Each <span class="math inline">\(\pi^{(k)}\)</span> stays a probability distribution and <span class="math inline">\(\pi^{(k)}\to\pi^{\star}\)</span>. Each step is one matvec by <span class="math inline">\(P\)</span>, and <span class="math inline">\(P\)</span> never has to be formed densely: the damping term acts as <span class="math inline">\(\tfrac{1-\tau}{n}(\mathbf 1^\top\pi^{(k)})\mathbf 1=\tfrac{1-\tau}{n}\mathbf 1\)</span>, so the matvec costs <span class="math inline">\(\bigO(\lvert E\rvert)\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="sec-7-linalg-review" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="sec-7-linalg-review"><span class="header-section-number">7.4</span> Linear-algebra review</h2>
+<p>The remaining applications lean on standard decompositions, collected here for reference; all were established in <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> and a linear-algebra prerequisite, so we only fix notation.</p>
+<ul>
+<li><strong>Diagonalization.</strong> <span class="math inline">\(A=P\Lambda P^{-1}\)</span> with <span class="math inline">\(\Lambda=\diag(\lambda_1,\dots,\lambda_n)\)</span> when <span class="math inline">\(A\)</span> has a full eigenbasis (the columns of <span class="math inline">\(P\)</span>).</li>
+<li><strong>Spectral theorem.</strong> A symmetric <span class="math inline">\(A=A^\top\)</span> diagonalizes <em>orthogonally</em>: <span class="math inline">\(A=Q\Lambda Q^\top\)</span> with <span class="math inline">\(Q^\top Q=I\)</span> and real <span class="math inline">\(\lambda_i\)</span>. Equivalently <span class="math inline">\(A=\sum_i\lambda_iq_iq_i^\top\)</span>, a sum of rank-one pieces.</li>
+<li><strong>Orthogonal projector.</strong> For <span class="math inline">\(Q\in\R^{n\times k}\)</span> with orthonormal columns (<span class="math inline">\(Q^\top Q=I_k\)</span>), <span class="math inline">\(P_Q=QQ^\top\)</span> is the orthogonal projection onto <span class="math inline">\(\Span(Q)=\operatorname{col}(Q)\)</span>; it is symmetric and idempotent, <span class="math inline">\(P_Q^2=P_Q\)</span>, with eigenvalues in <span class="math inline">\(\{0,1\}\)</span>.</li>
+<li><strong>SVD.</strong> Every <span class="math inline">\(A\in\R^{m\times n}\)</span> factors as <span class="math inline">\(A=U\Sigma V^\top\)</span> with orthogonal <span class="math inline">\(U,V\)</span> and <span class="math inline">\(\Sigma=\diag(\sigma_1,\dots)\)</span>, <span class="math inline">\(\sigma_1\ge\sigma_2\ge\dots\ge0\)</span>. The <strong>compact</strong> SVD keeps the <span class="math inline">\(r=\rank(A)\)</span> positive singular values, <span class="math inline">\(A=\sum_{i=1}^r\sigma_iu_iv_i^\top\)</span>; the <strong>truncated</strong> (rank-<span class="math inline">\(k\)</span>) SVD keeps the top <span class="math inline">\(k\)</span>. The SVD is the spectral theorem in disguise: <span class="math inline">\(A^\top A=V\Sigma^2V^\top\)</span> and <span class="math inline">\(AA^\top=U\Sigma^2U^\top\)</span>, so left/right singular vectors are eigenvectors of <span class="math inline">\(AA^\top\)</span>, <span class="math inline">\(A^\top A\)</span>, with <span class="math inline">\(\sigma_i^2\)</span> the eigenvalues.</li>
+</ul>
+<p>The <strong>Eckart–Young–Mirsky theorem</strong> — the truncated SVD is the best rank-<span class="math inline">\(k\)</span> approximation in Frobenius norm — is the workhorse behind PCA and the randomized SVD below.</p>
+</section>
+<section id="sec-7-pca" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="sec-7-pca"><span class="header-section-number">7.5</span> Principal component analysis (PCA)</h2>
+<p>Given data points <span class="math inline">\(x_j\in\R^m\)</span>, <span class="math inline">\(j=1,\dots,n\)</span> (dimension <span class="math inline">\(m\)</span>, count <span class="math inline">\(n\)</span>), PCA seeks a <span class="math inline">\(k\)</span>-dimensional subspace that captures the data as well as possible — in statistics, that explains as much variance as possible. Assume the data is <strong>de-meaned</strong>, <span class="math inline">\(\frac1n\sum_i x_i=0\)</span> (always arrangeable by subtracting the mean), and collect it into the data matrix <span class="math inline">\(X=[x_1,\dots,x_n]\in\R^{m\times n}\)</span>, whose empirical covariance is <span class="math inline">\(\frac1n XX^\top\)</span>.</p>
+<p><strong>The optimization problem.</strong> A subspace is described by an orthonormal basis <span class="math inline">\(Q=[q_1,\dots,q_k]\)</span> with <span class="math inline">\(Q^\top Q=I_k\)</span> (such <span class="math inline">\(Q\)</span> is said to have <em>orthonormal columns</em>); <span class="math inline">\(P_Q=QQ^\top\)</span> projects onto it. We minimize the total squared distance of the data from the subspace, <span id="eq-7-pca-objective"><span class="math display">\[
+f(Q)\defeq\sum_{i=1}^n\ntwo{x_i-P_Qx_i}^2 .
+\tag{7.7}\]</span></span> Since <span class="math inline">\((I-QQ^\top)x_i\)</span> is the <span class="math inline">\(i\)</span>-th column of <span class="math inline">\((I-QQ^\top)X\)</span>, and the squared Frobenius norm sums the squared column norms, <span class="math display">\[
+f(Q)=\bigl\lVert X-QQ^\top X\bigr\rVert_{\mathrm F}^2 .
+\]</span></p>
+<p><strong>The solution.</strong> Let <span class="math inline">\(X=\sum_{i=1}^r\sigma_iu_iv_i^\top\)</span> be the compact SVD and <span class="math inline">\(\tilde X=\sum_{i=1}^k\sigma_iu_iv_i^\top=\tilde U\tilde\Sigma\tilde V^\top\)</span> its rank-<span class="math inline">\(k\)</span> truncation, <span class="math inline">\(\tilde U=[u_1,\dots,u_k]\)</span>. Because <span class="math inline">\(\rank(QQ^\top X)\le k\)</span>, Eckart–Young says no choice of <span class="math inline">\(Q\)</span> can push <span class="math inline">\(QQ^\top X\)</span> closer to <span class="math inline">\(X\)</span> than <span class="math inline">\(\tilde X\)</span> does; and the choice <span class="math inline">\(Q=\tilde U\)</span> <em>attains</em> it, since <span class="math display">\[
+QQ^\top X=\tilde U\tilde U^\top\sum_{i=1}^r\sigma_iu_iv_i^\top=\sum_{i=1}^k\sigma_iu_iv_i^\top=\tilde X ,
+\]</span> using <span class="math inline">\(\tilde U^\top u_i=e_i\)</span> for <span class="math inline">\(i\le k\)</span> and <span class="math inline">\(\tilde U^\top u_i=0\)</span> for <span class="math inline">\(i&gt;k\)</span>. Thus the optimal subspace is the <strong>span of the top <span class="math inline">\(k\)</span> left singular vectors of the de-meaned <span class="math inline">\(X\)</span></strong> — equivalently, the span of the dominant <span class="math inline">\(k\)</span> eigenvectors of the covariance <span class="math inline">\(\frac1n XX^\top\)</span>.</p>
+<p>For a data point <span class="math inline">\(x_j\)</span>, the coordinate <span class="math inline">\(u_i\cdot x_j\)</span> along the <span class="math inline">\(i\)</span>-th singular vector is its <span class="math inline">\(i\)</span>-th <strong>principal component</strong>; the <span class="math inline">\(j\)</span>-th column of <span class="math inline">\(Q^\top X\in\R^{k\times n}\)</span> collects the first <span class="math inline">\(k\)</span> principal components of <span class="math inline">\(x_j\)</span>. Reading <span class="math inline">\(Y=Q^\top X\)</span> as a compression <span class="math inline">\(\R^m\to\R^k\)</span>, we approximately recover the data by <span class="math inline">\(\tilde X=QY=QQ^\top X\)</span>; because <span class="math inline">\(Q\)</span> minimized <a href="#eq-7-pca-objective" class="quarto-xref">Equation&nbsp;<span>7.7</span></a>, this recovery is as faithful as any <span class="math inline">\(k\)</span>-dimensional linear compression can be.</p>
+</section>
+<section id="sec-7-subspace" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="sec-7-subspace"><span class="header-section-number">7.6</span> Subspace iteration</h2>
+<p>To capture a <span class="math inline">\(k\)</span>-dimensional dominant subspace — as PCA and clustering demand — we run the power method on a whole block of <span class="math inline">\(k\)</span> vectors at once. This is <strong>subspace iteration</strong>.</p>
+<section id="sec-7-subspace-basic" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-subspace-basic">Basic algorithm</h3>
+<p>Let <span class="math inline">\(A\in\R^{n\times n}\)</span> be diagonalizable with eigenvalues ordered by modulus and a <strong>spectral gap</strong> after the <span class="math inline">\(k\)</span>-th, <span id="eq-7-subspace-gap"><span class="math display">\[
+\abs{\lambda_1}\ge\dots\ge\abs{\lambda_k}&gt;\abs{\lambda_{k+1}}\ge\dots\ge\abs{\lambda_n},
+\tag{7.8}\]</span></span> with eigenvectors <span class="math inline">\(u_1,\dots,u_n\)</span> and <span class="math inline">\(U=[u_1,\dots,u_k]\in\R^{n\times k}\)</span> (not necessarily orthonormal, since <span class="math inline">\(A\)</span> need not be symmetric). We want the subspace <span class="math inline">\(\Span(U)\)</span>. Take a block initial guess <span class="math inline">\(W=[w_1,\dots,w_k]\in\R^{n\times k}\)</span>.</p>
+<div id="thm-7-subspace-iteration" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.3 (Subspace iteration convergence)</strong></span> For a generic initial guess <span class="math inline">\(W\in\R^{n\times k}\)</span> there is a sequence of invertible matrices <span class="math inline">\(C_l\in\R^{k\times k}\)</span> with <span class="math display">\[
+\lim_{l\to\infty}A^lWC_l=U .
+\]</span> Consequently <span class="math inline">\(\Span(A^lW)\to\Span(U)\)</span> as a subspace, even though <span class="math inline">\(A^lW\)</span> itself does not converge.</p>
+</div>
+<p>The genericity condition and the <span class="math inline">\(C_l\)</span> are exhibited in the proof (<a href="#sec-7-subspace-proof" class="quarto-xref"><span>Section 7.6.2</span></a>). Because literally forming <span class="math inline">\(A^lW\)</span> overflows or underflows, the practical algorithm reorthonormalizes the block each step — the block analogue of the power method’s normalization. Writing <span class="math inline">\(V\)</span> for an orthonormal basis of <span class="math inline">\(\Span(W)\)</span> (from Gram–Schmidt, a rectangular QR factorization <span class="math inline">\(W=VR\)</span>, or Matlab’s <code>orth</code>):</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Subspace iteration (no stopping test yet)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given a generic <span class="math inline">\(W\in\R^{n\times k}\)</span>, matvec access to <span class="math inline">\(A\)</span>, and a count <span class="math inline">\(m\)</span>. Let <span class="math inline">\(V\)</span> have orthonormal columns spanning <span class="math inline">\(\Span(W)\)</span>. For <span class="math inline">\(j=0,1,\dots,m\)</span>:</p>
+<ol type="1">
+<li><span class="math inline">\(W\leftarrow AV\)</span> (this is <span class="math inline">\(k\)</span> matvecs, one per column).</li>
+<li>Reorthonormalize: let <span class="math inline">\(V\)</span> have orthonormal columns spanning <span class="math inline">\(\Span(W)\)</span>.</li>
+</ol>
+<p>Return <span class="math inline">\(V\)</span>. For <span class="math inline">\(m\)</span> large, <span class="math inline">\(\Span(V)\approx\Span(U)\)</span>.</p>
+</div>
+</div>
+<p>Each iteration costs (1) <span class="math inline">\(k\)</span> matvecs and (2) an <span class="math inline">\(\bigO(nk^2)\)</span> orthonormalization (from counting Gram–Schmidt operations). If <span class="math inline">\(A\)</span> is sparse with <span class="math inline">\(\bigO(n)\)</span> nonzeros the matvecs cost <span class="math inline">\(\bigO(nk)\)</span>; even dense, <span class="math inline">\(\bigO(n^2k)\)</span> — against <span class="math inline">\(\bigO(n^3)\)</span> for a full diagonalization when <span class="math inline">\(k\ll n\)</span>.</p>
+</section>
+<section id="sec-7-subspace-proof" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-subspace-proof">Convergence proof</h3>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(P=[u_1,\dots,u_n]=[\,U\mid U'\,]\)</span> be the full eigenvector matrix (here <span class="math inline">\(U'=[u_{k+1},\dots,u_n]\)</span>), so <span class="math inline">\(A=P\Lambda P^{-1}\)</span> with <span class="math display">\[
+\Lambda=\begin{pmatrix}\Lambda_1&amp;0\\0&amp;\Lambda_2\end{pmatrix},
+\qquad \Lambda_1=\diag(\lambda_1,\dots,\lambda_k),\quad\Lambda_2=\diag(\lambda_{k+1},\dots,\lambda_n).
+\]</span> The gap <a href="#eq-7-subspace-gap" class="quarto-xref">Equation&nbsp;<span>7.8</span></a> makes <span class="math inline">\(\Lambda_1\)</span> invertible. Set <span class="math inline">\(Y=P^{-1}W=\binom{Y_1}{Y_2}\)</span> with <span class="math inline">\(Y_1\)</span> being <span class="math inline">\(k\times k\)</span>; the <strong>genericity condition</strong> is that <em><span class="math inline">\(Y_1\)</span> is invertible</em>. Choose <span class="math inline">\(C_l=Y_1^{-1}\Lambda_1^{-l}\)</span> (invertible). Then <span class="math display">\[
+A^lWC_l=P\Lambda^lY C_l
+=P\begin{pmatrix}\Lambda_1^lY_1\\\Lambda_2^lY_2\end{pmatrix}Y_1^{-1}\Lambda_1^{-l}
+=P\begin{pmatrix}I_k\\\Lambda_2^lY_2Y_1^{-1}\Lambda_1^{-l}\end{pmatrix}.
+\]</span> Put <span class="math inline">\(B=Y_2Y_1^{-1}\)</span>. The lower block <span class="math inline">\(M_l=\Lambda_2^lB\Lambda_1^{-l}\)</span> has entries <span class="math display">\[
+(M_l)_{ij}=\Bigl(\tfrac{\lambda_{k+i}}{\lambda_j}\Bigr)^l B_{ij},
+\qquad
+\Bigl\lvert\tfrac{\lambda_{k+i}}{\lambda_j}\Bigr\rvert\le\frac{\abs{\lambda_{k+1}}}{\abs{\lambda_k}}&lt;1 ,
+\]</span> so <span class="math inline">\(M_l\to0\)</span> geometrically. Hence <span class="math inline">\(A^lWC_l\to P\binom{I_k}{0}=[\,U\mid U'\,]\binom{I_k}{0}=U\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="sec-7-subspace-distance" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-subspace-distance">Distance between subspaces</h3>
+<p>To stop the iteration we must measure how far apart two successive subspaces are. The clean device is the Frobenius distance between their orthogonal projectors. Let <span class="math inline">\(\Span(V)\)</span> and <span class="math inline">\(\Span(\tilde V)\)</span> have orthonormal bases (<span class="math inline">\(V^\top V=\tilde V^\top\tilde V=I_k\)</span>), with projectors <span class="math inline">\(P=VV^\top\)</span> and <span class="math inline">\(Q=\tilde V\tilde V^\top\)</span>. We compute <span class="math inline">\(\norm{P-Q}_{\mathrm F}^2\)</span> using two trace facts (with <span class="math inline">\(\tr B=\sum_iB_{ii}\)</span>): <strong>Fact 1</strong>, <span class="math inline">\(\norm{A}_{\mathrm F}^2=\tr[A^\top A]=\tr[AA^\top]\)</span>; and <strong>Fact 2</strong>, the cyclic property <span class="math inline">\(\tr[BC]=\tr[CB]\)</span>.</p>
+<div id="thm-7-subspace-distance" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.4 (Projector distance between subspaces)</strong></span> If <span class="math inline">\(V,\tilde V\in\R^{n\times k}\)</span> have orthonormal columns with projectors <span class="math inline">\(P=VV^\top\)</span>, <span class="math inline">\(Q=\tilde V\tilde V^\top\)</span>, then <span class="math display">\[
+\norm{P-Q}_{\mathrm F}^2=2\Bigl(k-\norm{V^\top\tilde V}_{\mathrm F}^2\Bigr),
+\qquad
+\frac{\norm{P-Q}_{\mathrm F}}{\norm{P}_{\mathrm F}}
+=\sqrt2\,\sqrt{1-k^{-1}\norm{V^\top\tilde V}_{\mathrm F}^2}.
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By Fact 1, <span class="math inline">\(\norm{P-Q}_{\mathrm F}^2=\tr[(P-Q)^2]=\tr[PP]-\tr[QP]-\tr[PQ]+\tr[QQ]\)</span>. Projectors satisfy <span class="math inline">\(PP=P\)</span>, <span class="math inline">\(QQ=Q\)</span>, and <span class="math inline">\(\tr[QP]=\tr[PQ]\)</span> by Fact 2, so <span class="math display">\[
+\norm{P-Q}_{\mathrm F}^2=\tr[P]+\tr[Q]-2\tr[PQ]
+=\tr[VV^\top]+\tr[\tilde V\tilde V^\top]-2\tr[VV^\top\tilde V\tilde V^\top].
+\]</span> Cycling each trace (Fact 2) turns these into <span class="math inline">\(\tr[V^\top V]=\tr[I_k]=k\)</span>, likewise <span class="math inline">\(k\)</span>, and <span class="math inline">\(2\tr[(V^\top\tilde V)^\top(V^\top\tilde V)]=2\norm{V^\top\tilde V}_{\mathrm F}^2\)</span>, giving the first identity. For the second, <span class="math inline">\(\norm{P}_{\mathrm F}^2=\tr[VV^\top VV^\top]=\tr[I_k]=k\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The payoff is efficiency: the distance is read off the small <span class="math inline">\(k\times k\)</span> matrix <span class="math inline">\(V^\top\tilde V\)</span> in <span class="math inline">\(\bigO(nk^2)\)</span>, never forming the <span class="math inline">\(n\times n\)</span> projectors <span class="math inline">\(P,Q\)</span> (which would cost <span class="math inline">\(\bigO(n^2k)\)</span>).</p>
+</section>
+<section id="sec-7-subspace-full" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-subspace-full">Full pseudocode</h3>
+<p>Comparing the current basis <span class="math inline">\(V\)</span> against the next <span class="math inline">\(\tilde V\)</span> by this relative distance gives the missing stopping test.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Subspace iteration (with stopping test)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given a generic <span class="math inline">\(W\in\R^{n\times k}\)</span>, matvec access to <span class="math inline">\(A\)</span>, a count <span class="math inline">\(m\)</span>, and tolerance <span class="math inline">\(\eps\)</span>. Let <span class="math inline">\(V\)</span> have orthonormal columns spanning <span class="math inline">\(\Span(W)\)</span>. For <span class="math inline">\(j=0,1,\dots,m\)</span>:</p>
+<ol type="1">
+<li><span class="math inline">\(W\leftarrow AV\)</span>.</li>
+<li>Let <span class="math inline">\(\tilde V\)</span> have orthonormal columns spanning <span class="math inline">\(\Span(W)\)</span>.</li>
+<li><span class="math inline">\(\delta\leftarrow\sqrt2\,\sqrt{1-k^{-1}\norm{V^\top\tilde V}_{\mathrm F}^2}\)</span>.</li>
+<li><span class="math inline">\(V\leftarrow\tilde V\)</span>.</li>
+<li>If <span class="math inline">\(\delta&lt;\eps\)</span>, <strong>break</strong>.</li>
+</ol>
+<p>Return <span class="math inline">\(V\)</span>, whose span approximates <span class="math inline">\(\Span(U)\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="sec-7-rayleigh-ritz" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-rayleigh-ritz">Recovering eigenpairs via Rayleigh–Ritz</h3>
+<p>Subspace iteration returns a basis of the dominant <em>subspace</em>, not eigenpairs. Assume now <span class="math inline">\(A\)</span> is <strong>symmetric</strong>, so by the spectral theorem <span class="math inline">\(U=[u_1,\dots,u_k]\)</span> can be taken orthonormal, and suppose the iteration has converged so that the returned <span class="math inline">\(V\in\R^{n\times k}\)</span> satisfies <span class="math inline">\(\Span(V)=\Span(U)\)</span> with <span class="math inline">\(V^\top V=I_k\)</span>. Because of scaling freedom and possible repeated eigenvalues we cannot hope to recover <span class="math inline">\(U\)</span> itself; we settle for the exact dominant eigenvalues <span class="math inline">\(\lambda_1,\dots,\lambda_k\)</span> and <em>some</em> orthonormal eigenvectors <span class="math inline">\(q_1,\dots,q_k\)</span> with <span class="math inline">\(Aq_j=\lambda_jq_j\)</span>. Packaged as a matrix equation, we seek <span class="math inline">\(Q=[q_1,\dots,q_k]\)</span> with orthonormal columns and <span class="math inline">\(AQ=Q\Lambda_1\)</span>, where <span class="math inline">\(\Lambda_1=\diag(\lambda_1,\dots,\lambda_k)\)</span>.</p>
+<div id="def-7-rayleigh-ritz" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 7.2 (Rayleigh–Ritz procedure)</strong></span> Given an orthonormal basis <span class="math inline">\(V\in\R^{n\times k}\)</span> of an (approximately) invariant subspace of a symmetric <span class="math inline">\(A\)</span>:</p>
+<ol type="1">
+<li>Form the <span class="math inline">\(k\times k\)</span> symmetric matrix <span class="math inline">\(\bar A=V^\top AV\)</span> (the <strong>Rayleigh quotient</strong> of the block).</li>
+<li>Diagonalize it completely, <span class="math inline">\(\bar A=\tilde U\bar\Lambda\tilde U^\top\)</span>, with <span class="math inline">\(\tilde U\)</span> orthogonal (<span class="math inline">\(k\times k\)</span>) and <span class="math inline">\(\bar\Lambda\)</span> diagonal, entries ordered by decreasing modulus. This costs <span class="math inline">\(\bigO(k^3)\)</span>, independent of <span class="math inline">\(n\)</span>.</li>
+<li>Recover the <strong>Ritz values</strong> <span class="math inline">\(\bar\Lambda\)</span> and <strong>Ritz vectors</strong> <span class="math inline">\(Q=V\tilde U\)</span>.</li>
+</ol>
+</div>
+<p>Both outputs are exact when <span class="math inline">\(\Span(V)=\Span(U)\)</span>.</p>
+<div id="thm-7-rayleigh-ritz-correct" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.5 (Exactness of Rayleigh–Ritz)</strong></span> If <span class="math inline">\(\Span(V)=\Span(U)\)</span> for the dominant orthonormal eigenblock <span class="math inline">\(U\)</span> of a symmetric <span class="math inline">\(A\)</span>, then the Rayleigh–Ritz procedure yields <span class="math inline">\(\bar\Lambda=\Lambda_1\)</span> and <span class="math inline">\(Q=V\tilde U\)</span> satisfies <span class="math inline">\(AQ=Q\Lambda_1\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Since <span class="math inline">\(\Span(V)=\Span(U)\)</span> and both have orthonormal columns, <span class="math inline">\(V=UO\)</span> for the <span class="math inline">\(k\times k\)</span> matrix <span class="math inline">\(O=U^\top V\)</span>: indeed <span class="math inline">\(UO=UU^\top V=P_UV=V\)</span>, as <span class="math inline">\(P_U=UU^\top\)</span> projects onto <span class="math inline">\(\Span(U)\supseteq\Span(V)\)</span>. And <span class="math inline">\(O\)</span> is orthogonal, <span class="math inline">\(O^\top O=(U^\top V)^\top(U^\top V)=V^\top P_UV=V^\top V=I_k\)</span>. Now <span class="math display">\[
+\bar A=V^\top AV=(UO)^\top A(UO)=O^\top(U^\top AU)\,O=O^\top\Lambda_1 O ,
+\]</span> using <span class="math inline">\(AU=U\Lambda_1\)</span> and <span class="math inline">\(U^\top U=I_k\)</span>. Since <span class="math inline">\(O^\top\)</span> is orthogonal, <span class="math inline">\(\bar A=O^\top\Lambda_1O\)</span> <em>is</em> a diagonalization of <span class="math inline">\(\bar A\)</span> with eigenvalues <span class="math inline">\(\lambda_1,\dots,\lambda_k\)</span>; as the Ritz values <span class="math inline">\(\bar\Lambda\)</span> are ordered the same way, <span class="math inline">\(\bar\Lambda=\Lambda_1\)</span>, proving the first claim. For the second, using <span class="math inline">\(V=UO\)</span>, <span class="math inline">\(AU=U\Lambda_1\)</span>, then inserting <span class="math inline">\(I_k=OO^\top\)</span> and <span class="math inline">\(\bar A=\tilde U\bar\Lambda\tilde U^\top=O^\top\Lambda_1O\)</span>, <span class="math display">\[
+AQ=AV\tilde U=A(UO)\tilde U=U\Lambda_1O\tilde U
+=UO(O^\top\Lambda_1O)\tilde U=UO\bar A\tilde U
+=UO(\tilde U\bar\Lambda\tilde U^\top)\tilde U=UO\tilde U\bar\Lambda=(V\tilde U)\Lambda_1=Q\Lambda_1 ,
+\]</span> where the penultimate step used <span class="math inline">\(\tilde U^\top\tilde U=I_k\)</span> and <span class="math inline">\(\bar\Lambda=\Lambda_1\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+</section>
+<section id="sec-7-randsvd" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="sec-7-randsvd"><span class="header-section-number">7.7</span> Randomized SVD</h2>
+<p>Subspace iteration plus Rayleigh–Ritz computes a truncated SVD: for <span class="math inline">\(A\in\R^{m\times n}\)</span> (<span class="math inline">\(m\ge n\)</span>) the top <span class="math inline">\(k\)</span> left singular vectors are the dominant <span class="math inline">\(k\)</span> eigenvectors of <span class="math inline">\(AA^\top\)</span> (eigenvalues <span class="math inline">\(\sigma_i^2\)</span>), and the right ones are the dominant <span class="math inline">\(k\)</span> eigenvectors of <span class="math inline">\(A^\top A\)</span>. But if the gap <span class="math inline">\(\sigma_k-\sigma_{k+1}\)</span> is small, subspace iteration converges slowly. The <strong>randomized SVD</strong> sidesteps iteration entirely, paying instead a controlled approximation error tied to how fast the singular values decay.</p>
+<section id="sec-7-randsvd-toy" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-randsvd-toy">Toy problem: the exact rank-<span class="math inline">\(k\)</span> case</h3>
+<p>Suppose <span class="math inline">\(\rank(A)=k\)</span> exactly. Let <span class="math inline">\(Z=[z_1,\dots,z_k]\in\R^{n\times k}\)</span> have random columns. The vectors <span class="math inline">\(Az_1,\dots,Az_k\)</span> lie in <span class="math inline">\(\operatorname{range}(A)\)</span> and, with probability one, are independent — so they span it: <span class="math display">\[
+\Span(AZ)=\operatorname{range}(A)=\Span(U),
+\]</span> the last equality because <span class="math inline">\(A=\sum_{i=1}^k\sigma_iu_iv_i^\top\)</span> terminates at <span class="math inline">\(k\)</span>, giving <span class="math inline">\(\operatorname{range}(A)=\Span(u_1,\dots,u_k)\)</span>. So a <em>single</em> random matvec block reveals the range — no iteration. Let <span class="math inline">\(X=\operatorname{orth}(AZ)\)</span> (orthonormal columns spanning <span class="math inline">\(\Span(U)\)</span>). Applying Rayleigh–Ritz to <span class="math inline">\(AA^\top\)</span> with the subspace <span class="math inline">\(\Span(X)\)</span> recovers <span class="math inline">\(U\)</span> and <span class="math inline">\(\Sigma\)</span>: form the <span class="math inline">\(k\times k\)</span> matrix <span class="math inline">\(B=X^\top AA^\top X=(X^\top A)(X^\top A)^\top\)</span>, diagonalize <span class="math inline">\(B=\tilde U\bar\Lambda\tilde U^\top\)</span>, and set <span class="math inline">\(U=X\tilde U\)</span>, <span class="math inline">\(\Sigma=\sqrt{\bar\Lambda}\)</span>. (Here <span class="math inline">\(X\)</span> plays the role of <span class="math inline">\(V\)</span> from subspace iteration; the letter <span class="math inline">\(V\)</span> is reserved for the right singular vectors.)</p>
+<p>There is a slicker route that gets <span class="math inline">\(U\)</span>, <span class="math inline">\(\Sigma\)</span>, and <span class="math inline">\(V\)</span> in one shot. With a second random <span class="math inline">\(W=[w_1,\dots,w_k]\in\R^{m\times k}\)</span>, let <span class="math inline">\(Y=\operatorname{orth}(A^\top W)\)</span> span the row space. Since <span class="math inline">\(XX^\top A=A\)</span> (as <span class="math inline">\(XX^\top\)</span> projects onto <span class="math inline">\(\operatorname{range}(A)\)</span>) and <span class="math inline">\(AYY^\top=A\)</span> likewise, <span class="math display">\[
+A=XX^\top A=XX^\top(AYY^\top)=X(X^\top AY)Y^\top .
+\]</span> Form the small <span class="math inline">\(\bar A=X^\top AY\in\R^{k\times k}\)</span> (not symmetric) and take its <strong>full</strong> SVD <span class="math inline">\(\bar A=\tilde U\tilde\Sigma\tilde V^\top\)</span>; then <span class="math inline">\(U=X\tilde U\)</span>, <span class="math inline">\(V=Y\tilde V\)</span>, <span class="math inline">\(\Sigma=\tilde\Sigma\)</span> give the SVD of <span class="math inline">\(A\)</span>. This is consistent with the two-sided recipe: <span class="math inline">\(\bar A\bar A^\top=X^\top AA^\top X=B\)</span> and <span class="math inline">\(\bar A^\top\bar A=Y^\top A^\top AY\)</span>, so the left/right singular vectors of the tiny <span class="math inline">\(\bar A\)</span> are exactly the eigenvectors that Rayleigh–Ritz would produce.</p>
+</section>
+<section id="sec-7-randsvd-beyond" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-randsvd-beyond">Beyond rank <span class="math inline">\(k\)</span></h3>
+<p>Real matrices are seldom exactly rank <span class="math inline">\(k\)</span>. We oversample: draw <span class="math inline">\(\tilde k\ge k\)</span> random vectors <span class="math inline">\(Z\in\R^{n\times\tilde k}\)</span>, <span class="math inline">\(W\in\R^{m\times\tilde k}\)</span>, so that <span class="math inline">\(\Span(AZ)\)</span> and <span class="math inline">\(\Span(A^\top W)\)</span> merely <em>approximately</em> contain the ranges of <span class="math inline">\(A\)</span> and <span class="math inline">\(A^\top\)</span>. With <span class="math inline">\(X=\operatorname{orth}(AZ)\)</span> and <span class="math inline">\(Y=\operatorname{orth}(A^\top W)\)</span>, <span class="math display">\[
+A\approx XX^\top A\approx XX^\top AYY^\top=X\bar A Y^\top,
+\qquad \bar A=X^\top AY\in\R^{\tilde k\times\tilde k}.
+\]</span> The error is quantified by the following, which we state without proof (it is beyond the course; the one-line intuition is that oversampling makes <span class="math inline">\(\Span(AZ)\)</span> capture the dominant singular directions with high probability, and the leftover is exactly the tail energy <span class="math inline">\(\sum_{i&gt;k}\sigma_i^2\)</span>).</p>
+<div id="thm-7-randomized-svd" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 7.6 (Randomized range approximation)</strong></span> Let <span class="math inline">\(\delta&gt;0\)</span>, let <span class="math inline">\(A\in\R^{m\times n}\)</span>, and let <span class="math inline">\(X=\operatorname{orth}(AZ)\)</span> where <span class="math inline">\(Z\in\R^{n\times\tilde k}\)</span> has i.i.d. standard-normal entries. There is a universal constant <span class="math inline">\(C\)</span> such that if <span class="math inline">\(\tilde k\ge C\,(k+\log(1/\delta))\)</span>, then with probability at least <span class="math inline">\(1-\delta\)</span>, <span class="math display">\[
+\bigl\lVert (I-XX^\top)A\bigr\rVert_{\mathrm F}^2\le 2\sum_{i&gt;k}\sigma_i^2 ,
+\]</span> with <span class="math inline">\(\sigma_i\)</span> the singular values of <span class="math inline">\(A\)</span>. (The source prints the left-hand side as <span class="math inline">\(\lVert XX^\top A\rVert_{\mathrm F}\)</span>, the projector onto the range rather than the residual, and unsquared; that is a typo — such a quantity is <span class="math inline">\(\approx\lVert A\rVert_{\mathrm F}\)</span>, not small — so we state the standard residual bound.)</p>
+</div>
+<p>So if <span class="math inline">\(A\)</span> has <em>numerical rank</em> <span class="math inline">\(k\)</span> — meaning <span class="math inline">\(\sum_{i&gt;k}\sigma_i^2\)</span> is negligible — then oversampling to a small multiple of <span class="math inline">\(k\)</span> makes the randomized SVD accurate with high probability.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Randomized SVD
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given matvec access to <span class="math inline">\(A\)</span> and <span class="math inline">\(A^\top\)</span>, target rank <span class="math inline">\(k\)</span>, and oversampling <span class="math inline">\(\tilde k\ge k\)</span>:</p>
+<ol type="1">
+<li>Draw <span class="math inline">\(Z\in\R^{n\times\tilde k}\)</span>, <span class="math inline">\(W\in\R^{m\times\tilde k}\)</span> with i.i.d. standard-normal entries.</li>
+<li>Form <span class="math inline">\(AZ\)</span> and <span class="math inline">\(A^\top W\)</span>; orthonormalize their columns to get <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</li>
+<li>Form <span class="math inline">\(\bar A=X^\top AY\in\R^{\tilde k\times\tilde k}\)</span> (not symmetric) and take its full SVD <span class="math inline">\(\bar A=\tilde U\tilde\Sigma\tilde V^\top\)</span>.</li>
+<li>Recover <span class="math inline">\(\hat U=[X\tilde U]_{:,1:k}\)</span>, <span class="math inline">\(\hat V=[Y\tilde V]_{:,1:k}\)</span>, <span class="math inline">\(\hat\Sigma=[\tilde\Sigma]_{1:k,1:k}\)</span>.</li>
+</ol>
+<p>Then <span class="math inline">\(A\approx\hat U\hat\Sigma\hat V^\top\)</span> is an approximate rank-<span class="math inline">\(k\)</span> truncated SVD.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-7-spectral" class="level2" data-number="7.8">
+<h2 data-number="7.8" class="anchored" data-anchor-id="sec-7-spectral"><span class="header-section-number">7.8</span> Spectral clustering</h2>
+<p>The last application partitions a data set into clusters that need not be linearly separable — two concentric rings, say — where <span class="math inline">\(k\)</span>-means on the raw coordinates fails. The trick is to re-embed the data using eigenvectors of a graph Laplacian, after which the clusters <em>do</em> separate (<a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>).</p>
+<section id="sec-7-spectral-graph" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-spectral-graph">A weighted graph from data</h3>
+<p>Given <span class="math inline">\(x_1,\dots,x_n\in\R^m\)</span>, build a weighted graph whose edge weights measure similarity. A <strong>similarity kernel</strong> is a symmetric <span class="math inline">\(K(x,y)=K(y,x)\ge0\)</span>; the standard choice is the <strong>Gaussian kernel</strong> with width <span class="math inline">\(\sigma&gt;0\)</span>, <span id="eq-7-gaussian-kernel"><span class="math display">\[
+K(x,y)=e^{-\frac{1}{2\sigma^2}\ntwo{x-y}^2}.
+\tag{7.9}\]</span></span> It yields a symmetric <strong>weighted adjacency matrix</strong> <span class="math inline">\(A_{ij}=K(x_i,x_j)\)</span>, large when points are close.</p>
+</section>
+<section id="sec-7-spectral-laplacian" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-spectral-laplacian">Graph Laplacians</h3>
+<div id="def-7-graph-laplacian" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 7.3 (Graph Laplacian)</strong></span> For a weighted adjacency <span class="math inline">\(A\)</span> with degree matrix <span class="math inline">\(D=\diag(A\mathbf 1)\)</span> (so <span class="math inline">\(D_{ii}=\sum_j A_{ij}\)</span>), the <strong>graph Laplacian</strong> is <span class="math inline">\(L=D-A\)</span>, i.e.&nbsp;<span class="math inline">\(L_{ij}=\delta_{ij}D_{ii}-A_{ij}\)</span>. The <strong>symmetric normalized</strong> Laplacian is <span id="eq-7-norm-laplacian"><span class="math display">\[
+\hat L=D^{-1/2}LD^{-1/2}=I-D^{-1/2}AD^{-1/2},
+\qquad \hat L_{ij}=\delta_{ij}-\frac{A_{ij}}{\sqrt{D_{ii}D_{jj}}}.
+\tag{7.10}\]</span></span></p>
+</div>
+<p>The Laplacian’s structure explains its role. Its intuition comes from the <strong>left-normalized</strong> variant <span class="math inline">\(\tilde L=D^{-1}L=I-D^{-1}A\)</span>: for any <span class="math inline">\(v\)</span>, <span class="math display">\[
+[\tilde Lv]_i=v_i-\frac{\sum_j A_{ij}v_j}{\sum_j A_{ij}},
+\]</span> the difference between <span class="math inline">\(v_i\)</span> and a weighted average of its neighbors — a discrete “smoothness” operator, small on functions that vary slowly across the graph. Three facts pin down its spectrum: (<strong>1</strong>) <span class="math inline">\(L\mathbf 1=0\)</span>, so the constant vector is a null eigenvector; (<strong>2</strong>) <span class="math inline">\(L\)</span> is diagonally dominant with nonnegative diagonal; hence (<strong>3</strong>) <span class="math inline">\(L\)</span> is positive semidefinite (all eigenvalues <span class="math inline">\(\ge0\)</span>). For the normalized <span class="math inline">\(\hat L\)</span> one more fact holds.</p>
+<div id="prp-7-laplacian-spectrum" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 7.2 (Spectrum of the normalized Laplacian)</strong></span> The eigenvalues of <span class="math inline">\(\hat L=D^{-1/2}LD^{-1/2}\)</span> all lie in <span class="math inline">\([0,2]\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><span class="math inline">\(\hat L\)</span> is positive semidefinite (congruent to the PSD <span class="math inline">\(L\)</span> via <span class="math inline">\(\hat L=D^{-1/2}LD^{-1/2}\)</span>), so its eigenvalues are <span class="math inline">\(\ge0\)</span>. For the upper bound, <span class="math inline">\(\hat L\)</span> is similar to <span class="math inline">\(\tilde L=D^{-1}L\)</span> (indeed <span class="math inline">\(\tilde L=D^{-1/2}\hat LD^{1/2}\)</span>), so they share a spectrum, and <span class="math inline">\(\spec(\tilde L)\le\ninf{\tilde L}\)</span>. Each row of <span class="math inline">\(\tilde L\)</span> has <span class="math inline">\(1\)</span>-norm <span class="math display">\[
+\sum_{j}\Bigl\lvert\delta_{ij}-\tfrac{A_{ij}}{D_{ii}}\Bigr\rvert
+\le 1+\frac{1}{D_{ii}}\sum_j A_{ij}=1+\frac{D_{ii}}{D_{ii}}=2 ,
+\]</span> so <span class="math inline">\(\ninf{\tilde L}\le2\)</span> and every eigenvalue of <span class="math inline">\(\hat L\)</span> lies in <span class="math inline">\([0,2]\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="sec-7-spectral-embedding" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-spectral-embedding">Spectral embedding</h3>
+<p>A <strong>spectral embedding</strong> is a map <span class="math inline">\(\Phi:\{1,\dots,n\}\to\R^d\)</span> sending graph vertex <span class="math inline">\(i\)</span> (data point <span class="math inline">\(x_i\)</span>) to a new point <span class="math inline">\(\Phi(i)\)</span>. Let <span class="math inline">\(U=[u_1,\dots,u_d]\in\R^{n\times d}\)</span> hold the eigenvectors of the <span class="math inline">\(d\)</span> <strong>lowest</strong> eigenvalues of <span class="math inline">\(\hat L\)</span> — the smoothest graph functions, which vary slowly <em>within</em> tightly-connected clusters and so encode cluster membership. (Since we want the <em>lowest</em> eigenpairs, subspace iteration is run on <span class="math inline">\(2I-\hat L\)</span>, whose dominant eigenvectors are those of <span class="math inline">\(\hat L\)</span>’s smallest eigenvalues, valid because the eigenvalues of <span class="math inline">\(\hat L\)</span> lie in <span class="math inline">\([0,2]\)</span> by <a href="#prp-7-laplacian-spectrum" class="quarto-xref">Proposition&nbsp;<span>7.2</span></a>.) The embedding is <span class="math display">\[
+\Phi(i)=[U_{i,:}]^\top\in\R^d ,
+\]</span> the <span class="math inline">\(i\)</span>-th row of <span class="math inline">\(U\)</span>. After embedding we cluster the new data <span class="math inline">\(y_i=\Phi(i)\)</span>. Points in the same cluster map to nearby embedded points even when the original clusters interleave geometrically, which is exactly what makes the rings of <a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> pull apart.</p>
+<div id="fig-7-spectral" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-7-spectral-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/07-spectral-clustering.svg" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-spectral-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.2: Two noisy concentric rings. In data space (left) the classes wrap around each other and no straight cut separates them. After the spectral embedding (right), rows of the lowest eigenvectors of <span class="math inline">\(\hat L\)</span> place the two rings in distinct, linearly separable blobs.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-7-spectral-clustering" class="level3">
+<h3 class="anchored" data-anchor-id="sec-7-spectral-clustering">Clustering</h3>
+<p>Whether we cluster the original <span class="math inline">\(x_i\in\R^m\)</span> or the embedded <span class="math inline">\(y_i=\Phi(i)\in\R^d\)</span> — the results differ, and the embedded version is the point of spectral clustering — we partition into <span class="math inline">\(k\)</span> clusters with <span class="math inline">\(k\)</span>-means. It introduces cluster centroids <span class="math inline">\(z_1,\dots,z_k\in\R^m\)</span> and an assignment map <span class="math inline">\(c:\{1,\dots,n\}\to\{1,\dots,k\}\)</span>, minimizing <span id="eq-7-kmeans-objective"><span class="math display">\[
+F(z_1,\dots,z_k,c)=\sum_{j=1}^k\sum_{i:\,c(i)=j}\ntwo{x_i-z_j}^2
+\tag{7.11}\]</span></span> over <em>both</em> the centroids and the assignment.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — <span class="math inline">\(k\)</span>-means (Lloyd’s algorithm)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>From a random initial guess, alternate the two closed-form minimizations until the assignment stops changing:</p>
+<ol type="1">
+<li><strong>Update centroids</strong> (assignment fixed): for <span class="math inline">\(j=1,\dots,k\)</span>, <span class="math inline">\(z_j\leftarrow\dfrac{\sum_{i:\,c(i)=j}x_i}{\#\{i:c(i)=j\}}\)</span>, the mean of cluster <span class="math inline">\(j\)</span>.</li>
+<li><strong>Update assignment</strong> (centroids fixed): for <span class="math inline">\(i=1,\dots,n\)</span>, <span class="math inline">\(c(i)\leftarrow\argmin_{j=1,\dots,k}\ntwo{x_i-z_j}^2\)</span>, the nearest centroid.</li>
+</ol>
+</div>
+</div>
+<p>Each step can only decrease <a href="#eq-7-kmeans-objective" class="quarto-xref">Equation&nbsp;<span>7.11</span></a>, so Lloyd’s algorithm never increases the objective and terminates — but there is <strong>no guarantee of reaching the global optimum</strong>: it can get stuck, and random restarts are the usual remedy. Applied directly to interleaved data it fails; applied to the spectral embedding it succeeds, because the embedding has already turned “same cluster” into “nearby in <span class="math inline">\(\R^d\)</span>.”</p>
+</section>
+</section>
+<section id="chapter-summary" class="level2" data-number="7.9">
+<h2 data-number="7.9" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">7.9</span> Chapter summary</h2>
+<ul>
+<li>The <strong>power method</strong> (<a href="#thm-7-power-method" class="quarto-xref">Theorem&nbsp;<span>7.1</span></a>) finds the dominant eigenpair by normalized repeated matvecs <span class="math inline">\(u^{(k)}=A^kx/\ntwo{A^kx}\)</span>; it converges geometrically at rate <span class="math inline">\(\abs{\lambda_2/\lambda_1}\)</span> set by the spectral gap, with the eigenvalue read off the <strong>Rayleigh quotient</strong>
+<ol class="example" type="1">
+<li></li>
+</ol></li>
+<li>A <strong>Markov chain</strong> advances distributions by a stochastic matrix <span class="math inline">\(P\)</span> (<a href="#prp-7-markov-evolution" class="quarto-xref">Proposition&nbsp;<span>7.1</span></a>); its <strong>invariant distribution</strong> is the eigenvalue-<span class="math inline">\(1\)</span> dominant eigenvector, guaranteed and computable by the power method when <span class="math inline">\(P\)</span> is positive (<strong>Perron–Frobenius</strong>, <a href="#thm-7-perron-frobenius" class="quarto-xref">Theorem&nbsp;<span>7.2</span></a>).</li>
+<li><strong>PageRank</strong> is the power method on the damped chain <a href="#eq-7-pagerank-damped" class="quarto-xref">Equation&nbsp;<span>7.6</span></a>; damping makes <span class="math inline">\(P\)</span> positive so convergence is fast and no renormalization is needed.</li>
+<li><strong>PCA</strong> minimizes <a href="#eq-7-pca-objective" class="quarto-xref">Equation&nbsp;<span>7.7</span></a>; the optimal <span class="math inline">\(k\)</span>-dimensional subspace is the span of the top <span class="math inline">\(k\)</span> left singular vectors of the de-meaned data (Eckart–Young), the dominant eigenvectors of the covariance.</li>
+<li><strong>Subspace iteration</strong> (<a href="#thm-7-subspace-iteration" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a>) is the block power method with reorthonormalization; convergence is detected by the projector distance <a href="#thm-7-subspace-distance" class="quarto-xref">Theorem&nbsp;<span>7.4</span></a>, and <strong>Rayleigh–Ritz</strong>
+<ol start="2" class="example" type="1">
+<li>recovers exact eigenpairs from the converged subspace when <span class="math inline">\(A\)</span> is symmetric.</li>
+</ol></li>
+<li>The <strong>randomized SVD</strong> approximates the rank-<span class="math inline">\(k\)</span> truncated SVD from a few random matvecs, exact when <span class="math inline">\(\rank(A)=k\)</span> and accurate up to the tail <span class="math inline">\(\sum_{i&gt;k}\sigma_i^2\)</span> under oversampling (<a href="#thm-7-randomized-svd" class="quarto-xref">Theorem&nbsp;<span>7.6</span></a>).</li>
+<li><strong>Spectral clustering</strong> builds a Gaussian-kernel graph, embeds via the lowest eigenvectors of the normalized Laplacian <span class="math inline">\(\hat L\)</span> (spectrum in <span class="math inline">\([0,2]\)</span>, <a href="#prp-7-laplacian-spectrum" class="quarto-xref">Proposition&nbsp;<span>7.2</span></a>), and runs <span class="math inline">\(k\)</span>-means on the embedding to separate clusters that are inseparable in data space (<a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>).</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./06-approximation-theory.html" class="pagination-link" aria-label="Approximation Theory">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./08-nonlinear-equations.html" class="pagination-link" aria-label="Nonlinear Equations &amp; Optimization">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

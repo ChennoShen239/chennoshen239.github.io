@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+
+<title>8&nbsp; Nonlinear Equations &amp; Optimization – Numerical Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./notation.html" rel="next">
+<link href="./07-eigenvalue-problems.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./08-nonlinear-equations.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Interpolation, Quadrature &amp; ODEs (Math 128A)</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-interpolation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Polynomial Interpolation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-differentiation-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Numerical Differentiation &amp; Integration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-ivp-odes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Initial-Value Problems for ODEs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-direct-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Direct Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Numerical Linear Algebra &amp; Approximation (Math 128B)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-iterative-linear-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Iterative Methods for Linear Systems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-approximation-theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximation Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-eigenvalue-problems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-nonlinear-equations.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-8-general" id="toc-sec-8-general" class="nav-link active" data-scroll-target="#sec-8-general"><span class="header-section-number">8.1</span> General nonlinear equations</a></li>
+  <li><a href="#sec-8-fixed-point" id="toc-sec-8-fixed-point" class="nav-link" data-scroll-target="#sec-8-fixed-point"><span class="header-section-number">8.2</span> Fixed-point iteration</a>
+  <ul class="collapse">
+  <li><a href="#sec-8-fp-motivation" id="toc-sec-8-fp-motivation" class="nav-link" data-scroll-target="#sec-8-fp-motivation">From roots to fixed points</a></li>
+  <li><a href="#sec-8-banach" id="toc-sec-8-banach" class="nav-link" data-scroll-target="#sec-8-banach">The Banach fixed-point theorem</a></li>
+  <li><a href="#sec-8-contraction-test" id="toc-sec-8-contraction-test" class="nav-link" data-scroll-target="#sec-8-contraction-test">A sufficient condition for contraction</a></li>
+  <li><a href="#sec-8-gd" id="toc-sec-8-gd" class="nav-link" data-scroll-target="#sec-8-gd">Convergence of gradient descent for convex optimization</a></li>
+  </ul></li>
+  <li><a href="#sec-8-newton" id="toc-sec-8-newton" class="nav-link" data-scroll-target="#sec-8-newton"><span class="header-section-number">8.3</span> Newton’s method</a>
+  <ul class="collapse">
+  <li><a href="#sec-8-newton-algo" id="toc-sec-8-newton-algo" class="nav-link" data-scroll-target="#sec-8-newton-algo">Motivation and algorithm</a></li>
+  <li><a href="#sec-8-orders" id="toc-sec-8-orders" class="nav-link" data-scroll-target="#sec-8-orders">Orders of convergence</a></li>
+  <li><a href="#sec-8-newton-conv" id="toc-sec-8-newton-conv" class="nav-link" data-scroll-target="#sec-8-newton-conv">Local convergence of Newton’s method</a></li>
+  </ul></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">8.4</span> Chapter summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-iterative-linear-systems.html">Numerical Linear Algebra &amp; Approximation (Math 128B)</a></li><li class="breadcrumb-item"><a href="./08-nonlinear-equations.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-nonlinear" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nonlinear Equations &amp; Optimization</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ninf}[1]{\left\lVert #1 \right\rVert_{\infty}}
+\newcommand{\ntwo}[1]{\left\lVert #1 \right\rVert_{2}}
+\newcommand{\none}[1]{\left\lVert #1 \right\rVert_{1}}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\spec}{\rho}
+\newcommand{\cond}{\kappa}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\defeq}{:=}
+\]</span></p>
+</div>
+<p>Every earlier chapter that solved an equation solved a <em>linear</em> one: interpolation coefficients, spline curvatures, least-squares normal equations, and the linear systems of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a> are all <span class="math inline">\(Ax=b\)</span>. Most equations in practice are not linear, and there is no finite formula for their roots. What we have instead is <strong>iteration</strong>: start from a guess and improve it repeatedly, hoping the sequence homes in on a solution. This chapter builds two such iterations — fixed-point iteration and Newton’s method — proves when they converge, and measures <em>how fast</em>. The speed question is the reason we must be careful with the word “order”: here it means <strong>order of convergence</strong> (how the error shrinks step to step), not the order of accuracy <span class="math inline">\(\bigO(h^p)\)</span> of a discretization from <a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>. The two are different ideas and the notes never conflate them (see <a href="./notation.html">Notation</a>).</p>
+<section id="sec-8-general" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="sec-8-general"><span class="header-section-number">8.1</span> General nonlinear equations</h2>
+<p>A <strong>general system of <span class="math inline">\(n\)</span> nonlinear equations in <span class="math inline">\(n\)</span> unknowns</strong> is the problem of solving <span id="eq-8-system"><span class="math display">\[
+F(x)=0,\qquad F:\R^n\to\R^n .
+\tag{8.1}\]</span></span> It is useful to view <span class="math inline">\(F\)</span> as a stack of scalar-valued <strong>coordinate functions</strong> <span class="math inline">\(f_i:\R^n\to\R\)</span>, <span class="math display">\[
+F(x)=\begin{pmatrix} f_1(x)\\ \vdots\\ f_n(x)\end{pmatrix},
+\]</span> so that <a href="#eq-8-system" class="quarto-xref">Equation&nbsp;<span>8.1</span></a> is the simultaneous system <span class="math inline">\(f_1(x)=\dots=f_n(x)=0\)</span>. Unlike the linear case, such a system may have any number of solutions — none, one, or many — and there is no direct solver. We therefore look for <strong>iterative methods</strong> that, from an initial guess, converge to <em>some</em> solution (usually the one nearest the guess), assuming one exists.</p>
+<p>Two special cases anchor everything that follows.</p>
+<ul>
+<li><strong>Linear equations</strong> are the case <span class="math inline">\(F(x)=Ax-b\)</span>, treated at length in Chapters 4–5. Newton’s method (<a href="#sec-8-newton" class="quarto-xref"><span>Section 8.3</span></a>) will reduce a nonlinear solve to a <em>sequence</em> of linear solves, so the linear machinery is a building block, not a separate world.</li>
+<li><strong>Optimization.</strong> Minimizing (or otherwise finding critical points of) a scalar objective <span class="math inline">\(u:\R^n\to\R\)</span> means solving <span class="math inline">\(\nabla u(x)=0\)</span>, i.e.&nbsp;taking <span class="math inline">\(F=\nabla u\)</span>. The sharpest guarantees hold when <span class="math inline">\(u\)</span> is <strong>strictly convex</strong> — its Hessian <span class="math inline">\(\nabla^2 u(x)=\bigl[\partial^2 u/\partial
+x_i\partial x_j\bigr]\)</span> is positive definite for all <span class="math inline">\(x\)</span> — a case we return to in <a href="#sec-8-gd" class="quarto-xref"><span>Section 8.2.4</span></a>.</li>
+</ul>
+<p>Nonlinear systems also arise from implicit time-stepping for stiff ODEs (<a href="03-ivp-odes.html" class="quarto-xref"><span>Chapter 3</span></a>), from discretized nonlinear PDEs, and countless other settings; the two methods below are the workhorses for all of them.</p>
+</section>
+<section id="sec-8-fixed-point" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="sec-8-fixed-point"><span class="header-section-number">8.2</span> Fixed-point iteration</h2>
+<section id="sec-8-fp-motivation" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-fp-motivation">From roots to fixed points</h3>
+<div id="def-8-fixed-point" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 8.1 (Fixed point)</strong></span> Given <span class="math inline">\(G:\R^n\to\R^n\)</span>, a point <span class="math inline">\(x\)</span> is a <strong>fixed point</strong> of <span class="math inline">\(G\)</span> if <span class="math inline">\(G(x)=x\)</span>.</p>
+</div>
+<p>The idea of fixed-point iteration is to recast the root problem <span class="math inline">\(F(x)=0\)</span> as a fixed-point problem <span class="math inline">\(G(x)=x\)</span> whose solutions are <em>the same points</em>. One systematic way to build such a <span class="math inline">\(G\)</span>: pick any scalar <span class="math inline">\(\eps\neq 0\)</span> and set <span id="eq-8-fp-map"><span class="math display">\[
+G(x)\defeq x-\eps\,F(x).
+\tag{8.2}\]</span></span> Then <span class="math display">\[
+G(x)=x\iff x-\eps F(x)=x\iff \eps F(x)=0\iff F(x)=0,
+\]</span> using <span class="math inline">\(\eps\neq0\)</span> at the last step, so the fixed points of <span class="math inline">\(G\)</span> are exactly the roots of <span class="math inline">\(F\)</span>, as desired. Any nonzero <span class="math inline">\(\eps\)</span> “works” in this equivalence sense, but — crucially — different choices make the iteration below converge or diverge.</p>
+<p>Given such a <span class="math inline">\(G\)</span>, <strong>fixed-point iteration</strong> is the sequence produced by feeding each output back in as the next input: <span id="eq-8-fp-iter"><span class="math display">\[
+x^{(k+1)}=G(x^{(k)}),\qquad k=0,1,2,\dots,
+\tag{8.3}\]</span></span> from an initial guess <span class="math inline">\(x^{(0)}\in\R^n\)</span>; equivalently <span class="math inline">\(x^{(k)}=\underbrace{G\circ\cdots\circ
+G}_{k\text{ times}}(x^{(0)})\)</span>. To analyze it we assume <span class="math inline">\(G\)</span> is <strong>continuous</strong>: for every <span class="math inline">\(x\)</span> and every sequence <span class="math inline">\(x^{(k)}\to x\)</span> we have <span class="math inline">\(G(x^{(k)})\to G(x)\)</span>.</p>
+<p>The first thing to check is that if the iteration converges at all, it converges to <em>the right kind of point</em>.</p>
+<div id="prp-8-limit-is-fixed" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposition 8.1 (Limits of fixed-point iteration are fixed points)</strong></span> If <span class="math inline">\(G\)</span> is continuous and the iterates <a href="#eq-8-fp-iter" class="quarto-xref">Equation&nbsp;<span>8.3</span></a> satisfy <span class="math inline">\(x^{(k)}\to x\)</span>, then <span class="math inline">\(x\)</span> is a fixed point of <span class="math inline">\(G\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Take <span class="math inline">\(k\to\infty\)</span> in <span class="math inline">\(x^{(k+1)}=G(x^{(k)})\)</span>. The left side tends to <span class="math inline">\(x\)</span> (a convergent sequence and its shift share a limit); the right side tends to <span class="math inline">\(G(x)\)</span> by continuity of <span class="math inline">\(G\)</span>. Hence <span class="math inline">\(x=G(x)\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>This settles <em>what</em> the limit is but not <em>whether</em> one exists. That is the content of the Banach theorem.</p>
+</section>
+<section id="sec-8-banach" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-banach">The Banach fixed-point theorem</h3>
+<p>When does <a href="#eq-8-fp-iter" class="quarto-xref">Equation&nbsp;<span>8.3</span></a> converge? A clean sufficient condition is that <span class="math inline">\(G\)</span> contracts distances. Throughout, fix a norm <span class="math inline">\(\norm{\cdot}\)</span> on <span class="math inline">\(\R^n\)</span> and let <span class="math inline">\(\norm{\cdot}\)</span> also denote the induced (operator) norm on <span class="math inline">\(\R^{n\times n}\)</span>.</p>
+<div id="def-8-contraction" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 8.2 (Contraction map)</strong></span> A map <span class="math inline">\(G:\R^n\to\R^n\)</span> is a <strong>contraction</strong> with parameter <span class="math inline">\(\alpha\in[0,1)\)</span> if <span id="eq-8-contraction"><span class="math display">\[
+\norm{G(x)-G(y)}\le\alpha\,\norm{x-y}\qquad\text{for all }x,y\in\R^n .
+\tag{8.4}\]</span></span></p>
+</div>
+<p>This is exactly a Lipschitz condition with constant <span class="math inline">\(L=\alpha&lt;1\)</span>: <span class="math inline">\(G\)</span> shrinks every pair of points by at least the fixed factor <span class="math inline">\(\alpha\)</span>. The proof needs one fact from analysis. Call a sequence <span class="math inline">\(\{x^{(k)}\}\)</span> <strong>Cauchy</strong> if for every <span class="math inline">\(\eps&gt;0\)</span> there is <span class="math inline">\(K\)</span> with <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\le\eps\)</span> for all <span class="math inline">\(k,l\ge K\)</span>. The fact we use is that <strong>every Cauchy sequence in <span class="math inline">\(\R^n\)</span> converges</strong> — <span class="math inline">\(\R^n\)</span> under any norm is a complete metric space.</p>
+<div id="thm-8-banach" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.1 (Banach fixed-point theorem)</strong></span> Suppose <span class="math inline">\(G:\R^n\to\R^n\)</span> is a contraction with parameter <span class="math inline">\(\alpha\in[0,1)\)</span>. Let <span class="math inline">\(x^{(0)}\in\R^n\)</span> and define <span class="math inline">\(x^{(k+1)}=G(x^{(k)})\)</span> for <span class="math inline">\(k=0,1,2,\dots\)</span>. Then:</p>
+<ol type="1">
+<li>the sequence converges, <span class="math inline">\(x^{(k)}\to x^\star\)</span> for some <span class="math inline">\(x^\star\in\R^n\)</span>;</li>
+<li><span class="math inline">\(x^\star\)</span> is the <strong>unique</strong> fixed point of <span class="math inline">\(G\)</span> in <span class="math inline">\(\R^n\)</span>; and</li>
+<li>the error obeys <span id="eq-8-banach-error"><span class="math display">\[
+\norm{x^{(k)}-x^\star}\le\frac{\alpha^{k}}{1-\alpha}\,\norm{x^{(1)}-x^{(0)}}.
+\tag{8.5}\]</span></span></li>
+</ol>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><strong>Step 1: the iterates are Cauchy.</strong> For <span class="math inline">\(k\le l\)</span>, telescoping and the triangle inequality give <span class="math display">\[
+\norm{x^{(k)}-x^{(l)}}=\Bigl\|\textstyle\sum_{i=k}^{l-1}\bigl(x^{(i)}-x^{(i+1)}\bigr)\Bigr\|
+\le\sum_{i=k}^{l-1}\norm{x^{(i)}-x^{(i+1)}}.
+\]</span> We bound each term. First note the <span class="math inline">\(j\)</span>-fold composite <span class="math inline">\(G^{j}\)</span> is itself a contraction with parameter <span class="math inline">\(\alpha^{j}\)</span>: by induction, for <span class="math inline">\(j\ge1\)</span>, <span class="math display">\[
+\norm{G^{j}(x)-G^{j}(y)}=\norm{G\bigl(G^{j-1}(x)\bigr)-G\bigl(G^{j-1}(y)\bigr)}
+\le\alpha\,\norm{G^{j-1}(x)-G^{j-1}(y)}\le\cdots\le\alpha^{j}\norm{x-y}.
+\]</span> Since <span class="math inline">\(x^{(i)}=G^{i}(x^{(0)})\)</span> and <span class="math inline">\(x^{(i+1)}=G^{i}(x^{(1)})\)</span>, this yields <span class="math display">\[
+\norm{x^{(i)}-x^{(i+1)}}=\norm{G^{i}(x^{(0)})-G^{i}(x^{(1)})}\le\alpha^{i}\norm{x^{(0)}-x^{(1)}}.
+\]</span> Summing the geometric series and extending it to infinity, <span class="math display">\[
+\norm{x^{(k)}-x^{(l)}}\le\Bigl(\sum_{i=k}^{l-1}\alpha^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
+\le\Bigl(\sum_{i=k}^{\infty}\alpha^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
+=\frac{\alpha^{k}}{1-\alpha}\,\norm{x^{(0)}-x^{(1)}}.
+\tag{$\star$}
+\]</span> The right side does not depend on <span class="math inline">\(l\)</span> and, since <span class="math inline">\(\alpha\in[0,1)\)</span>, tends to <span class="math inline">\(0\)</span> as <span class="math inline">\(k\to\infty\)</span>. Hence the sequence is Cauchy.</p>
+<p><strong>Step 2: convergence, uniqueness, and the bound.</strong> Being Cauchy in the complete space <span class="math inline">\(\R^n\)</span>, the sequence has a limit <span class="math inline">\(x^\star=\lim_k x^{(k)}\)</span>. A contraction is continuous, so by <a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a> the limit is a fixed point. It is the only one: if <span class="math inline">\(x^\star\)</span> and <span class="math inline">\(y^\star\)</span> were both fixed, then <span class="math inline">\(\norm{x^\star-y^\star}=\norm{G(x^\star)-G(y^\star)}\le\alpha\norm{x^\star-y^\star}\)</span>, and since <span class="math inline">\(\alpha&lt;1\)</span> this forces <span class="math inline">\(\norm{x^\star-y^\star}=0\)</span>. Finally, hold <span class="math inline">\(k\)</span> fixed in <span class="math inline">\((\star)\)</span> and let <span class="math inline">\(l\to\infty\)</span>; because the norm is continuous, <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\to\norm{x^{(k)}-x^\star}\)</span>, giving 1. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The theorem does more than guarantee convergence: 1 is a <strong>rate</strong>. The error decays geometrically, like <span class="math inline">\(\alpha^{k}\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Linear convergence, in words
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Because <span class="math inline">\(\log\norm{x^{(k)}-x^\star}\)</span> falls linearly in <span class="math inline">\(k\)</span> with slope <span class="math inline">\(\log\alpha&lt;0\)</span>, numerical analysts call the geometric decay of 1 <strong>linear convergence</strong> — this is the <span class="math inline">\(q=1\)</span> case of <a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a> below. One reading: each new correct digit (a <span class="math inline">\(10\times\)</span> error reduction) costs about the <em>same</em> number of iterations as the previous one. Newton’s method will do dramatically better, with <em>superlinear</em> convergence in which each new digit gets cheaper.</p>
+</div>
+</div>
+</section>
+<section id="sec-8-contraction-test" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-contraction-test">A sufficient condition for contraction</h3>
+<p>Verifying <a href="#eq-8-contraction" class="quarto-xref">Equation&nbsp;<span>8.4</span></a> directly is awkward. A checkable condition uses first partial derivatives through the <strong>Jacobian</strong>.</p>
+<div id="def-8-jacobian" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 8.3 (Jacobian)</strong></span> For <span class="math inline">\(G:\R^n\to\R^n\)</span> with coordinate functions <span class="math inline">\(g_1,\dots,g_n\)</span>, the <strong>Jacobian</strong> <span class="math inline">\(DG(x)\)</span> is the <span class="math inline">\(n\times n\)</span> matrix-valued function <span class="math display">\[
+[DG(x)]_{ij}=\pdiff{g_i}{x_j}(x).
+\]</span></p>
+</div>
+<div id="thm-8-contraction-jacobian" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.2 (Jacobian bound implies contraction)</strong></span> If there is <span class="math inline">\(\alpha\in[0,1)\)</span> with <span class="math inline">\(\norm{DG(x)}\le\alpha\)</span> for all <span class="math inline">\(x\in\R^n\)</span> (induced norm matching the vector norm), then <span class="math inline">\(G\)</span> is a contraction with parameter <span class="math inline">\(\alpha\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(x,y\)</span> and connect them by the segment <span class="math inline">\(z(t)=(1-t)x+ty\)</span>, <span class="math inline">\(t\in[0,1]\)</span>, so <span class="math inline">\(z(0)=x\)</span>, <span class="math inline">\(z(1)=y\)</span>, and <span class="math inline">\(z'(t)=y-x\)</span>. By the fundamental theorem of calculus and the chain rule, <span class="math display">\[
+G(y)-G(x)=\int_0^1\diff{}{t}G(z(t))\,\dd t=\int_0^1 DG(z(t))\,[y-x]\,\dd t.
+\]</span> Taking norms and passing the triangle inequality through the integral, <span class="math display">\[
+\norm{G(y)-G(x)}\le\int_0^1\norm{DG(z(t))\,[y-x]}\,\dd t
+\le\int_0^1\norm{DG(z(t))}\,\norm{y-x}\,\dd t
+\le\int_0^1\alpha\,\norm{y-x}\,\dd t=\alpha\,\norm{y-x},
+\]</span> using <span class="math inline">\(\norm{Mv}\le\norm{M}\norm{v}\)</span> and the hypothesis <span class="math inline">\(\norm{DG(z(t))}\le\alpha\)</span> along the segment. <span class="math inline">\(\square\)</span></p>
+</div>
+</section>
+<section id="sec-8-gd" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-gd">Convergence of gradient descent for convex optimization</h3>
+<p>Return to minimizing <span class="math inline">\(u:\R^n\to\R\)</span>, i.e.&nbsp;solving <span class="math inline">\(F(x)=\nabla u(x)=0\)</span>. The fixed-point map <a href="#eq-8-fp-map" class="quarto-xref">Equation&nbsp;<span>8.2</span></a> with <span class="math inline">\(G(x)=x-\eps\nabla u(x)\)</span> gives the update <span id="eq-8-gd"><span class="math display">\[
+x^{(k+1)}=x^{(k)}-\eps\,\nabla u(x^{(k)}),
+\tag{8.6}\]</span></span> which is <strong>gradient descent</strong> with <strong>step size</strong> <span class="math inline">\(\eps&gt;0\)</span>. We now use the contraction test to pin down when it converges and how fast.</p>
+<div id="def-8-strictly-convex" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 8.4 (Strictly convex function)</strong></span> <span class="math inline">\(u\in C^2(\R^n)\)</span> is <strong>strictly convex</strong> if its Hessian <span class="math inline">\(\nabla^2 u(x)=\bigl[\partial^2 u/\partial
+x_i\partial x_j\bigr]\)</span> is positive definite for all <span class="math inline">\(x\)</span>.</p>
+</div>
+<p>The <span class="math inline">\(C^2\)</span> assumption makes the Hessian exist and be symmetric (mixed partials commute). Strict convexity is equivalent to all eigenvalues of <span class="math inline">\(\nabla^2 u(x)\)</span> being positive, and any critical point of a strictly convex <span class="math inline">\(u\)</span> is its unique global minimizer. For a quantitative rate we assume a uniform two-sided eigenvalue bound.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Standing assumption (strong convexity + Lipschitz gradient)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>There exist constants <span class="math inline">\(0&lt;c\le C\)</span> such that for all <span class="math inline">\(x\)</span> the eigenvalues of <span class="math inline">\(\nabla^2 u(x)\)</span> lie in <span class="math inline">\([c,C]\)</span>. The lower bound <span class="math inline">\(c&gt;0\)</span> is strong convexity; the upper bound <span class="math inline">\(C\)</span> makes <span class="math inline">\(\nabla u\)</span> Lipschitz. The ratio <span class="math inline">\(C/c\)</span> acts as a <strong>condition number</strong> for the problem — it is the <span class="math inline">\(2\)</span>-norm condition number <span class="math inline">\(\cond_2\)</span> (<a href="04-direct-linear-systems.html#def-4-cond" class="quarto-xref">Definition&nbsp;<span>4.6</span></a>) of a positive-definite Hessian, the ratio of its largest to smallest eigenvalue — and it governs the speed below.</p>
+</div>
+</div>
+<div id="thm-8-gd" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.3 (Gradient descent converges linearly)</strong></span> Under the standing assumption, gradient descent <a href="#eq-8-gd" class="quarto-xref">Equation&nbsp;<span>8.6</span></a> with step size <span class="math inline">\(\eps=1/C\)</span> converges to the unique global minimizer <span class="math inline">\(x^\star\)</span> of <span class="math inline">\(u\)</span>. Moreover <span class="math inline">\(G(x)=x-\tfrac1C\nabla u(x)\)</span> is a contraction with parameter <span class="math inline">\(\alpha=1-c/C\)</span>, so by <a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a> <span id="eq-8-gd-error"><span class="math display">\[
+\ntwo{x^{(k)}-x^\star}\le\Bigl(1-\frac{c}{C}\Bigr)^{k}\frac{C}{c}\,\ntwo{x^{(1)}-x^{(0)}}.
+\tag{8.7}\]</span></span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By <a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a> it suffices to bound <span class="math inline">\(\ntwo{DG(x)}\)</span>. Differentiating <span class="math inline">\(G(x)=x-\tfrac1C\nabla u(x)\)</span> gives <span class="math display">\[
+DG(x)=I_n-\frac1C\,\nabla^2 u(x).
+\]</span> If <span class="math inline">\(\lambda\)</span> is an eigenvalue of <span class="math inline">\(\nabla^2 u(x)\)</span>, then <span class="math inline">\(1-\lambda/C\)</span> is the corresponding eigenvalue of <span class="math inline">\(DG(x)\)</span>. Since <span class="math inline">\(c\le\lambda\le C\)</span>, we get <span class="math inline">\(c/C\le\lambda/C\le1\)</span>, hence every eigenvalue of <span class="math inline">\(DG(x)\)</span> lies in <span class="math inline">\([\,0,\,1-c/C\,]\)</span>. Now <span class="math inline">\(DG(x)\)</span> is symmetric (as <span class="math inline">\(\nabla^2 u\)</span> is), so its <span class="math inline">\(2\)</span>-norm equals its spectral radius (<a href="05-iterative-linear-systems.html#def-5-spectral-radius" class="quarto-xref">Definition&nbsp;<span>5.4</span></a>), <span class="math display">\[
+\ntwo{DG(x)}=\spec(DG(x))=\max_i\abs{\lambda_i(DG(x))}=1-\frac{c}{C},
+\]</span> because the eigenvalues sit in <span class="math inline">\([0,1-c/C]\)</span> with <span class="math inline">\(0\le1-c/C&lt;1\)</span>. Thus <span class="math inline">\(\ntwo{DG(x)}\le\alpha\)</span> with <span class="math inline">\(\alpha=1-c/C\in[0,1)\)</span>, so <span class="math inline">\(G\)</span> is a contraction and <a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a> applies; <a href="#eq-8-gd-error" class="quarto-xref">Equation&nbsp;<span>8.7</span></a> is 1 with <span class="math inline">\(1/(1-\alpha)=C/c\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>If the condition number <span class="math inline">\(C/c\)</span> is large, then <span class="math inline">\(\alpha=1-c/C\)</span> is close to <span class="math inline">\(1\)</span> and convergence is slow — the ill-conditioned case in <a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>. This is the fundamental limitation of plain gradient descent, and the motivation for the second-derivative method of the next section.</p>
+</section>
+</section>
+<section id="sec-8-newton" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="sec-8-newton"><span class="header-section-number">8.3</span> Newton’s method</h2>
+<section id="sec-8-newton-algo" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-newton-algo">Motivation and algorithm</h3>
+<p>Gradient descent uses only first-order information and pays for it with a condition-number-limited linear rate. <strong>Newton’s method</strong> uses the derivative of <span class="math inline">\(F\)</span> itself. The idea is to alternate two steps: <strong>linearize</strong> the equations near the current guess, then <strong>solve</strong> the linear system for the next guess.</p>
+<p>Near a guess <span class="math inline">\(x^{(k)}\)</span>, the first-order multivariate Taylor expansion is <span class="math display">\[
+F(x)\approx F(x^{(k)})+DF(x^{(k)})\,(x-x^{(k)}),
+\]</span> with <span class="math inline">\(DF\)</span> the Jacobian of <span class="math inline">\(F\)</span> (<a href="#def-8-jacobian" class="quarto-xref">Definition&nbsp;<span>8.3</span></a>). Replacing <span class="math inline">\(F\)</span> by this linearization in <span class="math inline">\(F(x)=0\)</span> gives the linear system <span class="math inline">\(0=F(x^{(k)})+DF(x^{(k)})(x-x^{(k)})\)</span>; solving it (when <span class="math inline">\(DF(x^{(k)})\)</span> is invertible) and calling the solution <span class="math inline">\(x^{(k+1)}\)</span> yields <strong>Newton’s method</strong>: <span id="eq-8-newton"><span class="math display">\[
+x^{(k+1)}=x^{(k)}-DF(x^{(k)})^{-1}F(x^{(k)}).
+\tag{8.8}\]</span></span> In the scalar case <span class="math inline">\(n=1\)</span> this is the familiar <span class="math display">\[
+x^{(k+1)}=x^{(k)}-\frac{F(x^{(k)})}{F'(x^{(k)})}.
+\]</span> For optimization, <span class="math inline">\(F=\nabla u\)</span> has Jacobian <span class="math inline">\(DF=\nabla^2 u\)</span>, so Newton’s method minimizes <span class="math inline">\(u\)</span> via <span class="math display">\[
+x^{(k+1)}=x^{(k)}-\nabla^2 u(x^{(k)})^{-1}\nabla u(x^{(k)}),
+\]</span> which for <span class="math inline">\(n=1\)</span> reads <span class="math inline">\(x^{(k+1)}=x^{(k)}-u'(x^{(k)})/u''(x^{(k)})\)</span>.</p>
+<p>In practice one never forms the inverse <span class="math inline">\(DF(x^{(k)})^{-1}\)</span> — that is an <span class="math inline">\(\bigO(n^3)\)</span>, potentially unstable, and wasteful operation. Instead, compute the <strong>Newton step</strong> <span class="math inline">\(y\)</span> as the solution of a linear system, exactly the <span class="math inline">\(Ax=b\)</span> problem of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm — Newton’s method
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given <span class="math inline">\(x^{(0)}\)</span> and a maximum count <span class="math inline">\(m\)</span> (or a stopping tolerance):</p>
+<ul>
+<li>set <span class="math inline">\(x\leftarrow x^{(0)}\)</span>;</li>
+<li>for <span class="math inline">\(i=1,\dots,m\)</span> (or until convergence):
+<ol type="1">
+<li>assemble <span class="math inline">\(A\leftarrow DF(x)\)</span> and <span class="math inline">\(b\leftarrow F(x)\)</span>;</li>
+<li>solve the linear system <span class="math inline">\(A\,y=b\)</span> for the step <span class="math inline">\(y\)</span> (LU with partial pivoting, <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>);</li>
+<li>update <span class="math inline">\(x\leftarrow x-y\)</span>;</li>
+<li>optionally stop when <span class="math inline">\(\norm{y}\)</span> or <span class="math inline">\(\norm{F(x)}\)</span> falls below the tolerance.</li>
+</ol></li>
+</ul>
+</div>
+</div>
+<p>Each Newton iteration thus costs one Jacobian evaluation and one linear solve. What buys back that per-step cost is the convergence <em>order</em>, which we define next.</p>
+</section>
+<section id="sec-8-orders" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-orders">Orders of convergence</h3>
+<p>Before analyzing Newton’s method we make precise how fast an iteration converges. This is the “order of convergence” sense of the word <em>order</em>, distinct from the order of accuracy of a discretization.</p>
+<div id="def-8-order-convergence" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 8.5 (Order of convergence)</strong></span> Let an iterative method produce <span class="math inline">\(x^{(k)}\to x^\star\)</span>. The method has <strong>order of convergence</strong> <span class="math inline">\(q\)</span> (a positive integer) with <strong>rate</strong> <span class="math inline">\(M&gt;0\)</span> if <span class="math display">\[
+\frac{\norm{x^{(k+1)}-x^\star}}{\norm{x^{(k)}-x^\star}^{q}}\le M
+\qquad\Longleftrightarrow\qquad
+\norm{x^{(k+1)}-x^\star}\le M\,\norm{x^{(k)}-x^\star}^{q}
+\tag{$*$}
+\]</span> holds for all <span class="math inline">\(k\)</span>. The case <span class="math inline">\(q=1\)</span> is <strong>linear convergence</strong>, <span class="math inline">\(q&gt;1\)</span> is <strong>superlinear convergence</strong>, and <span class="math inline">\(q=2\)</span> is <strong>quadratic convergence</strong>.</p>
+</div>
+<p>The two regimes behave qualitatively differently.</p>
+<ul>
+<li><strong>Linear (<span class="math inline">\(q=1\)</span>).</strong> Here <span class="math inline">\((*)\)</span> reads <span class="math inline">\(\norm{x^{(k+1)}-x^\star}\le M\norm{x^{(k)}-x^\star}\)</span>, and we need <span class="math inline">\(M&lt;1\)</span> for it to force convergence — no matter how close <span class="math inline">\(x^{(0)}\)</span> starts. So <span class="math inline">\(M&lt;1\)</span> is an implicit requirement when <span class="math inline">\(q=1\)</span> (as with <span class="math inline">\(\alpha\)</span> in <a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>).</li>
+<li><strong>Superlinear (<span class="math inline">\(q&gt;1\)</span>).</strong> Now <span class="math inline">\(M&lt;1\)</span> is <em>not</em> needed: as long as <span class="math inline">\(x^{(0)}\)</span> is close enough to <span class="math inline">\(x^\star\)</span>, inequality <span class="math inline">\((*)\)</span> alone drives the error to zero. In practice a method may crawl at first and only reach its superlinear regime once the iterate enters a neighborhood of <span class="math inline">\(x^\star\)</span>; the definition captures this <strong>asymptotic</strong> behavior.</li>
+</ul>
+<p>The next theorem quantifies just how fast superlinear convergence is: the error decays doubly exponentially, like <span class="math inline">\(e^{-\alpha q^{k}}\)</span>.</p>
+<div id="thm-8-superlinear" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.4 (Superlinear convergence is doubly exponential)</strong></span> Suppose an iteration satisfies <span class="math inline">\((*)\)</span> with <span class="math inline">\(q&gt;1\)</span>. If the initial error obeys <span class="math inline">\(\norm{x^{(0)}-x^\star}\le M^{-1/(q-1)}\)</span>, then the method converges, and there exist constants <span class="math inline">\(\alpha,C&gt;0\)</span> with <span id="eq-8-superlinear"><span class="math display">\[
+\norm{x^{(k)}-x^\star}\le C\,e^{-\alpha q^{k}} .
+\tag{8.9}\]</span></span> In fact one may take <span class="math inline">\(C=M^{-1/(q-1)}\)</span> and <span class="math inline">\(\alpha=-\log\!\bigl(M^{1/(q-1)}\norm{x^{(0)}-x^\star}\bigr)\)</span> (with <span class="math inline">\(\alpha&gt;0\)</span> requiring the strict inequality <span class="math inline">\(\norm{x^{(0)}-x^\star}&lt;M^{-1/(q-1)}\)</span>).</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Write <span class="math inline">\(E_k=\norm{x^{(k)}-x^\star}\)</span>, so <span class="math inline">\((*)\)</span> is <span class="math inline">\(E_{k+1}\le M E_k^{q}\)</span>. Taking logs, <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\)</span> with <span class="math inline">\(b=\log M\)</span>. Define the linear recursion <span class="math inline">\(a_0=\log E_0\)</span>, <span class="math inline">\(a_{k+1}=b+q\,a_k\)</span>; by induction <span class="math inline">\(\log E_k\le a_k\)</span> for all <span class="math inline">\(k\)</span> (the step is <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\le b+q a_k=a_{k+1}\)</span>). Solving the recursion, <span class="math display">\[
+a_k=q^{k}a_0+b\sum_{j=0}^{k-1}q^{j}=q^{k}a_0+b\,\frac{q^{k}-1}{q-1}
+=q^{k}\Bigl(a_0+\frac{b}{q-1}\Bigr)-\frac{b}{q-1}.
+\]</span> Set <span class="math inline">\(\alpha\defeq-\bigl(a_0+\tfrac{b}{q-1}\bigr)\)</span>. With <span class="math inline">\(a_0=\log E_0\)</span> and <span class="math inline">\(b=\log M\)</span>, the condition <span class="math inline">\(\alpha&gt;0\)</span> is <span class="math inline">\(\log\!\bigl(E_0 M^{1/(q-1)}\bigr)&lt;0\)</span>, i.e.&nbsp;<span class="math inline">\(E_0&lt;M^{-1/(q-1)}\)</span> — the hypothesis. Then <span class="math inline">\(\log E_k\le a_k=-\alpha q^{k}-\tfrac{b}{q-1}\)</span>, and exponentiating gives <span class="math inline">\(E_k\le C e^{-\alpha q^{k}}\)</span> with <span class="math inline">\(C=e^{-b/(q-1)}=M^{-1/(q-1)}\)</span>. Since <span class="math inline">\(\alpha&gt;0\)</span> and <span class="math inline">\(q&gt;1\)</span>, the exponent <span class="math inline">\(-\alpha q^{k}\to-\infty\)</span>, so <span class="math inline">\(E_k\to0\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>The contrast is stark: linear convergence adds a <em>fixed</em> number of digits per step, while quadratic convergence roughly <em>doubles</em> the number of correct digits each step. <a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> shows both on a log scale, where linear convergence is a straight line and quadratic convergence bends sharply downward.</p>
+<div id="fig-8-convergence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-8-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/08-convergence.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-8-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.1: Error versus iteration count on a logarithmic scale. Linear convergence (<a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>) plots as a straight line whose slope is set by <span class="math inline">\(\alpha\)</span>; a large condition number pushes <span class="math inline">\(\alpha\)</span> toward <span class="math inline">\(1\)</span> and flattens the line. Quadratic convergence (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>) curves ever more steeply — each step roughly squares the error.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-8-newton-conv" class="level3">
+<h3 class="anchored" data-anchor-id="sec-8-newton-conv">Local convergence of Newton’s method</h3>
+<p>We can now state and prove that Newton’s method converges quadratically, provided we start close enough and the Jacobian is nonsingular at the root.</p>
+<div id="thm-8-newton" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 8.5 (Local quadratic convergence of Newton’s method)</strong></span> Suppose the coordinate functions of <span class="math inline">\(F:\R^n\to\R^n\)</span> are all twice continuously differentiable. Let <span class="math inline">\(x^\star\)</span> solve <span class="math inline">\(F(x)=0\)</span> and suppose <span class="math inline">\(DF(x^\star)\)</span> is invertible. Then for any initial guess <span class="math inline">\(x^{(0)}\)</span> sufficiently close to <span class="math inline">\(x^\star\)</span>, Newton’s method <a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.8</span></a> converges <strong>quadratically</strong> to <span class="math inline">\(x^\star\)</span>.</p>
+</div>
+<p>The invertibility hypothesis is a <strong>nondegeneracy</strong> condition: in the scalar case it is <span class="math inline">\(F'(x^\star)\neq0\)</span> (the root is simple), and for optimization (<span class="math inline">\(F=\nabla u\)</span>) it says <span class="math inline">\(\nabla^2
+u(x^\star)\)</span> is positive definite — the minimizer is not “flat” in any direction. Where it fails, Newton’s method loses its quadratic rate.</p>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>We prove the scalar case <span class="math inline">\(n=1\)</span>; the general case is identical in spirit using multivariate Taylor expansion and matrix norms. Since <span class="math inline">\(F'(x^\star)\neq0\)</span> and <span class="math inline">\(F'\)</span> is continuous (<span class="math inline">\(F\in C^2\)</span>), there are <span class="math inline">\(\eps&gt;0\)</span> and <span class="math inline">\(\delta&gt;0\)</span> with <span class="math inline">\(\abs{F'(x)}\ge\eps\)</span> on <span class="math inline">\(I\defeq(x^\star-\delta,x^\star+\delta)\)</span>; and <span class="math inline">\(F''\)</span> is continuous, hence bounded, <span class="math inline">\(\abs{F''(x)}\le C\)</span> on <span class="math inline">\(I\)</span>. Put <span class="math inline">\(M\defeq C/(2\eps)\)</span> and assume <span class="math inline">\(x^{(0)}\)</span> close enough that <span class="math inline">\(E_0=\abs{x^{(0)}-x^\star}\le\min\{\delta,1/M\}\)</span>, so <span class="math inline">\(x^{(0)}\in I\)</span>.</p>
+<p>Assume inductively <span class="math inline">\(x^{(k)}\in I\)</span>. Expand <span class="math inline">\(F\)</span> about <span class="math inline">\(x^{(k)}\)</span> to first order with Lagrange remainder and evaluate at <span class="math inline">\(x^\star\)</span>: <span class="math display">\[
+F(x^\star)=F(x^{(k)})+F'(x^{(k)})\bigl(x^\star-x^{(k)}\bigr)
++\tfrac12 F''(\xi^{(k)})\bigl(x^\star-x^{(k)}\bigr)^2,
+\]</span> for some <span class="math inline">\(\xi^{(k)}\)</span> between <span class="math inline">\(x^\star\)</span> and <span class="math inline">\(x^{(k)}\)</span>, so <span class="math inline">\(\xi^{(k)}\in I\)</span>. Since <span class="math inline">\(F(x^\star)=0\)</span> and <span class="math inline">\(F'(x^{(k)})\neq0\)</span>, divide by <span class="math inline">\(F'(x^{(k)})\)</span> and rearrange: <span class="math display">\[
+-\frac{\tfrac12 F''(\xi^{(k)})(x^\star-x^{(k)})^2}{F'(x^{(k)})}
+=\frac{F(x^{(k)})}{F'(x^{(k)})}+\bigl(x^\star-x^{(k)}\bigr)
+=x^\star-\Bigl[x^{(k)}-\frac{F(x^{(k)})}{F'(x^{(k)})}\Bigr]
+=x^\star-x^{(k+1)},
+\]</span> recognizing the Newton update <a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.8</span></a> in the bracket. Taking absolute values and using <span class="math inline">\(\abs{F''(\xi^{(k)})}\le C\)</span>, <span class="math inline">\(\abs{F'(x^{(k)})}\ge\eps\)</span>, <span class="math display">\[
+\abs{x^{(k+1)}-x^\star}\le\frac{C}{2\eps}\,\abs{x^{(k)}-x^\star}^2=M\,\abs{x^{(k)}-x^\star}^2,
+\]</span> which is <span class="math inline">\((*)\)</span> with <span class="math inline">\(q=2\)</span>. Moreover <span class="math inline">\(E_{k+1}\le M E_k^2=(M E_k)E_k\le(M E_0)E_k\le E_k\)</span>, so the error is nonincreasing and <span class="math inline">\(x^{(k+1)}\in I\)</span>, closing the induction. With <span class="math inline">\((*)\)</span> holding for all <span class="math inline">\(k\)</span> and <span class="math inline">\(q=2&gt;1\)</span>, <a href="#thm-8-superlinear" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a> gives convergence, and the order is quadratic. <span class="math inline">\(\square\)</span></p>
+</div>
+<p>Quadratic convergence is the payoff for Newton’s per-step cost: near the root, a handful of iterations reach machine precision, in contrast to the many steps a linearly convergent method spends per digit. The price is locality (a poor initial guess may diverge) and the need for the Jacobian and a linear solve each step — trade-offs addressed by globalization strategies and <strong>quasi-Newton</strong> methods (which approximate <span class="math inline">\(DF\)</span> from successive function values), and by the broader optimization toolkit of Lagrangian duality, augmented-Lagrangian/ADMM splitting, and the like, beyond our scope here.</p>
+</section>
+</section>
+<section id="chapter-summary" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">8.4</span> Chapter summary</h2>
+<ul>
+<li>A <strong>nonlinear system</strong> <span class="math inline">\(F(x)=0\)</span> with <span class="math inline">\(F:\R^n\to\R^n\)</span> (<a href="#eq-8-system" class="quarto-xref">Equation&nbsp;<span>8.1</span></a>) has no direct solver; we iterate from a guess. Optimization is the special case <span class="math inline">\(F=\nabla u\)</span>, best-behaved when <span class="math inline">\(u\)</span> is strictly convex (<a href="#def-8-strictly-convex" class="quarto-xref">Definition&nbsp;<span>8.4</span></a>).</li>
+<li><strong>Fixed-point iteration</strong> <span class="math inline">\(x^{(k+1)}=G(x^{(k)})\)</span> recasts roots of <span class="math inline">\(F\)</span> as fixed points of <span class="math inline">\(G(x)=x-\eps F(x)\)</span> (<a href="#def-8-fixed-point" class="quarto-xref">Definition&nbsp;<span>8.1</span></a>); a convergent iteration lands on a fixed point (<a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a>).</li>
+<li>The <strong>Banach fixed-point theorem</strong> (<a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>): a contraction (<a href="#def-8-contraction" class="quarto-xref">Definition&nbsp;<span>8.2</span></a>) has a unique fixed point, the iteration converges to it, and the error decays like <span class="math inline">\(\alpha^k\)</span>
+<ol class="example" type="1">
+<li>— <strong>linear convergence</strong>. A checkable sufficient condition is <span class="math inline">\(\norm{DG(x)}\le\alpha&lt;1\)</span> (<a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a>).</li>
+</ol></li>
+<li><strong>Gradient descent</strong> <span class="math inline">\(x^{(k+1)}=x^{(k)}-\tfrac1C\nabla u(x^{(k)})\)</span> is a contraction with parameter <span class="math inline">\(1-c/C\)</span> (<a href="#thm-8-gd" class="quarto-xref">Theorem&nbsp;<span>8.3</span></a>); the condition number <span class="math inline">\(C/c\)</span> sets the rate, and a large one makes it slow.</li>
+<li><strong>Newton’s method</strong> (<a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.8</span></a>) linearizes <span class="math inline">\(F\)</span> and solves the linear system <span class="math inline">\(DF(x)\,y=F(x)\)</span> each step. It converges <strong>quadratically</strong> near a root where <span class="math inline">\(DF(x^\star)\)</span> is invertible (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>).</li>
+<li><strong>Order of convergence</strong> <span class="math inline">\(q\)</span> (<a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>): <span class="math inline">\(q=1\)</span> linear (needs rate <span class="math inline">\(M&lt;1\)</span>), <span class="math inline">\(q=2\)</span> quadratic; for <span class="math inline">\(q&gt;1\)</span> the error falls doubly exponentially, <span class="math inline">\(\bigO(e^{-\alpha q^{k}})\)</span> (<a href="#thm-8-superlinear" class="quarto-xref">Theorem&nbsp;<span>8.4</span></a>), so each step roughly doubles the correct digits (<a href="#fig-8-convergence" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>).</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./07-eigenvalue-problems.html" class="pagination-link" aria-label="Eigenvalue Problems">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Eigenvalue Problems</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./notation.html" class="pagination-link" aria-label="Notation">
+        <span class="nav-page-text">Notation</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes. Part II reconstructs M. Lindsey’s <em>Math 128B</em> lecture notes (UC Berkeley, 2025); all rights in the original course materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
