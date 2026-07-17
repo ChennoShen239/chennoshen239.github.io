@@ -245,7 +245,10 @@ window.Quarto = {
    
   <ul>
   <li><a href="#well-posedness-when-does-a-solution-exist-and-depend-stably-on-data" id="toc-well-posedness-when-does-a-solution-exist-and-depend-stably-on-data" class="nav-link active" data-scroll-target="#well-posedness-when-does-a-solution-exist-and-depend-stably-on-data"><span class="header-section-number">3.1</span> Well-posedness: when does a solution exist and depend stably on data?</a></li>
-  <li><a href="#eulers-method-and-its-error" id="toc-eulers-method-and-its-error" class="nav-link" data-scroll-target="#eulers-method-and-its-error"><span class="header-section-number">3.2</span> Euler’s method and its error</a></li>
+  <li><a href="#eulers-method-and-its-error" id="toc-eulers-method-and-its-error" class="nav-link" data-scroll-target="#eulers-method-and-its-error"><span class="header-section-number">3.2</span> Euler’s method and its error</a>
+  <ul class="collapse">
+  <li><a href="#sec-3-euler-example" id="toc-sec-3-euler-example" class="nav-link" data-scroll-target="#sec-3-euler-example">Euler versus RK4 on the running example</a></li>
+  </ul></li>
   <li><a href="#local-truncation-error-and-consistency" id="toc-local-truncation-error-and-consistency" class="nav-link" data-scroll-target="#local-truncation-error-and-consistency"><span class="header-section-number">3.3</span> Local truncation error and consistency</a></li>
   <li><a href="#taylor-methods-higher-order-by-more-derivatives" id="toc-taylor-methods-higher-order-by-more-derivatives" class="nav-link" data-scroll-target="#taylor-methods-higher-order-by-more-derivatives"><span class="header-section-number">3.4</span> Taylor methods: higher order by more derivatives</a>
   <ul class="collapse">
@@ -264,7 +267,8 @@ window.Quarto = {
   <li><a href="#sec-3-lotka" id="toc-sec-3-lotka" class="nav-link" data-scroll-target="#sec-3-lotka">Application: the predator-prey model</a></li>
   </ul></li>
   <li><a href="#stiff-equations-and-implicit-methods" id="toc-stiff-equations-and-implicit-methods" class="nav-link" data-scroll-target="#stiff-equations-and-implicit-methods"><span class="header-section-number">3.9</span> Stiff equations and implicit methods</a></li>
-  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">3.10</span> Chapter summary</a></li>
+  <li><a href="#methods-at-a-glance" id="toc-methods-at-a-glance" class="nav-link" data-scroll-target="#methods-at-a-glance"><span class="header-section-number">3.10</span> Methods at a glance</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">3.11</span> Chapter summary</a></li>
   </ul>
 </nav>
     </div>
@@ -377,7 +381,17 @@ w_{j+1}=w_j+h\,f(t_j,w_j).
 \tag{3.2}\]</span></span> Each step costs a single evaluation of <span class="math inline">\(f\)</span>.</p>
 </div>
 </div>
-<p>Geometrically we follow the slope field’s tangent for one step of length <span class="math inline">\(h\)</span>, then re-read the slope and repeat. The error accumulates, but in a controlled way.</p>
+<p>Geometrically we follow the slope field’s tangent for one step of length <span class="math inline">\(h\)</span>, then re-read the slope and repeat. Each step starts from the already-imperfect <span class="math inline">\(w_j\)</span>, not from the true <span class="math inline">\(y(t_j)\)</span>, so it re-tangents to a <em>shifted</em> flow line and the polyline drifts off the exact curve; the error accumulates, but in a controlled way (see <a href="#fig-3-euler-tangent" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>).</p>
+<div id="fig-3-euler-tangent" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-euler-tangent-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/03-euler-tangent.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-euler-tangent-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Euler on the running example <span class="math inline">\(y'=y-t^2+1\)</span>, <span class="math inline">\(y(0)=0.5\)</span>, with a deliberately coarse <span class="math inline">\(h=0.5\)</span>. Light arrows show the slope field; the black curve is the exact solution. Each Euler segment (red) is tangent to the field at its left endpoint, but because it departs from the previous, already-wrong iterate, it re-tangents to a lower flow line and the gap <span class="math inline">\(|y(t_j)-w_j|\)</span> (blue dashes) widens step by step, exactly the <span class="math inline">\(\bigO(h)\)</span> accumulation the bound below predicts.
+</figcaption>
+</figure>
+</div>
 <div id="thm-3-euler-conv" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 3.3 (Euler convergence bound)</strong></span> Let <span class="math inline">\(f\)</span> be continuous and Lipschitz in <span class="math inline">\(y\)</span> with constant <span class="math inline">\(L\)</span> on <span class="math inline">\([a,b]\times\R\)</span>, and let <span class="math inline">\(y\in
 C^2[a,b]\)</span> solve <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> with <span class="math inline">\(M=\max_{t\in[a,b]}\abs{y''(t)}\)</span>. Then the Euler iterates <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> satisfy, for each <span class="math inline">\(j\)</span>, <span id="eq-3-euler-bound"><span class="math display">\[
@@ -410,6 +424,82 @@ h_{\mathrm{opt}}=\sqrt{\frac{2\delta}{M}}=\bigO(\sqrt\delta),
 \]</span> below which finite precision makes the answer <em>worse</em>, not better.</p>
 </div>
 </div>
+<section id="sec-3-euler-example" class="level3">
+<h3 class="anchored" data-anchor-id="sec-3-euler-example">Euler versus RK4 on the running example</h3>
+<p>To make the order gap concrete, march the running case <span class="math inline">\(y'=y-t^2+1\)</span>, <span class="math inline">\(y(0)=0.5\)</span> on <span class="math inline">\([0,2]\)</span> with <span class="math inline">\(h=0.2\)</span>, using both Euler <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> and RK4 <a href="#eq-3-rk4" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> (<a href="#thm-3-rk4" class="quarto-xref">Theorem&nbsp;<span>3.5</span></a>, four evaluations per step), against the exact <span class="math inline">\(y(t)=(t+1)^2-\tfrac12 e^{t}\)</span> (<a href="#tbl-3-euler-rk4" class="quarto-xref">Table&nbsp;<span>3.1</span></a>). Euler’s first step reproduces the value cited in <a href="#sec-3-taylor-example" class="quarto-xref"><span>Section 3.4.1</span></a>, <span class="math inline">\(w_1=0.5+0.2(0.5-0+1)=0.8\)</span>.</p>
+<div id="tbl-3-euler-rk4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-euler-rk4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.1: Euler and RK4 on <span class="math inline">\(y'=y-t^2+1\)</span>, <span class="math inline">\(y(0)=0.5\)</span> with <span class="math inline">\(h=0.2\)</span>. Euler’s error grows to <span class="math inline">\(\approx0.44\)</span> by <span class="math inline">\(t=2\)</span>; RK4, at the same step, holds it near <span class="math inline">\(10^{-4}\)</span>, roughly four thousand times smaller, the visible payoff of fourth versus first order.
+</figcaption>
+<div aria-describedby="tbl-3-euler-rk4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 18%">
+<col style="width: 15%">
+<col style="width: 22%">
+<col style="width: 18%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(t_j\)</span></th>
+<th style="text-align: center;">Euler <span class="math inline">\(w_j\)</span></th>
+<th style="text-align: center;">RK4 <span class="math inline">\(w_j\)</span></th>
+<th style="text-align: center;">exact <span class="math inline">\(y(t_j)\)</span></th>
+<th style="text-align: center;">Euler error</th>
+<th style="text-align: center;">RK4 error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">\(0.2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.800000\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.829293\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.829299\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2.9\times10^{-2}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(5.3\times10^{-6}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">\(0.4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.152000\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.214076\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.214088\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(6.2\times10^{-2}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.1\times10^{-5}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">\(1.0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2.458176\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2.640823\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2.640859\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.8\times10^{-1}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3.6\times10^{-5}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">\(1.6\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3.950128\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4.283410\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4.283484\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(3.3\times10^{-1}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(7.4\times10^{-5}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">\(2.0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4.865784\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(5.305363\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(5.305472\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4.4\times10^{-1}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.1\times10^{-4}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The Euler column drifts steadily below the exact solution (the sign of the <span class="math inline">\(\bigO(h)\)</span> tangent lag of <a href="#fig-3-euler-tangent" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>), while RK4 tracks it to four or five digits throughout. This is the same accuracy-per-step story the convergence plot <a href="#fig-3-convergence" class="quarto-xref">Figure&nbsp;<span>3.2</span></a> makes across a range of <span class="math inline">\(h\)</span>.</p>
+</section>
 </section>
 <section id="local-truncation-error-and-consistency" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="local-truncation-error-and-consistency"><span class="header-section-number">3.3</span> Local truncation error and consistency</h2>
@@ -427,7 +517,7 @@ h_{\mathrm{opt}}=\sqrt{\frac{2\delta}{M}}=\bigO(\sqrt\delta),
 </div>
 <p>Consistency alone is not convergence, but for one-step methods it is nearly the whole story. If in addition <span class="math inline">\(\phi\)</span> is Lipschitz in <span class="math inline">\(w\)</span> (uniformly in <span class="math inline">\(h\)</span> on <span class="math inline">\(0&lt;h&lt;h_0\)</span>), then the method is <strong>stable</strong>, and the global error inherits the local one: <span class="math display">\[
 \abs{y(t_j)-w_j}\le\frac{\tau(h)}{L}\,e^{L(t_j-a)},\qquad \tau(h)\defeq\max_j\abs{\tau_{j+1}(h)} .
-\]</span> Thus <strong>consistency plus stability implies convergence</strong> (the Lax equivalence principle for ODEs), and for one-step methods stability is automatic once <span class="math inline">\(\phi\)</span> is Lipschitz, exactly the Euler proof, now abstracted. As an illustration, the modified-Euler slope <span class="math inline">\(\phi(t,w,h)=\tfrac12\bigl[f(t,w)+f(t+h,w+hf(t,w))\bigr]\)</span> is Lipschitz in <span class="math inline">\(w\)</span> with constant <span class="math inline">\(L=\widehat L+\tfrac12 h\widehat L^2\)</span> whenever <span class="math inline">\(\abs{\pdiff{f}{y}}\le\widehat L\)</span>, so it too is convergent.</p>
+\]</span> This is the same estimate as the Euler bound <a href="#eq-3-euler-bound" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>, merely loosened: dropping the <span class="math inline">\(-1\)</span> in the factor <span class="math inline">\((e^{L(t_j-a)}-1)\)</span> and writing <span class="math inline">\(\tau(h)\)</span> for <span class="math inline">\(\tfrac{hM}{2}\)</span> trades the sharp constant for a form that holds for any consistent one-step method, so the two do not disagree. Thus <strong>consistency plus stability implies convergence</strong> (the Lax equivalence principle for ODEs), and for one-step methods stability is automatic once <span class="math inline">\(\phi\)</span> is Lipschitz, exactly the Euler proof, now abstracted. As an illustration, the modified-Euler slope <span class="math inline">\(\phi(t,w,h)=\tfrac12\bigl[f(t,w)+f(t+h,w+hf(t,w))\bigr]\)</span> is Lipschitz in <span class="math inline">\(w\)</span> with constant <span class="math inline">\(L=\widehat L+\tfrac12 h\widehat L^2\)</span> whenever <span class="math inline">\(\abs{\pdiff{f}{y}}\le\widehat L\)</span>, so it too is convergent. This slope is exactly <strong>Heun’s method</strong>, a sibling of the midpoint scheme <a href="#eq-3-rk2" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>: both are second-order Runge-Kutta formulas, differing only in where they sample the second slope, so the illustration here is not a one-off but a preview of the next section.</p>
 </section>
 <section id="taylor-methods-higher-order-by-more-derivatives" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="taylor-methods-higher-order-by-more-derivatives"><span class="header-section-number">3.4</span> Taylor methods: higher order by more derivatives</h2>
@@ -487,6 +577,17 @@ w_{j+1}=w_j+\frac{h}{6}\bigl(k_1+2k_2+2k_3+k_4\bigr).
 \tag{3.9}\]</span></span> The method uses four evaluations of <span class="math inline">\(f\)</span> per step and its LTE is <span class="math inline">\(\bigO(h^4)\)</span>.</p>
 </div>
 <p>The update is a weighted Simpson-like average of four slopes: one at the left endpoint, two probes at the midpoint, and one at the right endpoint, with the midpoint slopes weighted double. Matching the order-<span class="math inline">\(4\)</span> Taylor expansion term by term fixes the weights <span class="math inline">\(\tfrac16(1,2,2,1)\)</span> and the nodes; the derivation is the same two-variable-Taylor bookkeeping as <a href="#thm-3-rk2" class="quarto-xref">Theorem&nbsp;<span>3.4</span></a> carried to fourth order, which we do not repeat. RK4’s accuracy per evaluation makes it the default one-step solver and the initializer for the multistep methods below.</p>
+<p>The three orders are visible at a glance in <a href="#fig-3-convergence" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>: a log-log plot of the global error at <span class="math inline">\(t=2\)</span> against <span class="math inline">\(h\)</span> turns each method’s order into the slope of its point cloud, <span class="math inline">\(1\)</span> for Euler, <span class="math inline">\(2\)</span> for the midpoint method, <span class="math inline">\(4\)</span> for RK4, and the huge vertical gap between the clouds is exactly the accuracy-per-work advantage the text keeps asserting.</p>
+<div id="fig-3-convergence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/03-convergence.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: Global error <span class="math inline">\(|y(2)-w_N|\)</span> versus step size <span class="math inline">\(h\)</span> for the running example, on log-log axes. Euler, the midpoint RK2, and RK4 line up parallel to the reference slopes <span class="math inline">\(1\)</span>, <span class="math inline">\(2\)</span>, <span class="math inline">\(4\)</span> (dotted): halving <span class="math inline">\(h\)</span> divides the error by <span class="math inline">\(2\)</span>, <span class="math inline">\(4\)</span>, <span class="math inline">\(16\)</span> respectively. At any fixed <span class="math inline">\(h\)</span> RK4 is orders of magnitude more accurate, which is why it is the default.
+</figcaption>
+</figure>
+</div>
 </section>
 <section id="adaptive-step-size-control" class="level2" data-number="3.6">
 <h2 data-number="3.6" class="anchored" data-anchor-id="adaptive-step-size-control"><span class="header-section-number">3.6</span> Adaptive step-size control</h2>
@@ -623,14 +724,14 @@ L\norm{\mathbf u-\mathbf z}\)</span>, again implied by bounded partials <span cl
 x'&amp;=\alpha x-\beta xy,\\
 y'&amp;=-\gamma y+\delta xy .
 \end{aligned}
-\tag{3.18}\]</span></span> Prey grow exponentially when alone (<span class="math inline">\(\alpha x\)</span>) but are eaten on encounter (<span class="math inline">\(-\beta xy\)</span>); predators starve without prey (<span class="math inline">\(-\gamma y\)</span>) but thrive on encounter (<span class="math inline">\(+\delta xy\)</span>). This is a coupled nonlinear system with no elementary solution, a natural target for RK4. Solving <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> and plotting <span class="math inline">\(y\)</span> against <span class="math inline">\(x\)</span> traces the <strong>phase portrait</strong> (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>): the trajectories are closed loops circling the coexistence equilibrium <span class="math inline">\((\gamma/\delta,\ \alpha/\beta)\)</span>, the mathematical signature of the perpetual boom-and-bust cycle of the two populations.</p>
+\tag{3.18}\]</span></span> Prey grow exponentially when alone (<span class="math inline">\(\alpha x\)</span>) but are eaten on encounter (<span class="math inline">\(-\beta xy\)</span>); predators starve without prey (<span class="math inline">\(-\gamma y\)</span>) but thrive on encounter (<span class="math inline">\(+\delta xy\)</span>). This is a coupled nonlinear system with no elementary solution, a natural target for RK4. Solving <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> and plotting <span class="math inline">\(y\)</span> against <span class="math inline">\(x\)</span> traces the <strong>phase portrait</strong> (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.3</span></a>): the trajectories are closed loops circling the coexistence equilibrium <span class="math inline">\((\gamma/\delta,\ \alpha/\beta)\)</span>, the mathematical signature of the perpetual boom-and-bust cycle of the two populations.</p>
 <div id="fig-3-lotka" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-3-lotka-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/03-lotka.svg" class="img-fluid figure-img" style="width:72.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-lotka-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.1: Phase portrait of the Lotka-Volterra system <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> (<span class="math inline">\(\alpha=\gamma=1,\ \beta=0.01,\ \delta=0.02\)</span>), integrated with RK4 from three initial states. Each orbit is a closed loop around the equilibrium (red): predator and prey populations oscillate indefinitely, larger initial imbalances giving larger swings.
+Figure&nbsp;3.3: Phase portrait of the Lotka-Volterra system <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> (<span class="math inline">\(\alpha=\gamma=1,\ \beta=0.01,\ \delta=0.02\)</span>), integrated with RK4 from three initial states. Each orbit is a closed loop around the equilibrium (red): predator and prey populations oscillate indefinitely, larger initial imbalances giving larger swings.
 </figcaption>
 </figure>
 </div>
@@ -641,20 +742,35 @@ Figure&nbsp;3.1: Phase portrait of the Lotka-Volterra system <a href="#eq-3-lotk
 <p>Some problems force explicit methods to take absurdly small steps not for accuracy but for <strong>stability</strong>. The diagnostic is the linear test equation <span id="eq-3-test"><span class="math display">\[
 \diff{y}{t}=\lambda y,\qquad y(0)=\alpha,\qquad \lambda&lt;0,
 \tag{3.19}\]</span></span> whose solution <span class="math inline">\(y(t)=\alpha e^{\lambda t}\)</span> decays to <span class="math inline">\(0\)</span>. Its Lipschitz constant is <span class="math inline">\(L=\abs\lambda\)</span>, which can be enormous even as the solution vanishes, the hallmark of <strong>stiffness</strong>: widely separated time scales, a fast-decaying transient riding on slow dynamics.</p>
+<p>The scalar test isolates one time scale; genuine stiffness lives in systems that carry several at once. A minimal example is the diagonal <span class="math inline">\(2\times2\)</span> linear system <span class="math display">\[
+\mathbf u'=\begin{pmatrix}-1&amp;0\\0&amp;-1000\end{pmatrix}\mathbf u,
+\qquad
+\mathbf u(t)=\bigl(c_1 e^{-t},\ c_2 e^{-1000t}\bigr),
+\]</span> whose eigenvalues <span class="math inline">\(-1\)</span> and <span class="math inline">\(-1000\)</span> differ by three orders of magnitude. The <span class="math inline">\(e^{-1000t}\)</span> mode is dead by <span class="math inline">\(t\approx0.005\)</span>, after which the solution is essentially the slow <span class="math inline">\(e^{-t}\)</span> mode, yet an explicit method must keep <span class="math inline">\(h&lt;2/1000\)</span> for the whole run to stay stable against the long-vanished fast mode: stability, not accuracy, dictates the step. (A general system is stiff when its Jacobian has eigenvalues with widely separated negative real parts, exactly this ratio.)</p>
 <p>Apply Euler <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a>: <span class="math inline">\(w_{j+1}=(1+\lambda h)w_j\)</span>, so <span class="math inline">\(w_j=(1+\lambda h)^j\alpha\)</span>. A round-off error <span class="math inline">\(\delta\)</span> in <span class="math inline">\(w_0\)</span> propagates as <span class="math inline">\((1+\lambda h)^j\delta\)</span>, so the computed solution stays bounded (is <strong>absolutely stable</strong>) only when <span class="math display">\[
 \abs{1+\lambda h}&lt;1,\qquad\text{i.e.}\qquad -2&lt;\lambda h&lt;0 .
-\]</span> For <span class="math inline">\(\lambda=-10^6\)</span> this demands <span class="math inline">\(h&lt;2\times10^{-6}\)</span> throughout, long after the transient is dead: the step is dictated by stability, not accuracy. Implicit methods break this tyranny. The <strong>implicit trapezoid</strong> (the Adams-Moulton rule <a href="#eq-3-am1" class="quarto-xref">Equation&nbsp;<span>3.14</span></a>) applied to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a> gives <span class="math display">\[
+\]</span> For <span class="math inline">\(\lambda=-10^6\)</span> this demands <span class="math inline">\(h&lt;2\times10^{-6}\)</span> throughout, long after the transient is dead: the step is dictated by stability, not accuracy. Cross the limit and the failure is spectacular: with <span class="math inline">\(\lambda=-50\)</span> and <span class="math inline">\(h=0.05\)</span>, so <span class="math inline">\(\lambda h=-2.5&lt;-2\)</span>, the Euler factor <span class="math inline">\(1+\lambda h=-1.5\)</span> has <span class="math inline">\(\abs{1+\lambda h}&gt;1\)</span> and the iterates oscillate with <em>growing</em> amplitude while the true solution quietly decays to zero (<a href="#fig-3-stiff-blowup" class="quarto-xref">Figure&nbsp;<span>3.4</span></a>). Implicit methods break this tyranny. The <strong>implicit trapezoid</strong> (the Adams-Moulton rule <a href="#eq-3-am1" class="quarto-xref">Equation&nbsp;<span>3.14</span></a>) applied to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a> gives <span class="math display">\[
 w_{j+1}=w_j+\tfrac{\lambda h}{2}(w_{j+1}+w_j)
 \ \Longrightarrow\
 w_j=\left(\frac{1+\lambda h/2}{1-\lambda h/2}\right)^{\!j}\alpha,
-\]</span> and the amplification factor satisfies <span class="math inline">\(\bigl\lvert\frac{1+\lambda h/2}{1-\lambda h/2}\bigr\rvert&lt;1\)</span> for <em>every</em> <span class="math inline">\(\lambda h\)</span> with <span class="math inline">\(\operatorname{Re}(\lambda h)&lt;0\)</span>. The method is stable for all step sizes: <span class="math inline">\(h\)</span> can be chosen purely for accuracy (<a href="#fig-3-stability" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>). This unconditional stability is what makes implicit methods indispensable for stiff systems.</p>
+\]</span> and the amplification factor satisfies <span class="math inline">\(\bigl\lvert\frac{1+\lambda h/2}{1-\lambda h/2}\bigr\rvert&lt;1\)</span> for <em>every</em> <span class="math inline">\(\lambda h\)</span> with <span class="math inline">\(\operatorname{Re}(\lambda h)&lt;0\)</span>. The method is stable for all step sizes: <span class="math inline">\(h\)</span> can be chosen purely for accuracy (<a href="#fig-3-stability" class="quarto-xref">Figure&nbsp;<span>3.5</span></a>). This unconditional stability is what makes implicit methods indispensable for stiff systems.</p>
+<div id="fig-3-stiff-blowup" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-stiff-blowup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/03-stiff-blowup.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-stiff-blowup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.4: Forward Euler versus the implicit trapezoid on <span class="math inline">\(y'=\lambda y\)</span> with <span class="math inline">\(\lambda=-50\)</span> and step <span class="math inline">\(h=0.05\)</span>, just past Euler’s stability limit (<span class="math inline">\(\lambda h=-2.5&lt;-2\)</span>). The exact solution <span class="math inline">\(e^{\lambda t}\)</span> (black) decays to zero; the trapezoid (blue squares) follows it down, but Euler (red) oscillates with amplitude growing like <span class="math inline">\(\abs{1+\lambda h}^{\,j}=1.5^{\,j}\)</span> and diverges. This is the concrete catastrophe behind the <span class="math inline">\(-2&lt;\lambda h&lt;0\)</span> condition.
+</figcaption>
+</figure>
+</div>
 <div id="fig-3-stability" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-3-stability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/03-stability.svg" class="img-fluid figure-img" style="width:72.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-stability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.2: Amplification factor <span class="math inline">\(\abs{R(z)}\)</span> on the test equation <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a> as a function of <span class="math inline">\(z=\lambda h&lt;0\)</span>. Forward Euler (<span class="math inline">\(\abs{1+z}\)</span>, red) leaves the stable band <span class="math inline">\(\abs R&lt;1\)</span> once <span class="math inline">\(z&lt;-2\)</span> and then blows up; the implicit trapezoid (blue) tracks the true decay <span class="math inline">\(e^z\)</span> and stays stable for all <span class="math inline">\(z&lt;0\)</span>.
+Figure&nbsp;3.5: Amplification factor <span class="math inline">\(\abs{R(z)}\)</span> on the test equation <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a> as a function of <span class="math inline">\(z=\lambda h&lt;0\)</span>. Forward Euler (<span class="math inline">\(\abs{1+z}\)</span>, red) leaves the stable band <span class="math inline">\(\abs R&lt;1\)</span> once <span class="math inline">\(z&lt;-2\)</span> and then blows up; the implicit trapezoid (blue) tracks the true decay <span class="math inline">\(e^z\)</span> and stays stable for all <span class="math inline">\(z&lt;0\)</span>.
 </figcaption>
 </figure>
 </div>
@@ -665,8 +781,107 @@ w_{j+1}^{(\ell+1)}=w_{j+1}^{(\ell)}-\frac{w_{j+1}^{(\ell)}-w_j-\tfrac h2\bigl(f(
 {1-\tfrac h2\,\pdiff{f}{y}(t_{j+1},w_{j+1}^{(\ell)})} ,
 \]</span> which converges quadratically in a few iterations. The extra Newton solves per step are a small price for stability that decouples <span class="math inline">\(h\)</span> from <span class="math inline">\(\abs\lambda\)</span> entirely, on a stiff problem the implicit trapezoid is dramatically more reliable, and cheaper overall, than any explicit method.</p>
 </section>
-<section id="chapter-summary" class="level2" data-number="3.10">
-<h2 data-number="3.10" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">3.10</span> Chapter summary</h2>
+<section id="methods-at-a-glance" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="methods-at-a-glance"><span class="header-section-number">3.10</span> Methods at a glance</h2>
+<p>The accuracy-versus-work trade is scattered across the sections above; <a href="#tbl-3-methods" class="quarto-xref">Table&nbsp;<span>3.2</span></a> collects it. The pattern is uniform: higher order costs more evaluations of <span class="math inline">\(f\)</span> per step (Runge-Kutta) or more history and a restart penalty (multistep), and stability for all step sizes is bought only by going implicit, paying a solve per step.</p>
+<div id="tbl-3-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.2: One-glance comparison of the chapter’s methods. “<span class="math inline">\(f\)</span>-evals/step” counts new evaluations of <span class="math inline">\(f\)</span>; Taylor also needs hand-coded derivatives. Implicit rows add a per-step equation solve (Newton or a predictor-corrector sweep). “Self-starting” means no external method is needed to supply prior points.
+</figcaption>
+<div aria-describedby="tbl-3-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 19%">
+<col style="width: 23%">
+<col style="width: 19%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: center;">Order</th>
+<th style="text-align: center;"><span class="math inline">\(f\)</span>-evals/step</th>
+<th style="text-align: center;">Explicit/Implicit</th>
+<th style="text-align: center;">Self-starting?</th>
+<th style="text-align: left;">Stability note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Euler <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: center;">Explicit</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: left;">conditional: <span class="math inline">\(-2&lt;\lambda h&lt;0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Taylor-<span class="math inline">\(n\)</span> <a href="#eq-3-taylor" class="quarto-xref">Equation&nbsp;<span>3.5</span></a></td>
+<td style="text-align: center;"><span class="math inline">\(n\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span> (+ <span class="math inline">\(n-1\)</span> derivs)</td>
+<td style="text-align: center;">Explicit</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: left;">conditional</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RK2 midpoint <a href="#eq-3-rk2" class="quarto-xref">Equation&nbsp;<span>3.7</span></a></td>
+<td style="text-align: center;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: center;">Explicit</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: left;">conditional, bounded region</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RK4 <a href="#eq-3-rk4" class="quarto-xref">Equation&nbsp;<span>3.9</span></a></td>
+<td style="text-align: center;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: center;">Explicit</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: left;">conditional, bounded region</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AB4 <a href="#eq-3-ab4" class="quarto-xref">Equation&nbsp;<span>3.15</span></a></td>
+<td style="text-align: center;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: center;">Explicit</td>
+<td style="text-align: center;">No (RK4 start)</td>
+<td style="text-align: left;">conditional, small region</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AM4 <a href="#eq-3-am4" class="quarto-xref">Equation&nbsp;<span>3.16</span></a></td>
+<td style="text-align: center;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span> + solve</td>
+<td style="text-align: center;">Implicit</td>
+<td style="text-align: center;">No (RK4 start)</td>
+<td style="text-align: left;">conditional, larger region</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Adams4PC</td>
+<td style="text-align: center;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: center;">Explicit</td>
+<td style="text-align: center;">No (RK4 start)</td>
+<td style="text-align: left;">conditional</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Implicit trapezoid <a href="#eq-3-am1" class="quarto-xref">Equation&nbsp;<span>3.14</span></a></td>
+<td style="text-align: center;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span> + solve</td>
+<td style="text-align: center;">Implicit</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: left;">A-stable, all <span class="math inline">\(h&lt;\infty\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="chapter-summary" class="level2" data-number="3.11">
+<h2 data-number="3.11" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">3.11</span> Chapter summary</h2>
 <ul>
 <li>The IVP <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> is <strong>well-posed</strong> (unique solution, stable under perturbation) whenever <span class="math inline">\(f\)</span> is continuous and <strong>Lipschitz</strong> in <span class="math inline">\(y\)</span> (<a href="#def-3-lipschitz" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>, <a href="#thm-3-wellposed" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>); on a convex domain a bound <span class="math inline">\(\lvert\pdiff{f}{y}\rvert\le L\)</span> suffices (<a href="#thm-3-lipschitz-bound" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a>).</li>
 <li><strong>Euler’s method</strong> <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> is first order with global error <span class="math inline">\(\le\tfrac{hM}{2L}(e^{L(t_j-a)}-1)\)</span> (<a href="#thm-3-euler-conv" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a>); round-off puts a floor on accuracy at <span class="math inline">\(h_{\mathrm{opt}}=\bigO(\sqrt\delta)\)</span>.</li>
@@ -677,8 +892,8 @@ w_{j+1}^{(\ell+1)}=w_{j+1}^{(\ell)}-\frac{w_{j+1}^{(\ell)}-w_j-\tfrac h2\bigl(f(
 <li><strong>Runge-Kutta</strong> methods hit high order using only evaluations of <span class="math inline">\(f\)</span>: midpoint (<a href="#thm-3-rk2" class="quarto-xref">Theorem&nbsp;<span>3.4</span></a>), RK3 <a href="#eq-3-rk3" class="quarto-xref">Equation&nbsp;<span>3.8</span></a>, and the classical <strong>RK4</strong> <a href="#eq-3-rk4" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> (<a href="#thm-3-rk4" class="quarto-xref">Theorem&nbsp;<span>3.5</span></a>), the default one-step solver.</li>
 <li><strong>Adaptive control</strong> estimates the LTE by differencing two orders (<a href="#eq-3-lte-estimate" class="quarto-xref">Equation&nbsp;<span>3.10</span></a>) and rescales the step by <a href="#eq-3-stepsize" class="quarto-xref">Equation&nbsp;<span>3.11</span></a>; <strong>RKF45</strong> realizes this with an embedded 4–5 pair.</li>
 <li><strong>Multistep</strong> Adams methods reuse past slopes (one evaluation/step): explicit <strong>Adams-Bashforth</strong> <a href="#eq-3-ab4" class="quarto-xref">Equation&nbsp;<span>3.15</span></a> and implicit <strong>Adams-Moulton</strong> <a href="#eq-3-am4" class="quarto-xref">Equation&nbsp;<span>3.16</span></a>, with LTE constants <span class="math inline">\(\tfrac{251}{720}\)</span> and <span class="math inline">\(-\tfrac{19}{720}\)</span>; the <strong>predictor-corrector</strong> Adams4PC pairs them and self-estimates its error. Stability requires the <strong>root condition</strong> (<a href="#def-3-root-condition" class="quarto-xref">Definition&nbsp;<span>3.6</span></a>, <a href="#thm-3-dahlquist" class="quarto-xref">Theorem&nbsp;<span>3.6</span></a>).</li>
-<li>Systems and higher-order equations reduce to first-order vector form; RK4 applies verbatim, as in the <strong>Lotka-Volterra</strong> phase portrait (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>).</li>
-<li><strong>Stiff</strong> problems force explicit methods to tiny steps for stability, not accuracy; the <strong>implicit trapezoid</strong> is stable for all <span class="math inline">\(h\)</span> (<a href="#fig-3-stability" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>), solved each step by Newton iteration.</li>
+<li>Systems and higher-order equations reduce to first-order vector form; RK4 applies verbatim, as in the <strong>Lotka-Volterra</strong> phase portrait (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.3</span></a>).</li>
+<li><strong>Stiff</strong> problems force explicit methods to tiny steps for stability, not accuracy; the <strong>implicit trapezoid</strong> is stable for all <span class="math inline">\(h\)</span> (<a href="#fig-3-stability" class="quarto-xref">Figure&nbsp;<span>3.5</span></a>), solved each step by Newton iteration.</li>
 </ul>
 
 

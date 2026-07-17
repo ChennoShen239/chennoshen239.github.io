@@ -356,6 +356,18 @@ P(x)=\sum_{k=0}^{n} f(x_k)\,L_{n,k}(x),
 L_{n,k}(x)=\prod_{i\ne k}\frac{x-x_i}{x_k-x_i},
 \tag{1.1}\]</span></span> since each Lagrange basis polynomial satisfies <span class="math inline">\(L_{n,k}(x_i)=\delta_{ik}\)</span>, so <span class="math inline">\(P(x_i)=f(x_i)\)</span>. <em>Uniqueness</em>: if <span class="math inline">\(P\)</span> and <span class="math inline">\(\tilde P\)</span> both interpolate, their difference <span class="math inline">\(P-\tilde P\)</span> has degree <span class="math inline">\(\le n\)</span> yet vanishes at the <span class="math inline">\(n+1\)</span> distinct nodes, so it is the zero polynomial. <span class="math inline">\(\square\)</span></p>
 </div>
+<p>The delta property <span class="math inline">\(L_{n,k}(x_i)=\delta_{ik}\)</span> that drives the proof is worth seeing rather than just reading (<a href="#fig-1-lagrange-basis" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>): each basis polynomial rises to <span class="math inline">\(1\)</span> over its own node and pinches to <span class="math inline">\(0\)</span> at every other, so the weighted sum <span class="math inline">\(\sum_k f(x_k)L_{n,k}\)</span> reproduces the data heights one node at a time. The same picture explains why a high-degree basis oscillates: the bumps overshoot between the nodes they are forced through.</p>
+<div id="fig-1-lagrange-basis" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-lagrange-basis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/01-lagrange-basis.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-lagrange-basis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: The five Lagrange basis polynomials for nodes <span class="math inline">\(x_0,\dots,x_4\)</span>. Each curve equals <span class="math inline">\(1\)</span> (filled dot) at its own node and <span class="math inline">\(0\)</span> (open dots) at all the others, the delta property <span class="math inline">\(L_{n,k}(x_i)=
+\delta_{ik}\)</span> on which existence in <a href="#thm-1-uniqueness" class="quarto-xref">Theorem&nbsp;<span>1.1</span></a> rests.
+</figcaption>
+</figure>
+</div>
 <p>Interpolation would be useless if we could not say how far <span class="math inline">\(P\)</span> strays from <span class="math inline">\(f\)</span> between the nodes. The error is controlled by the <span class="math inline">\((n+1)\)</span>-st derivative of <span class="math inline">\(f\)</span> and by the <strong>node polynomial</strong> <span class="math inline">\(\prod_j (x-x_j)\)</span>. The proof rests on a repeated-zeros argument, so we isolate that first.</p>
 <div id="lem-1-rolle" class="theorem lemma">
 <p><span class="theorem-title"><strong>Lemma 1.1 (Generalized Rolle’s theorem)</strong></span> If <span class="math inline">\(g\in C^{n}[a,b]\)</span> vanishes at <span class="math inline">\(n+1\)</span> distinct points of <span class="math inline">\([a,b]\)</span>, then <span class="math inline">\(g^{(n)}(\xi)=0\)</span> for some <span class="math inline">\(\xi\in(a,b)\)</span>.</p>
@@ -385,6 +397,8 @@ f(x)-P(x)=\frac{f^{(3)}(\xi(x))}{3!}\,(x-2)(x-2.75)(x-4).
 \max_{x\in[2,4]}\abs{f(x)-P(x)}\le \frac{1}{3!}\cdot\frac38\cdot\frac{9}{16}
 =\frac{9}{256}\approx 0.035.
 \]</span></p>
+<p>How tight is this? Building the actual interpolant <span class="math inline">\(P\)</span> through <span class="math inline">\((2,\tfrac12),(2.75,\tfrac{4}{11}),
+(4,\tfrac14)\)</span> and sampling <span class="math inline">\(\abs{1/x-P(x)}\)</span> on <span class="math inline">\([2,4]\)</span> gives a true maximum of about <span class="math inline">\(0.0074\)</span>, near <span class="math inline">\(x\approx 3.45\)</span>. The bound <span class="math inline">\(0.035\)</span> overestimates by roughly a factor of <span class="math inline">\(5\)</span>: it is honest but loose, because it multiplies the two factors’ separate maxima, which are attained at different points.</p>
 </section>
 </section>
 <section id="nevilles-method-interpolation-as-a-recursion" class="level2" data-number="1.2">
@@ -417,6 +431,59 @@ Q_i \leftarrow \frac{(x-x_{i+k})\,Q_i-(x-x_i)\,Q_{i+1}}{x_i-x_{i+k}}.
 \]</span> After the sweep, <span class="math inline">\(Q_0=P(x)\)</span>.</p>
 </div>
 </div>
+<p>To make the triangular table concrete, take <span class="math inline">\(f(x)=1/x\)</span> at the same three nodes <span class="math inline">\(2,\,2.75,\,4\)</span> and estimate <span class="math inline">\(f(3)\)</span>. The zeroth column is the data, <span class="math inline">\(Q_0=\tfrac12\)</span>, <span class="math inline">\(Q_1=\tfrac{4}{11}\approx0.3636\)</span>, <span class="math inline">\(Q_2=\tfrac14\)</span>; each later entry combines its two left neighbours through <a href="#eq-1-neville" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> at <span class="math inline">\(x=3\)</span>, filling <a href="#tbl-1-neville" class="quarto-xref">Table&nbsp;<span>1.1</span></a>:</p>
+<div id="tbl-1-neville" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-1-neville-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1.1: Neville table estimating <span class="math inline">\(f(3)\)</span> for <span class="math inline">\(f(x)=1/x\)</span>; the apex is the degree-<span class="math inline">\(2\)</span> interpolant’s value.
+</figcaption>
+<div aria-describedby="tbl-1-neville-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">nodes</th>
+<th style="text-align: center;"><span class="math inline">\(Q_i\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(Q_{i,i+1}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(Q_{i,i+1,i+2}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(x_0=2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.5000\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="math inline">\(0.3182\)</span></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(x_1=2.75\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.3636\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="math inline">\(0.3295\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="math inline">\(0.3409\)</span></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(x_2=4\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.2500\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>For instance <span class="math inline">\(Q_{0,1}=\dfrac{(3-2.75)(0.5)-(3-2)(0.3636)}{2-2.75}=0.3182\)</span>, and the apex <span class="math inline">\(Q_{0,1,2}=\dfrac{(3-4)(0.3182)-(3-2)(0.3409)}{2-4}=0.3295\)</span>, the answer <span class="math inline">\(P(3)\)</span>. It sits close to the true <span class="math inline">\(f(3)=\tfrac13=0.3333\)</span>, and the gap <span class="math inline">\(0.0038\)</span> is consistent with the error bound of <a href="#sec-1-error-example" class="quarto-xref"><span>Section 1.1.1</span></a>.</p>
 </section>
 <section id="divided-differences-and-the-newton-form" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="divided-differences-and-the-newton-form"><span class="header-section-number">1.3</span> Divided differences and the Newton form</h2>
@@ -450,7 +517,7 @@ P(x)=\sum_{k=0}^{n} f[x_0,\dots,x_k]\prod_{j=0}^{k-1}(x-x_j).
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">F</span>(<span class="va">j</span>) <span class="op">=</span> (<span class="va">F</span>(<span class="va">j</span>) <span class="op">-</span> <span class="va">F</span>(<span class="va">j</span><span class="op">-</span><span class="fl">1</span>)) <span class="op">/</span> (<span class="va">x</span>(<span class="va">j</span>) <span class="op">-</span> <span class="va">x</span>(<span class="va">j</span><span class="op">-</span><span class="va">k</span><span class="op">+</span><span class="fl">1</span>))<span class="op">;</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>On return <code>F(k)</code> <span class="math inline">\(=f[x_0,\dots,x_{k-1}]\)</span>, the Newton coefficients of <a href="#eq-1-newton" class="quarto-xref">Equation&nbsp;<span>1.4</span></a>. The backward <code>j</code> loop is what lets the update overwrite in place without clobbering values still needed.</p>
+<p>On return <code>F(k)</code> <span class="math inline">\(=f[x_0,\dots,x_{k-1}]\)</span>, the Newton coefficients of <a href="#eq-1-newton" class="quarto-xref">Equation&nbsp;<span>1.4</span></a>. Mind the 0-based-math versus 1-based-code offset the introduction warns about: the divisor <code>x(j-k+1)</code> is the 1-based name for the oldest node <span class="math inline">\(x_{j-k}\)</span> entering the difference <span class="math inline">\(f[x_{j-k},\dots,x_{j-1}]\)</span>, the extra <span class="math inline">\(+1\)</span> being exactly that shift. The backward <code>j</code> loop is what lets the update overwrite in place without clobbering values still needed.</p>
 </div>
 </div>
 <p>Divided differences are not merely bookkeeping: the top one is a rescaled derivative, which is why the Newton and Lagrange error terms agree.</p>
@@ -484,17 +551,81 @@ f(x)-H(x)=\frac{f^{(2n+2)}(\xi(x))}{(2n+2)!}\prod_{j=0}^{n}(x-x_j)^2 .
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>Identical in spirit to <a href="#thm-1-interp-error" class="quarto-xref">Theorem&nbsp;<span>1.2</span></a>: fix a non-node <span class="math inline">\(x\)</span>, form <span class="math inline">\(g(t)=(f-H)(t)-(f-H)(x)\prod_j\frac{(t-x_j)^2}{(x-x_j)^2}\)</span>, and note <span class="math inline">\(g\)</span> has <span class="math inline">\(n+2\)</span> zeros (at <span class="math inline">\(x\)</span> and the nodes) while <span class="math inline">\(g'\)</span> has an extra zero at each node because <span class="math inline">\(H\)</span> matches <span class="math inline">\(f'\)</span> there. Counting multiplicities gives <span class="math inline">\(g\)</span> enough zeros to apply Rolle <span class="math inline">\(2n+2\)</span> times, and evaluating <span class="math inline">\(g^{(2n+2)}(\xi)=0\)</span> isolates the stated remainder. <span class="math inline">\(\square\)</span></p>
 </div>
+<p>The four constructions seen so far trade the same interpolant off against different priorities; <a href="#tbl-1-compare" class="quarto-xref">Table&nbsp;<span>1.2</span></a> collects the scattered claims for reference. Lagrange and Newton produce the <em>same</em> polynomial (<a href="#thm-1-uniqueness" class="quarto-xref">Theorem&nbsp;<span>1.1</span></a>), differing only in form: Newton buys extensibility, Lagrange buys a transparent basis. Splines break the “one global polynomial” mould entirely, which is what the next section develops.</p>
+<div id="tbl-1-compare" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-1-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1.2: The four interpolants at a glance. “Node appended” is the cost of adding one data point.
+</figcaption>
+<div aria-describedby="tbl-1-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">construction</th>
+<th style="text-align: left;">degree</th>
+<th style="text-align: left;">smoothness</th>
+<th style="text-align: left;">error term</th>
+<th style="text-align: left;">build cost</th>
+<th style="text-align: left;">node appended?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Lagrange</td>
+<td style="text-align: left;"><span class="math inline">\(\le n\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(C^\infty\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\dfrac{f^{(n+1)}(\xi)}{(n+1)!}\prod_j(x-x_j)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\bigO(n^2)\)</span></td>
+<td style="text-align: left;">rebuild all bases</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Newton</td>
+<td style="text-align: left;"><span class="math inline">\(\le n\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(C^\infty\)</span></td>
+<td style="text-align: left;">same as Lagrange</td>
+<td style="text-align: left;"><span class="math inline">\(\bigO(n^2)\)</span></td>
+<td style="text-align: left;">one extra term</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hermite</td>
+<td style="text-align: left;"><span class="math inline">\(\le 2n+1\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(C^\infty\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\dfrac{f^{(2n+2)}(\xi)}{(2n+2)!}\prod_j(x-x_j)^2\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\bigO(n^2)\)</span></td>
+<td style="text-align: left;">one extra double node</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cubic spline</td>
+<td style="text-align: left;"><span class="math inline">\(3\)</span> per piece</td>
+<td style="text-align: left;"><span class="math inline">\(C^2\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\bigO(h^4)\)</span> (clamped)</td>
+<td style="text-align: left;"><span class="math inline">\(\bigO(n)\)</span></td>
+<td style="text-align: left;">resolve tridiagonal</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 </section>
 <section id="sec-1-splines" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="sec-1-splines"><span class="header-section-number">1.5</span> Cubic splines: piecewise, but globally smooth</h2>
-<p>Raising the degree to fit more data is a trap: for equispaced nodes the interpolant of <span class="math inline">\(f(x)=1/(1+25x^2)\)</span> oscillates ever more wildly near the ends as <span class="math inline">\(n\)</span> grows, the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>). High-degree global polynomials are the wrong tool. The fix is to keep the pieces low-degree and stitch them together smoothly: a <strong>cubic spline</strong> uses a different cubic on each subinterval but forces the joins to agree in value and in the first two derivatives.</p>
+<p>Raising the degree to fit more data is a trap: for equispaced nodes the interpolant of <span class="math inline">\(f(x)=1/(1+25x^2)\)</span> oscillates ever more wildly near the ends as <span class="math inline">\(n\)</span> grows, the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>). The culprit is the node polynomial <span class="math inline">\(\prod_j(x-x_j)\)</span> in <a href="#eq-1-error" class="quarto-xref">Equation&nbsp;<span>1.2</span></a>, which for equispaced nodes swells enormously near the endpoints. That diagnosis points to one cure: clustering the nodes toward the ends, where the Chebyshev points of <a href="06-approximation-theory.html" class="quarto-xref"><span>Chapter 6</span></a> shrink the node polynomial and restore convergence. Here we develop the other cure, which keeps equispaced data but abandons the single global polynomial: keep the pieces low-degree and stitch them together smoothly. A <strong>cubic spline</strong> uses a different cubic on each subinterval but forces the joins to agree in value and in the first two derivatives.</p>
 <div id="fig-1-runge" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-1-runge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/01-runge.svg" class="img-fluid figure-img" style="width:78.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-runge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1.1: Equispaced polynomial interpolation of the Runge function. The degree-6 interpolant already overshoots near the endpoints, and the degree-10 interpolant diverges there, raising the degree makes matters worse, not better.
+Figure&nbsp;1.2: Equispaced polynomial interpolation of the Runge function. The degree-6 interpolant already overshoots near the endpoints, and the degree-10 interpolant diverges there, raising the degree makes matters worse, not better.
 </figcaption>
 </figure>
 </div>
@@ -511,7 +642,18 @@ b_{j+1}=b_j+2c_jh_j+3d_jh_j^2,\qquad c_{j+1}=c_j+3d_jh_j,
 h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_j c_{j+1}
 =3\!\left(\frac{a_{j+1}-a_j}{h_j}-\frac{a_j-a_{j-1}}{h_{j-1}}\right),
 \quad j=1,\dots,n-1.
-\]</span> The two missing conditions are boundary choices: the <strong>natural</strong> spline sets <span class="math inline">\(c_0=c_n=0\)</span> (<span class="math inline">\(S''=0\)</span> at the ends), while the <strong>clamped</strong> spline instead prescribes <span class="math inline">\(S'(x_0),S'(x_n)\)</span>. Either way the resulting tridiagonal system is strictly diagonally dominant, hence uniquely solvable in <span class="math inline">\(\bigO(n)\)</span> by the tridiagonal elimination of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>: splines are both smoother than a single high-degree polynomial and cheaper to compute.</p>
+\]</span> The two missing conditions are boundary choices: the <strong>natural</strong> spline sets <span class="math inline">\(c_0=c_n=0\)</span> (<span class="math inline">\(S''=0\)</span> at the ends), while the <strong>clamped</strong> spline instead prescribes <span class="math inline">\(S'(x_0),S'(x_n)\)</span>. The choice is not just cosmetic: a clamped spline supplied with the correct end slopes attains <span class="math inline">\(\bigO(h^4)\)</span> accuracy throughout, whereas the natural condition, a guess that <span class="math inline">\(S''\)</span> vanishes at the ends, degrades to <span class="math inline">\(\bigO(h^2)\)</span> in the boundary subintervals. This is why clamped is preferred whenever the end slopes are known. Either way the resulting tridiagonal system is strictly diagonally dominant, hence uniquely solvable in <span class="math inline">\(\bigO(n)\)</span> by the tridiagonal elimination of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>: splines are both smoother than a single high-degree polynomial and cheaper to compute.</p>
+<p>Even the natural spline, with no slope information at all, tracks the Runge function where the degree-<span class="math inline">\(10\)</span> polynomial through the <em>same</em> eleven nodes overshoots wildly near the ends (<a href="#fig-1-spline-vs-poly" class="quarto-xref">Figure&nbsp;<span>1.3</span></a>). That is the payoff the whole chapter builds toward: low-degree pieces joined smoothly beat one high-degree polynomial on identical data.</p>
+<div id="fig-1-spline-vs-poly" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-spline-vs-poly-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/01-spline-vs-poly.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-spline-vs-poly-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.3: The Runge function (black) with two interpolants on the same <span class="math inline">\(11\)</span> equispaced nodes: the degree-<span class="math inline">\(10\)</span> polynomial (red) oscillates near <span class="math inline">\(\pm1\)</span>, while the natural cubic spline (blue) lies essentially on top of <span class="math inline">\(f\)</span>. The spline is the fix <a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> only diagnoses.
+</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -534,7 +676,7 @@ h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_j c_{j+1}
 <li>The interpolation error <a href="#eq-1-error" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> is <span class="math inline">\(\dfrac{f^{(n+1)}(\xi)}{(n+1)!}\prod_j(x-x_j)\)</span>; bounding the derivative factor and the node polynomial separately gives usable error bounds (<a href="#sec-1-error-example" class="quarto-xref"><span>Section 1.1.1</span></a>).</li>
 <li><strong>Neville’s method</strong> builds the interpolant’s <em>value</em> by a recursion on low-degree pieces (<a href="#eq-1-neville" class="quarto-xref">Equation&nbsp;<span>1.3</span></a>); <strong>divided differences</strong> build the <em>polynomial</em>, with <span class="math inline">\(f[x_0,\dots,x_n]=f^{(n)}(\xi)/n!\)</span> (<a href="#thm-1-dd-derivative" class="quarto-xref">Theorem&nbsp;<span>1.3</span></a>).</li>
 <li><strong>Hermite interpolation</strong> matches values and slopes by coalescing nodes, giving a degree <span class="math inline">\(2n+1\)</span> polynomial with the squared-node error term of <a href="#thm-1-hermite-error" class="quarto-xref">Theorem&nbsp;<span>1.4</span></a>.</li>
-<li>Increasing the polynomial degree invites the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>); <strong>cubic splines</strong> avoid it with low-degree pieces joined in <span class="math inline">\(C^2\)</span>, reducing to a tridiagonal system solved in <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>.</li>
+<li>Increasing the polynomial degree invites the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>); <strong>cubic splines</strong> avoid it with low-degree pieces joined in <span class="math inline">\(C^2\)</span>, reducing to a tridiagonal system solved in <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>.</li>
 </ul>
 
 

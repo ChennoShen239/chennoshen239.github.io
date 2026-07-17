@@ -280,7 +280,8 @@ window.Quarto = {
   <li><a href="#sec-7-spectral-embedding" id="toc-sec-7-spectral-embedding" class="nav-link" data-scroll-target="#sec-7-spectral-embedding">Spectral embedding</a></li>
   <li><a href="#sec-7-spectral-clustering" id="toc-sec-7-spectral-clustering" class="nav-link" data-scroll-target="#sec-7-spectral-clustering">Clustering</a></li>
   </ul></li>
-  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">7.7</span> Chapter summary</a></li>
+  <li><a href="#sec-7-recap-table" id="toc-sec-7-recap-table" class="nav-link" data-scroll-target="#sec-7-recap-table"><span class="header-section-number">7.7</span> One engine, four applications</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">7.8</span> Chapter summary</a></li>
   </ul>
 </nav>
     </div>
@@ -360,7 +361,7 @@ u^{(k)}=\frac{\sum_i c_i\lambda_i^k v_i}{\bigl\lVert\sum_i c_i\lambda_i^k v_i\bi
 <div id="thm-7-power-method" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 7.1 (Power method convergence)</strong></span> Let <span class="math inline">\(A\in\R^{n\times n}\)</span> be diagonalizable with a strictly dominant eigenpair <span class="math inline">\((\lambda_1,v_1)\)</span> as in <a href="#eq-7-dominant" class="quarto-xref">Equation&nbsp;<span>7.1</span></a>, and let <span class="math inline">\(x=\sum_i c_iv_i\)</span> with <span class="math inline">\(c_1\ne0\)</span>. With <span class="math inline">\(u^{(k)}\)</span> as in <a href="#eq-7-power-iterate" class="quarto-xref">Equation&nbsp;<span>7.2</span></a> there exist unit scalars <span class="math inline">\(z^{(k)}\)</span> (<span class="math inline">\(z^{(k)}=\pm1\)</span> when <span class="math inline">\(A\)</span> is real) such that <span class="math display">\[
 \lim_{k\to\infty}\frac{u^{(k)}}{z^{(k)}}=\frac{v_1}{\ntwo{v_1}} .
-\]</span> The convergence is geometric: the error decays like <span class="math inline">\(\bigl(\abs{\lambda_2}/\abs{\lambda_1}\bigr)^k\)</span>, governed by the <strong>spectral gap</strong> <span class="math inline">\(\abs{\lambda_1}-\abs{\lambda_2}\)</span>.</p>
+\]</span> The convergence is geometric: the error decays like <span class="math inline">\(\bigl(\abs{\lambda_2}/\abs{\lambda_1}\bigr)^k\)</span>. The rate is the <em>ratio</em> <span class="math inline">\(\abs{\lambda_2/\lambda_1}\)</span>; the absolute <strong>spectral gap</strong> <span class="math inline">\(\abs{\lambda_1}-\abs{\lambda_2}\)</span> sets that rate only after normalizing by <span class="math inline">\(\abs{\lambda_1}\)</span>, since <span class="math inline">\(\abs{\lambda_2/\lambda_1}=1-(\abs{\lambda_1}-\abs{\lambda_2})/\abs{\lambda_1}\)</span>.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>The displayed limit is the computation above: <span class="math inline">\(\lambda_1^{-k}A^kx\to c_1v_1\)</span> term by term, and dividing by <span class="math inline">\(\ntwo{A^kx}\)</span> cancels the divergent scale <span class="math inline">\(\abs{\lambda_1}^k\abs{c_1}\)</span> while leaving the unit factor <span class="math inline">\(z^{(k)}\)</span>. The rate is set by the slowest-vanishing surviving term, <span class="math inline">\(\abs{\lambda_2/\lambda_1}^k\)</span>, which dominates the deviation <span class="math inline">\(u^{(k)}-z^{(k)}v_1/\ntwo{v_1}\)</span>. <span class="math inline">\(\square\)</span></p>
@@ -426,6 +427,17 @@ A=\begin{pmatrix}2&amp;1\\1&amp;2\end{pmatrix},
 \]</span> and seed <span class="math inline">\(x^{(0)}=(1,0)^\top\)</span>. The Rayleigh-quotient estimates <span class="math inline">\(\lambda_1^{(k)}=u^{(k)}\cdot Au^{(k)}\)</span> run <span class="math display">\[
 2.000,\quad 2.800,\quad 2.976,\quad 2.997,\quad \to 3 .
 \]</span> Two rates coexist here. The eigenvector direction converges at the raw ratio <span class="math inline">\(\abs{\lambda_2/\lambda_1}=1/3\)</span> (this is the quantity <a href="#fig-7-power" class="quarto-xref">Figure&nbsp;<span>7.1</span></a> tracks for other spectra). The eigenvalue estimate converges <em>faster</em>, at the squared rate <span class="math inline">\((\lambda_2/\lambda_1)^2=1/9\)</span> per step: the error sequence <span class="math inline">\(1,\,0.2,\,0.024,\,0.0027\)</span> shrinks by roughly <span class="math inline">\(1/9\)</span> each time. The squaring is no accident, for a symmetric matrix the Rayleigh quotient <a href="#eq-7-rayleigh-quotient" class="quarto-xref">Equation&nbsp;<span>7.3</span></a> is stationary at an eigenvector, so a first-order error in the direction shows up only to second order in the estimate. That free extra digit is the reason we monitor <span class="math inline">\(\lambda_1^{(k)}\)</span> rather than the direction.</p>
+<p><a href="#fig-7-rotation" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> shows the underlying geometry: the normalized iterate is a point on the unit circle, and each matvec swings it toward <span class="math inline">\(v_1\)</span>. On this matrix (ratio <span class="math inline">\(1/3\)</span>) the arrows bunch up on <span class="math inline">\(v_1\)</span> within a handful of steps; on a nearly tied spectrum (ratio <span class="math inline">\(0.9\)</span>) they crawl, exactly as the rate predicts.</p>
+<div id="fig-7-rotation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-7-rotation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/07-power-rotation.svg" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-rotation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.2: The power-method iterate <span class="math inline">\(u^{(k)}\)</span> as a point on the unit circle, marching from the seed <span class="math inline">\(u^{(0)}=(1,0)\)</span> toward the dominant eigenvector <span class="math inline">\(v_1=\tfrac1{\sqrt2}(1,1)\)</span> (arrows shaded light to dark with <span class="math inline">\(k\)</span>). Left: the worked-run matrix <span class="math inline">\(\left(\begin{smallmatrix}2&amp;1\\1&amp;2\end{smallmatrix}\right)\)</span>, gap ratio <span class="math inline">\(1/3\)</span>, converges in a few steps. Right: the same eigenvectors but eigenvalues <span class="math inline">\(3\)</span> and <span class="math inline">\(2.7\)</span>, gap ratio <span class="math inline">\(0.9\)</span>, barely rotates. The gap is a speedometer for the <em>angle</em>.
+</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -437,6 +449,19 @@ A=\begin{pmatrix}2&amp;1\\1&amp;2\end{pmatrix},
 </div>
 <div class="callout-body-container callout-body">
 <p>The power method is a <strong>linearly convergent</strong> iteration in the sense of <a href="08-nonlinear-equations.html#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>: the error contracts by a constant factor <span class="math inline">\(\abs{\lambda_2/\lambda_1}&lt;1\)</span> every step (order <span class="math inline">\(q=1\)</span>). That is the same regime as the stationary linear solvers of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> and slower than the quadratic order <span class="math inline">\(q=2\)</span> of Newton’s method in <a href="08-nonlinear-equations.html#sec-8-newton" class="quarto-xref"><span>Section 8.3</span></a>. The trade is deliberate: each step here is a single matvec, with no derivatives and no linear solves, so a slow-but-cheap iteration is exactly what a large sparse <span class="math inline">\(A\)</span> wants.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Retargeting the power method: shift and invert
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The power method finds the <em>extreme</em> eigenvalue of whatever operator it is fed, so we can aim it elsewhere by feeding it a transformed matrix, all of which share the eigenvectors of <span class="math inline">\(A\)</span>. A <strong>shift</strong> <span class="math inline">\(A-\mu I\)</span> moves the spectrum by <span class="math inline">\(\mu\)</span> (eigenvalues <span class="math inline">\(\lambda_i-\mu\)</span>); an <strong>inverse</strong> <span class="math inline">\((A-\mu I)^{-1}\)</span> has eigenvalues <span class="math inline">\(1/(\lambda_i-\mu)\)</span>, so its <em>dominant</em> eigenpair is the one with <span class="math inline">\(\lambda_i\)</span> nearest the shift <span class="math inline">\(\mu\)</span>. This is <strong>inverse iteration</strong>: pick <span class="math inline">\(\mu\)</span> near the eigenvalue you want and run the power method on <span class="math inline">\((A-\mu I)^{-1}\)</span>, applying it by solving <span class="math inline">\((A-\mu I)y=u\)</span> each step instead of a matvec. Taking <span class="math inline">\(\mu=0\)</span> retargets to the eigenvalue of <em>smallest</em> modulus. The same idea recurs at the block level in <a href="#sec-7-spectral-embedding" class="quarto-xref"><span>Section 7.6.3</span></a>, where running subspace iteration on <span class="math inline">\(2I-\hat L\)</span> (a shift, then extreme end) picks out the <em>smallest</em> eigenpairs of the Laplacian <span class="math inline">\(\hat L\)</span>.</p>
 </div>
 </div>
 <p>One dominant eigenvector is often not the whole story: PCA wants the top few directions, clustering the bottom few. The fix is to run the power method on a <em>block</em> of vectors at once, which is the subject of the next section.</p>
@@ -640,7 +665,7 @@ P=\tau\tilde P+(1-\tau)\tfrac1n\mathbf 1\mathbf 1^\top ,
 \pi=(0.4,\ 0.2,\ 0.4).
 \]</span> Damping with <span class="math inline">\(\tau=0.85\)</span> (the classic choice) shifts this only slightly, to <span class="math display">\[
 \pi^\star=(0.388,\ 0.215,\ 0.397),
-\]</span> mixing in the uniform teleport distribution <span class="math inline">\((\tfrac13,\tfrac13,\tfrac13)\)</span>, a small, stabilizing perturbation. Pages <span class="math inline">\(1\)</span> and <span class="math inline">\(3\)</span> tie in the undamped chain; damping breaks the tie faintly in favour of <span class="math inline">\(3\)</span>. Both vectors already sum to <span class="math inline">\(1\)</span>, illustrating why the PageRank iteration skips renormalization entirely.</p>
+\]</span> mixing in the uniform teleport distribution <span class="math inline">\((\tfrac13,\tfrac13,\tfrac13)\)</span>, a small, stabilizing perturbation. Pages <span class="math inline">\(1\)</span> and <span class="math inline">\(3\)</span> tie in the undamped chain; damping breaks the tie faintly in favour of <span class="math inline">\(3\)</span>. Notice that page <span class="math inline">\(1\)</span> keeps pace with page <span class="math inline">\(3\)</span> despite having only one inbound link to page <span class="math inline">\(3\)</span>’s two: its single backlink comes from page <span class="math inline">\(3\)</span> itself, a high-rank page, so its importance is <em>inherited</em>, not counted. This is exactly the payoff of eigenvector centrality over raw link counting. Both vectors already sum to <span class="math inline">\(1\)</span>, illustrating why the PageRank iteration skips renormalization entirely.</p>
 </section>
 </section>
 <section id="sec-7-pca" class="level2" data-number="7.4">
@@ -668,7 +693,17 @@ QQ^\top X=\tilde U\tilde U^\top\sum_{i=1}^r\sigma_iu_iv_i^\top=\sum_{i=1}^k\sigm
 X=\begin{pmatrix}2&amp;0&amp;-2&amp;0\\0&amp;1&amp;0&amp;-1\end{pmatrix},
 \qquad
 \frac14 XX^\top=\frac14\begin{pmatrix}8&amp;0\\0&amp;2\end{pmatrix}=\begin{pmatrix}2&amp;0\\0&amp;\tfrac12\end{pmatrix}.
-\]</span> The covariance is already diagonal, so the principal components are the coordinate axes: the first is the <span class="math inline">\(x\)</span>-axis with variance <span class="math inline">\(2\)</span>, the second the <span class="math inline">\(y\)</span>-axis with variance <span class="math inline">\(\tfrac12\)</span>. The top component captures <span class="math inline">\(2/(2+\tfrac12)=80\%\)</span> of the total variance, so projecting these four points onto the <span class="math inline">\(x\)</span>-axis, the span of the top left singular vector, is the best one-dimensional summary, keeping four fifths of the spread.</p>
+\]</span> The covariance is already diagonal, so the principal components are the coordinate axes: the first is the <span class="math inline">\(x\)</span>-axis with variance <span class="math inline">\(2\)</span>, the second the <span class="math inline">\(y\)</span>-axis with variance <span class="math inline">\(\tfrac12\)</span>. The top component captures <span class="math inline">\(2/(2+\tfrac12)=80\%\)</span> of the total variance, so projecting these four points onto the <span class="math inline">\(x\)</span>-axis, the span of the top left singular vector, is the best one-dimensional summary, keeping four fifths of the spread. <a href="#fig-7-pca" class="quarto-xref">Figure&nbsp;<span>7.3</span></a> draws the picture: the covariance ellipse has semi-axes <span class="math inline">\(\sqrt2\)</span> and <span class="math inline">\(\sqrt{1/2}\)</span> (the two standard deviations), the top axis is the long one, and dropping each point onto it loses only the short <span class="math inline">\(20\%\)</span>, which is precisely the residual Eckart–Young leaves behind.</p>
+<div id="fig-7-pca" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-7-pca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/07-pca-ellipse.svg" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-pca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.3: PCA of the four points <span class="math inline">\((\pm2,0),(0,\pm1)\)</span>. The covariance ellipse (semi-axes <span class="math inline">\(\sqrt2\)</span> and <span class="math inline">\(\sqrt{1/2}\)</span>) and the two principal axes, scaled by their standard deviations, sit along the coordinate axes because the covariance is diagonal. Dashed drop-lines project each point onto the top component (the <span class="math inline">\(x\)</span>-axis), the best one-dimensional summary, capturing <span class="math inline">\(80\%\)</span> of the variance; the discarded short axis is the residual <span class="math inline">\(20\%\)</span>.
+</figcaption>
+</figure>
+</div>
 </section>
 </section>
 <section id="sec-7-randsvd" class="level2" data-number="7.5">
@@ -695,7 +730,17 @@ A\approx XX^\top A\approx XX^\top AYY^\top=X\bar AY^\top,
 \bigl\lVert (I-XX^\top)A\bigr\rVert_{\mathrm F}^2\le 2\sum_{i&gt;k}\sigma_i^2 ,
 \]</span> <span class="math inline">\(\sigma_i\)</span> the singular values of <span class="math inline">\(A\)</span>. (Some sources print this as <span class="math inline">\(\lVert XX^\top A\rVert_{\mathrm F}\)</span>, the projection <em>onto</em> the range rather than the residual, which is <span class="math inline">\(\approx\lVert A\rVert_{\mathrm F}\)</span>, not small; the residual bound above is the one that matters.)</p>
 </div>
-<p>So when <span class="math inline">\(A\)</span> has <strong>numerical rank</strong> <span class="math inline">\(k\)</span>, meaning <span class="math inline">\(\sum_{i&gt;k}\sigma_i^2\)</span> is negligible, oversampling to a small multiple of <span class="math inline">\(k\)</span> makes the randomized SVD accurate with high probability.</p>
+<p>So when <span class="math inline">\(A\)</span> has <strong>numerical rank</strong> <span class="math inline">\(k\)</span>, meaning <span class="math inline">\(\sum_{i&gt;k}\sigma_i^2\)</span> is negligible, oversampling to a small multiple of <span class="math inline">\(k\)</span> makes the randomized SVD accurate with high probability. <a href="#fig-7-randsvd" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> makes the rule of thumb operational: for a matrix with fast (geometric) singular decay the measured residual <span class="math inline">\(\ntwo{(I-XX^\top)A}_{\mathrm F}\)</span> dives to the tail level <span class="math inline">\(\sqrt{2\sum_{i&gt;k}\sigma_i^2}\)</span> with only a handful of extra columns, while for slow (algebraic) decay the fat tail keeps the residual high and oversampling barely helps. Oversample a little; oversample more when the tail is fat.</p>
+<div id="fig-7-randsvd" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-7-randsvd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/07-randsvd-oversampling.svg" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-randsvd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.4: Randomized SVD for two synthetic <span class="math inline">\(200\times100\)</span> matrices with the same target rank <span class="math inline">\(k=10\)</span>. Left: their singular-value spectra, one with fast geometric decay and one with slow <span class="math inline">\(1/i\)</span> decay. Right: the relative residual <span class="math inline">\(\ntwo{(I-XX^\top)A}_{\mathrm F}/\ntwo{A}_{\mathrm F}\)</span> against the oversampling <span class="math inline">\(\tilde k\)</span>, with each spectrum’s theorem bound <span class="math inline">\(\sqrt{2\sum_{i&gt;k}\sigma_i^2}\)</span> as a dashed line. Fast decay collapses onto (and past) its bound almost at once; slow decay lags well above it.
+</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -720,7 +765,7 @@ A\approx XX^\top A\approx XX^\top AYY^\top=X\bar AY^\top,
 </section>
 <section id="sec-7-spectral" class="level2" data-number="7.6">
 <h2 data-number="7.6" class="anchored" data-anchor-id="sec-7-spectral"><span class="header-section-number">7.6</span> Spectral clustering</h2>
-<p>The last application partitions data into clusters that need not be linearly separable (two concentric rings, say) where <span class="math inline">\(k\)</span>-means on the raw coordinates fails outright. The move is to re-embed the data using eigenvectors of a graph Laplacian, after which the clusters <em>do</em> separate (<a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>). This time the informative eigenvectors are the ones with the <em>smallest</em> eigenvalues, so subspace iteration runs on a shifted matrix.</p>
+<p>The last application partitions data into clusters that need not be linearly separable (two concentric rings, say) where <span class="math inline">\(k\)</span>-means on the raw coordinates fails outright. The move is to re-embed the data using eigenvectors of a graph Laplacian, after which the clusters <em>do</em> separate (<a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.5</span></a>). This time the informative eigenvectors are the ones with the <em>smallest</em> eigenvalues, so subspace iteration runs on a shifted matrix.</p>
 <section id="sec-7-spectral-graph" class="level3">
 <h3 class="anchored" data-anchor-id="sec-7-spectral-graph">A weighted graph from data</h3>
 <p>Given <span class="math inline">\(x_1,\dots,x_n\in\R^m\)</span>, build a weighted graph whose edge weights measure similarity. A <strong>similarity kernel</strong> is a symmetric <span class="math inline">\(K(x,y)=K(y,x)\ge0\)</span>; the usual pick is the <strong>Gaussian kernel</strong> of width <span class="math inline">\(\sigma&gt;0\)</span>, <span id="eq-7-gaussian-kernel"><span class="math display">\[
@@ -766,14 +811,14 @@ L=D^{-1}L=I-D^{-1}A\)</span>: for any <span class="math inline">\(v\)</span>, <s
 <h3 class="anchored" data-anchor-id="sec-7-spectral-embedding">Spectral embedding</h3>
 <p>A <strong>spectral embedding</strong> is a map <span class="math inline">\(\Phi:\{1,\dots,n\}\to\R^d\)</span> sending vertex <span class="math inline">\(i\)</span> (data point <span class="math inline">\(x_i\)</span>) to a new point <span class="math inline">\(\Phi(i)\)</span>. Let <span class="math inline">\(Q=[v_1,\dots,v_d]\in\R^{n\times d}\)</span> hold the orthonormal eigenvectors of the <span class="math inline">\(d\)</span> <strong>lowest</strong> eigenvalues of <span class="math inline">\(\hat L\)</span>. Since we want the <em>lowest</em> eigenpairs, run subspace iteration on <span class="math inline">\(2I-\hat L\)</span>: its dominant eigenvectors are those of <span class="math inline">\(\hat L\)</span>’s smallest eigenvalues, and this is valid precisely because <span class="math inline">\(\spec(\hat L)\subseteq[0,2]\)</span> by <a href="#prp-7-laplacian-spectrum" class="quarto-xref">Proposition&nbsp;<span>7.2</span></a> keeps <span class="math inline">\(2I-\hat L\)</span> positive semidefinite. The embedding is <span class="math display">\[
 \Phi(i)=[Q_{i,:}]^\top\in\R^d ,
-\]</span> the <span class="math inline">\(i\)</span>-th row of <span class="math inline">\(Q\)</span>. Points in one cluster land near one another in <span class="math inline">\(\R^d\)</span> even when the original clusters interleave geometrically, which is what pulls apart the rings of <a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>.</p>
+\]</span> the <span class="math inline">\(i\)</span>-th row of <span class="math inline">\(Q\)</span>. Points in one cluster land near one another in <span class="math inline">\(\R^d\)</span> even when the original clusters interleave geometrically, which is what pulls apart the rings of <a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.5</span></a>.</p>
 <div id="fig-7-spectral" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-7-spectral-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/07-spectral-clustering.svg" class="img-fluid figure-img" style="width:95.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-spectral-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.2: Two noisy concentric rings. In data space (left) the classes wrap around each other and no straight cut separates them. After the spectral embedding (right), rows of the lowest eigenvectors of <span class="math inline">\(\hat L\)</span> place the two rings in distinct, linearly separable blobs.
+Figure&nbsp;7.5: Two noisy concentric rings. In data space (left) the classes wrap around each other and no straight cut separates them. After the spectral embedding (right), rows of the lowest eigenvectors of <span class="math inline">\(\hat L\)</span> place the two rings in distinct, linearly separable blobs.
 </figcaption>
 </figure>
 </div>
@@ -803,8 +848,69 @@ F(z_1,\dots,z_k,c)=\sum_{j=1}^k\sum_{i:\,c(i)=j}\ntwo{x_i-z_j}^2
 <p>Each step can only lower <a href="#eq-7-kmeans-objective" class="quarto-xref">Equation&nbsp;<span>7.11</span></a>, so Lloyd’s algorithm never increases the objective and terminates, but with <strong>no guarantee of the global optimum</strong>: it can stall in a bad local minimum, and random restarts are the standard cure. Run on interleaved data it fails; run on the spectral embedding it succeeds, because the embedding has already converted “same cluster” into “nearby in <span class="math inline">\(\R^d\)</span>.”</p>
 </section>
 </section>
-<section id="chapter-summary" class="level2" data-number="7.7">
-<h2 data-number="7.7" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">7.7</span> Chapter summary</h2>
+<section id="sec-7-recap-table" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="sec-7-recap-table"><span class="header-section-number">7.7</span> One engine, four applications</h2>
+<p>Every application in this chapter is the same matvec engine pointed at a different matrix and a different end of its spectrum, as <a href="#tbl-7-applications" class="quarto-xref">Table&nbsp;<span>7.1</span></a> collects. The only real choices are <em>which</em> matrix to apply, <em>which</em> eigenpairs you want, and whether they sit at the dominant or the smallest end (retargeted by a shift, as above).</p>
+<div id="tbl-7-applications" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-7-applications-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7.1: The chapter’s applications as one engine retargeted.
+</figcaption>
+<div aria-describedby="tbl-7-applications-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Matrix acted on</th>
+<th>Eigenpairs wanted</th>
+<th>End of spectrum</th>
+<th>Engine</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Markov / PageRank</td>
+<td>chain <span class="math inline">\(P\)</span></td>
+<td>eigenvalue <span class="math inline">\(1\)</span></td>
+<td>dominant</td>
+<td>power method</td>
+</tr>
+<tr class="even">
+<td>PCA</td>
+<td>covariance <span class="math inline">\(XX^\top\)</span></td>
+<td>top <span class="math inline">\(k\)</span></td>
+<td>dominant</td>
+<td>subspace iteration + Rayleigh–Ritz</td>
+</tr>
+<tr class="odd">
+<td>Randomized SVD</td>
+<td><span class="math inline">\(AA^\top\)</span> (and <span class="math inline">\(A^\top A\)</span>)</td>
+<td>top <span class="math inline">\(k\)</span></td>
+<td>dominant</td>
+<td>single random block (no iteration)</td>
+</tr>
+<tr class="even">
+<td>Spectral clustering</td>
+<td>Laplacian <span class="math inline">\(\hat L\)</span></td>
+<td>bottom <span class="math inline">\(k\)</span></td>
+<td>smallest, via <span class="math inline">\(2I-\hat L\)</span></td>
+<td>subspace iteration</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="chapter-summary" class="level2" data-number="7.8">
+<h2 data-number="7.8" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">7.8</span> Chapter summary</h2>
 <ul>
 <li>The <strong>power method</strong> (<a href="#thm-7-power-method" class="quarto-xref">Theorem&nbsp;<span>7.1</span></a>) finds the dominant eigenpair by normalized repeated matvecs <span class="math inline">\(u^{(k)}=A^kx/\ntwo{A^kx}\)</span>; it converges geometrically at rate <span class="math inline">\(\abs{\lambda_2/\lambda_1}\)</span> set by the spectral gap, a linearly convergent iteration (<a href="08-nonlinear-equations.html#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>), with the eigenvalue read off the <strong>Rayleigh quotient</strong> <a href="#eq-7-rayleigh-quotient" class="quarto-xref">Equation&nbsp;<span>7.3</span></a>.</li>
 <li><strong>Subspace iteration</strong> (<a href="#thm-7-subspace-iteration" class="quarto-xref">Theorem&nbsp;<span>7.2</span></a>) is the block power method with reorthonormalization; convergence is detected by the projector distance <a href="#thm-7-subspace-distance" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a>, and <strong>Rayleigh–Ritz</strong>
@@ -814,7 +920,7 @@ F(z_1,\dots,z_k,c)=\sum_{j=1}^k\sum_{i:\,c(i)=j}\ntwo{x_i-z_j}^2
 <li>A <strong>Markov chain</strong> advances distributions by a stochastic matrix <span class="math inline">\(P\)</span> (<a href="#prp-7-markov-evolution" class="quarto-xref">Proposition&nbsp;<span>7.1</span></a>); its <strong>invariant distribution</strong> is the eigenvalue-<span class="math inline">\(1\)</span> dominant eigenvector, guaranteed and computable by the power method when <span class="math inline">\(P\)</span> is positive (<strong>Perron–Frobenius</strong>, <a href="#thm-7-perron-frobenius" class="quarto-xref">Theorem&nbsp;<span>7.5</span></a>). <strong>PageRank</strong> is that method on the damped chain <a href="#eq-7-pagerank-damped" class="quarto-xref">Equation&nbsp;<span>7.7</span></a>, where the dominant eigenvalue is exactly <span class="math inline">\(1\)</span> so no renormalization is needed.</li>
 <li><strong>PCA</strong> minimizes <a href="#eq-7-pca-objective" class="quarto-xref">Equation&nbsp;<span>7.8</span></a>; the optimal <span class="math inline">\(k\)</span>-dimensional subspace is the span of the top <span class="math inline">\(k\)</span> left singular vectors of the de-meaned data (Eckart–Young), the dominant eigenvectors of the covariance.</li>
 <li>The <strong>randomized SVD</strong> approximates the rank-<span class="math inline">\(k\)</span> truncated SVD from a few random matvecs, exact when <span class="math inline">\(\rank(A)=k\)</span> and accurate up to the tail <span class="math inline">\(\sum_{i&gt;k}\sigma_i^2\)</span> under oversampling (<a href="#thm-7-randomized-svd" class="quarto-xref">Theorem&nbsp;<span>7.6</span></a>).</li>
-<li><strong>Spectral clustering</strong> builds a Gaussian-kernel graph, embeds via the lowest eigenvectors of the normalized Laplacian <span class="math inline">\(\hat L\)</span> (spectrum in <span class="math inline">\([0,2]\)</span>, <a href="#prp-7-laplacian-spectrum" class="quarto-xref">Proposition&nbsp;<span>7.2</span></a>), and runs <span class="math inline">\(k\)</span>-means on the embedding to separate clusters that are inseparable in data space (<a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>).</li>
+<li><strong>Spectral clustering</strong> builds a Gaussian-kernel graph, embeds via the lowest eigenvectors of the normalized Laplacian <span class="math inline">\(\hat L\)</span> (spectrum in <span class="math inline">\([0,2]\)</span>, <a href="#prp-7-laplacian-spectrum" class="quarto-xref">Proposition&nbsp;<span>7.2</span></a>), and runs <span class="math inline">\(k\)</span>-means on the embedding to separate clusters that are inseparable in data space (<a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.5</span></a>).</li>
 </ul>
 
 

@@ -354,7 +354,7 @@ E_3&amp;: x_1 + x_2 + x_3 = -2,        &amp; E_4&amp;: x_1 - x_2 + 4x_3 + 3x_4 =
 </section>
 <section id="partial-and-complete-pivoting" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="partial-and-complete-pivoting"><span class="header-section-number">4.2</span> Partial and complete pivoting</h2>
-<p>Even when <span class="math inline">\(a_{ss}\ne 0\)</span>, a <em>small</em> pivot is dangerous. Dividing by a pivot close to zero amplifies the round-off already present in the entries above it, and the computed solution can be badly wrong even though the system is well posed. The cure is to swap into the pivot position the equation with the largest available coefficient.</p>
+<p>Even when <span class="math inline">\(a_{ss}\ne 0\)</span>, a <em>small</em> pivot is dangerous. Dividing by a pivot close to zero amplifies the round-off already present in the entries above it, and the computed solution can be badly wrong even though the system is well posed (<a href="#fig-4-pivot-vs-cond" class="quarto-xref">Figure&nbsp;<span>4.4</span></a> makes this failure, and its cure, quantitative). The cure is to swap into the pivot position the equation with the largest available coefficient.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -388,12 +388,14 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Partial pivoting keeps the multipliers bounded, but it does <strong>not</strong> bound the <em>growth</em> of the matrix entries in the worst case. For the <strong>Wilkinson matrix</strong> <span class="math display">\[
+<p>Partial pivoting keeps the multipliers bounded, but it does <strong>not</strong> bound the <em>growth</em> of the matrix entries in the worst case. Measure that growth by the <strong>growth factor</strong> <span class="math display">\[
+\rho\defeq\frac{\max_{i,j,s}\abs{a_{ij}^{(s)}}}{\max_{i,j}\abs{a_{ij}}},
+\]</span> the largest entry appearing at any elimination stage <span class="math inline">\(s\)</span> relative to the largest entry of the original <span class="math inline">\(A\)</span>; the round-off in the computed solution is proportional to <span class="math inline">\(\rho\)</span>. For the <strong>Wilkinson matrix</strong> <span class="math display">\[
 A=\begin{pmatrix}
 1 &amp; &amp; &amp; &amp; 1\\ -1 &amp; 1 &amp; &amp; &amp; 1\\ -1 &amp; -1 &amp; 1 &amp; &amp; 1\\
 \vdots &amp; &amp; \ddots &amp; &amp; \vdots\\ -1 &amp; -1 &amp; \cdots &amp; -1 &amp; 1
 \end{pmatrix},
-\]</span> GEPP performs no swaps yet the trailing entries double at every step, so the largest entry of <span class="math inline">\(U\)</span> reaches <span class="math inline">\(2^{\,n-1}\)</span>. The residual <span class="math inline">\(r=b-A\hat x\)</span> of the computed solution then grows exponentially in <span class="math inline">\(n\)</span> (<a href="#fig-4-wilkinson" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>), even though the <em>problem</em> is not that sensitive. Partial pivoting is stable in practice and unstable only in the worst case.</p>
+\]</span> GEPP performs no swaps yet the trailing entries double at every step, so the largest entry of <span class="math inline">\(U\)</span> reaches <span class="math inline">\(2^{\,n-1}\)</span> and <span class="math inline">\(\rho=2^{\,n-1}\)</span>. The residual <span class="math inline">\(r=b-A\hat x\)</span> of the computed solution then grows exponentially in <span class="math inline">\(n\)</span> (<a href="#fig-4-wilkinson" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>), even though the <em>problem</em> is not that sensitive. Complete pivoting removes this growth: its factor is provably far milder, and is observed to sit near <span class="math inline">\(\rho\approx n\)</span> in practice. Partial pivoting is stable in practice and unstable only in the worst case.</p>
 </div>
 </div>
 <div id="fig-4-wilkinson" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -424,6 +426,17 @@ Figure&nbsp;4.1: Maximum residual <span class="math inline">\(\max_i\abs{r_i}\)<
 \]</span> using <span class="math inline">\(\sum_{k=1}^{N}k^2=\tfrac16 N(N+1)(2N+1)\)</span>. The multiplier and right-hand-side work, <span class="math inline">\(\sum_s (n-s)\)</span> and <span class="math inline">\(\sum_s 2(n-s)\)</span>, are each <span class="math inline">\(\bigO(n^2)\)</span>. Back-substitution costs <span class="math inline">\(\sum_{s=1}^{n}2(n-s)=n^2+\bigO(n)\)</span>. The cubic term therefore comes entirely from elimination. <span class="math inline">\(\square\)</span></p>
 </div>
 <p>The lopsided split (<span class="math inline">\(\bigO(n^3)\)</span> to triangularize but only <span class="math inline">\(\bigO(n^2)\)</span> to back-substitute) is the key economic fact of the whole chapter. If we must solve several systems with the <em>same</em> matrix <span class="math inline">\(A\)</span> but different right-hand sides, we should triangularize <span class="math inline">\(A\)</span> <strong>once</strong> and reuse the result. Storing the elimination as a factorization is exactly what makes that reuse possible, and it is where we turn next.</p>
+<p><a href="#fig-4-factor-reuse" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> makes the payoff concrete. Solving <span class="math inline">\(k\)</span> systems from scratch costs <span class="math inline">\(k\cdot\tfrac23 n^3\)</span>, a line whose slope is the full factorization cost; factoring once and reusing the result costs <span class="math inline">\(\tfrac23 n^3\)</span> up front and only <span class="math inline">\(2n^2\)</span> per additional right-hand side, a line so shallow it is nearly flat on the same axes. At <span class="math inline">\(n=500\)</span> the one-time factorization is <span class="math inline">\(\tfrac23 n^3\approx 8.3\times10^{7}\)</span> flops while each extra solve is <span class="math inline">\(2n^2=5\times10^{5}\)</span>, over a hundred times cheaper.</p>
+<div id="fig-4-factor-reuse" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-factor-reuse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/04-factor-reuse.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-factor-reuse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: Total flop count against the number of right-hand sides <span class="math inline">\(k\)</span>, at fixed <span class="math inline">\(n=500\)</span>. Re-solving from scratch pays the full <span class="math inline">\(\tfrac23 n^3\)</span> every time; factoring once and reusing <span class="math inline">\(L,U\)</span> pays it only once and then <span class="math inline">\(2n^2\)</span> per solve, so the reuse curve barely lifts off its intercept. This is the whole argument for the factorization viewpoint, and for never forming <span class="math inline">\(A^{-1}\)</span>: computing <span class="math inline">\(A^{-1}\)</span> is just the <span class="math inline">\(k=n\)</span> case of solving <span class="math inline">\(Ax_j=e_j\)</span>.
+</figcaption>
+</figure>
+</div>
 </section>
 <section id="matrix-algebra" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="matrix-algebra"><span class="header-section-number">4.4</span> Matrix algebra</h2>
@@ -465,9 +478,9 @@ A=\begin{pmatrix}1&amp;&amp;&amp;\\ \ell_{21}&amp;1&amp;&amp;\\ \vdots&amp;&amp;
 A=\begin{pmatrix}1&amp;1&amp;0&amp;3\\ 2&amp;1&amp;-1&amp;1\\ 3&amp;-1&amp;-1&amp;2\\ 1&amp;4&amp;3&amp;5\end{pmatrix}
 =\underbrace{\begin{pmatrix}1&amp;0&amp;0&amp;0\\ 2&amp;1&amp;0&amp;0\\ 3&amp;4&amp;1&amp;0\\ 1&amp;-3&amp;0&amp;1\end{pmatrix}}_{L}
 \underbrace{\begin{pmatrix}1&amp;1&amp;0&amp;3\\ 0&amp;-1&amp;-1&amp;-5\\ 0&amp;0&amp;3&amp;13\\ 0&amp;0&amp;0&amp;-13\end{pmatrix}}_{U}.
-\]</span> Once <span class="math inline">\(A=LU\)</span> is in hand, solving <span class="math inline">\(Ax=b\)</span> splits into two triangular solves, each <span class="math inline">\(\bigO(n^2)\)</span>: <span class="math display">\[
+\]</span> Once <span class="math inline">\(A=LU\)</span> is in hand, solving <span class="math inline">\(Ax=b\)</span> splits into two triangular solves: <span class="math display">\[
 Ly=b\ \text{(forward substitution)},\qquad Ux=y\ \text{(back-substitution)}.
-\]</span> This is where the factorization pays off: the <span class="math inline">\(\tfrac23 n^3\)</span> factorization is done once, and every new right-hand side costs only <span class="math inline">\(2n^2\)</span>.</p>
+\]</span> Each triangular solve costs <span class="math inline">\(n^2+\bigO(n)\)</span> (by the same <span class="math inline">\(\sum_s(n-s)\)</span> count as back-substitution in <a href="#thm-4-ge-cost" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>), so the pair costs <span class="math inline">\(2n^2+\bigO(n)\)</span>; this is the single per-right-hand-side figure, abbreviated <span class="math inline">\(2n^2\)</span>, that recurs below. This is where the factorization pays off: the <span class="math inline">\(\tfrac23 n^3\)</span> factorization is done once, and every new right-hand side costs only <span class="math inline">\(2n^2\)</span>, the shallow slope of <a href="#fig-4-factor-reuse" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>.</p>
 <section id="permutation-matrices-and-palu" class="level3">
 <h3 class="anchored" data-anchor-id="permutation-matrices-and-palu">Permutation matrices and <span class="math inline">\(PA=LU\)</span></h3>
 <p>Plain <span class="math inline">\(LU\)</span> fails exactly when elimination needs a row swap. Row swaps are themselves matrix multiplications: the <strong>permutation matrix</strong> <span class="math inline">\(P_{k,s}\)</span>, obtained by exchanging rows <span class="math inline">\(k\)</span> and <span class="math inline">\(s\)</span> of <span class="math inline">\(I_n\)</span>, has the property that <span class="math inline">\(P_{k,s}A\)</span> is <span class="math inline">\(A\)</span> with rows <span class="math inline">\(k\)</span> and <span class="math inline">\(s\)</span> interchanged. A product of permutation matrices is again a permutation matrix. If we collect all the swaps GEPP performs into one permutation <span class="math inline">\(P\)</span>, we can apply them to <span class="math inline">\(A\)</span> up front and then eliminate with no further swaps, which says the pivoted elimination is an ordinary <span class="math inline">\(LU\)</span> factorization of the row-reordered matrix <span class="math inline">\(PA\)</span>.</p>
@@ -625,6 +638,64 @@ h_1&amp;2(h_1+h_2)&amp;h_2&amp;\\
 <p>The progression <span class="math inline">\(\tfrac23 n^3\to\tfrac13 n^3\to 3n\)</span> across general <span class="math inline">\(LU\)</span>, Cholesky, and tridiagonal elimination is the recurring lesson of direct methods: identifying that a matrix is SPD, SDD, or banded, before touching the arithmetic, can cut the cost by a constant factor or, for banded matrices, by a whole power of <span class="math inline">\(n\)</span>.</p>
 </div>
 </div>
+<p><a href="#tbl-4-structure" class="quarto-xref">Table&nbsp;<span>4.1</span></a> collects the chapter’s spine in one place: what each class factors into, whether pivoting is needed, and the leading factorization cost.</p>
+<div id="tbl-4-structure" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-structure-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.1: Factorization, pivoting need, and cost for the matrix classes of this chapter; each new right-hand side then costs two triangular solves (<span class="math inline">\(2n^2\)</span> in the dense cases, <span class="math inline">\(\bigO(n)\)</span> when banded).
+</figcaption>
+<div aria-describedby="tbl-4-structure-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">matrix class</th>
+<th style="text-align: left;">factorization</th>
+<th style="text-align: center;">pivoting?</th>
+<th style="text-align: center;">factorization cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">general nonsingular</td>
+<td style="text-align: left;"><span class="math inline">\(PA=LU\)</span> (<a href="#thm-4-palu" class="quarto-xref">Theorem&nbsp;<span>4.3</span></a>)</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;"><span class="math inline">\(\tfrac23 n^3\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">strictly diagonally dominant</td>
+<td style="text-align: left;"><span class="math inline">\(A=LU\)</span> (<a href="#thm-4-sdd-nopivot" class="quarto-xref">Theorem&nbsp;<span>4.4</span></a>)</td>
+<td style="text-align: center;">no</td>
+<td style="text-align: center;"><span class="math inline">\(\tfrac23 n^3\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">symmetric positive definite</td>
+<td style="text-align: left;"><span class="math inline">\(A=LDL^\top\)</span> / Cholesky (<a href="#thm-4-cholesky" class="quarto-xref">Theorem&nbsp;<span>4.5</span></a>)</td>
+<td style="text-align: center;">no</td>
+<td style="text-align: center;"><span class="math inline">\(\tfrac13 n^3\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tridiagonal (general)</td>
+<td style="text-align: left;">bidiagonal <span class="math inline">\(L,U\)</span> (with swaps)</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;"><span class="math inline">\(4n\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tridiagonal SPD or SDD</td>
+<td style="text-align: left;">bidiagonal <span class="math inline">\(L,U\)</span></td>
+<td style="text-align: center;">no</td>
+<td style="text-align: center;"><span class="math inline">\(3n\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 </section>
 <section id="conditioning-of-a-linear-system" class="level2" data-number="4.8">
 <h2 data-number="4.8" class="anchored" data-anchor-id="conditioning-of-a-linear-system"><span class="header-section-number">4.8</span> Conditioning of a linear system</h2>
@@ -633,6 +704,17 @@ h_1&amp;2(h_1+h_2)&amp;h_2&amp;\\
 <p><span class="theorem-title"><strong>Definition 4.6 (Condition number)</strong></span> For a nonsingular <span class="math inline">\(A\)</span> and an induced matrix norm <span class="math inline">\(\norm{\cdot}\)</span>, the <strong>condition number</strong> is <span class="math display">\[
 \cond(A)\defeq\norm{A}\,\norm{A^{-1}}\ \ge 1,
 \]</span> written <span class="math inline">\(\cond_2,\cond_\infty,\dots\)</span> to match the norm used. A matrix with <span class="math inline">\(\cond(A)\)</span> large is <strong>ill-conditioned</strong>; one with <span class="math inline">\(\cond(A)\)</span> near <span class="math inline">\(1\)</span> is <strong>well-conditioned</strong>.</p>
+</div>
+<p>Geometrically, each equation <span class="math inline">\(E_i\)</span> is a line (a hyperplane in general) in the <span class="math inline">\((x_1,x_2)\)</span> plane, and the solution is where they cross. If the lines meet near-orthogonally the crossing is sharply pinned: perturbing the data slides each line a little and the intersection barely moves. If the lines are nearly parallel, the equations are almost redundant, and the same small slide sends the intersection far. Ill-conditioning is exactly this near-parallelism, and <span class="math inline">\(\cond(A)\)</span> measures it (<a href="#fig-4-conditioning-geometry" class="quarto-xref">Figure&nbsp;<span>4.3</span></a>).</p>
+<div id="fig-4-conditioning-geometry" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-conditioning-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/04-conditioning-geometry.svg" class="img-fluid figure-img" style="width:85.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-conditioning-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.3: Two <span class="math inline">\(2\times2\)</span> systems, each row of <span class="math inline">\(A\)</span> drawn as a line and each right-hand side known only to within a band of half-width <span class="math inline">\(\delta\)</span>. Left, a well-conditioned system (<span class="math inline">\(\cond_\infty=2\)</span>): the near-orthogonal bands overlap in a small patch, so the solution is well determined. Right, an ill-conditioned system (<span class="math inline">\(\cond_\infty\approx84\)</span>): the near-parallel bands overlap in a long sliver and the crossing point is poorly located. Same data uncertainty, wildly different sensitivity of the answer.
+</figcaption>
+</figure>
 </div>
 <p>The condition number bounds how much a relative perturbation of the data can change the solution.</p>
 <div id="thm-4-cond-bound" class="theorem">
@@ -643,7 +725,32 @@ h_1&amp;2(h_1+h_2)&amp;h_2&amp;\\
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>This is the standard first-order bound. From <span class="math inline">\(A\,\delta x=\delta b\)</span> we get <span class="math inline">\(\norm{\delta x}\le\norm{A^{-1}}\norm{\delta b}\)</span>, and from <span class="math inline">\(b=Ax\)</span> we get <span class="math inline">\(\norm{b}\le\norm{A}\norm{x}\)</span>, i.e.&nbsp;<span class="math inline">\(1/\norm{x}\le\norm{A}/\norm{b}\)</span>. Multiplying the two inequalities gives <span class="math inline">\(\norm{\delta x}/\norm{x}\le\norm{A}\norm{A^{-1}}\norm{\delta b}/\norm{b}\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>So a system with <span class="math inline">\(\cond(A)\approx10^{k}\)</span> can lose up to <span class="math inline">\(k\)</span> digits of accuracy relative to the precision of the data, independent of the solver. This is what the small-pivot experiments show: driving the <span class="math inline">\((1,1)\)</span> entry toward zero drives <span class="math inline">\(\cond(A)\)</span> up, and the residual <span class="math inline">\(r=b-A\hat x\)</span> grows with it. Pivoting keeps a stable algorithm from making things <em>worse</em>, but no direct method can recover accuracy that the conditioning of the problem has already destroyed; the condition number resurfaces in <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a> as the quantity governing how fast iterative solvers converge.</p>
+<p>To see the bound bite, take <span class="math display">\[
+A=\begin{pmatrix}1&amp;1\\ 1&amp;1.0001\end{pmatrix},\qquad b=\begin{pmatrix}2\\ 2.0001\end{pmatrix},
+\qquad x=\begin{pmatrix}1\\ 1\end{pmatrix}.
+\]</span> Here <span class="math inline">\(\det A=10^{-4}\)</span>, so <span class="math display">\[
+A^{-1}=10^{4}\begin{pmatrix}1.0001&amp;-1\\ -1&amp;1\end{pmatrix}
+=\begin{pmatrix}10001&amp;-10000\\ -10000&amp;10000\end{pmatrix},
+\]</span> and with <span class="math inline">\(\ninf{A}=2.0001\)</span>, <span class="math inline">\(\ninf{A^{-1}}=20001\)</span> the condition number is <span class="math inline">\(\cond_\infty(A)=2.0001\cdot 20001\approx 4.0\times10^{4}\)</span>. Now perturb the data to <span class="math inline">\(b+\delta b=(2.0001,\,2)^\top\)</span>, a relative change <span class="math inline">\(\ninf{\delta b}/\ninf{b}=10^{-4}/2.0001\approx
+5.0\times10^{-5}\)</span>. The new solution is <span class="math inline">\(x+\delta x=(3.0001,\,-1)^\top\)</span>, so <span class="math inline">\(\ninf{\delta x}/\ninf{x}=2.0001\)</span>. The amplification is <span class="math display">\[
+\frac{\ninf{\delta x}/\ninf{x}}{\ninf{\delta b}/\ninf{b}}
+=\frac{2.0001}{5.0\times10^{-5}}\approx 4.0\times10^{4}=\cond_\infty(A),
+\]</span> so this perturbation <em>attains</em> the bound of <a href="#thm-4-cond-bound" class="quarto-xref">Theorem&nbsp;<span>4.6</span></a> exactly. Concretely, an input good to about four digits (<span class="math inline">\(5\times10^{-5}\)</span>) yields an output with no correct digits at all (<span class="math inline">\(\ninf{\delta x}/\ninf{x}\approx2\)</span>): the <span class="math inline">\(\cond_\infty\approx10^{4.6}\)</span> has cost roughly the predicted <span class="math inline">\(4.6\)</span> digits.</p>
+<p>So a system with <span class="math inline">\(\cond(A)\approx10^{k}\)</span> can lose up to <span class="math inline">\(k\)</span> digits of accuracy relative to the precision of the data, independent of the solver.</p>
+<p>It is worth separating this from the small-pivot failure that motivated pivoting, because the two are different mechanisms. Consider the family <span class="math display">\[
+A=\begin{pmatrix}\varepsilon&amp;1\\ 1&amp;1\end{pmatrix},\qquad 0&lt;\varepsilon&lt;1,
+\]</span> the archetypal small-pivot example. As <span class="math inline">\(\varepsilon\to0\)</span> this matrix is <strong>well-conditioned</strong>: <span class="math inline">\(\cond_2(A)\to(1+\sqrt5)/(\sqrt5-1)\approx2.618\)</span>, bounded and small. The <em>problem</em> is fine. What fails is naive elimination: using the tiny pivot <span class="math inline">\(\varepsilon\)</span> forms the multiplier <span class="math inline">\(1/\varepsilon\)</span>, and the update <span class="math inline">\(1-1/\varepsilon\)</span> loses every bit of the original <span class="math inline">\(1\)</span> to catastrophic cancellation, so the computed solution is wrong by a relative error of order (unit roundoff)<span class="math inline">\(/\varepsilon\)</span>. One swap fixes it: GEPP puts the <span class="math inline">\(1\)</span> in the pivot position and returns a solution good to machine precision (<a href="#fig-4-pivot-vs-cond" class="quarto-xref">Figure&nbsp;<span>4.4</span></a>). A small pivot is thus an <em>algorithm</em> defect, curable by pivoting; ill-conditioning is a <em>problem</em> defect that defeats every solver equally. The earlier claim that “driving the <span class="math inline">\((1,1)\)</span> entry toward zero drives <span class="math inline">\(\cond(A)\)</span> up” is what happens only if the whole matrix degenerates; a small pivot alone does not.</p>
+<div id="fig-4-pivot-vs-cond" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-pivot-vs-cond-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/04-pivot-vs-cond.svg" class="img-fluid figure-img" style="width:70.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-pivot-vs-cond-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.4: The small-pivot family <span class="math inline">\(A=[[\varepsilon,1],[1,1]]\)</span> as <span class="math inline">\(\varepsilon\)</span> shrinks (note the reversed axis). The problem stays well-conditioned throughout (<span class="math inline">\(\cond_2\approx2.6\)</span>, flat), yet the relative forward error of naive Gaussian elimination climbs like (unit roundoff)<span class="math inline">\(/\varepsilon\)</span> up to <span class="math inline">\(O(1)\)</span>, while GEPP stays at machine precision. Algorithm stability and problem conditioning come apart: a perfectly benign problem that naive elimination nonetheless butchers, and that one row swap rescues.
+</figcaption>
+</figure>
+</div>
+<p>Pivoting keeps a stable algorithm from making things <em>worse</em>, but no direct method can recover accuracy that the conditioning of the problem has already destroyed; the condition number resurfaces in <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a> as the quantity governing how fast iterative solvers converge.</p>
 </section>
 <section id="chapter-summary" class="level2" data-number="4.9">
 <h2 data-number="4.9" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">4.9</span> Chapter summary</h2>

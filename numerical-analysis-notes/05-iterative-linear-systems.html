@@ -306,7 +306,8 @@ window.Quarto = {
   <li><a href="#sec-5-cg" id="toc-sec-5-cg" class="nav-link" data-scroll-target="#sec-5-cg"><span class="header-section-number">8.3</span> The conjugate gradient method</a></li>
   <li><a href="#sec-5-cg-convergence" id="toc-sec-5-cg-convergence" class="nav-link" data-scroll-target="#sec-5-cg-convergence"><span class="header-section-number">8.4</span> Convergence of CG</a></li>
   <li><a href="#sec-5-preconditioning" id="toc-sec-5-preconditioning" class="nav-link" data-scroll-target="#sec-5-preconditioning"><span class="header-section-number">8.5</span> Preconditioning</a></li>
-  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">8.6</span> Chapter summary</a></li>
+  <li><a href="#the-methods-at-a-glance" id="toc-the-methods-at-a-glance" class="nav-link" data-scroll-target="#the-methods-at-a-glance"><span class="header-section-number">8.6</span> The methods at a glance</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">8.7</span> Chapter summary</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -497,6 +498,7 @@ b=\begin{pmatrix}2\\2.0001\end{pmatrix}.
 <p><span class="proof-title"><em>Proof</em>. </span><span class="math inline">\(AA^{-1}=I\)</span> and submultiplicativity give <span class="math inline">\(1=\norm{I}\le\norm{A}\,\norm{A^{-1}}=\cond(A)\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
 <p>For the example above, <span class="math inline">\(A^{-1}=\frac{1}{0.0001}\begin{psmallmatrix}1.0001&amp;-1\\-1&amp;1\end{psmallmatrix}\)</span>, so <span class="math inline">\(\ninf{A}=2.0001\)</span> and <span class="math inline">\(\ninf{A^{-1}}=20001\)</span>, giving <span class="math inline">\(\cond_\infty(A)\approx4.0\times10^4\)</span>. The <span class="math inline">\(2\)</span>-norm tells the same story: the eigenvalues are <span class="math inline">\(\approx2.00005\)</span> and <span class="math inline">\(\approx5\times10^{-5}\)</span>, so <span class="math inline">\(\cond_2(A)\approx4\times10^4\)</span> as well. That enormous condition number is the licence for a <span class="math inline">\(10^{-4}\)</span> residual to hide a <span class="math inline">\(\sqrt2\)</span> error. Note too that this <span class="math inline">\(A\)</span> is symmetric positive definite, a foreshadowing of Movement (C), where <span class="math inline">\(\cond_2(A)\)</span> returns as the single quantity governing how fast conjugate gradient converges (<a href="#eq-5-2-matrix-norm" class="quarto-xref">Equation&nbsp;<span>6.4</span></a> makes <span class="math inline">\(\cond_2(A)=\sigma_1/\sigma_n\)</span>, the ratio of extreme singular values, and for SPD <span class="math inline">\(A\)</span> the ratio of extreme eigenvalues).</p>
+<p>This has a practical bite for the stopping tests to come. Both descent algorithms of Movement (C) halt on the relative residual <span class="math inline">\(\ntwo{r^{(k)}}/\ntwo{b}\le\eps\)</span>, but by the relative form of <a href="#thm-5-residual-error" class="quarto-xref">Theorem&nbsp;<span>6.5</span></a> that test pins the relative <em>error</em> only up to a factor <span class="math inline">\(\cond(A)\)</span>: <span class="math inline">\(\ntwo{x-x^{(k)}}/\ntwo{x}\le\cond(A)\,\eps\)</span>. On an ill-conditioned SPD system the error actually achieved can therefore be as much as <span class="math inline">\(\cond(A)\)</span> times larger than the tolerance <span class="math inline">\(\eps\)</span> the residual seems to promise.</p>
 </section>
 </section>
 <section id="movement-b-stationary-splitting-iterations" class="level1" data-number="7">
@@ -606,6 +608,50 @@ y^{(k+1)}=Tx^{(k)}-Tx=T\,y^{(k)},
 <p><span class="proof-title"><em>Proof</em>. </span>For Jacobi the computation above gives <span class="math inline">\(\ninf{T}&lt;1\)</span>, so <a href="#cor-5-rate" class="quarto-xref">Corollary&nbsp;<span>7.1</span></a> applies. Gauss–Seidel converges under the same hypothesis; the standard argument bounds the eigenvalues of <span class="math inline">\((D-L)^{-1}U\)</span> below <span class="math inline">\(1\)</span> via diagonal dominance, quoted here without proof. <span class="math inline">\(\square\)</span></p>
 </div>
 <p>This closes a loop with Part I. The cubic-spline system of <a href="01-interpolation.html#sec-1-splines" class="quarto-xref"><span>Section 1.5</span></a> (<a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a>) is tridiagonal with diagonal <span class="math inline">\(4\)</span> against off-diagonals summing to <span class="math inline">\(2\)</span>, strictly diagonally dominant. So <a href="#thm-5-sdd-convergence" class="quarto-xref">Theorem&nbsp;<span>7.2</span></a> tells us Jacobi and Gauss–Seidel would both solve that spline system, a concrete iterative payoff for a matrix we first met in an interpolation problem.</p>
+<p>A small run makes the theory tangible and shows Gauss–Seidel pulling ahead. Take the strictly diagonally dominant <span class="math display">\[
+A=\begin{pmatrix}4&amp;-1&amp;0\\-1&amp;4&amp;-1\\0&amp;-1&amp;4\end{pmatrix},\qquad
+b=\begin{pmatrix}3\\2\\3\end{pmatrix},\qquad x=\begin{pmatrix}1\\1\\1\end{pmatrix},
+\]</span> whose exact solution is <span class="math inline">\(x=(1,1,1)^\top\)</span>. Here <span class="math inline">\(D=4I\)</span> and <span class="math inline">\(L+U\)</span> has <span class="math inline">\(1\)</span>’s on the sub- and super-diagonal, so the Jacobi matrix is <span class="math inline">\(T=\tfrac14(L+U)\)</span>; its eigenvalues are <span class="math inline">\(\tfrac{\sqrt2}{4},0,-\tfrac{\sqrt2}{4}\)</span>, giving <span class="math inline">\(\spec(T_{\text{J}})=\tfrac{\sqrt2}{4}\approx0.354\)</span>. For this tridiagonal case the Gauss–Seidel matrix has spectral radius exactly <span class="math inline">\(\spec(T_{\text{J}})^2=\tfrac18=0.125\)</span>, so Gauss–Seidel should contract about twice as fast per step. Running both from <span class="math inline">\(x^{(0)}=0\)</span>:</p>
+<div id="tbl-5-jacobi-gs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-5-jacobi-gs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7.1: Two sweeps of Jacobi and Gauss–Seidel on the <span class="math inline">\(3\times3\)</span> system, from <span class="math inline">\(x^{(0)}=0\)</span>. Both errors shrink; Gauss–Seidel, reusing each freshly updated component within the sweep, is already the closer of the two.
+</figcaption>
+<div aria-describedby="tbl-5-jacobi-gs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">method</th>
+<th style="text-align: center;"><span class="math inline">\(x^{(1)}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(x^{(2)}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\ninf{x^{(2)}-x}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Jacobi</td>
+<td style="text-align: center;"><span class="math inline">\((0.750,\,0.500,\,0.750)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\((0.875,\,0.875,\,0.875)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.125\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gauss–Seidel</td>
+<td style="text-align: center;"><span class="math inline">\((0.750,\,0.688,\,0.922)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\((0.922,\,0.961,\,0.990)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.078\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>As <a href="#tbl-5-jacobi-gs" class="quarto-xref">Table&nbsp;<span>7.1</span></a> shows, after two sweeps Jacobi is off by <span class="math inline">\(0.125\)</span> in the <span class="math inline">\(\infty\)</span>-norm while Gauss–Seidel is off by <span class="math inline">\(0.078\)</span>, the smaller spectral radius cashed out as the smaller error.</p>
 <p>Two more facts frame the tuning of SOR’s parameter <span class="math inline">\(\omega\)</span>. First, <span class="math inline">\(\omega\)</span> is not free.</p>
 <div id="thm-5-kahan" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 7.3 (Kahan’s theorem)</strong></span> If <span class="math inline">\(a_{ii}\ne0\)</span> for all <span class="math inline">\(i\)</span>, then <span class="math inline">\(\spec(T_\omega)\ge\abs{\omega-1}\)</span> for SOR. Hence SOR can converge only if <span class="math inline">\(\omega\in(0,2)\)</span>.</p>
@@ -620,7 +666,17 @@ y^{(k+1)}=Tx^{(k)}-Tx=T\,y^{(k)},
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>Stated without proof (see the textbook). For weighted Jacobi one can see it directly: when <span class="math inline">\(A\succ0\)</span>, <span class="math inline">\(D^{-1}A\)</span> is diagonalizable with positive eigenvalues, so the eigenvalues <span class="math inline">\(1-\omega\lambda\)</span> of <span class="math inline">\(T_\omega=I-\omega D^{-1}A\)</span> lie in <span class="math inline">\((-1,1)\)</span> exactly when <span class="math inline">\(0&lt;\omega&lt;2/\spec(D^{-1}A)\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>The <em>optimal</em> <span class="math inline">\(\omega\)</span> is hard in general, though a closed form is known for tridiagonal positive definite matrices (see the textbook).</p>
+<p>The <em>optimal</em> <span class="math inline">\(\omega\)</span> is hard in general, though a closed form is known for tridiagonal positive definite matrices (see the textbook). <a href="#fig-5-sor-spectral-radius" class="quarto-xref">Figure&nbsp;<span>7.1</span></a> plots the whole story for one such matrix: <span class="math inline">\(\spec(T_\omega)\)</span> against <span class="math inline">\(\omega\)</span> traces a U with a sharp cusp, dropping from the Gauss–Seidel value at <span class="math inline">\(\omega=1\)</span> to a pronounced minimum at <span class="math inline">\(\omega_\ast\)</span>, then climbing the Kahan line <span class="math inline">\(\abs{\omega-1}\)</span> toward <span class="math inline">\(1\)</span>. Outside <span class="math inline">\((0,2)\)</span> that line already exceeds <span class="math inline">\(1\)</span>, so <a href="#thm-5-kahan" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a> is visible as the two endpoints where the curve is pinned to <span class="math inline">\(1\)</span>.</p>
+<div id="fig-5-sor-spectral-radius" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-5-sor-spectral-radius-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/05-sor-spectral-radius.svg" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-5-sor-spectral-radius-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.1: Spectral radius <span class="math inline">\(\spec(T_\omega)\)</span> of the SOR iteration matrix versus the relaxation parameter <span class="math inline">\(\omega\)</span>, for the <span class="math inline">\(1\)</span>-D Laplacian <span class="math inline">\(\operatorname{tridiag}(-1,2,-1)\)</span> with <span class="math inline">\(n=10\)</span>. The shaded band is the convergent region <span class="math inline">\(\spec&lt;1\)</span>. Over-relaxation pays off dramatically: the radius falls from the Gauss–Seidel value <span class="math inline">\(\spec(T_1)\approx0.92\)</span> (at <span class="math inline">\(\omega=1\)</span>, just below the Jacobi radius <span class="math inline">\(\approx0.96\)</span>) to <span class="math inline">\(\spec(T_{\omega_\ast})\approx0.56\)</span> at the optimum <span class="math inline">\(\omega_\ast\approx1.56\)</span>. For <span class="math inline">\(\omega\ge\omega_\ast\)</span> the eigenvalues turn complex and the radius rides the Kahan lower bound <span class="math inline">\(\abs{\omega-1}\)</span> (dashed), which forces <span class="math inline">\(\spec(T_\omega)\ge1\)</span> once <span class="math inline">\(\omega\)</span> leaves <span class="math inline">\((0,2)\)</span>.
+</figcaption>
+</figure>
+</div>
 </section>
 </section>
 <section id="movement-c-spd-systems-as-optimization" class="level1" data-number="8">
@@ -692,7 +748,17 @@ t^{(k)}=\frac{v^\top(b-Ax)}{v^\top Av}
 </ol>
 </div>
 </div>
-<p>Exact line search has a built-in defect that shows up geometrically. Because <span class="math inline">\(h'(t^{(k)})=0\)</span>, the new residual is orthogonal to the direction just travelled: <span class="math inline">\(\inner{r^{(k)}}{v^{(k)}}=0\)</span>. So each step turns a right angle from the last. On a well-conditioned bowl the level sets are nearly circular and those right-angle turns still march briskly toward the centre. On an ill-conditioned bowl, level sets stretched by a factor <span class="math inline">\(\cond_2(A)\)</span>, the negative gradient points almost straight across the narrow valley rather than along it, and two consecutive right-angle steps come back nearly antiparallel. The iterate then <strong>ricochets from wall to wall</strong>, inching along the valley floor a sliver at a time. The damage is quantitative: steepest descent contracts the error by only about <span class="math inline">\(\tfrac{\cond_2(A)-1}{\cond_2(A)+1}\)</span> per step, which for large <span class="math inline">\(\cond_2(A)\)</span> is roughly <span class="math inline">\(1-2/\cond_2(A)\)</span>, agonizingly close to <span class="math inline">\(1\)</span>. The remedy is to stop throwing away the directions already explored, which is the whole idea of conjugate gradient.</p>
+<p>Exact line search has a built-in defect that shows up geometrically. Because <span class="math inline">\(h'(t^{(k)})=0\)</span>, the new residual is orthogonal to the direction just travelled: <span class="math inline">\(\inner{r^{(k)}}{v^{(k)}}=0\)</span>. So each step turns a right angle from the last. On a well-conditioned bowl the level sets are nearly circular and those right-angle turns still march briskly toward the centre. On an ill-conditioned bowl, level sets stretched by a factor <span class="math inline">\(\cond_2(A)\)</span>, the negative gradient points almost straight across the narrow valley rather than along it, and two consecutive right-angle steps come back nearly antiparallel. The iterate then <strong>ricochets from wall to wall</strong>, inching along the valley floor a sliver at a time (<a href="#fig-5-sd-zigzag" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>). The damage is quantitative: steepest descent contracts the error by only about <span class="math inline">\(\tfrac{\cond_2(A)-1}{\cond_2(A)+1}\)</span> per step, which for large <span class="math inline">\(\cond_2(A)\)</span> is roughly <span class="math inline">\(1-2/\cond_2(A)\)</span>, agonizingly close to <span class="math inline">\(1\)</span>. The remedy is to stop throwing away the directions already explored, which is the whole idea of conjugate gradient.</p>
+<div id="fig-5-sd-zigzag" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-5-sd-zigzag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/05-sd-zigzag.svg" class="img-fluid figure-img" style="width:90.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-5-sd-zigzag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.1: Steepest descent on the quadratic bowl <span class="math inline">\(g(x)=\tfrac12 x^\top Ax\)</span> for two SPD matrices <span class="math inline">\(A\)</span>, with the minimizer starred. Left, a well-conditioned <span class="math inline">\(A\)</span> (<span class="math inline">\(\cond_2=1.5\)</span>): the level sets are nearly circular and the iterates march almost straight to the centre. Right, an ill-conditioned <span class="math inline">\(A\)</span> (<span class="math inline">\(\cond_2=30\)</span>): the level sets are a long thin valley, each exact-line-search step turns a right angle from the last, and the path ricochets between the walls while crawling along the floor. The conjugate-gradient path (in red) reaches the minimizer in exactly <span class="math inline">\(2\)</span> steps on the same problem.
+</figcaption>
+</figure>
+</div>
 </section>
 <section id="sec-5-cg" class="level2" data-number="8.3">
 <h2 data-number="8.3" class="anchored" data-anchor-id="sec-5-cg"><span class="header-section-number">8.3</span> The conjugate gradient method</h2>
@@ -703,7 +769,9 @@ t^{(k)}=\frac{v^\top(b-Ax)}{v^\top Av}
 <p>Conjugate gradient (CG) manufactures such directions as it goes. At step <span class="math inline">\(k\)</span> it starts from the steepest-descent residual <span class="math inline">\(r^{(k-1)}\)</span> and <strong><span class="math inline">\(A\)</span>-orthogonalizes</strong> it against all earlier directions by Gram–Schmidt in the <span class="math inline">\(A\)</span>-inner product: <span class="math display">\[
 v^{(k)}=r^{(k-1)}-\sum_{j=1}^{k-1}
 \frac{\inner{r^{(k-1)}}{v^{(j)}}_A}{\inner{v^{(j)}}{v^{(j)}}_A}\,v^{(j)} .
-\]</span> Written out this looks expensive, a growing sum at every step. Here is why it is not. The residuals <span class="math inline">\(r^{(0)},\dots,r^{(k-1)}\)</span> span the same Krylov subspace as the directions <span class="math inline">\(v^{(1)},\dots,v^{(k)}\)</span> built so far, and exact line search makes the new residual <span class="math inline">\(r^{(k-1)}\)</span> orthogonal to that whole subspace, hence to every <span class="math inline">\(v^{(j)}\)</span> with <span class="math inline">\(j&lt;k\)</span>. Feeding this into the projection coefficients, the factor <span class="math inline">\(\inner{r^{(k-1)}}{v^{(j)}}_A=\inner{r^{(k-1)}}{Av^{(j)}}\)</span> vanishes for every <span class="math inline">\(j\)</span> except <span class="math inline">\(j=k-1\)</span>, because <span class="math inline">\(Av^{(j)}\)</span> stays inside that subspace for <span class="math inline">\(j&lt;k-1\)</span> but <span class="math inline">\(Av^{(k-1)}\)</span> pokes out of it. Every term of the long sum is therefore zero but the last, and the Gram–Schmidt collapses to a <strong>two-term recurrence</strong>, <span id="eq-5-cg-recurrence"><span class="math display">\[
+\]</span> Written out this looks expensive, a growing sum at every step. Here is why it is not. Let <span class="math display">\[
+\mathcal K_k=\Span\{r^{(0)},Ar^{(0)},\dots,A^{k-1}r^{(0)}\}
+\]</span> be the <strong>Krylov subspace</strong> of order <span class="math inline">\(k\)</span>. Both families live inside it in lockstep: <span class="math inline">\(v^{(j)},r^{(j)}\in\mathcal K_{j+1}\)</span>, and the residuals <span class="math inline">\(r^{(0)},\dots,r^{(k-1)}\)</span> span the same <span class="math inline">\(\mathcal K_k\)</span> as the directions <span class="math inline">\(v^{(1)},\dots,v^{(k)}\)</span> built so far. Exact line search makes the new residual <span class="math inline">\(r^{(k-1)}\)</span> orthogonal to that whole subspace <span class="math inline">\(\mathcal K_k\)</span>, hence to every <span class="math inline">\(v^{(j)}\)</span> with <span class="math inline">\(j&lt;k\)</span>. Feeding this into the projection coefficients, the factor <span class="math inline">\(\inner{r^{(k-1)}}{v^{(j)}}_A=\inner{r^{(k-1)}}{Av^{(j)}}\)</span> vanishes for every <span class="math inline">\(j\)</span> except <span class="math inline">\(j=k-1\)</span>: for <span class="math inline">\(j&lt;k-1\)</span> we have <span class="math inline">\(Av^{(j)}\in\mathcal K_{j+2}\subseteq\mathcal K_k\)</span>, so <span class="math inline">\(r^{(k-1)}\perp Av^{(j)}\)</span>, whereas <span class="math inline">\(Av^{(k-1)}\in\mathcal K_{k+1}\)</span> pokes out of <span class="math inline">\(\mathcal K_k\)</span> and is the one term that survives. Every term of the long sum is therefore zero but the last, and the Gram–Schmidt collapses to a <strong>two-term recurrence</strong>, <span id="eq-5-cg-recurrence"><span class="math display">\[
 v^{(1)}=r^{(0)},\qquad
 v^{(k)}=r^{(k-1)}+s^{(k-1)}v^{(k-1)},\qquad
 s^{(k-1)}=-\frac{\inner{r^{(k-1)}}{Av^{(k-1)}}}{\inner{v^{(k-1)}}{Av^{(k-1)}}} .
@@ -729,7 +797,7 @@ s^{(k-1)}=-\frac{\inner{r^{(k-1)}}{Av^{(k-1)}}}{\inner{v^{(k-1)}}{Av^{(k-1)}}} .
 </ol>
 </div>
 </div>
-<p>So CG costs one matvec per step, exactly like steepest descent, but its directions remember the entire history rather than just the current gradient, which is what buys the dramatically faster descent of <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>. The loop in code:</p>
+<p>So CG costs one matvec per step, exactly like steepest descent, but its directions remember the entire history rather than just the current gradient, which is what buys the dramatically faster descent of <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>8.2</span></a>. The loop in code:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conjugate_gradient(A, b, x0, m, eps):</span>
@@ -761,23 +829,23 @@ s^{(k-1)}=-\frac{\inner{r^{(k-1)}}{Av^{(k-1)}}}{\inner{v^{(k-1)}}{Av^{(k-1)}}} .
 <p>Finite termination already delivers an <span class="math inline">\(\bigO(n^2)\)</span> solver whenever each matvec is <span class="math inline">\(\bigO(n)\)</span> (sparse <span class="math inline">\(A\)</span>), beating the <span class="math inline">\(\bigO(n^3)\)</span> of a factorization. But the real prize is that CG usually reaches good accuracy in <strong>far fewer than <span class="math inline">\(n\)</span></strong> steps, at a rate set by the condition number, the same <span class="math inline">\(\cond_2(A)\)</span> from <a href="#sec-5-condition" class="quarto-xref"><span>Section 6.3</span></a>.</p>
 <div id="thm-5-cg-convergence" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 8.3 (Convergence rate of conjugate gradient)</strong></span> If <span class="math inline">\(A\succ0\)</span> has <span class="math inline">\(2\)</span>-norm condition number <span class="math inline">\(\cond(A)=\cond_2(A)\)</span>, then the CG iterates for <span class="math inline">\(Ax=b\)</span> satisfy <span id="eq-5-cg-rate"><span class="math display">\[
-\ntwo{x^{(k)}-x}\le 2\,\cond(A)\left(\frac{\sqrt{\cond(A)}-1}{\sqrt{\cond(A)}+1}\right)^{k}
+\ntwo{x^{(k)}-x}\le 2\,\sqrt{\cond(A)}\left(\frac{\sqrt{\cond(A)}-1}{\sqrt{\cond(A)}+1}\right)^{k}
 \ntwo{x^{(0)}-x} .
 \tag{8.5}\]</span></span></p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Stated without proof; the standard argument bounds the <span class="math inline">\(A\)</span>-norm of the error by a Chebyshev polynomial on the spectrum of <span class="math inline">\(A\)</span>. For SPD <span class="math inline">\(A\)</span>, <span class="math inline">\(\cond_2(A)\)</span> is the ratio of largest to smallest eigenvalue. The base is the point: when <span class="math inline">\(\cond(A)\)</span> is large, <span class="math display">\[
+<p><span class="proof-title"><em>Proof</em>. </span>Stated without proof; the standard argument bounds the <span class="math inline">\(A\)</span>-norm of the error by a Chebyshev polynomial on the spectrum of <span class="math inline">\(A\)</span>, giving the clean bound <span class="math inline">\(\norm{x^{(k)}-x}_A\le 2\,r^k\norm{x^{(0)}-x}_A\)</span> with <span class="math inline">\(r=(\sqrt{\cond(A)}-1)/(\sqrt{\cond(A)}+1)\)</span>. Passing from the <span class="math inline">\(A\)</span>-norm to the <span class="math inline">\(2\)</span>-norm costs a factor <span class="math inline">\(\sqrt{\cond(A)}\)</span> (since <span class="math inline">\(\sqrt{\lambda_{\min}}\,\ntwo{e}\le\norm{e}_A\le\sqrt{\lambda_{\max}}\,\ntwo{e}\)</span>), which is the prefactor in <a href="#eq-5-cg-rate" class="quarto-xref">Equation&nbsp;<span>8.5</span></a>. For SPD <span class="math inline">\(A\)</span>, <span class="math inline">\(\cond_2(A)\)</span> is the ratio of largest to smallest eigenvalue. The base is the point: when <span class="math inline">\(\cond(A)\)</span> is large, <span class="math display">\[
 \frac{\sqrt{\cond(A)}-1}{\sqrt{\cond(A)}+1}\approx1-\frac{2}{\sqrt{\cond(A)}},
 \]</span> so CG’s error decays geometrically at a rate governed by <span class="math inline">\(\sqrt{\cond(A)}\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>Set this beside the descent estimate of <a href="#sec-5-steepest-descent" class="quarto-xref"><span>Section 8.2</span></a>. Steepest descent (and the stationary methods) contract with base about <span class="math inline">\(1-2/\cond(A)\)</span>; CG contracts with base about <span class="math inline">\(1-2/\sqrt{\cond(A)}\)</span>. Replacing <span class="math inline">\(\cond\)</span> by <span class="math inline">\(\sqrt{\cond}\)</span> in the exponent is a genuine square-root speedup, worth orders of magnitude on ill-conditioned problems. <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> shows both methods on the <span class="math inline">\(1\)</span>-D Laplacian, an SPD system with <span class="math inline">\(\cond_2(A)\approx4.1\times10^3\)</span>: steepest descent stalls against the walls of its valley while CG plunges.</p>
+<p>Set this beside the descent estimate of <a href="#sec-5-steepest-descent" class="quarto-xref"><span>Section 8.2</span></a>. Steepest descent (and the stationary methods) contract with base about <span class="math inline">\(1-2/\cond(A)\)</span>; CG contracts with base about <span class="math inline">\(1-2/\sqrt{\cond(A)}\)</span>. Replacing <span class="math inline">\(\cond\)</span> by <span class="math inline">\(\sqrt{\cond}\)</span> in the exponent is a genuine square-root speedup, worth orders of magnitude on ill-conditioned problems. Put numbers on it for the very matrix of <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>8.2</span></a>, the <span class="math inline">\(1\)</span>-D Laplacian with <span class="math inline">\(\cond_2(A)\approx4.1\times10^3\)</span>. Steepest descent contracts at base <span class="math inline">\(1-2/\cond_2(A)\approx0.99951\)</span>, so cutting the error by <span class="math inline">\(10^{-6}\)</span> needs about <span class="math inline">\(\log(10^{-6})/\log(0.99951)\approx2.8\times10^4\)</span> steps; conjugate gradient contracts at base <span class="math inline">\(1-2/\sqrt{\cond_2(A)}\approx0.969\)</span> and needs only about <span class="math inline">\(4\times10^2\)</span>. That is the <span class="math inline">\(\sim\!70\times\)</span> gap the figure already draws, and it is exactly the square root of the conditioning: <span class="math inline">\(\sqrt{4.1\times10^3}\approx64\)</span>. <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>8.2</span></a> shows both methods on this system: steepest descent stalls against the walls of its valley while CG plunges.</p>
 <div id="fig-5-cg-vs-sd" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-5-cg-vs-sd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/05-cg-vs-sd.svg" class="img-fluid figure-img" style="width:75.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-5-cg-vs-sd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.1: Relative residual <span class="math inline">\(\ntwo{r^{(k)}}/\ntwo{b}\)</span> against iteration for the <span class="math inline">\(1\)</span>-D Laplacian <span class="math inline">\(A=\operatorname{tridiag}(-1,2,-1)\)</span> of size <span class="math inline">\(n=100\)</span>, the matrix from discretizing <span class="math inline">\(-u''\)</span> and a close relative of the tridiagonal spline system of <a href="01-interpolation.html#sec-1-splines" class="quarto-xref"><span>Section 1.5</span></a>. Its eigenvalues <span class="math inline">\(4\sin^2\!\bigl(\tfrac{k\pi}{2(n+1)}\bigr)\)</span> give <span class="math inline">\(\cond_2(A)\approx4.1\times10^3\)</span>. Steepest descent ricochets down the narrow valley and crawls; conjugate gradient, carrying the full history of search directions, drives the residual down many orders of magnitude in a fraction of the iterations.
+Figure&nbsp;8.2: Relative residual <span class="math inline">\(\ntwo{r^{(k)}}/\ntwo{b}\)</span> against iteration for the <span class="math inline">\(1\)</span>-D Laplacian <span class="math inline">\(A=\operatorname{tridiag}(-1,2,-1)\)</span> of size <span class="math inline">\(n=100\)</span>, the matrix from discretizing <span class="math inline">\(-u''\)</span> and a close relative of the tridiagonal spline system of <a href="01-interpolation.html#sec-1-splines" class="quarto-xref"><span>Section 1.5</span></a>. Its eigenvalues <span class="math inline">\(4\sin^2\!\bigl(\tfrac{k\pi}{2(n+1)}\bigr)\)</span> give <span class="math inline">\(\cond_2(A)\approx4.1\times10^3\)</span>. Steepest descent ricochets down the narrow valley and crawls; conjugate gradient, carrying the full history of search directions, drives the residual down many orders of magnitude in a fraction of the iterations.
 </figcaption>
 </figure>
 </div>
@@ -793,8 +861,83 @@ Figure&nbsp;8.1: Relative residual <span class="math inline">\(\ntwo{r^{(k)}}/\n
 C=D^{1/2},
 \]</span> with <span class="math inline">\(D\)</span> the diagonal of <span class="math inline">\(A\)</span>: a one-line stand-in for a Cholesky factor. Then <span class="math inline">\(C^{-1}=C^{-\top}\)</span> is diagonal with entries <span class="math inline">\(1/\sqrt{a_{ii}}\)</span>, and <span class="math inline">\(\tilde A\)</span> has all diagonal entries equal to <span class="math inline">\(1\)</span>, a simple rescaling that already earns its keep when <span class="math inline">\(A\)</span>’s diagonal varies widely.</p>
 </section>
-<section id="chapter-summary" class="level2" data-number="8.6">
-<h2 data-number="8.6" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">8.6</span> Chapter summary</h2>
+<section id="the-methods-at-a-glance" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="the-methods-at-a-glance"><span class="header-section-number">8.6</span> The methods at a glance</h2>
+<p><a href="#tbl-5-compare" class="quarto-xref">Table&nbsp;<span>8.1</span></a> pools the scattered facts of the chapter. The pattern to read off is the last two columns together: the stationary methods and steepest descent all contract at a base pinned to <span class="math inline">\(\cond_2(A)\)</span> itself, while conjugate gradient replaces <span class="math inline">\(\cond_2(A)\)</span> by its square root, the single structural reason it wins on ill-conditioned SPD systems (write <span class="math inline">\(\kappa=\cond_2(A)\)</span>).</p>
+<div id="tbl-5-compare" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-5-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;8.1: The five iterations of this chapter compared. All cost one matrix–vector product (“matvec”) per step; the split between <span class="math inline">\(\cond_2(A)\)</span> and <span class="math inline">\(\sqrt{\cond_2(A)}\)</span> in the contraction base is the square-root speedup of conjugate gradient. For a consistently ordered tridiagonal <span class="math inline">\(A\)</span> the Gauss–Seidel base is <span class="math inline">\(\spec(T_{\text{J}})^2\)</span>, and the tuned SOR base <span class="math inline">\(\spec(T_{\omega_\ast})\)</span> is smaller still.
+</figcaption>
+<div aria-describedby="tbl-5-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 20%">
+<col style="width: 15%">
+<col style="width: 20%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">method</th>
+<th style="text-align: left;">iteration matrix / update</th>
+<th style="text-align: center;">cost per step</th>
+<th style="text-align: left;">converges when</th>
+<th style="text-align: center;">contraction base</th>
+<th style="text-align: left;">parallelism</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Jacobi</td>
+<td style="text-align: left;"><span class="math inline">\(T=D^{-1}(L+U)\)</span></td>
+<td style="text-align: center;">1 matvec</td>
+<td style="text-align: left;"><span class="math inline">\(\spec(T)&lt;1\)</span> (e.g.&nbsp;<span class="math inline">\(A\)</span> SDD)</td>
+<td style="text-align: center;"><span class="math inline">\(\spec(T_{\text{J}})\)</span></td>
+<td style="text-align: left;">fully parallel</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gauss–Seidel</td>
+<td style="text-align: left;"><span class="math inline">\(T=(D-L)^{-1}U\)</span></td>
+<td style="text-align: center;">1 matvec</td>
+<td style="text-align: left;"><span class="math inline">\(\spec(T)&lt;1\)</span> (SDD or <span class="math inline">\(A\succ0\)</span>)</td>
+<td style="text-align: center;"><span class="math inline">\(\spec(T_{\text{GS}})\)</span></td>
+<td style="text-align: left;">sequential sweep</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SOR</td>
+<td style="text-align: left;"><span class="math inline">\(T_\omega=(D-\omega L)^{-1}[(1-\omega)D+\omega U]\)</span></td>
+<td style="text-align: center;">1 matvec</td>
+<td style="text-align: left;"><span class="math inline">\(\omega\in(0,2)\)</span>; suff. if <span class="math inline">\(A\succ0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\spec(T_{\omega_\ast})\)</span></td>
+<td style="text-align: left;">sequential sweep</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">steepest descent</td>
+<td style="text-align: left;"><span class="math inline">\(x{+}t\,r\)</span>, exact line search</td>
+<td style="text-align: center;">1 matvec</td>
+<td style="text-align: left;"><span class="math inline">\(A\succ0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\approx1-2/\kappa\)</span></td>
+<td style="text-align: left;">matvec + reductions</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">conjugate gradient</td>
+<td style="text-align: left;">two-term recurrence <a href="#eq-5-cg-recurrence" class="quarto-xref">Equation&nbsp;<span>8.4</span></a></td>
+<td style="text-align: center;">1 matvec</td>
+<td style="text-align: left;"><span class="math inline">\(A\succ0\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\approx1-2/\sqrt{\kappa}\)</span></td>
+<td style="text-align: left;">matvec + reductions</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="chapter-summary" class="level2" data-number="8.7">
+<h2 data-number="8.7" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">8.7</span> Chapter summary</h2>
 <ul>
 <li><strong>Movement (A): size and sensitivity.</strong> Vector norms (<a href="#def-5-vector-norm" class="quarto-xref">Definition&nbsp;<span>6.1</span></a>) and induced matrix norms
 <ol class="example" type="1">
@@ -804,7 +947,7 @@ C=D^{1/2},
 <li><strong>Movement (B): splitting iterations.</strong> One splitting <span class="math inline">\(A=D-L-U\)</span> produces <strong>Jacobi</strong> (<a href="#eq-5-jacobi" class="quarto-xref">Equation&nbsp;<span>7.2</span></a>), <strong>Gauss–Seidel</strong> (<a href="#eq-5-gauss-seidel" class="quarto-xref">Equation&nbsp;<span>7.4</span></a>), and <strong>SOR</strong> (<a href="#eq-5-sor" class="quarto-xref">Equation&nbsp;<span>7.6</span></a>), all of the stationary form <span class="math inline">\(x^{(k+1)}=Tx^{(k)}+c\)</span>. Such an iteration converges for all data iff <span class="math inline">\(\spec(T)&lt;1\)</span> (<a href="#thm-5-jacobi-gs-conv" class="quarto-xref">Theorem&nbsp;<span>7.1</span></a>), a special case of the Banach fixed-point theorem (<a href="08-nonlinear-equations.html#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>), with rate <span class="math inline">\(\norm{T}^k\)</span> (<a href="#cor-5-rate" class="quarto-xref">Corollary&nbsp;<span>7.1</span></a>); strict diagonal dominance (<a href="#def-5-sdd" class="quarto-xref">Definition&nbsp;<span>7.1</span></a>) guarantees convergence of Jacobi and Gauss–Seidel (<a href="#thm-5-sdd-convergence" class="quarto-xref">Theorem&nbsp;<span>7.2</span></a>), and covers the spline system of <a href="01-interpolation.html#sec-1-splines" class="quarto-xref"><span>Section 1.5</span></a>. SOR needs <span class="math inline">\(\omega\in(0,2)\)</span> (<a href="#thm-5-kahan" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a>) and converges there when <span class="math inline">\(A\succ0\)</span> (<a href="#thm-5-ostrowski-reich" class="quarto-xref">Theorem&nbsp;<span>7.4</span></a>).</li>
 <li><strong>Movement (C): SPD as optimization.</strong> For <span class="math inline">\(A\succ0\)</span>, solving <span class="math inline">\(Ax=b\)</span> is minimizing <span class="math inline">\(g(x)=\tfrac12x^\top Ax-b^\top x\)</span> (<a href="#thm-5-quadratic-min" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>), and every square system reduces to an SPD one via the normal equations (<a href="#prp-5-spd-equiv" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a>). <strong>Steepest descent</strong> follows the residual with exact line search (<a href="#eq-5-linesearch" class="quarto-xref">Equation&nbsp;<span>8.3</span></a>) but ricochets down ill-conditioned valleys, contracting at base <span class="math inline">\(\approx1-2/\cond_2(A)\)</span>. <strong>Conjugate gradient</strong> builds <span class="math inline">\(A\)</span>-orthogonal directions
 <ol start="3" class="example" type="1">
-<li>by a two-term recurrence (<a href="#eq-5-cg-recurrence" class="quarto-xref">Equation&nbsp;<span>8.4</span></a>) at one matvec per step, terminates exactly in <span class="math inline">\(\le n\)</span> steps (<a href="#thm-5-cg-finite" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a>), and contracts at base <span class="math inline">\(\approx1-2/\sqrt{\cond_2(A)}\)</span> (<a href="#thm-5-cg-convergence" class="quarto-xref">Theorem&nbsp;<span>8.3</span></a>, <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>), a square-root improvement. <strong>Preconditioning</strong> replaces <span class="math inline">\(A\)</span> by <span class="math inline">\(\tilde A=C^{-1}AC^{-\top}\approx I\)</span> (<a href="#eq-5-precond" class="quarto-xref">Equation&nbsp;<span>8.6</span></a>), a sparse stand-in for the Cholesky factor of <a href="04-direct-linear-systems.html#thm-4-cholesky" class="quarto-xref">Theorem&nbsp;<span>4.5</span></a>, with the diagonal choice <span class="math inline">\(C=D^{1/2}\)</span> the cheap default.</li>
+<li>by a two-term recurrence (<a href="#eq-5-cg-recurrence" class="quarto-xref">Equation&nbsp;<span>8.4</span></a>) at one matvec per step, terminates exactly in <span class="math inline">\(\le n\)</span> steps (<a href="#thm-5-cg-finite" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a>), and contracts at base <span class="math inline">\(\approx1-2/\sqrt{\cond_2(A)}\)</span> (<a href="#thm-5-cg-convergence" class="quarto-xref">Theorem&nbsp;<span>8.3</span></a>, <a href="#fig-5-cg-vs-sd" class="quarto-xref">Figure&nbsp;<span>8.2</span></a>), a square-root improvement. <strong>Preconditioning</strong> replaces <span class="math inline">\(A\)</span> by <span class="math inline">\(\tilde A=C^{-1}AC^{-\top}\approx I\)</span> (<a href="#eq-5-precond" class="quarto-xref">Equation&nbsp;<span>8.6</span></a>), a sparse stand-in for the Cholesky factor of <a href="04-direct-linear-systems.html#thm-4-cholesky" class="quarto-xref">Theorem&nbsp;<span>4.5</span></a>, with the diagonal choice <span class="math inline">\(C=D^{1/2}\)</span> the cheap default.</li>
 </ol></li>
 </ul>
 
