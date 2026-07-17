@@ -341,7 +341,7 @@ window.Quarto = {
 \newcommand{\defeq}{:=}
 \]</span></p>
 </div>
-<p>The most basic approximation problem is this: we know a function <span class="math inline">\(f\)</span> only at finitely many points <span class="math inline">\(x_0,\dots,x_n\)</span> — perhaps because <span class="math inline">\(f\)</span> is expensive to evaluate, or known only from data — and we want a simple function that agrees with <span class="math inline">\(f\)</span> there and can be evaluated, differentiated, and integrated everywhere. Polynomials are the natural candidates: they are cheap, smooth, and by the Weierstrass theorem dense in <span class="math inline">\(C[a,b]\)</span>. This chapter builds the polynomial that passes through given data, measures the error it commits, and then confronts the ways plain polynomial interpolation fails — motivating divided differences, Hermite interpolation, and splines.</p>
+<p>The most basic approximation problem is this: we know a function <span class="math inline">\(f\)</span> only at finitely many points <span class="math inline">\(x_0,\dots,x_n\)</span> (perhaps because <span class="math inline">\(f\)</span> is expensive to evaluate, or known only from data) and we want a simple function that agrees with <span class="math inline">\(f\)</span> there and can be evaluated, differentiated, and integrated everywhere. Polynomials are the natural candidates: they are cheap, smooth, and by the Weierstrass theorem dense in <span class="math inline">\(C[a,b]\)</span>. This chapter builds the polynomial that passes through given data, measures the error it commits, and then confronts the ways plain polynomial interpolation fails, motivating divided differences, Hermite interpolation, and splines.</p>
 <p>Throughout, “<span class="math inline">\(n+1\)</span> nodes <span class="math inline">\(x_0,\dots,x_n\)</span>” go with a polynomial of degree at most <span class="math inline">\(n\)</span>; keeping that correspondence straight (see <a href="./notation.html">Notation</a>) avoids most off-by-one errors.</p>
 <section id="the-interpolation-problem-and-its-error" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="the-interpolation-problem-and-its-error"><span class="header-section-number">1.1</span> The interpolation problem and its error</h2>
@@ -401,14 +401,14 @@ P(x)=\frac{(x-x_{j+1})\,Q(x)-(x-x_i)\,\hat Q(x)}{x_i-x_{j+1}}
 <p>Writing <span class="math inline">\(Q_{i,\dots,j}\)</span> for the interpolant on <span class="math inline">\(x_i,\dots,x_j\)</span>, <a href="#eq-1-neville" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> is the recursion <span class="math display">\[
 Q_{i,\dots,j+1}(x)=\frac{(x-x_{j+1})Q_{i,\dots,j}(x)-(x-x_i)Q_{i+1,\dots,j+1}(x)}{x_i-x_{j+1}},
 \qquad Q_i\defeq f(x_i),
-\]</span> filling a triangular table whose apex <span class="math inline">\(Q_{0,\dots,n}(x)\)</span> is the answer. The subscripts are exactly the nodes the entry interpolates — a useful mnemonic. Overwriting the table in place collapses the storage to a single vector:</p>
+\]</span> filling a triangular table whose apex <span class="math inline">\(Q_{0,\dots,n}(x)\)</span> is the answer. The subscripts are exactly the nodes the entry interpolates, a useful mnemonic. Overwriting the table in place collapses the storage to a single vector:</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Algorithm — Neville (in-place, <span class="math inline">\(\bigO(n)\)</span> memory)
+<span class="screen-reader-only">Note</span>Algorithm: Neville (in-place, <span class="math inline">\(\bigO(n)\)</span> memory)
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -430,7 +430,7 @@ f[x_i,\dots,x_{j+1}]=\frac{f[x_{i+1},\dots,x_{j+1}]-f[x_i,\dots,x_j]}{x_{j+1}-x_
 </div>
 <p>Matching <a href="#eq-1-newton" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> against the interpolation conditions one node at a time shows <span class="math inline">\(a_0=f[x_0]\)</span>, then <span class="math inline">\(a_1=f[x_0,x_1]\)</span>, and in general <span class="math inline">\(a_k=f[x_0,\dots,x_k]\)</span>: evaluating the difference quotient of <span class="math inline">\(P\)</span> at successive nodes reproduces exactly the recursion <a href="#eq-1-dd-recursion" class="quarto-xref">Equation&nbsp;<span>1.5</span></a>. Thus <span class="math display">\[
 P(x)=\sum_{k=0}^{n} f[x_0,\dots,x_k]\prod_{j=0}^{k-1}(x-x_j).
-\]</span> Appending a node <span class="math inline">\(x_{n+1}\)</span> costs one more term <span class="math inline">\(f[x_0,\dots,x_{n+1}]\prod_{j=0}^{n}(x-x_j)\)</span> and leaves the earlier coefficients untouched — the property Lagrange’s form lacks.</p>
+\]</span> Appending a node <span class="math inline">\(x_{n+1}\)</span> costs one more term <span class="math inline">\(f[x_0,\dots,x_{n+1}]\prod_{j=0}^{n}(x-x_j)\)</span> and leaves the earlier coefficients untouched, the property Lagrange’s form lacks.</p>
 <p>The divided differences are computed by filling a table with <a href="#eq-1-dd-recursion" class="quarto-xref">Equation&nbsp;<span>1.5</span></a>; the Newton coefficients are read off the top edge. Two standard implementations trade memory for clarity:</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -438,7 +438,7 @@ P(x)=\sum_{k=0}^{n} f[x_0,\dots,x_k]\prod_{j=0}^{k-1}(x-x_j).
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Algorithm — Newton divided differences (in-place, <span class="math inline">\(\bigO(n)\)</span> memory)
+<span class="screen-reader-only">Note</span>Algorithm: Newton divided differences (in-place, <span class="math inline">\(\bigO(n)\)</span> memory)
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -469,7 +469,7 @@ f[x_0,x_0]\defeq f'(x_0),
 H(x)=f(x_0)+f'(x_0)(x-x_0)+f[x_0,x_0,x_2](x-x_0)^2+f[x_0,x_0,x_2,x_2](x-x_0)^2(x-x_2),
 \]</span> which satisfies the four conditions <span class="math inline">\(H(x_0)=f(x_0)\)</span>, <span class="math inline">\(H'(x_0)=f'(x_0)\)</span>, <span class="math inline">\(H(x_2)=f(x_2)\)</span>, <span class="math inline">\(H'(x_2)=f'(x_2)\)</span>. In general:</p>
 <div id="def-1-hermite" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 1.2 (Hermite interpolant)</strong></span> Given <span class="math inline">\(f(x_j),f'(x_j)\)</span> at <span class="math inline">\(n+1\)</span> distinct nodes, the Hermite interpolant <span class="math inline">\(H\)</span> is the unique polynomial of degree <span class="math inline">\(\le 2n+1\)</span> with <span class="math inline">\(H(x_j)=f(x_j)\)</span> and <span class="math inline">\(H'(x_j)=f'(x_j)\)</span> for all <span class="math inline">\(j\)</span> — that is <span class="math inline">\(2n+2\)</span> conditions fixing <span class="math inline">\(2n+2\)</span> coefficients.</p>
+<p><span class="theorem-title"><strong>Definition 1.2 (Hermite interpolant)</strong></span> Given <span class="math inline">\(f(x_j),f'(x_j)\)</span> at <span class="math inline">\(n+1\)</span> distinct nodes, the Hermite interpolant <span class="math inline">\(H\)</span> is the unique polynomial of degree <span class="math inline">\(\le 2n+1\)</span> with <span class="math inline">\(H(x_j)=f(x_j)\)</span> and <span class="math inline">\(H'(x_j)=f'(x_j)\)</span> for all <span class="math inline">\(j\)</span>, that is <span class="math inline">\(2n+2\)</span> conditions fixing <span class="math inline">\(2n+2\)</span> coefficients.</p>
 </div>
 <p>Besides the divided-difference construction there is an explicit basis form, convenient for analysis: <span class="math display">\[
 H(x)=\sum_{j=0}^n f(x_j)\,H_j(x)+\sum_{j=0}^n f'(x_j)\,\hat H_j(x),
@@ -487,14 +487,14 @@ f(x)-H(x)=\frac{f^{(2n+2)}(\xi(x))}{(2n+2)!}\prod_{j=0}^{n}(x-x_j)^2 .
 </section>
 <section id="sec-1-splines" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="sec-1-splines"><span class="header-section-number">1.5</span> Cubic splines: piecewise, but globally smooth</h2>
-<p>Raising the degree to fit more data is a trap: for equispaced nodes the interpolant of <span class="math inline">\(f(x)=1/(1+25x^2)\)</span> oscillates ever more wildly near the ends as <span class="math inline">\(n\)</span> grows — the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>). High-degree global polynomials are the wrong tool. The fix is to keep the pieces low-degree and stitch them together smoothly: a <strong>cubic spline</strong> uses a different cubic on each subinterval but forces the joins to agree in value and in the first two derivatives.</p>
+<p>Raising the degree to fit more data is a trap: for equispaced nodes the interpolant of <span class="math inline">\(f(x)=1/(1+25x^2)\)</span> oscillates ever more wildly near the ends as <span class="math inline">\(n\)</span> grows, the <strong>Runge phenomenon</strong> (<a href="#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>). High-degree global polynomials are the wrong tool. The fix is to keep the pieces low-degree and stitch them together smoothly: a <strong>cubic spline</strong> uses a different cubic on each subinterval but forces the joins to agree in value and in the first two derivatives.</p>
 <div id="fig-1-runge" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-1-runge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/01-runge.svg" class="img-fluid figure-img" style="width:78.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-runge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1.1: Equispaced polynomial interpolation of the Runge function. The degree-6 interpolant already overshoots near the endpoints, and the degree-10 interpolant diverges there — raising the degree makes matters worse, not better.
+Figure&nbsp;1.1: Equispaced polynomial interpolation of the Runge function. The degree-6 interpolant already overshoots near the endpoints, and the degree-10 interpolant diverges there, raising the degree makes matters worse, not better.
 </figcaption>
 </figure>
 </div>
@@ -507,11 +507,11 @@ S_j(x)=a_j+b_j(x-x_j)+c_j(x-x_j)^2+d_j(x-x_j)^3,
 a_j=f(x_j),\qquad a_{j+1}=a_j+b_jh_j+c_jh_j^2+d_jh_j^3 .
 \]</span> Matching first and second derivatives at the interior nodes adds <span class="math display">\[
 b_{j+1}=b_j+2c_jh_j+3d_jh_j^2,\qquad c_{j+1}=c_j+3d_jh_j,
-\]</span> which is <span class="math inline">\(n+1\)</span> plus <span class="math inline">\(3(n-1)\)</span> conditions, i.e.&nbsp;<span class="math inline">\(4n-2\)</span> in all — two short of the <span class="math inline">\(4n\)</span> unknowns. Eliminating the <span class="math inline">\(b_j,d_j\)</span> in favor of the curvatures <span class="math inline">\(c_j\)</span> turns the whole system into a single <strong>tridiagonal</strong> linear system for <span class="math inline">\(c_0,\dots,c_n\)</span>: <span class="math display">\[
+\]</span> which is <span class="math inline">\(n+1\)</span> plus <span class="math inline">\(3(n-1)\)</span> conditions, i.e.&nbsp;<span class="math inline">\(4n-2\)</span> in all, two short of the <span class="math inline">\(4n\)</span> unknowns. Eliminating the <span class="math inline">\(b_j,d_j\)</span> in favor of the curvatures <span class="math inline">\(c_j\)</span> turns the whole system into a single <strong>tridiagonal</strong> linear system for <span class="math inline">\(c_0,\dots,c_n\)</span>: <span class="math display">\[
 h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_j c_{j+1}
 =3\!\left(\frac{a_{j+1}-a_j}{h_j}-\frac{a_j-a_{j-1}}{h_{j-1}}\right),
 \quad j=1,\dots,n-1.
-\]</span> The two missing conditions are boundary choices: the <strong>natural</strong> spline sets <span class="math inline">\(c_0=c_n=0\)</span> (<span class="math inline">\(S''=0\)</span> at the ends), while the <strong>clamped</strong> spline instead prescribes <span class="math inline">\(S'(x_0),S'(x_n)\)</span>. Either way the resulting tridiagonal system is strictly diagonally dominant, hence uniquely solvable in <span class="math inline">\(\bigO(n)\)</span> by the tridiagonal elimination of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a> — splines are both smoother than a single high-degree polynomial and cheaper to compute.</p>
+\]</span> The two missing conditions are boundary choices: the <strong>natural</strong> spline sets <span class="math inline">\(c_0=c_n=0\)</span> (<span class="math inline">\(S''=0\)</span> at the ends), while the <strong>clamped</strong> spline instead prescribes <span class="math inline">\(S'(x_0),S'(x_n)\)</span>. Either way the resulting tridiagonal system is strictly diagonally dominant, hence uniquely solvable in <span class="math inline">\(\bigO(n)\)</span> by the tridiagonal elimination of <a href="04-direct-linear-systems.html" class="quarto-xref"><span>Chapter 4</span></a>: splines are both smoother than a single high-degree polynomial and cheaper to compute.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -525,7 +525,7 @@ h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_j c_{j+1}
 <p>Cubics carry exactly four degrees of freedom per piece, which is what matching value, slope, and curvature at both ends of a subinterval consumes. Demanding <span class="math inline">\(C^3\)</span> would over-determine the pieces; allowing only <span class="math inline">\(C^1\)</span> wastes the curvature information that makes splines look smooth to the eye. Cubic <span class="math inline">\(C^2\)</span> is the sweet spot, which is why it wraps car bodies and font outlines alike.</p>
 </div>
 </div>
-<p>Parametric data — a curve <span class="math inline">\((x(t),y(t))\)</span> that need not be a graph — is handled by interpolating each coordinate against the parameter <span class="math inline">\(t\)</span> separately; the piecewise-cubic version with slopes chosen from guide points is the <strong>Bézier</strong> curve of computer graphics, taken up alongside numerical differentiation in <a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
+<p>Parametric data, a curve <span class="math inline">\((x(t),y(t))\)</span> that need not be a graph, is handled by interpolating each coordinate against the parameter <span class="math inline">\(t\)</span> separately; the piecewise-cubic version with slopes chosen from guide points is the <strong>Bézier</strong> curve of computer graphics, taken up alongside numerical differentiation in <a href="02-differentiation-integration.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
 </section>
 <section id="chapter-summary" class="level2" data-number="1.6">
 <h2 data-number="1.6" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">1.6</span> Chapter summary</h2>

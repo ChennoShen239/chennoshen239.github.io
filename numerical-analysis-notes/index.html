@@ -260,7 +260,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Numerical Analysis</h1>
-<p class="subtitle lead">Interpolation, Quadrature, ODEs, and Numerical Linear Algebra — Math 128A/128B</p>
+<p class="subtitle lead">Interpolation, Quadrature, ODEs, and Numerical Linear Algebra (Math 128A/128B)</p>
 </div>
 
 <div>
@@ -296,8 +296,8 @@ window.Quarto = {
 
 <section id="preface" class="level1 unnumbered">
 <h1 class="unnumbered">Preface</h1>
-<p>These are self-contained lecture notes on <strong>numerical analysis</strong> — the art of computing approximate answers to continuous mathematical problems, and of bounding the error you commit by doing so. They cover the two-semester Berkeley sequence <strong>Math 128A</strong> and <strong>Math 128B</strong>, rebuilt in English from first principles as a single browsable book.</p>
-<p>The unifying question of the subject is always the same: <em>replace an object you cannot compute exactly — an integral, a derivative, the solution of a differential equation, the solution of a huge linear system, an eigenvector, a root — by one you can, and control the difference.</em> Every chapter is a variation on discretize, solve, and estimate the error.</p>
+<p>These are self-contained lecture notes on <strong>numerical analysis</strong>, the art of computing approximate answers to continuous mathematical problems, and of bounding the error you commit by doing so. They cover the two-semester Berkeley sequence <strong>Math 128A</strong> and <strong>Math 128B</strong>, rebuilt in English from first principles as a single browsable book.</p>
+<p>The unifying question of the subject is always the same: <em>replace an object you cannot compute exactly (an integral, a derivative, the solution of a differential equation, the solution of a huge linear system, an eigenvector, a root) by one you can, and control the difference.</em> Every chapter is a variation on discretize, solve, and estimate the error.</p>
 <section id="the-arc-of-the-subject" class="level2">
 <h2 class="anchored" data-anchor-id="the-arc-of-the-subject">The arc of the subject</h2>
 <table class="caption-top table">
@@ -335,13 +335,13 @@ window.Quarto = {
 <section id="how-the-notes-are-organized" class="level2">
 <h2 class="anchored" data-anchor-id="how-the-notes-are-organized">How the notes are organized</h2>
 <ul>
-<li><strong>Part I — Interpolation, Quadrature &amp; ODEs (128A).</strong> <a href="./01-interpolation.html">Polynomial Interpolation</a> (Lagrange, Newton, Hermite, splines, Bézier); <a href="./02-differentiation-integration.html">Numerical Differentiation &amp; Integration</a> (finite differences, Richardson extrapolation, Newton–Cotes, Romberg, adaptive and Gauss quadrature); <a href="./03-ivp-odes.html">Initial-Value Problems for ODEs</a> (Euler, Taylor, Runge–Kutta, multistep, predictor–corrector, stiffness); <a href="./04-direct-linear-systems.html">Direct Methods for Linear Systems</a> (Gaussian elimination, pivoting, LU, SPD and Cholesky, tridiagonal solvers).</li>
-<li><strong>Part II — Numerical Linear Algebra &amp; Approximation (128B).</strong> <a href="./05-iterative-linear-systems.html">Iterative Methods for Linear Systems</a> (Jacobi, Gauss–Seidel, SOR, condition numbers, steepest descent, conjugate gradient, preconditioning); <a href="./06-approximation-theory.html">Approximation Theory</a> (least squares, orthogonal and Chebyshev polynomials, Padé, Fourier, the FFT); <a href="./07-eigenvalue-problems.html">Eigenvalue Problems</a> (power method, Markov chains and PageRank, PCA, subspace iteration, randomized SVD, spectral clustering); <a href="./08-nonlinear-equations.html">Nonlinear Equations &amp; Optimization</a> (fixed-point iteration, the Banach theorem, Newton’s method, orders of convergence).</li>
+<li><strong>Part I: Interpolation, Quadrature &amp; ODEs (128A).</strong> <a href="./01-interpolation.html">Polynomial Interpolation</a> (Lagrange, Newton, Hermite, splines, Bézier); <a href="./02-differentiation-integration.html">Numerical Differentiation &amp; Integration</a> (finite differences, Richardson extrapolation, Newton–Cotes, Romberg, adaptive and Gauss quadrature); <a href="./03-ivp-odes.html">Initial-Value Problems for ODEs</a> (Euler, Taylor, Runge–Kutta, multistep, predictor–corrector, stiffness); <a href="./04-direct-linear-systems.html">Direct Methods for Linear Systems</a> (Gaussian elimination, pivoting, LU, SPD and Cholesky, tridiagonal solvers).</li>
+<li><strong>Part II: Numerical Linear Algebra &amp; Approximation (128B).</strong> <a href="./05-iterative-linear-systems.html">Iterative Methods for Linear Systems</a> (Jacobi, Gauss–Seidel, SOR, condition numbers, steepest descent, conjugate gradient, preconditioning); <a href="./06-approximation-theory.html">Approximation Theory</a> (least squares, orthogonal and Chebyshev polynomials, Padé, Fourier, the FFT); <a href="./07-eigenvalue-problems.html">Eigenvalue Problems</a> (power method, Markov chains and PageRank, PCA, subspace iteration, randomized SVD, spectral clustering); <a href="./08-nonlinear-equations.html">Nonlinear Equations &amp; Optimization</a> (fixed-point iteration, the Banach theorem, Newton’s method, orders of convergence).</li>
 </ul>
 </section>
 <section id="a-word-on-sources" class="level2">
 <h2 class="anchored" data-anchor-id="a-word-on-sources">A word on sources</h2>
-<p>The two parts rest on <strong>different sources</strong>, and the notes are honest about it. <strong>Part I (128A)</strong> is reconstructed from the author’s own course notes — there is no official instructor text for 128A, so the notes stand on their own derivations. <strong>Part II (128B)</strong> is reconstructed from <strong>M. Lindsey’s</strong> official <em>Math 128B</em> lecture notes, cited section by section, with the author’s personal notes folded in where they add something. The reasoning behind this asymmetry, and the notation policy, are recorded in <code>docs/adr/</code> and <a href="./notation.html"><code>notation.qmd</code></a>.</p>
+<p>The two parts rest on <strong>different sources</strong>, and the notes are honest about it. <strong>Part I (128A)</strong> is reconstructed from the author’s own course notes: there is no official instructor text for 128A, so the notes stand on their own derivations. <strong>Part II (128B)</strong> is reconstructed from <strong>M. Lindsey’s</strong> official <em>Math 128B</em> lecture notes, cited section by section, with the author’s personal notes folded in where they add something. The reasoning behind this asymmetry, and the notation policy, are recorded in <code>docs/adr/</code> and <a href="./notation.html"><code>notation.qmd</code></a>.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -355,7 +355,7 @@ window.Quarto = {
 </section>
 <section id="license-attribution" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="license-attribution">License &amp; attribution</h2>
-<p>The original exposition and all figures here are my own work, released under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><strong>CC BY-NC-SA 4.0</strong></a> — share and adapt for non-commercial purposes with attribution and share-alike. The underlying course material is not mine: <strong>Part I</strong> reconstructs my own Math 128A class notes, and <strong>Part II</strong> reconstructs <strong>M. Lindsey’s</strong> <em>Math 128B: Lecture Notes</em> (UC Berkeley, Spring 2025) in my own words with original figures — no text or figures from the source are reproduced, and all rights in the original lecture notes remain with M. Lindsey. This is a non-commercial educational study aid, not endorsed by or affiliated with M. Lindsey or UC Berkeley. Full terms are in <code>LICENSE.md</code>; if you are a rights holder with any concern, contact me and I will address it promptly.</p>
+<p>The original exposition and all figures here are my own work, released under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><strong>CC BY-NC-SA 4.0</strong></a>: share and adapt for non-commercial purposes with attribution and share-alike. The underlying course material is not mine: <strong>Part I</strong> reconstructs my own Math 128A class notes, and <strong>Part II</strong> reconstructs <strong>M. Lindsey’s</strong> <em>Math 128B: Lecture Notes</em> (UC Berkeley, Spring 2025) in my own words with original figures: no text or figures from the source are reproduced, and all rights in the original lecture notes remain with M. Lindsey. This is a non-commercial educational study aid, not endorsed by or affiliated with M. Lindsey or UC Berkeley. Full terms are in <code>LICENSE.md</code>; if you are a rights holder with any concern, contact me and I will address it promptly.</p>
 
 
 </section>

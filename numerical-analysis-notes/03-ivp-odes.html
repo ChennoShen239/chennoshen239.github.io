@@ -320,7 +320,7 @@ window.Quarto = {
 </div>
 <p>Most laws of change are written as differential equations, and most of them cannot be solved in closed form. This chapter builds the numerical machinery for the <strong>initial-value problem</strong> (IVP) <span id="eq-3-ivp"><span class="math display">\[
 \diff{y}{t}=f(t,y),\qquad a\le t\le b,\qquad y(a)=\alpha ,
-\tag{3.1}\]</span></span> which asks for the trajectory <span class="math inline">\(y(t)\)</span> that starts at <span class="math inline">\(\alpha\)</span> and obeys the slope field <span class="math inline">\(f\)</span>. We first pin down when <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> even has a well-behaved solution — the Lipschitz condition and well-posedness — then march that solution forward on a mesh with Euler’s method, measure the error it commits, and systematically improve it: Taylor and Runge-Kutta one-step methods, adaptive step-size control, multistep Adams methods and predictor-correctors, and finally the implicit methods that alone cope with <em>stiff</em> problems. Throughout, <span class="math inline">\(w_i\approx y(t_i)\)</span> denotes the computed approximation at the mesh point <span class="math inline">\(t_i=a+ih\)</span>, <span class="math inline">\(h=(b-a)/N\)</span> (see <a href="./notation.html">Notation</a>).</p>
+\tag{3.1}\]</span></span> which asks for the trajectory <span class="math inline">\(y(t)\)</span> that starts at <span class="math inline">\(\alpha\)</span> and obeys the slope field <span class="math inline">\(f\)</span>. We first pin down when <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> even has a well-behaved solution, the Lipschitz condition and well-posedness, then march that solution forward on a mesh with Euler’s method, measure the error it commits, and systematically improve it: Taylor and Runge-Kutta one-step methods, adaptive step-size control, multistep Adams methods and predictor-correctors, and finally the implicit methods that alone cope with <em>stiff</em> problems. Throughout, <span class="math inline">\(w_i\approx y(t_i)\)</span> denotes the computed approximation at the mesh point <span class="math inline">\(t_i=a+ih\)</span>, <span class="math inline">\(h=(b-a)/N\)</span> (see <a href="./notation.html">Notation</a>).</p>
 <section id="well-posedness-when-does-a-solution-exist-and-depend-stably-on-data" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="well-posedness-when-does-a-solution-exist-and-depend-stably-on-data"><span class="header-section-number">3.1</span> Well-posedness: when does a solution exist and depend stably on data?</h2>
 <p>A numerical method chases the true solution, so we should first know that a true solution exists, is unique, and does not swing wildly under small perturbations. The single hypothesis that buys all three is a one-sided smoothness bound on <span class="math inline">\(f\)</span> in its second argument.</p>
@@ -330,10 +330,10 @@ window.Quarto = {
 \qquad\text{whenever }(t,y_1),(t,y_2)\in D .
 \]</span> <span class="math inline">\(L\)</span> is the <strong>Lipschitz constant</strong>.</p>
 </div>
-<p>For example <span class="math inline">\(f(t,y)=t\abs{y}\)</span> on <span class="math inline">\(D=\{(t,y):0\le t\le T\}\)</span> satisfies the condition with <span class="math inline">\(L=T\)</span>, because <span class="math inline">\(\abs{t\abs{y_1}-t\abs{y_2}}\le t\,\abs{y_1-y_2}\le T\abs{y_1-y_2}\)</span>. By contrast <span class="math inline">\(f(t,y)=ty^2\)</span> satisfies <em>no</em> Lipschitz condition on that unbounded strip: since <span class="math inline">\(\abs{ty_1^2-ty_2^2}=t\abs{y_1+y_2}\,\abs{y_1-y_2}\)</span> and <span class="math inline">\(t\abs{y_1+y_2}\)</span> is unbounded, no single <span class="math inline">\(L\)</span> works — though restricting <span class="math inline">\(y\)</span> to a bounded band <span class="math inline">\(\abs{y}\le Y\)</span> restores it with <span class="math inline">\(L=2TY\)</span>.</p>
+<p>For example <span class="math inline">\(f(t,y)=t\abs{y}\)</span> on <span class="math inline">\(D=\{(t,y):0\le t\le T\}\)</span> satisfies the condition with <span class="math inline">\(L=T\)</span>, because <span class="math inline">\(\abs{t\abs{y_1}-t\abs{y_2}}\le t\,\abs{y_1-y_2}\le T\abs{y_1-y_2}\)</span>. By contrast <span class="math inline">\(f(t,y)=ty^2\)</span> satisfies <em>no</em> Lipschitz condition on that unbounded strip: since <span class="math inline">\(\abs{ty_1^2-ty_2^2}=t\abs{y_1+y_2}\,\abs{y_1-y_2}\)</span> and <span class="math inline">\(t\abs{y_1+y_2}\)</span> is unbounded, no single <span class="math inline">\(L\)</span> works, though restricting <span class="math inline">\(y\)</span> to a bounded band <span class="math inline">\(\abs{y}\le Y\)</span> restores it with <span class="math inline">\(L=2TY\)</span>.</p>
 <p>Verifying the inequality directly is awkward; on a <strong>convex</strong> domain a bound on the partial derivative is equivalent and far easier to check.</p>
 <div id="def-3-convex" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 3.2 (Convex set)</strong></span> A set <span class="math inline">\(D\subset\R^2\)</span> is <strong>convex</strong> if for all <span class="math inline">\((t_1,y_1),(t_2,y_2)\in D\)</span> and all <span class="math inline">\(\lambda\in[0,1]\)</span>, <span class="math inline">\((1-\lambda)(t_1,y_1)+\lambda(t_2,y_2)\in D\)</span> — the whole segment joining any two of its points lies in <span class="math inline">\(D\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition 3.2 (Convex set)</strong></span> A set <span class="math inline">\(D\subset\R^2\)</span> is <strong>convex</strong> if for all <span class="math inline">\((t_1,y_1),(t_2,y_2)\in D\)</span> and all <span class="math inline">\(\lambda\in[0,1]\)</span>, <span class="math inline">\((1-\lambda)(t_1,y_1)+\lambda(t_2,y_2)\in D\)</span>: the whole segment joining any two of its points lies in <span class="math inline">\(D\)</span>.</p>
 </div>
 <div id="thm-3-lipschitz-bound" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 3.1 (Derivative bound implies Lipschitz)</strong></span> Suppose <span class="math inline">\(f(t,y)\)</span> is defined on a convex set <span class="math inline">\(D\subset\R^2\)</span> and there is <span class="math inline">\(L&gt;0\)</span> with <span class="math inline">\(\bigl\lvert \pdiff{f}{y}(t,y)\bigr\rvert\le L\)</span> for all <span class="math inline">\((t,y)\in D\)</span>. Then <span class="math inline">\(f\)</span> satisfies a Lipschitz condition in <span class="math inline">\(y\)</span> on <span class="math inline">\(D\)</span> with constant <span class="math inline">\(L\)</span>.</p>
@@ -368,7 +368,7 @@ y(t_{j+1})=y(t_j)+h\,y'(t_j)+\tfrac{h^2}{2}y''(\xi_j)
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Algorithm — Euler’s method
+<span class="screen-reader-only">Note</span>Algorithm: Euler’s method
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -413,13 +413,13 @@ h_{\mathrm{opt}}=\sqrt{\frac{2\delta}{M}}=\bigO(\sqrt\delta),
 </section>
 <section id="local-truncation-error-and-consistency" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="local-truncation-error-and-consistency"><span class="header-section-number">3.3</span> Local truncation error and consistency</h2>
-<p>To compare methods we need a per-step measure of fidelity that ignores accumulated error. Write a general one-step method as <span class="math inline">\(w_{j+1}=w_j+h\,\phi(t_j,w_j,h)\)</span>, where <span class="math inline">\(\phi\)</span> is the method’s slope estimate — <span class="math inline">\(\phi=f\)</span> for Euler.</p>
+<p>To compare methods we need a per-step measure of fidelity that ignores accumulated error. Write a general one-step method as <span class="math inline">\(w_{j+1}=w_j+h\,\phi(t_j,w_j,h)\)</span>, where <span class="math inline">\(\phi\)</span> is the method’s slope estimate, <span class="math inline">\(\phi=f\)</span> for Euler.</p>
 <div id="def-3-lte" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 3.4 (Local truncation error)</strong></span> The <strong>local truncation error</strong> (LTE) of the one-step method <span class="math inline">\(w_{j+1}=w_j+h\,\phi(t_j,w_j,h)\)</span> at step <span class="math inline">\(j+1\)</span> is <span id="eq-3-lte"><span class="math display">\[
 \tau_{j+1}(h)\defeq\frac{y(t_{j+1})-y(t_j)}{h}-\phi\bigl(t_j,y(t_j),h\bigr),
 \tag{3.4}\]</span></span> the amount by which the <em>exact</em> solution fails to satisfy the update, per unit step. It is the error made in one step from exact data.</p>
 </div>
-<p>For Euler, <span class="math inline">\(\phi=f=y'\)</span>, so <a href="#eq-3-lte" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> and the two-term expansion give <span class="math inline">\(\tau_{j+1}(h)=\tfrac{h}{2}y''(\xi_j)\)</span>, whence <span class="math inline">\(\abs{\tau_{j+1}(h)}\le\tfrac{hM}{2}=\bigO(h)\)</span> — Euler’s LTE is first order, consistent with <a href="#eq-3-euler-bound" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>. The minimal demand on any method is that this per-step error vanish in the limit.</p>
+<p>For Euler, <span class="math inline">\(\phi=f=y'\)</span>, so <a href="#eq-3-lte" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> and the two-term expansion give <span class="math inline">\(\tau_{j+1}(h)=\tfrac{h}{2}y''(\xi_j)\)</span>, whence <span class="math inline">\(\abs{\tau_{j+1}(h)}\le\tfrac{hM}{2}=\bigO(h)\)</span>: Euler’s LTE is first order, consistent with <a href="#eq-3-euler-bound" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>. The minimal demand on any method is that this per-step error vanish in the limit.</p>
 <div id="def-3-consistency" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 3.5 (Consistency)</strong></span> A one-step method is <strong>consistent</strong> with the ODE if its LTE vanishes uniformly as <span class="math inline">\(h\to0\)</span>: <span class="math display">\[
 \lim_{h\to0}\ \max_{0\le j\le N}\ \abs{\tau_{j+1}(h)}=0 .
@@ -427,7 +427,7 @@ h_{\mathrm{opt}}=\sqrt{\frac{2\delta}{M}}=\bigO(\sqrt\delta),
 </div>
 <p>Consistency alone is not convergence, but for one-step methods it is nearly the whole story. If in addition <span class="math inline">\(\phi\)</span> is Lipschitz in <span class="math inline">\(w\)</span> (uniformly in <span class="math inline">\(h\)</span> on <span class="math inline">\(0&lt;h&lt;h_0\)</span>), then the method is <strong>stable</strong>, and the global error inherits the local one: <span class="math display">\[
 \abs{y(t_j)-w_j}\le\frac{\tau(h)}{L}\,e^{L(t_j-a)},\qquad \tau(h)\defeq\max_j\abs{\tau_{j+1}(h)} .
-\]</span> Thus <strong>consistency plus stability implies convergence</strong> (the Lax equivalence principle for ODEs), and for one-step methods stability is automatic once <span class="math inline">\(\phi\)</span> is Lipschitz — exactly the Euler proof, now abstracted. As an illustration, the modified-Euler slope <span class="math inline">\(\phi(t,w,h)=\tfrac12\bigl[f(t,w)+f(t+h,w+hf(t,w))\bigr]\)</span> is Lipschitz in <span class="math inline">\(w\)</span> with constant <span class="math inline">\(L=\widehat L+\tfrac12 h\widehat L^2\)</span> whenever <span class="math inline">\(\abs{\pdiff{f}{y}}\le\widehat L\)</span>, so it too is convergent.</p>
+\]</span> Thus <strong>consistency plus stability implies convergence</strong> (the Lax equivalence principle for ODEs), and for one-step methods stability is automatic once <span class="math inline">\(\phi\)</span> is Lipschitz, exactly the Euler proof, now abstracted. As an illustration, the modified-Euler slope <span class="math inline">\(\phi(t,w,h)=\tfrac12\bigl[f(t,w)+f(t+h,w+hf(t,w))\bigr]\)</span> is Lipschitz in <span class="math inline">\(w\)</span> with constant <span class="math inline">\(L=\widehat L+\tfrac12 h\widehat L^2\)</span> whenever <span class="math inline">\(\abs{\pdiff{f}{y}}\le\widehat L\)</span>, so it too is convergent.</p>
 </section>
 <section id="taylor-methods-higher-order-by-more-derivatives" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="taylor-methods-higher-order-by-more-derivatives"><span class="header-section-number">3.4</span> Taylor methods: higher order by more derivatives</h2>
@@ -448,7 +448,7 @@ w_{j+1}=\Bigl(1+h+\tfrac{h^2}{2}\Bigr)w_j-\Bigl(h+\tfrac{h^2}{2}\Bigr)t_j^2-h^2 
 \tag{3.6}\]</span></span> With <span class="math inline">\(h=0.2\)</span> the coefficients are <span class="math inline">\(1.22,\,0.22,\,0.04,\,0.22\)</span>, so <span class="math inline">\(w_{j+1}=1.22\,w_j-0.22\,t_j^2-0.04\,t_j+0.22\)</span>. Starting from <span class="math inline">\(w_0=0.5\)</span> at <span class="math inline">\(t_0=0\)</span>, <span class="math display">\[
 w_1=1.22(0.5)+0.22=0.83,\qquad
 w_2=1.22(0.83)-0.22(0.04)-0.04(0.2)+0.22=1.2158.
-\]</span> The exact solution <span class="math inline">\(y(t)=(t+1)^2-\tfrac12 e^{t}\)</span> gives <span class="math inline">\(y(0.2)=0.8292986\)</span> and <span class="math inline">\(y(0.4)=1.2140877\)</span>, so the errors after one and two steps are <span class="math inline">\(7.0\times10^{-4}\)</span> and <span class="math inline">\(1.7\times10^{-3}\)</span> — a marked gain on Euler, whose first step <span class="math inline">\(w_1=0.8\)</span> already errs by <span class="math inline">\(2.9\times10^{-2}\)</span>, forty times larger at the same <span class="math inline">\(h\)</span>.</p>
+\]</span> The exact solution <span class="math inline">\(y(t)=(t+1)^2-\tfrac12 e^{t}\)</span> gives <span class="math inline">\(y(0.2)=0.8292986\)</span> and <span class="math inline">\(y(0.4)=1.2140877\)</span>, so the errors after one and two steps are <span class="math inline">\(7.0\times10^{-4}\)</span> and <span class="math inline">\(1.7\times10^{-3}\)</span>, a marked gain on Euler, whose first step <span class="math inline">\(w_1=0.8\)</span> already errs by <span class="math inline">\(2.9\times10^{-2}\)</span>, forty times larger at the same <span class="math inline">\(h\)</span>.</p>
 </section>
 </section>
 <section id="runge-kutta-methods" class="level2" data-number="3.5">
@@ -490,7 +490,7 @@ w_{j+1}=w_j+\frac{h}{6}\bigl(k_1+2k_2+2k_3+k_4\bigr).
 </section>
 <section id="adaptive-step-size-control" class="level2" data-number="3.6">
 <h2 data-number="3.6" class="anchored" data-anchor-id="adaptive-step-size-control"><span class="header-section-number">3.6</span> Adaptive step-size control</h2>
-<p>A fixed <span class="math inline">\(h\)</span> wastes work where the solution is smooth and loses accuracy where it is not — the “crying babies get more candy” principle: put mesh points where the error demands them. The difficulty is that the true error is unknown. The remedy is to run two methods of consecutive orders and let their disagreement estimate the error.</p>
+<p>A fixed <span class="math inline">\(h\)</span> wastes work where the solution is smooth and loses accuracy where it is not, the “crying babies get more candy” principle: put mesh points where the error demands them. The difficulty is that the true error is unknown. The remedy is to run two methods of consecutive orders and let their disagreement estimate the error.</p>
 <p>Let <span class="math inline">\(\phi\)</span> be order <span class="math inline">\(n\)</span> with iterate <span class="math inline">\(w_{j+1}\)</span>, and <span class="math inline">\(\widetilde\phi\)</span> order <span class="math inline">\(n+1\)</span> with iterate <span class="math inline">\(\widetilde w_{j+1}\)</span>, both stepping from the (assumed exact) common value <span class="math inline">\(w_j\approx y(t_j)\)</span>. From <a href="#eq-3-lte" class="quarto-xref">Equation&nbsp;<span>3.4</span></a>, <span class="math display">\[
 \tau_{j+1}(h)=\frac{y(t_{j+1})-w_{j+1}}{h}
 =\underbrace{\frac{y(t_{j+1})-\widetilde w_{j+1}}{h}}_{\bigO(h^{n+1})}
@@ -508,7 +508,7 @@ q\le\left\lvert\frac{\eps h}{\widetilde w_{j+1}-w_{j+1}}\right\rvert^{1/n}.
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Algorithm — RKF45 step-size selection
+<span class="screen-reader-only">Note</span>Algorithm: RKF45 step-size selection
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -534,7 +534,7 @@ y(t_{j+1})-y(t_j)=\int_{t_j}^{t_{j+1}} f\bigl(t,y(t)\bigr)\,\dd t,
 \int_{t_j}^{t_{j+1}}\frac{(t-t_{j-1})f_j+(t_j-t)f_{j-1}}{h}\,\dd t=\frac{h}{2}\bigl(3f_j-f_{j-1}\bigr),
 \]</span> so <span id="eq-3-ab2"><span class="math display">\[
 w_{j+1}=w_j+\tfrac{h}{2}\bigl(3f(t_j,w_j)-f(t_{j-1},w_{j-1})\bigr).
-\tag{3.13}\]</span></span> Only past values appear, so <span class="math inline">\(w_{j+1}\)</span> is obtained by one evaluation — the method is <strong>explicit</strong>.</p>
+\tag{3.13}\]</span></span> Only past values appear, so <span class="math inline">\(w_{j+1}\)</span> is obtained by one evaluation: the method is <strong>explicit</strong>.</p>
 <p><strong>Implicit (Adams-Moulton).</strong> Interpolating instead through <span class="math inline">\(t_j\)</span> and the <em>new</em> point <span class="math inline">\(t_{j+1}\)</span> gives the trapezoidal rule for the integral, <span id="eq-3-am1"><span class="math display">\[
 w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
 \tag{3.14}\]</span></span> in which <span class="math inline">\(w_{j+1}\)</span> appears on both sides: the method is <strong>implicit</strong> and each step requires solving an equation for <span class="math inline">\(w_{j+1}\)</span>. Both <a href="#eq-3-ab2" class="quarto-xref">Equation&nbsp;<span>3.13</span></a> and <a href="#eq-3-am1" class="quarto-xref">Equation&nbsp;<span>3.14</span></a> are second order.</p>
@@ -552,7 +552,7 @@ w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
 \tau_{j+1}^{\mathrm{AB}}(h)=\frac{251}{720}\,f^{(4)}(\xi,y(\xi))\,h^4 ;
 \]</span> Adams-Moulton uses <span class="math inline">\(t_{j-2},\dots,t_{j+1}\)</span>, giving <span class="math inline">\(\int_0^h(s-h)s(s+h)(s+2h)\,\dd s\)</span> and <span class="math display">\[
 \tau_{j+1}^{\mathrm{AM}}(h)=-\frac{19}{720}\,f^{(4)}(\xi,y(\xi))\,h^4 .
-\]</span> Both are <span class="math inline">\(\bigO(h^4)\)</span>, but the implicit AM4 has the far smaller error constant <span class="math inline">\(\tfrac{19}{720}\)</span> versus <span class="math inline">\(\tfrac{251}{720}\)</span>: at equal order and equal work the implicit method is more accurate as well as more stable. This is the recurring trade — implicit methods cost a solve per step but are worth it.</p>
+\]</span> Both are <span class="math inline">\(\bigO(h^4)\)</span>, but the implicit AM4 has the far smaller error constant <span class="math inline">\(\tfrac{19}{720}\)</span> versus <span class="math inline">\(\tfrac{251}{720}\)</span>: at equal order and equal work the implicit method is more accurate as well as more stable. This is the recurring trade: implicit methods cost a solve per step but are worth it.</p>
 </section>
 <section id="predictor-corrector-schemes" class="level3">
 <h3 class="anchored" data-anchor-id="predictor-corrector-schemes">Predictor-corrector schemes</h3>
@@ -563,7 +563,7 @@ w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Algorithm — fourth-order Adams predictor-corrector (Adams4PC)
+<span class="screen-reader-only">Note</span>Algorithm: fourth-order Adams predictor-corrector (Adams4PC)
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -587,7 +587,7 @@ w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Multistep methods are <strong>cheaper</strong> — one new <span class="math inline">\(f\)</span>-evaluation per step by reusing history — but every step-size change invalidates that history and forces a <strong>restart</strong> with a single-step method like RK4. Runge-Kutta changes <span class="math inline">\(h\)</span> freely but pays several evaluations per step. Adaptive codes therefore combine them: RK4 to start and to restart, Adams4PC to cruise.</p>
+<p>Multistep methods are <strong>cheaper</strong>, one new <span class="math inline">\(f\)</span>-evaluation per step by reusing history, but every step-size change invalidates that history and forces a <strong>restart</strong> with a single-step method like RK4. Runge-Kutta changes <span class="math inline">\(h\)</span> freely but pays several evaluations per step. Adaptive codes therefore combine them: RK4 to start and to restart, Adams4PC to cruise.</p>
 </div>
 </div>
 </section>
@@ -611,7 +611,7 @@ P(\mu)=\mu^m-\bigl(a_{m-1}\mu^{m-1}+\dots+a_0\bigr).
 <p>Nothing above used that <span class="math inline">\(y\)</span> is scalar. A system of <span class="math inline">\(m\)</span> first-order equations is written in vector form <span class="math display">\[
 \diff{\mathbf u}{t}=\mathbf f(t,\mathbf u),\qquad \mathbf u(a)=\boldsymbol\alpha,\qquad
 \mathbf u,\boldsymbol\alpha\in\R^m,
-\]</span> and every method of this chapter applies verbatim with <span class="math inline">\(w_j,f\)</span> replaced by vectors — RK4, for instance, is <a href="#eq-3-rk4" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> read componentwise, the <span class="math inline">\(k_i\)</span> now vectors. Existence and uniqueness hold under a vector Lipschitz condition <span class="math inline">\(\norm{\mathbf f(t,\mathbf u)-\mathbf f(t,\mathbf z)}\le
+\]</span> and every method of this chapter applies verbatim with <span class="math inline">\(w_j,f\)</span> replaced by vectors, RK4, for instance, is <a href="#eq-3-rk4" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> read componentwise, the <span class="math inline">\(k_i\)</span> now vectors. Existence and uniqueness hold under a vector Lipschitz condition <span class="math inline">\(\norm{\mathbf f(t,\mathbf u)-\mathbf f(t,\mathbf z)}\le
 L\norm{\mathbf u-\mathbf z}\)</span>, again implied by bounded partials <span class="math inline">\(\lvert\pdiff{f_j}{u_k}\rvert\le L\)</span>, with uniqueness following from Grönwall exactly as in <a href="#thm-3-wellposed" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>.</p>
 <p>A single <span class="math inline">\(m\)</span>-th order equation <span class="math inline">\(y^{(m)}=f(t,y,y',\dots,y^{(m-1)})\)</span> reduces to such a system by the standard substitution <span class="math inline">\(u_1=y,\ u_2=y',\ \dots,\ u_m=y^{(m-1)}\)</span>, whence <span class="math display">\[
 \mathbf u'=(u_2,\,u_3,\,\dots,\,f(t,u_1,\dots,u_m))^\top .
@@ -623,7 +623,7 @@ L\norm{\mathbf u-\mathbf z}\)</span>, again implied by bounded partials <span cl
 x'&amp;=\alpha x-\beta xy,\\
 y'&amp;=-\gamma y+\delta xy .
 \end{aligned}
-\tag{3.18}\]</span></span> Prey grow exponentially when alone (<span class="math inline">\(\alpha x\)</span>) but are eaten on encounter (<span class="math inline">\(-\beta xy\)</span>); predators starve without prey (<span class="math inline">\(-\gamma y\)</span>) but thrive on encounter (<span class="math inline">\(+\delta xy\)</span>). This is a coupled nonlinear system with no elementary solution — a natural target for RK4. Solving <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> and plotting <span class="math inline">\(y\)</span> against <span class="math inline">\(x\)</span> traces the <strong>phase portrait</strong> (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>): the trajectories are closed loops circling the coexistence equilibrium <span class="math inline">\((\gamma/\delta,\ \alpha/\beta)\)</span>, the mathematical signature of the perpetual boom-and-bust cycle of the two populations.</p>
+\tag{3.18}\]</span></span> Prey grow exponentially when alone (<span class="math inline">\(\alpha x\)</span>) but are eaten on encounter (<span class="math inline">\(-\beta xy\)</span>); predators starve without prey (<span class="math inline">\(-\gamma y\)</span>) but thrive on encounter (<span class="math inline">\(+\delta xy\)</span>). This is a coupled nonlinear system with no elementary solution, a natural target for RK4. Solving <a href="#eq-3-lotka" class="quarto-xref">Equation&nbsp;<span>3.18</span></a> and plotting <span class="math inline">\(y\)</span> against <span class="math inline">\(x\)</span> traces the <strong>phase portrait</strong> (<a href="#fig-3-lotka" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>): the trajectories are closed loops circling the coexistence equilibrium <span class="math inline">\((\gamma/\delta,\ \alpha/\beta)\)</span>, the mathematical signature of the perpetual boom-and-bust cycle of the two populations.</p>
 <div id="fig-3-lotka" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-3-lotka-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -640,8 +640,8 @@ Figure&nbsp;3.1: Phase portrait of the Lotka-Volterra system <a href="#eq-3-lotk
 <h2 data-number="3.9" class="anchored" data-anchor-id="stiff-equations-and-implicit-methods"><span class="header-section-number">3.9</span> Stiff equations and implicit methods</h2>
 <p>Some problems force explicit methods to take absurdly small steps not for accuracy but for <strong>stability</strong>. The diagnostic is the linear test equation <span id="eq-3-test"><span class="math display">\[
 \diff{y}{t}=\lambda y,\qquad y(0)=\alpha,\qquad \lambda&lt;0,
-\tag{3.19}\]</span></span> whose solution <span class="math inline">\(y(t)=\alpha e^{\lambda t}\)</span> decays to <span class="math inline">\(0\)</span>. Its Lipschitz constant is <span class="math inline">\(L=\abs\lambda\)</span>, which can be enormous even as the solution vanishes — the hallmark of <strong>stiffness</strong>: widely separated time scales, a fast-decaying transient riding on slow dynamics.</p>
-<p>Apply Euler <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a>: <span class="math inline">\(w_{j+1}=(1+\lambda h)w_j\)</span>, so <span class="math inline">\(w_j=(1+\lambda h)^j\alpha\)</span>. A round-off error <span class="math inline">\(\delta\)</span> in <span class="math inline">\(w_0\)</span> propagates as <span class="math inline">\((1+\lambda h)^j\delta\)</span>, so the computed solution stays bounded — is <strong>absolutely stable</strong> — only when <span class="math display">\[
+\tag{3.19}\]</span></span> whose solution <span class="math inline">\(y(t)=\alpha e^{\lambda t}\)</span> decays to <span class="math inline">\(0\)</span>. Its Lipschitz constant is <span class="math inline">\(L=\abs\lambda\)</span>, which can be enormous even as the solution vanishes, the hallmark of <strong>stiffness</strong>: widely separated time scales, a fast-decaying transient riding on slow dynamics.</p>
+<p>Apply Euler <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a>: <span class="math inline">\(w_{j+1}=(1+\lambda h)w_j\)</span>, so <span class="math inline">\(w_j=(1+\lambda h)^j\alpha\)</span>. A round-off error <span class="math inline">\(\delta\)</span> in <span class="math inline">\(w_0\)</span> propagates as <span class="math inline">\((1+\lambda h)^j\delta\)</span>, so the computed solution stays bounded (is <strong>absolutely stable</strong>) only when <span class="math display">\[
 \abs{1+\lambda h}&lt;1,\qquad\text{i.e.}\qquad -2&lt;\lambda h&lt;0 .
 \]</span> For <span class="math inline">\(\lambda=-10^6\)</span> this demands <span class="math inline">\(h&lt;2\times10^{-6}\)</span> throughout, long after the transient is dead: the step is dictated by stability, not accuracy. Implicit methods break this tyranny. The <strong>implicit trapezoid</strong> (the Adams-Moulton rule <a href="#eq-3-am1" class="quarto-xref">Equation&nbsp;<span>3.14</span></a>) applied to <a href="#eq-3-test" class="quarto-xref">Equation&nbsp;<span>3.19</span></a> gives <span class="math display">\[
 w_{j+1}=w_j+\tfrac{\lambda h}{2}(w_{j+1}+w_j)
@@ -663,12 +663,12 @@ F(w)\defeq w-w_j-\tfrac h2\bigl(f(t_{j+1},w)+f(t_j,w_j)\bigr).
 \]</span> Newton’s method (<a href="08-nonlinear-equations.html" class="quarto-xref"><span>Chapter 8</span></a>) does this efficiently. Starting from <span class="math inline">\(w_{j+1}^{(0)}=w_j\)</span>, iterate <span class="math display">\[
 w_{j+1}^{(\ell+1)}=w_{j+1}^{(\ell)}-\frac{w_{j+1}^{(\ell)}-w_j-\tfrac h2\bigl(f(t_{j+1},w_{j+1}^{(\ell)})+f(t_j,w_j)\bigr)}
 {1-\tfrac h2\,\pdiff{f}{y}(t_{j+1},w_{j+1}^{(\ell)})} ,
-\]</span> which converges quadratically in a few iterations. The extra Newton solves per step are a small price for stability that decouples <span class="math inline">\(h\)</span> from <span class="math inline">\(\abs\lambda\)</span> entirely — on a stiff problem the implicit trapezoid is dramatically more reliable, and cheaper overall, than any explicit method.</p>
+\]</span> which converges quadratically in a few iterations. The extra Newton solves per step are a small price for stability that decouples <span class="math inline">\(h\)</span> from <span class="math inline">\(\abs\lambda\)</span> entirely, on a stiff problem the implicit trapezoid is dramatically more reliable, and cheaper overall, than any explicit method.</p>
 </section>
 <section id="chapter-summary" class="level2" data-number="3.10">
 <h2 data-number="3.10" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">3.10</span> Chapter summary</h2>
 <ul>
-<li>The IVP <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> is <strong>well-posed</strong> — unique solution, stable under perturbation — whenever <span class="math inline">\(f\)</span> is continuous and <strong>Lipschitz</strong> in <span class="math inline">\(y\)</span> (<a href="#def-3-lipschitz" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>, <a href="#thm-3-wellposed" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>); on a convex domain a bound <span class="math inline">\(\lvert\pdiff{f}{y}\rvert\le L\)</span> suffices (<a href="#thm-3-lipschitz-bound" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a>).</li>
+<li>The IVP <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> is <strong>well-posed</strong> (unique solution, stable under perturbation) whenever <span class="math inline">\(f\)</span> is continuous and <strong>Lipschitz</strong> in <span class="math inline">\(y\)</span> (<a href="#def-3-lipschitz" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>, <a href="#thm-3-wellposed" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>); on a convex domain a bound <span class="math inline">\(\lvert\pdiff{f}{y}\rvert\le L\)</span> suffices (<a href="#thm-3-lipschitz-bound" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a>).</li>
 <li><strong>Euler’s method</strong> <a href="#eq-3-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> is first order with global error <span class="math inline">\(\le\tfrac{hM}{2L}(e^{L(t_j-a)}-1)\)</span> (<a href="#thm-3-euler-conv" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a>); round-off puts a floor on accuracy at <span class="math inline">\(h_{\mathrm{opt}}=\bigO(\sqrt\delta)\)</span>.</li>
 <li>The <strong>local truncation error</strong> (<a href="#def-3-lte" class="quarto-xref">Definition&nbsp;<span>3.4</span></a>) measures per-step fidelity; <strong>consistency</strong>
 <ol class="example" type="1">
