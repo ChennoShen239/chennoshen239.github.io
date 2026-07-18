@@ -389,13 +389,13 @@ Important
 </div>
 <div class="callout-body-container callout-body">
 <p>Partial pivoting keeps the multipliers bounded, but it does <strong>not</strong> bound the <em>growth</em> of the matrix entries in the worst case. Measure that growth by the <strong>growth factor</strong> <span class="math display">\[
-\rho\defeq\frac{\max_{i,j,s}\abs{a_{ij}^{(s)}}}{\max_{i,j}\abs{a_{ij}}},
-\]</span> the largest entry appearing at any elimination stage <span class="math inline">\(s\)</span> relative to the largest entry of the original <span class="math inline">\(A\)</span>; the round-off in the computed solution is proportional to <span class="math inline">\(\rho\)</span>. For the <strong>Wilkinson matrix</strong> <span class="math display">\[
+\gamma\defeq\frac{\max_{i,j,s}\abs{a_{ij}^{(s)}}}{\max_{i,j}\abs{a_{ij}}},
+\]</span> the largest entry appearing at any elimination stage <span class="math inline">\(s\)</span> relative to the largest entry of the original <span class="math inline">\(A\)</span>; the round-off in the computed solution is proportional to <span class="math inline">\(\gamma\)</span>. For the <strong>Wilkinson matrix</strong> <span class="math display">\[
 A=\begin{pmatrix}
 1 &amp; &amp; &amp; &amp; 1\\ -1 &amp; 1 &amp; &amp; &amp; 1\\ -1 &amp; -1 &amp; 1 &amp; &amp; 1\\
 \vdots &amp; &amp; \ddots &amp; &amp; \vdots\\ -1 &amp; -1 &amp; \cdots &amp; -1 &amp; 1
 \end{pmatrix},
-\]</span> GEPP performs no swaps yet the trailing entries double at every step, so the largest entry of <span class="math inline">\(U\)</span> reaches <span class="math inline">\(2^{\,n-1}\)</span> and <span class="math inline">\(\rho=2^{\,n-1}\)</span>. The residual <span class="math inline">\(r=b-A\hat x\)</span> of the computed solution then grows exponentially in <span class="math inline">\(n\)</span> (<a href="#fig-4-wilkinson" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>), even though the <em>problem</em> is not that sensitive. Complete pivoting removes this growth: its factor is provably far milder, and is observed to sit near <span class="math inline">\(\rho\approx n\)</span> in practice. Partial pivoting is stable in practice and unstable only in the worst case.</p>
+\]</span> GEPP performs no swaps yet the trailing entries double at every step, so the largest entry of <span class="math inline">\(U\)</span> reaches <span class="math inline">\(2^{\,n-1}\)</span> and <span class="math inline">\(\gamma=2^{\,n-1}\)</span>. The residual <span class="math inline">\(r=b-A\hat x\)</span> of the computed solution then grows exponentially in <span class="math inline">\(n\)</span> (<a href="#fig-4-wilkinson" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>), even though the <em>problem</em> is not that sensitive. Complete pivoting removes this growth: its factor is provably far milder, and is observed to sit near <span class="math inline">\(\gamma\approx n\)</span> in practice. Partial pivoting is stable in practice and unstable only in the worst case.</p>
 </div>
 </div>
 <div id="fig-4-wilkinson" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -718,7 +718,7 @@ Figure&nbsp;4.3: Two <span class="math inline">\(2\times2\)</span> systems, each
 </div>
 <p>The condition number bounds how much a relative perturbation of the data can change the solution.</p>
 <div id="thm-4-cond-bound" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 4.6 (Perturbation bound)</strong></span> Let <span class="math inline">\(Ax=b\)</span> with <span class="math inline">\(b\ne0\)</span>, and let <span class="math inline">\(A(x+\delta x)=b+\delta b\)</span>. Then <span class="math display">\[
+<p><span class="theorem-title"><strong>Theorem 4.6 (Perturbation bound)</strong></span> Let <span class="math inline">\(A\)</span> be nonsingular, <span class="math inline">\(Ax=b\)</span> with <span class="math inline">\(b\ne0\)</span>, and let <span class="math inline">\(A(x+\delta x)=b+\delta b\)</span>. Then <span class="math display">\[
 \frac{\norm{\delta x}}{\norm{x}}\le\cond(A)\,\frac{\norm{\delta b}}{\norm{b}}.
 \]</span></p>
 </div>

@@ -324,7 +324,7 @@ window.Quarto = {
 </div>
 <p>Most laws of change are written as differential equations, and most of them cannot be solved in closed form. This chapter builds the numerical machinery for the <strong>initial-value problem</strong> (IVP) <span id="eq-3-ivp"><span class="math display">\[
 \diff{y}{t}=f(t,y),\qquad a\le t\le b,\qquad y(a)=\alpha ,
-\tag{3.1}\]</span></span> which asks for the trajectory <span class="math inline">\(y(t)\)</span> that starts at <span class="math inline">\(\alpha\)</span> and obeys the slope field <span class="math inline">\(f\)</span>. We first pin down when <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> even has a well-behaved solution, the Lipschitz condition and well-posedness, then march that solution forward on a mesh with Euler’s method, measure the error it commits, and systematically improve it: Taylor and Runge-Kutta one-step methods, adaptive step-size control, multistep Adams methods and predictor-correctors, and finally the implicit methods that alone cope with <em>stiff</em> problems. Throughout, <span class="math inline">\(w_i\approx y(t_i)\)</span> denotes the computed approximation at the mesh point <span class="math inline">\(t_i=a+ih\)</span>, <span class="math inline">\(h=(b-a)/N\)</span> (see <a href="./notation.html">Notation</a>).</p>
+\tag{3.1}\]</span></span> which asks for the trajectory <span class="math inline">\(y(t)\)</span> that starts at <span class="math inline">\(\alpha\)</span> and obeys the slope field <span class="math inline">\(f\)</span>. We first pin down when <a href="#eq-3-ivp" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> even has a well-behaved solution, the Lipschitz condition and well-posedness, then march that solution forward on a mesh with Euler’s method, measure the error it commits, and systematically improve it: Taylor and Runge-Kutta one-step methods, adaptive step-size control, multistep Adams methods and predictor-correctors, and finally the implicit methods that alone cope with <em>stiff</em> problems. Throughout, <span class="math inline">\(w_j\approx y(t_j)\)</span> denotes the computed approximation at the mesh point <span class="math inline">\(t_j=a+jh\)</span>, <span class="math inline">\(h=(b-a)/N\)</span> (see <a href="./notation.html">Notation</a>).</p>
 <section id="well-posedness-when-does-a-solution-exist-and-depend-stably-on-data" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="well-posedness-when-does-a-solution-exist-and-depend-stably-on-data"><span class="header-section-number">3.1</span> Well-posedness: when does a solution exist and depend stably on data?</h2>
 <p>A numerical method chases the true solution, so we should first know that a true solution exists, is unique, and does not swing wildly under small perturbations. The single hypothesis that buys all three is a one-sided smoothness bound on <span class="math inline">\(f\)</span> in its second argument.</p>
@@ -418,7 +418,7 @@ E_j\le p_j-\tfrac{hM}{2L}\le \tfrac{hM}{2L}\bigl((1+hL)^j-1\bigr)\le\tfrac{hM}{2
 </div>
 <div class="callout-body-container callout-body">
 <p>Formula <a href="#eq-3-euler-bound" class="quarto-xref">Equation&nbsp;<span>3.3</span></a> suggests taking <span class="math inline">\(h\to0\)</span>, but on a real machine each step also injects a round-off error <span class="math inline">\(\delta_{j+1}\)</span> with <span class="math inline">\(\abs{\delta_{j+1}}\le\delta\)</span>. Repeating the proof with this extra term gives <span class="math display">\[
-\abs{y(t_j)-u_j}\le\Bigl(\delta+\frac{hM}{2L}+\frac{\delta}{hL}\Bigr)\bigl(e^{L(t_j-a)}-1\bigr).
+\abs{y(t_j)-u_j}\le\frac{1}{L}\Bigl(\frac{hM}{2}+\frac{\delta}{h}\Bigr)\bigl(e^{L(t_j-a)}-1\bigr)+\delta\,e^{L(t_j-a)}.
 \]</span> The bracket <span class="math inline">\(\tfrac{hM}{2}+\tfrac{\delta}{h}\)</span> (dropping constants) <em>increases</em> as <span class="math inline">\(h\to0\)</span> because of the <span class="math inline">\(\delta/h\)</span> term: too many steps accumulate too much round-off. Minimizing over <span class="math inline">\(h\)</span> gives the optimal step <span class="math display">\[
 h_{\mathrm{opt}}=\sqrt{\frac{2\delta}{M}}=\bigO(\sqrt\delta),
 \]</span> below which finite precision makes the answer <em>worse</em>, not better.</p>
@@ -677,7 +677,7 @@ w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
 </div>
 <p>The predictor and corrector also furnish a <em>free</em> error estimate. Since <span class="math inline">\(w_{j+1}^{\mathrm p}\approx y_{j+1}-\tfrac{251}{720}f^{(4)}h^5\)</span> and <span class="math inline">\(w_{j+1}\approx y_{j+1}+\tfrac{19}{720}f^{(4)}h^5\)</span>, subtracting eliminates <span class="math inline">\(y_{j+1}\)</span> and gives <span class="math display">\[
 \tau_{j+1}(h)=\frac{y_{j+1}-w_{j+1}}{h}\approx-\frac{19}{270}\cdot\frac{w_{j+1}-w_{j+1}^{\mathrm p}}{h},
-\]</span> so the predictor-corrector difference drives adaptive step control exactly as <a href="#eq-3-stepsize" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> did for RKF, here with <span class="math inline">\(q=1.5\,\lvert\eps h/(w_{j+1}-w_{j+1}^{\mathrm p})\rvert^{1/4}\)</span>.</p>
+\]</span> so the predictor-corrector difference drives adaptive step control exactly as <a href="#eq-3-stepsize" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> did for RKF, here with <span class="math inline">\(q=\bigl(\tfrac{270}{19}\bigr)^{1/4}\lvert\eps h/(w_{j+1}-w_{j+1}^{\mathrm p})\rvert^{1/4}\)</span>.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -704,7 +704,7 @@ P(\mu)=\mu^m-\bigl(a_{m-1}\mu^{m-1}+\dots+a_0\bigr).
 <div id="thm-3-dahlquist" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 3.6 (Dahlquist equivalence)</strong></span> For a consistent multistep method, the following are equivalent: the method is stable; it satisfies the root condition; it is convergent.</p>
 </div>
-<p>We state this without proof; it is the multistep counterpart of the one-step consistency-plus-stability theorem of 1.</p>
+<p>We state this without proof; it is the multistep counterpart of the one-step consistency-plus-stability principle discussed just after 1.</p>
 </section>
 </section>
 <section id="systems-and-higher-order-equations" class="level2" data-number="3.8">
@@ -861,7 +861,7 @@ Table&nbsp;3.2: One-glance comparison of the chapter’s methods. “<span class
 <tr class="odd">
 <td style="text-align: left;">Adams4PC</td>
 <td style="text-align: center;"><span class="math inline">\(4\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1\)</span></td>
 <td style="text-align: center;">Explicit</td>
 <td style="text-align: center;">No (RK4 start)</td>
 <td style="text-align: left;">conditional</td>
