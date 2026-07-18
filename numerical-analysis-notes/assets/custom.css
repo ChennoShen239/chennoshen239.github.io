@@ -7,3 +7,20 @@
   --body:'Spectral',Georgia,'Times New Roman',serif;
   --ease:cubic-bezier(.2,.6,.2,1);
 }
+
+/* ---------- mobile: stop wide equations / long titles from dragging the whole
+   page sideways (a wide element elsewhere on the page made the entire book
+   horizontally scrollable, so figures could appear shifted/cropped after any
+   sideways scroll, even though the figures themselves are responsive) ---------- */
+html,body{overflow-x:hidden}
+mjx-container[display="true"]{
+  overflow-x:auto;
+  overflow-y:hidden;
+  max-width:100%;
+}
+@media (max-width:768px){
+  .quarto-page-breadcrumbs,.quarto-page-breadcrumbs .breadcrumb{
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-wrap:nowrap;
+  }
+  .quarto-secondary-nav .container-fluid{min-width:0}
+}
