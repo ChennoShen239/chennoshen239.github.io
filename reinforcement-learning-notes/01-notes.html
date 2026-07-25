@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+
+<title>1&nbsp; The Basic Idea of RL, and Its Link to Dynamic Programming – Reinforcement Learning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02-notes.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-notes.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Basic Idea of RL, and Its Link to Dynamic Programming</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Reinforcement Learning</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-notes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Basic Idea of RL, and Its Link to Dynamic Programming</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-basic-idea-of-rl" id="toc-the-basic-idea-of-rl" class="nav-link active" data-scroll-target="#the-basic-idea-of-rl"><span class="header-section-number">1.1</span> The basic idea of RL</a>
+  <ul class="collapse">
+  <li><a href="#computing-a-value-function" id="toc-computing-a-value-function" class="nav-link" data-scroll-target="#computing-a-value-function">Computing a value function</a></li>
+  <li><a href="#reinforcement-learning-and-deep-learning" id="toc-reinforcement-learning-and-deep-learning" class="nav-link" data-scroll-target="#reinforcement-learning-and-deep-learning">Reinforcement learning and deep learning</a></li>
+  </ul></li>
+  <li><a href="#link-to-dynamic-programming" id="toc-link-to-dynamic-programming" class="nav-link" data-scroll-target="#link-to-dynamic-programming"><span class="header-section-number">1.2</span> Link to Dynamic Programming</a>
+  <ul class="collapse">
+  <li><a href="#bellman-equation-with-finite-states" id="toc-bellman-equation-with-finite-states" class="nav-link" data-scroll-target="#bellman-equation-with-finite-states">Bellman equation with finite states</a></li>
+  <li><a href="#matrix-vector-form-of-the-bellman-equation" id="toc-matrix-vector-form-of-the-bellman-equation" class="nav-link" data-scroll-target="#matrix-vector-form-of-the-bellman-equation">Matrix-vector form of the Bellman equation</a></li>
+  <li><a href="#value-function-iteration-vfi" id="toc-value-function-iteration-vfi" class="nav-link" data-scroll-target="#value-function-iteration-vfi">Value function iteration (VFI)</a></li>
+  <li><a href="#howard-policy-iteration-hpi" id="toc-howard-policy-iteration-hpi" class="nav-link" data-scroll-target="#howard-policy-iteration-hpi">Howard policy iteration (HPI)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Basic Idea of RL, and Its Link to Dynamic Programming</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\BR}{\operatorname{BR}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,\vert\,}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sm}{\setminus}
+\newcommand{\defeq}{\equiv}
+\]</span></p>
+</div>
+<p>This first chapter follows <a href="https://benjaminmoll.com/lectures/">Ben Moll’s Lecture 1</a>. The one idea to keep in mind throughout: <strong>reinforcement learning is Monte-Carlo dynamic programming</strong>. It uses the same Bellman recursions, but with expectations <em>estimated from samples</em> instead of <em>computed from a known model</em>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Source:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ben Moll’s <a href="https://benjaminmoll.com/lectures/">RL lecture slides</a>, Lecture 1.</p>
+</div>
+</div>
+<section id="the-basic-idea-of-rl" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="the-basic-idea-of-rl"><span class="header-section-number">1.1</span> The basic idea of RL</h2>
+<p>For a random variable <span class="math inline">\(x\)</span>, how can we compute <span class="math inline">\(\E[x]\)</span>? There are two approaches.</p>
+<ol type="1">
+<li><strong>Exact.</strong> If we know the distribution <span class="math inline">\(p(x)\)</span>, integrate: <span class="math display">\[
+\E[x]=\int x\,p(x)\,dx .
+\]</span></li>
+<li><strong>Monte Carlo.</strong> If we do not know <span class="math inline">\(p(x)\)</span> but can sample <span class="math inline">\(\vec{x}=[x_{1},\dots,x_{N}]'\)</span>, average: <span class="math display">\[
+\E[x]\approx \bar{x}=\frac{1}{N}\sum_{i=1}^{N}x_{i} .
+\]</span></li>
+</ol>
+<p>The Monte-Carlo mean can be built up <em>incrementally</em>. Writing <span class="math inline">\(\bar{x}_{k}=\tfrac{1}{k}\sum_{i=1}^{k}x_{i}\)</span> for the running mean of the first <span class="math inline">\(k\)</span> samples, a one-line rearrangement gives the recursion</p>
+<p><span id="eq-running-mean"><span class="math display">\[
+\bar{x}_{k}=\bar{x}_{k-1}+\frac{1}{k}\,(x_{k}-\bar{x}_{k-1}).
+\tag{1.1}\]</span></span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Read <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> as <strong>old estimate <span class="math inline">\(+\)</span> step <span class="math inline">\(\times\)</span> (new sample <span class="math inline">\(-\)</span> old estimate)</strong>. The step size <span class="math inline">\(\tfrac{1}{k}\)</span> is the <em>learning rate</em>. Replacing it with a constant <span class="math inline">\(\alpha\)</span> is precisely what turns <em>averaging</em> into <em>learning</em>, the recurring theme of everything below.</p>
+</div>
+</div>
+<section id="computing-a-value-function" class="level3">
+<h3 class="anchored" data-anchor-id="computing-a-value-function">Computing a value function</h3>
+<div id="def-mrp" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.1 (Markov reward process)</strong></span> A <strong>Markov reward process (MRP)</strong> assigns to each starting state <span class="math inline">\(s_{0}\)</span> the discounted expected reward <span class="math display">\[
+v(s_{0})=\E\!\left[\sum_{t=0}^{\infty}\beta^{t}r(s_{t})\right],
+\]</span> where the state <span class="math inline">\(s_{t}\)</span> follows an exogenous Markov process and <span class="math inline">\(\beta\in(0,1)\)</span> is the discount factor.</p>
+</div>
+<p>As before, there are two ways to obtain <span class="math inline">\(v\)</span>.</p>
+<ol type="1">
+<li><strong>Dynamic programming.</strong> If we know the transition density <span class="math inline">\(p(s'\given s)\)</span>, then <span class="math inline">\(v\)</span> solves the fixed point <span id="eq-mrp-dp"><span class="math display">\[
+v(s)=r(s)+\beta\int v(s')\,p(s'\given s)\,ds' .
+\tag{1.2}\]</span></span></li>
+<li><strong>Monte Carlo.</strong> If we cannot evaluate <span class="math inline">\(p\)</span> but can sample <strong>trajectories</strong> <span class="math inline">\(\{s_{t}^{i}\}_{t=0}^{T}\)</span>, average the realized returns: <span class="math display">\[
+v(s_{0})\approx \hat{v}(s_{0})=\frac{1}{N}\sum_{i=1}^{N}\sum_{t=0}^{T}\beta^{t}r(s_{t}^{i}).
+\]</span></li>
+</ol>
+<p>Averaging whole trajectories is wasteful: it waits for a trajectory to finish before updating. Instead we can update <span class="math inline">\(\hat{v}\)</span> at <em>every</em> step <span class="math inline">\(t\)</span> of every trajectory <span class="math inline">\(k\)</span>, using the incremental rule <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> with a constant learning rate <span class="math inline">\(\alpha\)</span>:</p>
+<p><span id="eq-td0"><span class="math display">\[
+\hat{v}_{t+1}^{k}(s_{t}^{k})=\hat{v}_{t}^{k}(s_{t}^{k})+\alpha\big[\,r(s_{t}^{k})+\beta\,\hat{v}_{t}^{k}(s_{t+1}^{k})-\hat{v}_{t}^{k}(s_{t}^{k})\,\big].
+\tag{1.3}\]</span></span></p>
+<p>This is the <strong>TD(0)</strong> update. Where does it come from?</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: from the incremental mean to TD(0)">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Derivation: from the incremental mean to TD(0)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Start from the dynamic-programming fixed point <a href="#eq-mrp-dp" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> and read it as an expectation: <span class="math display">\[
+v(s)=r(s)+\beta\int v(s')\,p(s'\given s)\,ds'
+     =\E_{s'\sim p(\cdot\given s)}\big[\,\underbrace{r(s)+\beta v(s')}_{Y\,\defeq\,r(s)+\beta v(s')}\,\big].
+\]</span> So computing <span class="math inline">\(v(s)\)</span> <em>is</em> computing <span class="math inline">\(\E[Y]\)</span>, and we already know how to estimate an expectation incrementally via <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a>, with the learning rate relaxed to a constant <span class="math inline">\(\alpha\)</span>.</p>
+<p>At trajectory <span class="math inline">\(k\)</span> the realized value of <span class="math inline">\(Y\)</span> is <span class="math inline">\(r(s^{k})+\beta v(s'^{k})\)</span>. The catch: we do not have the true <span class="math inline">\(v(s'^{k})\)</span>. So we <strong>bootstrap</strong>: plug in the current estimate <span class="math inline">\(\hat{v}^{k}\)</span> in its place: <span class="math display">\[
+x_{k}=r(s^{k})+\beta\,\hat{v}^{k}(s'^{k}).
+\]</span> If <span class="math inline">\(\hat{v}^{k}\to v\)</span> then <span class="math inline">\(x_{k}\to Y\)</span>, so the target is asymptotically unbiased. Feeding <span class="math inline">\(x_{k}\)</span> into the incremental rule <span class="math inline">\(\bar{x}_{k}=\bar{x}_{k-1}+\alpha(x_{k}-\bar{x}_{k-1})\)</span>, with <span class="math inline">\(\bar{x}_{k}=\hat{v}'^{k}(s^{k})\)</span> the <em>updated</em> estimate and <span class="math inline">\(\bar{x}_{k-1}=\hat{v}^{k}(s^{k})\)</span> the <em>old</em> one (a prime marks the post-update value), gives <span class="math display">\[
+\begin{aligned}
+\hat{v}'^{k}(s^{k})
+  &amp;=\hat{v}^{k}(s^{k})+\alpha\big[\,r(s^{k})+\beta\,\hat{v}^{k}(s'^{k})-\hat{v}^{k}(s^{k})\,\big] \\
+  &amp;=(1-\alpha)\,\hat{v}^{k}(s^{k})+\alpha\big[\,r(s^{k})+\beta\,\hat{v}^{k}(s'^{k})\,\big],
+\end{aligned}
+\]</span> which is <a href="#eq-td0" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> written one step at a time.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The last line says the new estimate is a <strong>convex combination</strong> of the old estimate and the bootstrapped target, with weights <span class="math inline">\((1-\alpha,\,\alpha)\)</span>. The bracketed quantity <span class="math inline">\(r+\beta\hat{v}(s')-\hat{v}(s)\)</span> is the <strong>temporal-difference error</strong>: the gap between the one-step-ahead target and the current guess.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Why a constant step size?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why a constant step size?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The average in <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> uses a <em>shrinking</em> step <span class="math inline">\(\tfrac{1}{k}\)</span> because it estimates the mean of a <strong>fixed</strong> distribution: every sample deserves equal weight, and the estimate converges (its variance falls like <span class="math inline">\(1/k\)</span>).</p>
+<p>The TD target <span class="math inline">\(r+\beta\,\hat{v}(s')\)</span> is different: it is <strong>non-stationary</strong>. It moves as <span class="math inline">\(\hat{v}\)</span> is updated (that is exactly what bootstrapping does), and as the policy changes. A step that decays to zero would freeze the early, low-quality estimates in place and never catch up to the moving target.</p>
+<p>A <strong>constant</strong> <span class="math inline">\(\alpha\)</span> instead keeps a fixed weight on recent samples (an exponentially recency-weighted average, <span class="math inline">\(\hat{v}\leftarrow(1-\alpha)\hat{v}+\alpha\cdot(\text{target})\)</span>), so the estimate keeps chasing the target. The price: it no longer converges to a point but fluctuates around the truth, with a stationary standard deviation <span class="math inline">\(\propto\sqrt{\alpha}\)</span> (it violates the Robbins-Monro conditions <span class="math inline">\(\sum_{t}\alpha_{t}=\infty,\ \sum_{t}\alpha_{t}^{2}&lt;\infty\)</span>). Genuine convergence needs <span class="math inline">\(\alpha\)</span> to decay over time. So a constant step trades <strong>asymptotic precision</strong> for the ability to <strong>track</strong>.</p>
+</div>
+</div>
+<p>The trajectory average and the TD(0) update estimate the <em>same</em> <span class="math inline">\(v\)</span>, but they trade off very differently:</p>
+<div id="tbl-mc-td" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-mc-td-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1.1: Monte Carlo vs.&nbsp;TD(0) as estimators of the value function.
+</figcaption>
+<div aria-describedby="tbl-mc-td-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Trajectory average (MC)</th>
+<th>TD(0) (bootstrap)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Target</strong></td>
+<td>realized return <span class="math inline">\(\sum_{t}\beta^{t}r\)</span></td>
+<td><span class="math inline">\(r+\beta\,\hat{v}(s')\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Bias</strong></td>
+<td>unbiased</td>
+<td>biased for finite <span class="math inline">\(\hat{v}\)</span> (unbiased only as <span class="math inline">\(\hat{v}\to v\)</span>)</td>
+</tr>
+<tr class="odd">
+<td><strong>Variance</strong></td>
+<td>high (sums many random steps)</td>
+<td>low (one random step plus a bootstrap)</td>
+</tr>
+<tr class="even">
+<td><strong>Updates</strong></td>
+<td>only once the trajectory ends</td>
+<td>every step, online</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>TD buys much lower <strong>variance</strong> at the cost of a little <strong>bias</strong>, and trades “wait until the end” for “update online.” The two are endpoints of a spectrum: <span class="math inline">\(n\)</span>-step returns and TD(<span class="math inline">\(\lambda\)</span>) interpolate between them.</p>
+<div id="fig-1-mc-vs-td" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-mc-vs-td-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/01-mc-vs-td.svg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-mc-vs-td-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: The trade in <a href="#tbl-mc-td" class="quarto-xref">Table&nbsp;<span>1.1</span></a>, measured. Both estimators are shown the <em>same</em> episodes from a five-state discounted Markov reward process, and scored by the error of <span class="math inline">\(\hat{v}\)</span> across all states. TD(0) falls faster at small budgets, because one random step carries far less variance than a whole trajectory. But a <strong>constant</strong> step size never settles: TD flattens onto a noise floor whose height is set by <span class="math inline">\(\alpha\)</span>, while Monte Carlo, which keeps averaging, eventually crosses below it. Which estimator is better is therefore a question about the sample budget, not a fact about the estimators.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="reinforcement-learning-and-deep-learning" class="level3">
+<h3 class="anchored" data-anchor-id="reinforcement-learning-and-deep-learning">Reinforcement learning and deep learning</h3>
+<p>Often we approximate the value function by a parametric family <span class="math display">\[
+\hat{V}(s,w),
+\]</span> where <span class="math inline">\(w\)</span> is a parameter vector, for instance the weights of a neural network. RL with a neural-network approximator is what people call <strong>deep reinforcement learning</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>RL and deep learning are <strong>orthogonal</strong>. RL is about <em>how to estimate</em> values and policies from sampled experience; the network is merely one choice of function approximator. Either can be swapped out without the other.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="link-to-dynamic-programming" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="link-to-dynamic-programming"><span class="header-section-number">1.2</span> Link to Dynamic Programming</h2>
+<section id="bellman-equation-with-finite-states" class="level3">
+<h3 class="anchored" data-anchor-id="bellman-equation-with-finite-states">Bellman equation with finite states</h3>
+<div id="def-mdp" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.2 (Markov decision process)</strong></span> A <strong>stochastic optimal-control problem</strong> (or MDP) chooses controls to maximize discounted expected reward, <span class="math display">\[
+v(s_{0})=\max_{\{a_{t}\}_{t=0}^{\infty}}\E_{0}\!\left[\sum_{t=0}^{\infty}\beta^{t}r(s_{t},a_{t})\right]
+\quad\text{s.t.}\quad s_{t+1}\sim p(\cdot\given s_{t},a_{t}),\ \ s_{0}\text{ given},
+\]</span> with state <span class="math inline">\(s\in\mathcal{S}=\{s_{1},\dots,s_{n}\}\)</span> and control <span class="math inline">\(a\in\mathcal{A}\)</span>. The goal is an optimal policy <span class="math inline">\(a=\pi(s)\)</span>.</p>
+</div>
+<div id="exm-ncgm" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1.1 (Neoclassical growth model)</strong></span> Force capital onto a finite grid <span class="math inline">\(\mathcal{K}=\{k_{1},\dots,k_{n}\}\)</span> and solve <span class="math display">\[
+v(k_{0})=\max_{\{c_{t}\}_{t=0}^{\infty}}\sum_{t=0}^{\infty}\beta^{t}u(c_{t})
+\quad\text{s.t.}\quad k_{t+1}=f(k_{t})+(1-\delta)k_{t}-c_{t}\in\mathcal{K}.
+\]</span> The dynamics are deterministic, so the transition “probabilities” are degenerate: <span class="math display">\[
+p(s'\given s,a)=
+\begin{cases}
+1 &amp; \text{if } s'=f(s)+(1-\delta)s-a \ \text{ and }\ s'\in\mathcal{K},\\
+0 &amp; \text{otherwise.}
+\end{cases}
+\]</span></p>
+</div>
+<p>Back to the general problem, the value function satisfies the <strong>Bellman equation</strong> <span id="eq-bellman"><span class="math display">\[
+v(s)=\max_{a\in\mathcal{A}}\Big\{\,r(s,a)+\beta\sum_{s'\in\mathcal{S}}v(s')\,p(s'\given s,a)\,\Big\}.
+\tag{1.4}\]</span></span></p>
+<p>Naming the bracketed quantity gives the <strong>action-value</strong> (or <strong>Q</strong>) function: <span class="math display">\[
+v(s)=\max_{a\in\mathcal{A}}\Big\{\,\underbrace{r(s,a)+\beta\sum_{s'\in\mathcal{S}}v(s')\,p(s'\given s,a)}_{\defeq\,q(s,a)}\,\Big\}=\max_{a\in\mathcal{A}}q(s,a).
+\]</span></p>
+<div id="def-qfun" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1.3 (Action-value (Q) function)</strong></span> <span class="math inline">\(q(s,a)\)</span> is the value of taking action <span class="math inline">\(a\)</span> in state <span class="math inline">\(s\)</span> and following the optimal policy <span class="math inline">\(\pi^{*}\)</span> thereafter: <span class="math display">\[
+\begin{aligned}
+\pi(s) &amp;=\argmax_{a\in\mathcal{A}}q(s,a),\\[2pt]
+q(s,a) &amp;=r(s,a)+\E_{\pi^{*}}\!\left[\sum_{\tau=1}^{\infty}\beta^{\tau}r(s_{t+\tau},a_{t+\tau})\ \given\ s_{t}=s,\,a_{t}=a\right].
+\end{aligned}
+\]</span></p>
+</div>
+<p>Strictly, <a href="#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> defines the <strong>optimal</strong> action-value <span class="math inline">\(q^{*}\)</span>: it assumes the optimal policy <span class="math inline">\(\pi^{*}\)</span> is followed after the first action. Swapping <span class="math inline">\(\pi^{*}\)</span> for an arbitrary policy <span class="math inline">\(\pi\)</span> gives the <strong>policy-specific</strong> <span class="math inline">\(q_{\pi}\)</span>; the version under the current policy, <span class="math inline">\(q_{\pi_{k}}\)</span>, is what Howard policy iteration iterates on below.</p>
+<p>The two expressions for <span class="math inline">\(q\)</span> agree: the “one step now, optimal continuation later” form follows from the discounted-sum form.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: the two forms of q(s,a) coincide">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Derivation: the two forms of q(s,a) coincide
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Start from <span class="math display">\[
+q(s,a)=r(s,a)+\beta\sum_{s'\in\mathcal{S}}v(s')\,p(s'\given s,a),
+\]</span> and expand the continuation value, which by definition is itself an expectation taken from <span class="math inline">\(t+1\)</span> onward: <span class="math display">\[
+v(s')=\E_{\pi^{*}}\!\left[\sum_{\tau=0}^{\infty}\beta^{\tau}r(s_{t+1+\tau},a_{t+1+\tau})\ \given\ s_{t+1}=s'\right].
+\]</span> Substitute and apply the law of total expectation, which collapses the sum over <span class="math inline">\(s'\)</span> into a single conditional expectation: <span class="math display">\[
+\begin{aligned}
+\sum_{s'\in\mathcal{S}}v(s')\,p(s'\given s,a)
+&amp;=\E_{s_{t+1}\sim p(\cdot\given s,a)}\!\left[\E_{\pi^{*}}\!\left[\sum_{\tau=0}^{\infty}\beta^{\tau}r(s_{t+1+\tau},a_{t+1+\tau})\ \given\ s_{t+1}=s'\right]\right]\\
+&amp;=\E_{\pi^{*}}\!\left[\sum_{\tau=0}^{\infty}\beta^{\tau}r(s_{t+1+\tau},a_{t+1+\tau})\ \given\ s_{t}=s,\,a_{t}=a\right].
+\end{aligned}
+\]</span> Reindex with <span class="math inline">\(k=\tau+1\)</span>: <span class="math display">\[
+\sum_{s'\in\mathcal{S}}v(s')\,p(s'\given s,a)
+=\E_{\pi^{*}}\!\left[\sum_{k=1}^{\infty}\beta^{k-1}r(s_{t+k},a_{t+k})\ \given\ s_{t}=s,\,a_{t}=a\right].
+\]</span> Finally, put this back and absorb the discount <span class="math inline">\(\beta\)</span>: <span class="math display">\[
+\begin{aligned}
+q(s,a)
+&amp;=r(s,a)+\beta\,\E_{\pi^{*}}\!\left[\sum_{k=1}^{\infty}\beta^{k-1}r(s_{t+k},a_{t+k})\ \given\ s_{t}=s,\,a_{t}=a\right]\\
+&amp;=r(s,a)+\E_{\pi^{*}}\!\left[\sum_{k=1}^{\infty}\beta^{k}r(s_{t+k},a_{t+k})\ \given\ s_{t}=s,\,a_{t}=a\right],
+\end{aligned}
+\]</span> which is exactly the discounted-sum form in <a href="#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="matrix-vector-form-of-the-bellman-equation" class="level3">
+<h3 class="anchored" data-anchor-id="matrix-vector-form-of-the-bellman-equation">Matrix-vector form of the Bellman equation</h3>
+<p>Index the states <span class="math inline">\(s_{i},\ i=1,\dots,n\)</span>, and write <span class="math inline">\(r_{a}(s)=r(s,a)\)</span> and <span class="math inline">\(p_{a}(s'\given s)=p(s'\given s,a)\)</span>. Then <a href="#eq-bellman" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> reads <span class="math display">\[
+v(s_{i})=\max_{a\in\mathcal{A}}\Big\{\,r_{a}(s_{i})+\beta\sum_{s_{j}\in\mathcal{S}}v(s_{j})\,p_{a}(s_{j}\given s_{i})\,\Big\}.
+\]</span> Stacking all states together yields the compact <strong>matrix-vector form</strong> <span id="eq-bellman-mat"><span class="math display">\[
+\mathbf{v}=\max_{a\in\mathcal{A}}\big\{\,\mathbf{r}_{a}+\beta\,\mathbf{P}_{a}\mathbf{v}\,\big\},
+\tag{1.5}\]</span></span> where the maximization is component-wise, <span class="math display">\[
+\mathbf{v}=\begin{bmatrix}v(s_{1})\\ \vdots\\ v(s_{n})\end{bmatrix},\qquad
+\mathbf{r}_{a}=\begin{bmatrix}r_{a}(s_{1})\\ \vdots\\ r_{a}(s_{n})\end{bmatrix},
+\]</span> and <span class="math inline">\(\mathbf{P}_{a}\)</span> is the <span class="math inline">\(n\times n\)</span> transition matrix with entries <span class="math inline">\((\mathbf{P}_{a})_{ij}=p_{a}(s_{j}\given s_{i})\)</span>.</p>
+</section>
+<section id="value-function-iteration-vfi" class="level3">
+<h3 class="anchored" data-anchor-id="value-function-iteration-vfi">Value function iteration (VFI)</h3>
+<p>Iterate the Bellman operator <a href="#eq-bellman-mat" class="quarto-xref">Equation&nbsp;<span>1.5</span></a> to convergence, starting from any <span class="math inline">\(\mathbf{v}_{0}\)</span>: <span class="math display">\[
+\mathbf{v}_{k+1}=\max_{a}\big\{\,\mathbf{r}_{a}+\beta\,\mathbf{P}_{a}\mathbf{v}_{k}\,\big\}.
+\]</span></p>
+</section>
+<section id="howard-policy-iteration-hpi" class="level3">
+<h3 class="anchored" data-anchor-id="howard-policy-iteration-hpi">Howard policy iteration (HPI)</h3>
+<p>Howard policy iteration alternates two steps until the policy stops changing. Given an initial policy <span class="math inline">\(\pi_{0}\)</span>:</p>
+<ol type="1">
+<li><strong>Policy evaluation (PE)</strong> computes the value of following the current policy <span class="math inline">\(\pi_{k}\)</span>: <span id="eq-hpi-pe"><span class="math display">\[
+\mathbf{v}_{\pi_{k}}=\mathbf{r}_{\pi_{k}}+\beta\,\mathbf{P}_{\pi_{k}}\mathbf{v}_{\pi_{k}}.
+\tag{1.6}\]</span></span></li>
+<li><strong>Policy improvement (PI)</strong> maximizes component-wise against that value: <span class="math display">\[
+\pi_{k+1}=\argmax_{\pi}\big\{\,\mathbf{r}_{\pi}+\beta\,\mathbf{P}_{\pi}\mathbf{v}_{\pi_{k}}\,\big\}.
+\]</span></li>
+</ol>
+<p>HPI often converges in far fewer iterations than VFI: each evaluation step solves for a policy’s value <em>exactly</em>, so every improvement acts on the <em>true</em> value of the current policy, a Newton-like step in policy space. With finitely many policies and a strict improvement each round, it reaches the optimum in finitely many iterations.</p>
+<div id="fig-1-vfi-vs-hpi" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-vfi-vs-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/01-vfi-vs-hpi.svg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-vfi-vs-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.2: The two algorithms on the neoclassical growth model of <a href="#exm-ncgm" class="quarto-xref">Example&nbsp;<span>1.1</span></a>, capital discretised onto a 250-point grid with <span class="math inline">\(\beta=0.96\)</span>. VFI is a contraction of modulus <span class="math inline">\(\beta\)</span>, so its error falls by a constant factor every sweep: a straight line on a log scale, which never actually terminates. HPI does terminate. The policy stops changing at iteration 19, and one iteration earlier the error drops off a cliff to machine precision, because an evaluation step that is <em>exact</em> returns the true value of a policy that has stopped improving. Matching that accuracy by VFI takes on the order of <span class="math inline">\(\log(10^{-15})/\log\beta\approx850\)</span> sweeps.
+</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>This is the doorway from dynamic programming to RL.</strong> Every RL algorithm starts from HPI and replaces the exact policy-evaluation step <a href="#eq-hpi-pe" class="quarto-xref">Equation&nbsp;<span>1.6</span></a> with a <strong>Monte-Carlo estimate</strong> built from sampled trajectories, needing no knowledge of <span class="math inline">\(\mathbf{P}_{\pi_{k}}\)</span>.</p>
+<p>But evaluating the <em>state</em> value <span class="math inline">\(\mathbf{v}_{\pi_{k}}\)</span> is only half of being model-free: the improvement step <span class="math inline">\(\argmax_{\pi}\{\mathbf{r}_{\pi}+\beta\mathbf{P}_{\pi}\mathbf{v}\}\)</span> still reads off the model <span class="math inline">\((\mathbf{r},\mathbf{P})\)</span> to turn a value into a decision. The fix is to estimate the <strong>action-value</strong> <span class="math inline">\(q_{\pi_{k}}(s,a)\)</span> directly; improvement is then simply <span class="math inline">\(\pi(s)=\argmax_{a}q_{\pi_{k}}(s,a)\)</span>, a comparison of estimated <span class="math inline">\(q\)</span>-values that needs no model. That is why RL revolves around <span class="math inline">\(q\)</span>, and it is the road to <strong>SARSA</strong> and <strong>Q-learning</strong>.</p>
+</div>
+</div>
+<p>The evaluation step <a href="#eq-hpi-pe" class="quarto-xref">Equation&nbsp;<span>1.6</span></a> is a linear fixed point in <span class="math inline">\(\mathbf{v}_{\pi_{k}}\)</span>, solvable two ways:</p>
+<ol type="1">
+<li><strong>Closed form</strong> (one linear solve): <span class="math display">\[
+\mathbf{v}_{\pi_{k}}=(I-\beta\,\mathbf{P}_{\pi_{k}})^{-1}\mathbf{r}_{\pi_{k}}.
+\]</span></li>
+<li><strong>Iteratively</strong> (cheaper when <span class="math inline">\(n\)</span> is large): <span class="math display">\[
+\mathbf{v}_{\pi_{k}}^{\,j+1}=\mathbf{r}_{\pi_{k}}+\beta\,\mathbf{P}_{\pi_{k}}\mathbf{v}_{\pi_{k}}^{\,j},\qquad j=0,1,2,\dots
+\]</span></li>
+</ol>
+<p>The improvement step is itself a Q-function maximization: <span class="math display">\[
+\begin{aligned}
+\pi_{k+1}(s)
+&amp;=\argmax_{\pi}\Big\{\,r(s,\pi)+\beta\sum_{s'\in\mathcal{S}}v_{\pi_{k}}(s')\,p(s'\given s,\pi)\,\Big\}\\
+&amp;=\argmax_{\pi}q_{\pi_{k}}(s,\pi),
+\end{aligned}
+\]</span> where <span class="math inline">\(q_{\pi_{k}}\)</span> is the Q-function under policy <span class="math inline">\(\pi_{k}\)</span>. In vector form, <span class="math display">\[
+\boldsymbol{\pi}_{k+1}=\argmax_{\boldsymbol{\pi}}\mathbf{q}_{\pi,\pi_{k}},
+\qquad\text{with}\quad
+\mathbf{q}_{a,\pi_{k}}=\mathbf{r}_{a}+\beta\,\mathbf{P}_{a}\mathbf{v}_{\pi_{k}}.
+\]</span></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02-notes.html" class="pagination-link" aria-label="Monte Carlo Methods and Stochastic Approximation">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes based on Ben Moll’s reinforcement learning lectures, themselves adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>; all rights in those original materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

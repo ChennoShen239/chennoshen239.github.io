@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+
+<title>3&nbsp; Temporal Difference Learning, Sarsa, and Q-learning – Reinforcement Learning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./04-notes.html" rel="next">
+<link href="./02-notes.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03-notes.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Reinforcement Learning</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Basic Idea of RL, and Its Link to Dynamic Programming</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-notes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#incremental-versus-episodic-learning" id="toc-incremental-versus-episodic-learning" class="nav-link active" data-scroll-target="#incremental-versus-episodic-learning"><span class="header-section-number">3.1</span> Incremental versus episodic learning</a></li>
+  <li><a href="#td-learning-of-state-values" id="toc-td-learning-of-state-values" class="nav-link" data-scroll-target="#td-learning-of-state-values"><span class="header-section-number">3.2</span> TD learning of state values</a>
+  <ul class="collapse">
+  <li><a href="#why-barv_t-deserves-the-name-target" id="toc-why-barv_t-deserves-the-name-target" class="nav-link" data-scroll-target="#why-barv_t-deserves-the-name-target">Why <span class="math inline">\(\bar{v}_{t}\)</span> deserves the name “target”</a></li>
+  <li><a href="#convergence" id="toc-convergence" class="nav-link" data-scroll-target="#convergence">Convergence</a></li>
+  <li><a href="#td-against-monte-carlo" id="toc-td-against-monte-carlo" class="nav-link" data-scroll-target="#td-against-monte-carlo">TD against Monte Carlo</a></li>
+  </ul></li>
+  <li><a href="#sarsa-td-learning-of-action-values" id="toc-sarsa-td-learning-of-action-values" class="nav-link" data-scroll-target="#sarsa-td-learning-of-action-values"><span class="header-section-number">3.3</span> Sarsa: TD learning of action values</a>
+  <ul class="collapse">
+  <li><a href="#policy-searching-by-sarsa" id="toc-policy-searching-by-sarsa" class="nav-link" data-scroll-target="#policy-searching-by-sarsa">Policy searching by Sarsa</a></li>
+  </ul></li>
+  <li><a href="#q-learning-td-learning-of-optimal-action-values" id="toc-q-learning-td-learning-of-optimal-action-values" class="nav-link" data-scroll-target="#q-learning-td-learning-of-optimal-action-values"><span class="header-section-number">3.4</span> Q-learning: TD learning of optimal action values</a>
+  <ul class="collapse">
+  <li><a href="#why-q-learning-is-off-policy" id="toc-why-q-learning-is-off-policy" class="nav-link" data-scroll-target="#why-q-learning-is-off-policy">Why Q-learning is off-policy</a></li>
+  </ul></li>
+  <li><a href="#td-learning-with-function-approximation" id="toc-td-learning-with-function-approximation" class="nav-link" data-scroll-target="#td-learning-with-function-approximation"><span class="header-section-number">3.5</span> TD learning with function approximation</a>
+  <ul class="collapse">
+  <li><a href="#values-as-parameterized-functions" id="toc-values-as-parameterized-functions" class="nav-link" data-scroll-target="#values-as-parameterized-functions">Values as parameterized functions</a></li>
+  <li><a href="#fitting-w-by-stochastic-gradient-descent" id="toc-fitting-w-by-stochastic-gradient-descent" class="nav-link" data-scroll-target="#fitting-w-by-stochastic-gradient-descent">Fitting <span class="math inline">\(w\)</span> by stochastic gradient descent</a></li>
+  <li><a href="#sarsa-with-function-approximation" id="toc-sarsa-with-function-approximation" class="nav-link" data-scroll-target="#sarsa-with-function-approximation">Sarsa with function approximation</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\BR}{\operatorname{BR}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,\vert\,}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sm}{\setminus}
+\newcommand{\defeq}{\equiv}
+\]</span></p>
+</div>
+<p>Monte Carlo was the first model-free method. <strong>Temporal difference (TD) learning</strong> is the second, and it improves on Monte Carlo along the one axis Chapter 2 could not: it does not wait. Where MC Basic must run an episode to its end before it learns anything, TD updates after every single transition. This chapter builds that idea three times over, for state values, for action values under a fixed policy (<strong>Sarsa</strong>), and for optimal action values directly (<strong>Q-learning</strong>), and then removes the assumption that has been quietly holding since Chapter 1, that values can be stored in a table.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Source:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ben Moll’s <a href="https://benjaminmoll.com/lectures/">RL lecture slides</a>, Lecture 3.</p>
+</div>
+</div>
+<section id="incremental-versus-episodic-learning" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="incremental-versus-episodic-learning"><span class="header-section-number">3.1</span> Incremental versus episodic learning</h2>
+<p>The distinction is worth naming precisely, because it is the whole difference between this chapter and the last.</p>
+<p>Chapter 2’s policy evaluation step was <a href="02-notes.html#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a>, the average return over <span class="math inline">\(N\)</span> episodes. Written as a running average in the manner of <a href="02-notes.html#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a>, the <span class="math inline">\(j\)</span>-th update is</p>
+<p><span id="eq-episodic-update"><span class="math display">\[
+q_{\pi_{k}}^{j+1}(s,a)=q_{\pi_{k}}^{j}(s,a)+\frac{1}{j}\left[\sum_{t=0}^{T}\gamma^{t}r(s_{t}^{j},a_{t}^{j})-q_{\pi_{k}}^{j}(s,a)\right].
+\tag{3.1}\]</span></span></p>
+<p>The bracket contains a <em>whole episode’s</em> realized return, so nothing can be updated until <span class="math inline">\(t\)</span> has run from <span class="math inline">\(0\)</span> to <span class="math inline">\(T\)</span>. This chapter instead develops algorithms of the form</p>
+<p><span id="eq-incremental-update"><span class="math display">\[
+q_{t+1}(s_{t},a_{t})=q_{t}(s_{t},a_{t})+\alpha_{t}\times(\text{something available at time } t),
+\tag{3.2}\]</span></span></p>
+<p>where <span class="math inline">\(q_{t}\)</span> is the time-<span class="math inline">\(t\)</span> estimate of <span class="math inline">\(q_{\pi_{k}}\)</span>.</p>
+<div id="def-incremental" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.1 (Incremental and episodic learning)</strong></span> An algorithm is <strong>incremental</strong> if it updates in real time, at every transition, as in <a href="#eq-incremental-update" class="quarto-xref">Equation&nbsp;<span>3.2</span></a>. It is <strong>episodic</strong> (or non-incremental) if it must wait for an episode to finish, as in <a href="#eq-episodic-update" class="quarto-xref">Equation&nbsp;<span>3.1</span></a>.</p>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="A terminology trap">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>A terminology trap
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sutton and Barto call this same distinction <strong>online</strong> versus <strong>offline</strong>. That vocabulary is best avoided here, because “offline RL” has since come to mean something else entirely: learning from a fixed, previously collected dataset with no further interaction. Incremental and episodic are unambiguous.</p>
+</div>
+</div>
+<p>The distinction outlives the tabular setting. The second half of this chapter writes updates to a parameter vector <span class="math inline">\(w\)</span> rather than to a table, and the same question applies: does <span class="math inline">\(w\)</span> move at every step, or only at the end of an episode? Chapter 4 will find both, with REINFORCE episodic and actor-critic incremental.</p>
+</section>
+<section id="td-learning-of-state-values" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="td-learning-of-state-values"><span class="header-section-number">3.2</span> TD learning of state values</h2>
+<p>Start with the easier problem: estimate <span class="math inline">\(v_{\pi}\)</span> for a <strong>fixed</strong> policy <span class="math inline">\(\pi\)</span>, with no improvement step. Write <span class="math inline">\(v_{t}(s)\)</span> for the time-<span class="math inline">\(t\)</span> estimate of <span class="math inline">\(v_{\pi}(s)\)</span>.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: TD learning of state values">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: TD learning of state values
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given experience <span class="math inline">\(\{(s_{t},r_{t+1},s_{t+1})\}_{t}\)</span> generated by following <span class="math inline">\(\pi\)</span>, at each <span class="math inline">\(t=0,1,2,\dots\)</span></p>
+<p><span id="eq-td-state"><span class="math display">\[
+v_{t+1}(s_{t})=v_{t}(s_{t})+\alpha_{t}(s_{t})\big[\,r_{t+1}+\gamma v_{t}(s_{t+1})-v_{t}(s_{t})\,\big],
+\tag{3.3}\]</span></span></p>
+<p><span id="eq-td-untouched"><span class="math display">\[
+v_{t+1}(s)=v_{t}(s)\qquad\text{for all } s\neq s_{t}.
+\tag{3.4}\]</span></span></p>
+</div>
+</div>
+<p><a href="#eq-td-untouched" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> says only the state just visited is touched; every other entry of the table is left alone. It is usually left implicit, but it matters: TD learning is a <em>local</em> update, and the fact that visiting one state teaches you nothing about any other is exactly the weakness that function approximation will fix at the end of this chapter.</p>
+<p>Annotating <a href="#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a> names its parts:</p>
+<p><span id="eq-td-annotated"><span class="math display">\[
+\underbrace{v_{t+1}(s_{t})}_{\text{new estimate}}
+=\underbrace{v_{t}(s_{t})}_{\text{current estimate}}
++\alpha_{t}(s_{t})\Big[\underbrace{\overbrace{r_{t+1}+\gamma v_{t}(s_{t+1})}^{\text{TD target }\bar{v}_{t}}-v_{t}(s_{t})}_{\text{TD error }\delta_{t}}\Big].
+\tag{3.5}\]</span></span></p>
+<div id="def-td-target" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.2 (TD target and TD error)</strong></span> <span class="math display">\[
+\bar{v}_{t}\defeq r_{t+1}+\gamma v_{t}(s_{t+1}),
+\qquad
+\delta_{t}\defeq \bar{v}_{t}-v_{t}(s_{t}).
+\]</span></p>
+</div>
+<p>This is <a href="01-notes.html#eq-td0" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> from Chapter 1, now with the names attached and the learning rate allowed to depend on the state.</p>
+<section id="why-barv_t-deserves-the-name-target" class="level3">
+<h3 class="anchored" data-anchor-id="why-barv_t-deserves-the-name-target">Why <span class="math inline">\(\bar{v}_{t}\)</span> deserves the name “target”</h3>
+<p>Because the algorithm provably moves <span class="math inline">\(v(s_{t})\)</span> toward it.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: the update contracts the gap to the target">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Derivation: the update contracts the gap to the target
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Rewrite <a href="#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a> in terms of <span class="math inline">\(\bar{v}_{t}\)</span> and subtract <span class="math inline">\(\bar{v}_{t}\)</span> from both sides: <span class="math display">\[
+\begin{aligned}
+v_{t+1}(s_{t})&amp;=v_{t}(s_{t})+\alpha_{t}(s_{t})\big[\bar{v}_{t}-v_{t}(s_{t})\big]\\
+\implies\quad v_{t+1}(s_{t})-\bar{v}_{t}&amp;=v_{t}(s_{t})-\bar{v}_{t}+\alpha_{t}(s_{t})\big[\bar{v}_{t}-v_{t}(s_{t})\big]\\
+\implies\quad v_{t+1}(s_{t})-\bar{v}_{t}&amp;=\big[1-\alpha_{t}(s_{t})\big]\big[v_{t}(s_{t})-\bar{v}_{t}\big]\\
+\implies\quad \big|v_{t+1}(s_{t})-\bar{v}_{t}\big|&amp;=\big|1-\alpha_{t}(s_{t})\big|\,\big|v_{t}(s_{t})-\bar{v}_{t}\big| .
+\end{aligned}
+\]</span> By the standing assumption <span class="math inline">\(\alpha_{t}(s_{t})\in(0,1)\)</span> we have <span class="math inline">\(0&lt;1-\alpha_{t}(s_{t})&lt;1\)</span>, and therefore <span class="math display">\[
+\big|v_{t+1}(s_{t})-\bar{v}_{t}\big|\leq\big|v_{t}(s_{t})-\bar{v}_{t}\big| .
+\]</span></p>
+</div>
+</div>
+</div>
+<p>Each update never increases the distance to <span class="math inline">\(\bar{v}_{t}\)</span>, and strictly shrinks it whenever <span class="math inline">\(v_{t}(s_{t})\neq\bar{v}_{t}\)</span>. (The assumption <span class="math inline">\(\alpha_{t}&lt;1\)</span> is doing real work: at <span class="math inline">\(\alpha_{t}&gt;2\)</span> the factor <span class="math inline">\(|1-\alpha_{t}|\)</span> exceeds one and the gap would grow.) The target moves, because it is built from <span class="math inline">\(v_{t}\)</span> itself, but at every instant the estimate is being pulled toward it.</p>
+</section>
+<section id="convergence" class="level3">
+<h3 class="anchored" data-anchor-id="convergence">Convergence</h3>
+<div id="thm-td-convergence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.1 (Convergence of TD learning)</strong></span> Assume <span class="math inline">\(\gamma\in(0,1)\)</span>, that <span class="math inline">\(\mathcal{S}\)</span> is finite, that rewards are bounded, and that <span class="math inline">\(\alpha_{t}(s)\in(0,1)\)</span> for every <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>. Then under the TD algorithm <a href="#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>, <span class="math inline">\(v_{t}(s)\)</span> converges with probability 1 to <span class="math inline">\(v_{\pi}(s)\)</span> for all <span class="math inline">\(s\in\mathcal{S}\)</span> as <span class="math inline">\(t\to\infty\)</span>, provided <span class="math display">\[
+\sum_{t}\alpha_{t}(s)=\infty
+\qquad\text{and}\qquad
+\sum_{t}\alpha_{t}^{2}(s)&lt;\infty
+\qquad\text{for all } s\in\mathcal{S}.
+\]</span></p>
+</div>
+<p>These are the Robbins-Monro conditions of <a href="02-notes.html#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>, now required to hold <strong>state by state</strong>, and that qualifier carries the content.</p>
+<p>Proving it needs a <strong>variant</strong> of <a href="02-notes.html#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a>, not a generalization of it. The variant handles many variables at once, one per state, and it trades the zero-mean noise requirement for a weaker one, that the bias be <em>bounded by the current error</em>; in exchange it adds the requirement <span class="math inline">\(\E[\beta_{k}]\leq\E[\alpha_{k}]\)</span>, which the Chapter 2 form does not impose. Neither theorem contains the other, and the Robbins-Monro corollary in Chapter 2 uses the Chapter 2 form. Bootstrapping guarantees the latter: the TD target is built from <span class="math inline">\(v_{t}\)</span>, so it is biased by exactly as much as <span class="math inline">\(v_{t}\)</span> is wrong.</p>
+<div id="thm-dvoretzky-ext" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.2 (Dvoretzky, multi-variable form)</strong></span> Let <span class="math inline">\(\mathcal{S}\)</span> be a finite index set. For the stochastic process <span id="eq-dvoretzky-ext"><span class="math display">\[
+\Delta_{k+1}(s)=\big(1-\alpha_{k}(s)\big)\Delta_{k}(s)+\beta_{k}(s)\eta_{k}(s),
+\tag{3.6}\]</span></span> <span class="math inline">\(\Delta_{k}(s)\)</span> converges to zero almost surely for every <span class="math inline">\(s\in\mathcal{S}\)</span> provided that, for every <span class="math inline">\(s\in\mathcal{S}\)</span>,</p>
+<ol type="1">
+<li><span class="math inline">\(\sum_{k}\alpha_{k}(s)=\infty\)</span>, <span class="math inline">\(\sum_{k}\alpha_{k}^{2}(s)&lt;\infty\)</span>, <span class="math inline">\(\sum_{k}\beta_{k}^{2}(s)&lt;\infty\)</span>, and <span class="math inline">\(\E[\beta_{k}(s)\given\mathcal{H}_{k}]\leq\E[\alpha_{k}(s)\given\mathcal{H}_{k}]\)</span>, uniformly almost surely;</li>
+<li><span class="math inline">\(\big\|\E[\eta_{k}(s)\given\mathcal{H}_{k}]\big\|_{\infty}\leq\gamma\|\Delta_{k}\|_{\infty}\)</span> for some <span class="math inline">\(\gamma\in(0,1)\)</span>;</li>
+<li><span class="math inline">\(\operatorname{var}[\eta_{k}(s)\given\mathcal{H}_{k}]\leq C\big(1+\|\Delta_{k}\|_{\infty}\big)^{2}\)</span> for a constant <span class="math inline">\(C\)</span>,</li>
+</ol>
+<p>where <span class="math inline">\(\|x(s)\|_{\infty}\defeq\max_{s\in\mathcal{S}}|x(s)|\)</span> is the maximum over the index set.</p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Condition 2 is the one that matters. <a href="02-notes.html#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> demanded unbiased noise; here the bias may be nonzero but must be a <strong>strict contraction</strong> of the current error, shrinking it by a factor <span class="math inline">\(\gamma&lt;1\)</span>. In the proof below, <span class="math inline">\(\gamma\)</span> turns out to be the discount factor, which is why discounting is not a modelling convenience here but the thing that makes bootstrapping converge at all.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof of the convergence of TD learning">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof of the convergence of TD learning
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Fix an arbitrary state <span class="math inline">\(s\in\mathcal{S}\)</span> and define the estimation error <span class="math display">\[
+\Delta_{t}(s)\defeq v_{t}(s)-v_{\pi}(s).
+\]</span></p>
+<p><strong>Step 1: put the algorithm in the form <a href="#eq-dvoretzky-ext" class="quarto-xref">Equation&nbsp;<span>3.6</span></a>.</strong> When <span class="math inline">\(s=s_{t}\)</span>, subtract <span class="math inline">\(v_{\pi}(s)\)</span> from both sides of <a href="#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>: <span class="math display">\[
+\Delta_{t+1}(s)=\big(1-\alpha_{t}(s)\big)\Delta_{t}(s)+\alpha_{t}(s)\underbrace{\big[r_{t+1}+\gamma v_{t}(s_{t+1})-v_{\pi}(s)\big]}_{\eta_{t}(s)} .
+\]</span> When <span class="math inline">\(s\neq s_{t}\)</span>, <a href="#eq-td-untouched" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> gives <span class="math inline">\(\Delta_{t+1}(s)=\Delta_{t}(s)\)</span>, which is the same expression with <span class="math inline">\(\alpha_{t}(s)=0\)</span> and <span class="math inline">\(\eta_{t}(s)=0\)</span>. So regardless of which state was visited, <span class="math display">\[
+\Delta_{t+1}(s)=\big(1-\alpha_{t}(s)\big)\Delta_{t}(s)+\alpha_{t}(s)\eta_{t}(s),
+\]</span> which is <a href="#eq-dvoretzky-ext" class="quarto-xref">Equation&nbsp;<span>3.6</span></a> with <span class="math inline">\(\beta_{t}(s)=\alpha_{t}(s)\)</span>, so the requirement <span class="math inline">\(\E[\beta_{t}]\leq\E[\alpha_{t}]\)</span> holds with equality.</p>
+<p><strong>Step 2: condition 1.</strong> This is precisely the hypothesis of <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a>.</p>
+<p><strong>Step 3: condition 2, the contraction.</strong> Everything here stays <em>conditional on</em> <span class="math inline">\(\mathcal{H}_{t}\)</span>. That matters: <span class="math inline">\(\eta_{t}(s)\)</span> contains <span class="math inline">\(v_{t}\)</span>, which is a function of the whole past trajectory and so is emphatically history-dependent. What the Markov property gives is narrower and is all we need. Conditioning on <span class="math inline">\(\mathcal{H}_{t}\)</span> fixes both the table <span class="math inline">\(v_{t}\)</span> and the current state <span class="math inline">\(s_{t}\)</span>, so the only randomness left in <span class="math inline">\(\eta_{t}(s)\)</span> is the pair <span class="math inline">\((r_{t+1},s_{t+1})\)</span>, whose law depends on <span class="math inline">\(s_{t}\)</span> alone. For <span class="math inline">\(s\neq s_{t}\)</span> we have <span class="math inline">\(\eta_{t}(s)=0\)</span> and the bound is trivial. For <span class="math inline">\(s=s_{t}\)</span>, <span class="math display">\[
+\E[\eta_{t}(s)\given\mathcal{H}_{t}]=\E\big[r_{t+1}+\gamma v_{t}(s_{t+1})\given\mathcal{H}_{t}\big]-v_{\pi}(s_{t}).
+\]</span> Now use the Bellman equation for <span class="math inline">\(v_{\pi}\)</span>, which says <span class="math inline">\(v_{\pi}(s_{t})=\E[r_{t+1}+\gamma v_{\pi}(s_{t+1})\given s_{t}]\)</span>. Subtracting, the reward terms cancel exactly and only the value gap survives: <span class="math display">\[
+\E[\eta_{t}(s)\given\mathcal{H}_{t}]=\gamma\,\E\big[v_{t}(s_{t+1})-v_{\pi}(s_{t+1})\given\mathcal{H}_{t}\big]
+=\gamma\sum_{s'\in\mathcal{S}}p(s'\given s_{t})\big[v_{t}(s')-v_{\pi}(s')\big],
+\]</span> where <span class="math inline">\(v_{t}\)</span> passes outside the expectation because <span class="math inline">\(\mathcal{H}_{t}\)</span> determines it. Bound the sum by its largest term, using that <span class="math inline">\(p(\cdot\given s_{t})\)</span> is a probability distribution and therefore sums to one: <span class="math display">\[
+\big|\E[\eta_{t}(s)\given\mathcal{H}_{t}]\big|
+\leq\gamma\sum_{s'}p(s'\given s_{t})\max_{s'}\big|v_{t}(s')-v_{\pi}(s')\big|
+=\gamma\max_{s'}\big|v_{t}(s')-v_{\pi}(s')\big|
+=\gamma\|\Delta_{t}\|_{\infty}.
+\]</span> This holds whether or not <span class="math inline">\(s=s_{t}\)</span>, so <span class="math inline">\(\|\E[\eta_{t}(s)\given\mathcal{H}_{t}]\|_{\infty}\leq\gamma\|\Delta_{t}\|_{\infty}\)</span>, with <span class="math inline">\(\gamma\in(0,1)\)</span> the discount factor. Note both sides are <span class="math inline">\(\mathcal{H}_{t}\)</span>-measurable random variables, which is exactly the form condition 2 of <a href="#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> asks for.</p>
+<p><strong>Step 4: condition 3.</strong> For <span class="math inline">\(s\neq s_{t}\)</span>, <span class="math inline">\(\operatorname{var}[\eta_{t}(s)\given\mathcal{H}_{t}]=0\)</span>. For <span class="math inline">\(s=s_{t}\)</span>, the constant <span class="math inline">\(v_{\pi}(s_{t})\)</span> drops out of the variance, leaving <span class="math inline">\(\operatorname{var}[r_{t+1}+\gamma v_{t}(s_{t+1})\given s_{t}]\)</span>, which is bounded by a constant multiple of <span class="math inline">\((1+\|\Delta_{t}\|_{\infty})^{2}\)</span> because the reward is bounded and <span class="math inline">\(v_{t}\)</span> differs from the fixed <span class="math inline">\(v_{\pi}\)</span> by at most <span class="math inline">\(\|\Delta_{t}\|_{\infty}\)</span>.</p>
+<p>All three conditions hold, so <a href="#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> gives <span class="math inline">\(\Delta_{t}(s)\to0\)</span> almost surely for every <span class="math inline">\(s\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The proof isolates why bootstrapping is safe. The TD target is not an unbiased estimate of <span class="math inline">\(v_{\pi}(s_{t})\)</span>: it is contaminated by the current error at the <em>next</em> state. But Step 3 shows that contamination enters multiplied by <span class="math inline">\(\gamma\)</span>. Each update therefore replaces the error at <span class="math inline">\(s_{t}\)</span> with at most <span class="math inline">\(\gamma\)</span> times the worst error anywhere, and iterating a factor <span class="math inline">\(\gamma&lt;1\)</span> drives it to zero. Undiscounted problems, <span class="math inline">\(\gamma=1\)</span>, lose exactly this argument.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="What the two conditions demand here">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>What the two conditions demand here
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Recall from <a href="#eq-td-untouched" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> that <span class="math inline">\(\alpha_{t}(s)&gt;0\)</span> only when <span class="math inline">\(s_{t}=s\)</span>, and <span class="math inline">\(\alpha_{t}(s)=0\)</span> otherwise. So:</p>
+<ul>
+<li><span class="math inline">\(\sum_{t}\alpha_{t}(s)=\infty\)</span> <strong>for every <span class="math inline">\(s\)</span></strong> can only hold if every state is visited infinitely often. This is not a condition on the step size at all: it is an exploration requirement in disguise, and it is why <span class="math inline">\(\eps\)</span>-greedy policies from <a href="02-notes.html#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a> reappear the moment we start improving the policy.</li>
+<li><span class="math inline">\(\sum_{t}\alpha_{t}^{2}(s)&lt;\infty\)</span> requires <span class="math inline">\(\alpha_{t}\to0\)</span>. In practice <span class="math inline">\(\alpha\)</span> is usually a small <strong>constant</strong>, which violates it. As <a href="02-notes.html#fig-2-step-size" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> showed, the estimate then does not converge to a point but fluctuates around the truth, and one settles for convergence in an expectation sense.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="td-against-monte-carlo" class="level3">
+<h3 class="anchored" data-anchor-id="td-against-monte-carlo">TD against Monte Carlo</h3>
+<p>Both are model-free; they differ in what they wait for and what they assume.</p>
+<div id="tbl-td-mc" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-td-mc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.1: Temporal difference learning against Monte Carlo. Chapter 1 made the same comparison as a bias-variance trade in <a href="01-notes.html#tbl-mc-td" class="quarto-xref">Table&nbsp;<span>1.1</span></a>; the rows here are its practical consequences.
+</figcaption>
+<div aria-describedby="tbl-td-mc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>TD / Sarsa</th>
+<th>Monte Carlo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Timing</strong></td>
+<td>incremental: updates immediately after each reward</td>
+<td>episodic: waits until an episode is complete</td>
+</tr>
+<tr class="even">
+<td><strong>Task type</strong></td>
+<td>handles episodic <em>and</em> continuing tasks</td>
+<td>needs terminal states, so episodic tasks only</td>
+</tr>
+<tr class="odd">
+<td><strong>Bootstrapping</strong></td>
+<td>yes: the update uses the previous estimate of the same value, so it needs an initial guess</td>
+<td>no: estimates values directly from returns, no initial guess needed</td>
+</tr>
+<tr class="even">
+<td><strong>Variance</strong></td>
+<td>low: few random variables per update (Sarsa needs only <span class="math inline">\(r_{t+1},s_{t+1},a_{t+1}\)</span>)</td>
+<td>high: estimating <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span> requires samples of <span class="math inline">\(r_{t+1}+\gamma r_{t+2}+\gamma^{2}r_{t+3}+\cdots\)</span>, and with episodes of length <span class="math inline">\(L\)</span> there are <span class="math inline">\(|\mathcal{A}|^{L}\)</span> possible episodes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+</section>
+<section id="sarsa-td-learning-of-action-values" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="sarsa-td-learning-of-action-values"><span class="header-section-number">3.3</span> Sarsa: TD learning of action values</h2>
+<p>TD as stated estimates <em>state</em> values, and Chapter 2 established why that is not enough: turning <span class="math inline">\(v\)</span> into a decision requires the model. To search for optimal policies we need action values. The fix is entirely mechanical.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: Sarsa">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: Sarsa
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given experience <span class="math inline">\(\{(s_{t},a_{t},r_{t+1},s_{t+1},a_{t+1})\}_{t}\)</span> generated by following <span class="math inline">\(\pi\)</span>,</p>
+<p><span id="eq-sarsa"><span class="math display">\[
+q_{t+1}(s_{t},a_{t})=q_{t}(s_{t},a_{t})+\alpha_{t}(s_{t},a_{t})\big[\,r_{t+1}+\gamma q_{t}(s_{t+1},a_{t+1})-q_{t}(s_{t},a_{t})\,\big],
+\tag{3.7}\]</span></span></p>
+<p>with <span class="math inline">\(q_{t+1}(s,a)=q_{t}(s,a)\)</span> for all <span class="math inline">\((s,a)\neq(s_{t},a_{t})\)</span>.</p>
+</div>
+</div>
+<p>Three questions answer themselves from <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>.</p>
+<p><strong>Why the name?</strong> Each update consumes the quintuple <span class="math inline">\((s_{t},a_{t},r_{t+1},s_{t+1},a_{t+1})\)</span>: <strong>s</strong>tate, <strong>a</strong>ction, <strong>r</strong>eward, <strong>s</strong>tate, <strong>a</strong>ction. Sarsa.</p>
+<p><strong>How does it relate to TD?</strong> Replace the state value <span class="math inline">\(v(s)\)</span> in <a href="#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a> by the action value <span class="math inline">\(q(s,a)\)</span> and you have <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>. Sarsa <em>is</em> the TD algorithm, in action-value form.</p>
+<p><strong>What does it solve, mathematically?</strong> <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> is a stochastic approximation algorithm, in the sense of <a href="02-notes.html#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>, for the equation</p>
+<p><span id="eq-bellman-q"><span class="math display">\[
+q_{\pi}(s,a)=\E\big[R+\gamma q_{\pi}(S',A')\ \given\ s,a\big],
+\qquad\text{for all } s,a,
+\tag{3.8}\]</span></span></p>
+<p>which is the action-value form of the policy-evaluation Bellman equation for the fixed policy <span class="math inline">\(\pi\)</span>: <a href="02-notes.html#eq-bellman-pi" class="quarto-xref">Equation&nbsp;<span>2.2</span></a> with the maximization over <span class="math inline">\(\pi\)</span> removed.</p>
+<p>The claim deserves a proof, because <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> does not look like anything in Chapter 2. There is no sum over actions in it, and the policy <span class="math inline">\(\pi\)</span> appears nowhere. Both are hiding inside the expectation.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof that the Sarsa fixed point is the Bellman equation">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof that the Sarsa fixed point is the Bellman equation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Write <span class="math inline">\(p(r\given s,a)\)</span> for the distribution of the immediate reward and <span class="math inline">\(p(s'\given s,a)\)</span> for the transition, both conditional on the pair <span class="math inline">\((s,a)\)</span>. Expanding the right-hand side of <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> by the definition of expectation,</p>
+<p><span class="math display">\[
+\E\big[R+\gamma q_{\pi}(S',A')\given s,a\big]
+=\sum_{r}r\,p(r\given s,a)
++\gamma\sum_{s'\in\mathcal{S}}\sum_{a'\in\mathcal{A}}q_{\pi}(s',a')\,p(s',a'\given s,a).
+\]</span></p>
+<p>Linearity is doing the work in that split: each term is integrated against its own marginal, so nothing needs to be assumed about how <span class="math inline">\(R\)</span> and <span class="math inline">\(S'\)</span> are related. The first term is the expected immediate reward, which collapses to <span class="math inline">\(r(s,a)\)</span> whenever the reward is a deterministic function of the pair, as it was in Chapters 1 and 2. The second term needs the joint law of the next state <em>and</em> the next action, and that is the one object here we have not met before.</p>
+<p><strong>Factor the joint.</strong> The chain rule is free: <span class="math display">\[
+p(s',a'\given s,a)=p(s'\given s,a)\,p(a'\given s',s,a).
+\]</span> The second factor is where the policy enters. The agent produces <span class="math inline">\(a'\)</span> by drawing from <span class="math inline">\(\pi(\cdot\given s')\)</span>, and <span class="math inline">\(\pi\)</span> reads the current state and nothing else: not where the agent came from, not what it did to get there. So conditionally on <span class="math inline">\(s'\)</span>, the next action is independent of <span class="math inline">\((s,a)\)</span>, and <span class="math display">\[
+p(a'\given s',s,a)=p(a'\given s')=\pi(a'\given s').
+\]</span> That step is an assumption about the <em>policy</em>, not about the environment, and it is worth being clear about why it is legitimate. The pair <span class="math inline">\((s,a)\)</span> certainly influences <span class="math inline">\(a'\)</span>, but only by determining which <span class="math inline">\(s'\)</span> the agent lands in. Conditioning on <span class="math inline">\(s'\)</span> closes that one channel, and there is no other, because a stationary Markov policy has no memory to route information through. This is the class of policies that has been in force since <a href="02-notes.html#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>. A history-dependent policy would break the step, and would break considerably more than the step: <span class="math inline">\(q\)</span> would no longer be a function of <span class="math inline">\((s,a)\)</span> alone, and there would be no table left to fill in.</p>
+<p><strong>Substitute and collect.</strong> Putting the factorization back and summing over <span class="math inline">\(a'\)</span> first, <span class="math display">\[
+q_{\pi}(s,a)=\underbrace{\sum_{r}r\,p(r\given s,a)}_{\E[R\given s,a]}
++\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\underbrace{\sum_{a'\in\mathcal{A}}\pi(a'\given s')\,q_{\pi}(s',a')}_{v_{\pi}(s')},
+\]</span> because the action value averaged against the policy at <span class="math inline">\(s'\)</span> is by definition the state value there. Hence <span class="math display">\[
+q_{\pi}(s,a)=\E[R\given s,a]+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\,v_{\pi}(s'),
+\]</span> which is <a href="02-notes.html#eq-q-model" class="quarto-xref">Equation&nbsp;<span>2.5</span></a>, the model-based form of the action value.</p>
+<p><strong>And back to state values.</strong> Average that last display against <span class="math inline">\(\pi(a\given s)\)</span> and use <a href="02-notes.html#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>: <span class="math display">\[
+v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
+=r_{\pi}(s)+\gamma\sum_{s'\in\mathcal{S}}p_{\pi}(s'\given s)\,v_{\pi}(s'),
+\]</span> which is <a href="01-notes.html#eq-hpi-pe" class="quarto-xref">Equation&nbsp;<span>1.6</span></a>, the policy-evaluation equation, written one state at a time. So <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> and the state-value Bellman equation are one equation read at two resolutions: one entry per pair, or one entry per state. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<p>Which is why the quintuple in the name is not an accident. <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> sets <span class="math inline">\(q_{\pi}(s,a)\)</span> equal to the mean of <span class="math inline">\(R+\gamma q_{\pi}(S',A')\)</span>, and the sample <span class="math inline">\((r_{t+1},s_{t+1},a_{t+1})\)</span> is one draw of exactly those random variables. Sarsa averages the draws incrementally in the manner of <a href="02-notes.html#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a>, bootstrapping the current <span class="math inline">\(q_{t}\)</span> in for the unknown <span class="math inline">\(q_{\pi}\)</span> inside the target.</p>
+<div id="thm-sarsa-convergence" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 3.3 (Convergence of Sarsa)</strong></span> Under the same standing assumptions as <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> (<span class="math inline">\(\gamma\in(0,1)\)</span>, finite <span class="math inline">\(\mathcal{S}\)</span> and <span class="math inline">\(\mathcal{A}\)</span>, bounded rewards, <span class="math inline">\(\alpha_{t}\in(0,1)\)</span>), the Sarsa algorithm <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> has <span class="math inline">\(q_{t}(s,a)\)</span> converging with probability 1 to <span class="math inline">\(q_{\pi}(s,a)\)</span> for all <span class="math inline">\((s,a)\)</span> as <span class="math inline">\(t\to\infty\)</span>, provided <span class="math inline">\(\sum_{t}\alpha_{t}(s,a)=\infty\)</span> and <span class="math inline">\(\sum_{t}\alpha_{t}^{2}(s,a)&lt;\infty\)</span> for all <span class="math inline">\((s,a)\)</span>.</p>
+</div>
+<p>The hypotheses read exactly as in <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> with one word changed: the Robbins-Monro conditions must now hold <strong>pair by pair</strong> rather than state by state. The conclusion changes in the same mechanical way, from the whole vector of state values to the whole table of action values. So does the proof, and it is worth showing precisely how rather than asserting it.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof of the convergence of Sarsa">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof of the convergence of Sarsa
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Nothing new is needed. Sarsa is the TD algorithm with its index set enlarged from states to state-action pairs, so the proof of <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> carries over under a dictionary. Here are the substitutions, in the order that proof uses them.</p>
+<p><strong>The index set.</strong> Replace <span class="math inline">\(\mathcal{S}\)</span> by <span class="math inline">\(\mathcal{S}\times\mathcal{A}\)</span> everywhere. It is still finite, which is all <a href="#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> ever asked of it, and the norm becomes <span class="math inline">\(\|x\|_{\infty}=\max_{(s,a)}|x(s,a)|\)</span>, a maximum over pairs.</p>
+<p><strong>Step 1, the error process.</strong> In place of <span class="math inline">\(\Delta_{t}(s)\defeq v_{t}(s)-v_{\pi}(s)\)</span>, define <span class="math inline">\(\Delta_{t}(s,a)\defeq q_{t}(s,a)-q_{\pi}(s,a)\)</span>. Subtracting <span class="math inline">\(q_{\pi}(s,a)\)</span> from <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> when <span class="math inline">\((s,a)=(s_{t},a_{t})\)</span> gives <span class="math display">\[
+\Delta_{t+1}(s,a)=\big(1-\alpha_{t}(s,a)\big)\Delta_{t}(s,a)+\alpha_{t}(s,a)\underbrace{\big[r_{t+1}+\gamma q_{t}(s_{t+1},a_{t+1})-q_{\pi}(s,a)\big]}_{\eta_{t}(s,a)},
+\]</span> and every other pair is left untouched, which is the same line with <span class="math inline">\(\alpha_{t}(s,a)=0\)</span> and <span class="math inline">\(\eta_{t}(s,a)=0\)</span>. That is <a href="#eq-dvoretzky-ext" class="quarto-xref">Equation&nbsp;<span>3.6</span></a> on the new index set, again with <span class="math inline">\(\beta_{t}=\alpha_{t}\)</span>.</p>
+<p><strong>Step 2, condition 1.</strong> The hypothesis of the theorem, now imposed on pairs.</p>
+<p><strong>Step 3, the contraction.</strong> This is the only step carrying any content. As before, once the pair is given, <span class="math inline">\(\eta_{t}(s,a)\)</span> does not depend on the history, so <span class="math inline">\(\E[\eta_{t}(s,a)\given\mathcal{H}_{t}]=\E[\eta_{t}(s,a)]\)</span>, and the bound is trivial for pairs other than <span class="math inline">\((s_{t},a_{t})\)</span>. For <span class="math inline">\((s,a)=(s_{t},a_{t})\)</span>, <span class="math display">\[
+\E[\eta_{t}(s,a)]=\E\big[r_{t+1}+\gamma q_{t}(s_{t+1},a_{t+1})\given s_{t},a_{t}\big]-q_{\pi}(s_{t},a_{t}).
+\]</span> The state-value proof subtracted the Bellman equation for <span class="math inline">\(v_{\pi}\)</span> at this point. Subtract <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> instead, which is exactly what the proof above licensed, and the reward terms cancel in the same way, leaving only the gap between estimate and truth at the <em>next</em> pair: <span class="math display">\[
+\E[\eta_{t}(s,a)]=\gamma\sum_{s'\in\mathcal{S}}\sum_{a'\in\mathcal{A}}p(s'\given s_{t},a_{t})\,\pi(a'\given s')\big[q_{t}(s',a')-q_{\pi}(s',a')\big].
+\]</span> The weights here are the factored joint <span class="math inline">\(p(s',a'\given s_{t},a_{t})\)</span> from that same proof: non-negative, and summing to one over pairs. Bounding the sum by its largest term therefore works verbatim, <span class="math display">\[
+\big|\E[\eta_{t}(s,a)]\big|\leq\gamma\max_{(s',a')}\big|q_{t}(s',a')-q_{\pi}(s',a')\big|=\gamma\|\Delta_{t}\|_{\infty},
+\]</span> with <span class="math inline">\(\gamma\in(0,1)\)</span> the discount factor once again supplying the contraction.</p>
+<p><strong>Step 4, the variance.</strong> Unchanged. The constant <span class="math inline">\(q_{\pi}(s,a)\)</span> drops out of the variance, <span class="math inline">\(r_{t+1}\)</span> is bounded, and <span class="math inline">\(q_{t}\)</span> differs from the fixed <span class="math inline">\(q_{\pi}\)</span> by at most <span class="math inline">\(\|\Delta_{t}\|_{\infty}\)</span>, so condition 3 holds for the same reason it did before.</p>
+<p>All three conditions of <a href="#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> hold on the index set <span class="math inline">\(\mathcal{S}\times\mathcal{A}\)</span>, so <span class="math inline">\(\Delta_{t}(s,a)\to0\)</span> almost surely for every pair. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="What the dictionary costs">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What the dictionary costs
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The translation is free on the mathematics but not on the data. Since <span class="math inline">\(\alpha_{t}(s,a)&gt;0\)</span> only when <span class="math inline">\((s_{t},a_{t})=(s,a)\)</span>, requiring <span class="math inline">\(\sum_{t}\alpha_{t}(s,a)=\infty\)</span> for <strong>every pair</strong> demands that every pair be visited infinitely often, and visiting every state infinitely often does not deliver that. A deterministic policy can tour all of <span class="math inline">\(\mathcal{S}\)</span> forever while taking exactly one action in each state, leaving <span class="math inline">\(|\mathcal{S}|(|\mathcal{A}|-1)\)</span> entries of the table with <span class="math inline">\(\alpha_{t}=0\)</span> at every <span class="math inline">\(t\)</span>, frozen at their initial guesses. The requirement is stronger by a factor of <span class="math inline">\(|\mathcal{A}|\)</span> in the number of things that must be sampled, and no greedy policy can meet it.</p>
+</div>
+</div>
+<p>Note what this theorem does and does not deliver: it finds <span class="math inline">\(q_{\pi}\)</span> for a <strong>given</strong> policy <span class="math inline">\(\pi\)</span>. It is a policy <em>evaluation</em> result. Getting an optimal policy requires pairing it with improvement.</p>
+<section id="policy-searching-by-sarsa" class="level3">
+<h3 class="anchored" data-anchor-id="policy-searching-by-sarsa">Policy searching by Sarsa</h3>
+<p>The pairing is the Howard structure of <a href="02-notes.html#eq-hpi-rl" class="quarto-xref">Equation&nbsp;<span>2.3</span></a> once more, except that neither step waits for the other to finish. Evaluation takes one TD step, improvement acts on the result immediately, and the improved policy generates the next transition.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: policy searching by Sarsa">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: policy searching by Sarsa
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For each episode: generate <span class="math inline">\(a_{0}\)</span> at <span class="math inline">\(s_{0}\)</span> following <span class="math inline">\(\pi_{0}(s_{0})\)</span>. Then for each <span class="math inline">\(t=0,1,2,\dots\)</span> while <span class="math inline">\(s_{t}\)</span> is not the target state:</p>
+<ol type="1">
+<li><p><strong>Interact.</strong> Take <span class="math inline">\(a_{t}\)</span>, observe <span class="math inline">\(r_{t+1}\)</span> and <span class="math inline">\(s_{t+1}\)</span>, and generate <span class="math inline">\(a_{t+1}\)</span> following <span class="math inline">\(\pi_{t}(s_{t+1})\)</span>.</p></li>
+<li><p><strong>Update the <span class="math inline">\(q\)</span>-value</strong> of <span class="math inline">\((s_{t},a_{t})\)</span> by <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>.</p></li>
+<li><p><strong>Update the policy</strong> at <span class="math inline">\(s_{t}\)</span> to be <span class="math inline">\(\eps\)</span>-greedy with respect to the new <span class="math inline">\(q_{t+1}\)</span>, in the sense of <a href="02-notes.html#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a>.</p></li>
+<li><p>Set <span class="math inline">\(s_{t}\leftarrow s_{t+1}\)</span>, <span class="math inline">\(a_{t}\leftarrow a_{t+1}\)</span>.</p></li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <span class="math inline">\(\eps\)</span>-greedy step is not a detail. <a href="#thm-sarsa-convergence" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a> needs every pair <span class="math inline">\((s,a)\)</span> visited infinitely often, and a greedy policy would starve every non-greedy action of data immediately. This is the exploration problem of Chapter 2 arriving exactly where it was promised.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="q-learning-td-learning-of-optimal-action-values" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="q-learning-td-learning-of-optimal-action-values"><span class="header-section-number">3.4</span> Q-learning: TD learning of optimal action values</h2>
+<p>Sarsa estimates <span class="math inline">\(q_{\pi}\)</span> for the policy currently being followed, and therefore <em>must</em> be combined with an improvement step. Q-learning skips the intermediary and estimates <span class="math inline">\(q^{*}\)</span> directly.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: Q-learning">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: Q-learning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span id="eq-qlearning"><span class="math display">\[
+q_{t+1}(s_{t},a_{t})=q_{t}(s_{t},a_{t})+\alpha_{t}(s_{t},a_{t})\Big[\,r_{t+1}+\gamma\max_{a\in\mathcal{A}}q_{t}(s_{t+1},a)-q_{t}(s_{t},a_{t})\,\Big],
+\tag{3.9}\]</span></span></p>
+<p>with <span class="math inline">\(q_{t+1}(s,a)=q_{t}(s,a)\)</span> for all <span class="math inline">\((s,a)\neq(s_{t},a_{t})\)</span>.</p>
+</div>
+</div>
+<p>Set <a href="#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> beside <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> and exactly one thing has changed, the TD target:</p>
+<div id="tbl-sarsa-q" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sarsa-q-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.2: Sarsa and Q-learning differ in one term. Everything downstream follows from it.
+</figcaption>
+<div aria-describedby="tbl-sarsa-q-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>TD target</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Sarsa</strong></td>
+<td><span class="math inline">\(r_{t+1}+\gamma\,q_{t}(s_{t+1},a_{t+1})\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Q-learning</strong></td>
+<td><span class="math inline">\(r_{t+1}+\gamma\,\max_{a\in\mathcal{A}}q_{t}(s_{t+1},a)\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>That single substitution changes what equation the algorithm solves. Sarsa is stochastic approximation on the Bellman equation <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a>; Q-learning is stochastic approximation on the Bellman <strong>optimality</strong> equation,</p>
+<p><span id="eq-bellman-opt-q"><span class="math display">\[
+q(s,a)=\E\Big[R+\gamma\max_{a'\in\mathcal{A}}q(S',a')\ \given\ s,a\Big],
+\qquad\text{for all } s,a,
+\tag{3.10}\]</span></span></p>
+<p>whose solution is <span class="math inline">\(q^{*}\)</span>. So Q-learning estimates the optimal action values directly, and needs no separate policy improvement step at all.</p>
+<p>Calling <a href="#eq-bellman-opt-q" class="quarto-xref">Equation&nbsp;<span>3.10</span></a> an optimality equation is a claim worth checking, because it does not look like one. Its only maximization sits inside the expectation, over the <em>next</em> action; nothing is maximized over policies, and the unknown carries no <span class="math inline">\(\pi\)</span> subscript at all.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof that the Q-learning fixed point is the Bellman optimality equation">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof that the Q-learning fixed point is the Bellman optimality equation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Step 1: expand the expectation.</strong> Exactly as for Sarsa, write the right-hand side as sums against the conditional distributions of the reward and of the next state. What differs is that the next <em>action</em> is not random: the <span class="math inline">\(\max\)</span> has already chosen it, so only <span class="math inline">\(r\)</span> and <span class="math inline">\(s'\)</span> are integrated out and no policy is needed to average over <span class="math inline">\(a'\)</span>, <span class="math display">\[
+q(s,a)=\sum_{r}r\,p(r\given s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\max_{a'\in\mathcal{A}}q(s',a').
+\]</span> The off-policy character of Q-learning is already visible: no <span class="math inline">\(\pi\)</span> entered the derivation, because no action had to be drawn.</p>
+<p><strong>Step 2: maximize both sides over the first action.</strong> Both sides are functions of <span class="math inline">\(a\)</span> and <span class="math inline">\(\mathcal{A}\)</span> is finite, so the maximum exists and <span class="math display">\[
+\max_{a\in\mathcal{A}}q(s,a)=\max_{a\in\mathcal{A}}\Big\{\sum_{r}r\,p(r\given s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\max_{a'\in\mathcal{A}}q(s',a')\Big\}.
+\]</span></p>
+<p><strong>Step 3: name the maximized value.</strong> Define <span class="math display">\[
+v(s)\defeq\max_{a\in\mathcal{A}}q(s,a).
+\]</span> The inner maximum on the right is that same definition evaluated at <span class="math inline">\(s'\)</span>, so it is <span class="math inline">\(v(s')\)</span>, and the left-hand side is <span class="math inline">\(v(s)\)</span>: <span class="math display">\[
+v(s)=\max_{a\in\mathcal{A}}\Big\{\sum_{r}r\,p(r\given s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\,v(s')\Big\},
+\]</span> which is <a href="01-notes.html#eq-bellman" class="quarto-xref">Equation&nbsp;<span>1.4</span></a>, in the <span class="math inline">\(\gamma\)</span> dialect and with the expected reward written as a sum because rewards here are random.</p>
+<p><strong>Step 4: maximizing over actions is maximizing over policies.</strong> Chapter 2 wrote the optimality equation with the maximum taken over stochastic policies, <a href="02-notes.html#eq-bellman-stoch" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, so the two forms still have to be reconciled. Abbreviate the bracket in Step 3 as <span class="math display">\[
+f(a)\defeq\sum_{r}r\,p(r\given s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\,v(s').
+\]</span> For any distribution <span class="math inline">\(\pi(\cdot\given s)\)</span> on the finite set <span class="math inline">\(\mathcal{A}\)</span>, <span class="math display">\[
+\sum_{a\in\mathcal{A}}\pi(a\given s)f(a)\leq\sum_{a\in\mathcal{A}}\pi(a\given s)\max_{b\in\mathcal{A}}f(b)=\max_{b\in\mathcal{A}}f(b),
+\]</span> since a weighted average of finitely many numbers cannot exceed the largest of them, the weights summing to one. The bound is attained: finiteness of <span class="math inline">\(\mathcal{A}\)</span> makes <span class="math inline">\(\argmax_{a}f(a)\)</span> nonempty, and putting all the mass on one of its elements turns the average into the maximum. Hence <span class="math display">\[
+\max_{\pi}\sum_{a\in\mathcal{A}}\pi(a\given s)f(a)=\max_{a\in\mathcal{A}}f(a),
+\]</span> the maximum over the simplex of distributions being attained at a vertex, that is, at a point mass. Step 3 is therefore <a href="02-notes.html#eq-bellman-stoch" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, and <a href="#eq-bellman-opt-q" class="quarto-xref">Equation&nbsp;<span>3.10</span></a> is the Bellman optimality equation written one state-action pair at a time. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<p>Two consequences are worth stating. Randomizing never pays: the maximum over distributions is attained at a point mass, so an optimal policy may always be taken deterministic, and <span class="math inline">\(\pi(s)=\argmax_{a}q^{*}(s,a)\)</span> reads it off the table by comparison alone, with no model and no separate improvement step. The <span class="math inline">\(\eps\)</span>-greedy policy in the algorithm below is thus about collecting data, not about any value in randomizing. And the correspondence runs both ways: define <span class="math inline">\(q\)</span> from a solution <span class="math inline">\(v\)</span> of <a href="01-notes.html#eq-bellman" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> by the one-step formula of Step 1, and Step 3 gives <span class="math inline">\(\max_{a}q(s,a)=v(s)\)</span>, which substituted back shows that <span class="math inline">\(q\)</span> solves <a href="#eq-bellman-opt-q" class="quarto-xref">Equation&nbsp;<span>3.10</span></a>. The two fixed points determine each other, so the object Q-learning converges to is <span class="math inline">\(q^{*}\)</span>, with <span class="math inline">\(v^{*}(s)=\max_{a}q^{*}(s,a)\)</span>.</p>
+<section id="why-q-learning-is-off-policy" class="level3">
+<h3 class="anchored" data-anchor-id="why-q-learning-is-off-policy">Why Q-learning is off-policy</h3>
+<p>Look at what each update consumes. Sarsa <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> needs <span class="math inline">\(a_{t+1}\)</span>, the action the current policy will actually take next. Q-learning <a href="#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> does not: the <span class="math inline">\(\max\)</span> is taken over the table, not over what happens. Its update needs only <span class="math inline">\((s_{t},a_{t},r_{t+1},s_{t+1})\)</span>.</p>
+<div id="def-on-off-policy" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 3.3 (On-policy and off-policy)</strong></span> An algorithm is <strong>on-policy</strong> if the data must be generated by the policy being learned. It is <strong>off-policy</strong> if the data may come from any <strong>behavior policy</strong>, while the <strong>target policy</strong> being learned is a different one.</p>
+</div>
+<p>Sarsa is on-policy: <span class="math inline">\(a_{t+1}\)</span> ties the update to the policy in force. Q-learning is off-policy, which is why it can learn the optimal policy from data collected by an arbitrarily exploratory behavior policy, or from a log recorded long ago.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: policy searching by Q-learning">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: policy searching by Q-learning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For each episode, for each <span class="math inline">\(t=0,1,2,\dots\)</span> while <span class="math inline">\(s_{t}\)</span> is not the target state:</p>
+<ol type="1">
+<li><p><strong>Interact.</strong> Generate <span class="math inline">\(a_{t}\)</span> following <span class="math inline">\(\pi_{t}(s_{t})\)</span>; observe <span class="math inline">\(r_{t+1}\)</span> and <span class="math inline">\(s_{t+1}\)</span>.</p></li>
+<li><p><strong>Update the <span class="math inline">\(q\)</span>-value</strong> of <span class="math inline">\((s_{t},a_{t})\)</span> by <a href="#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a>.</p></li>
+<li><p><strong>Update the policy</strong> at <span class="math inline">\(s_{t}\)</span> to be <span class="math inline">\(\eps\)</span>-greedy with respect to <span class="math inline">\(q_{t+1}\)</span>.</p></li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compare this with policy searching by Sarsa: there is no <span class="math inline">\(a_{t+1}\)</span> anywhere. This version still generates its own data with an <span class="math inline">\(\eps\)</span>-greedy behavior policy, which makes it a convenient but not a <em>fully</em> off-policy implementation. A fully off-policy version draws all its data from a fixed exploratory behavior policy and never updates it.</p>
+</div>
+</div>
+<div id="fig-3-sarsa-q" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-sarsa-q-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/03-sarsa-vs-q.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-sarsa-q-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Sarsa and Q-learning on a five-state chain, run on identical experience with <span class="math inline">\(\gamma=0.9\)</span> and <span class="math inline">\(\eps=0.2\)</span>. Walking the ledge pays 10 on arrival but a mis-step off it costs <span class="math inline">\(-12\)</span> and ends the episode; stepping aside at the start is a safe route worth 5. Acting optimally, the ledge wins (<span class="math inline">\(v^{*}(s_{0})=7.29\)</span>); acting <span class="math inline">\(\eps\)</span>-greedily it does not, because the exploration itself keeps falling off. <strong>Left:</strong> each algorithm converges to the fixed point of <em>its own</em> equation, Sarsa to <span class="math inline">\(q_{\pi}\)</span> for the best <span class="math inline">\(\eps\)</span>-greedy policy and Q-learning to <span class="math inline">\(q^{*}\)</span>, plotted as the share of the initial error still left. They are level until values have to be bootstrapped back along the chain; after that Q-learning pulls away, because its <span class="math inline">\(\max\)</span> target carries the best continuation immediately instead of waiting for the behavior policy to happen to pick it. <strong>Right:</strong> the same runs scored by the value of the greedy policy each currently implies. Sarsa settles on the safe route, worth 5, because on-policy it is valuing what it will actually do, exploration and all. Q-learning settles on the ledge, worth 7.29, because off-policy it is valuing what it <em>would</em> do if it stopped exploring. Neither is converging badly: they are answering different questions.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="td-learning-with-function-approximation" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="td-learning-with-function-approximation"><span class="header-section-number">3.5</span> TD learning with function approximation</h2>
+<p>Everything so far has stored values in a <strong>table</strong>: one entry per state, or one per state-action pair. <a href="#eq-td-untouched" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> is the clearest statement of what that costs, since visiting a state updates that state and nothing else.</p>
+<p>Tables are intuitive and easy to analyze. They fail on two counts:</p>
+<ol type="1">
+<li><strong>Storage.</strong> A table has <span class="math inline">\(|\mathcal{S}|\)</span> or <span class="math inline">\(|\mathcal{S}|\times|\mathcal{A}|\)</span> entries. For large or continuous state spaces this is hopeless, and in economics the state space is routinely continuous.</li>
+<li><strong>Generalization.</strong> Nothing learned at <span class="math inline">\(s\)</span> transfers to a nearby <span class="math inline">\(s'\)</span>. Every state must be visited, many times, on its own account.</li>
+</ol>
+<section id="values-as-parameterized-functions" class="level3">
+<h3 class="anchored" data-anchor-id="values-as-parameterized-functions">Values as parameterized functions</h3>
+<p>Replace the table with a function</p>
+<p><span id="eq-fa"><span class="math display">\[
+\hat{v}(s,w)\approx v_{\pi}(s),
+\qquad w\in\R^{m},
+\tag{3.11}\]</span></span></p>
+<p>where <span class="math inline">\(m\)</span> can be far smaller than <span class="math inline">\(|\mathcal{S}|\)</span>. The change is in <em>how a value is accessed and assigned</em>: instead of reading and writing one cell, we evaluate a function and adjust its parameters, which moves the estimate at many states at once. That is generalization, purchased directly.</p>
+<div id="exm-linear-fa" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3.1 (Fitting a line)</strong></span> Suppose the states <span class="math inline">\(s_{1},\dots,s_{|\mathcal{S}|}\)</span> are one-dimensional and <span class="math inline">\(|\mathcal{S}|\)</span> is very large. The crudest approximation is a straight line: <span class="math display">\[
+\hat{v}(s,w)=as+b=\underbrace{[\,s\ \ 1\,]}_{\phi^{\!\top}(s)}\underbrace{\begin{bmatrix}a\\ b\end{bmatrix}}_{w}=\phi^{\!\top}(s)\,w .
+\]</span> Here <span class="math inline">\(w\)</span> is the <strong>parameter vector</strong>, <span class="math inline">\(\phi(s)\)</span> is the <strong>feature vector</strong> of <span class="math inline">\(s\)</span>, and <span class="math inline">\(\hat{v}\)</span> is linear in <span class="math inline">\(w\)</span>. Two numbers now stand in for <span class="math inline">\(|\mathcal{S}|\)</span> of them.</p>
+</div>
+<p>Nothing requires <span class="math inline">\(\hat{v}\)</span> to be linear. Taking <span class="math inline">\(\hat{v}(s,w)\)</span> to be a deep neural network, with <span class="math inline">\(w\)</span> its weights, is what people mean by <strong>deep reinforcement learning</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As Chapter 1 already insisted: RL and deep learning are orthogonal. RL says how to estimate values and policies from sampled experience; the network is one choice of approximator among many, and swapping it for <a href="#exm-linear-fa" class="quarto-xref">Example&nbsp;<span>3.1</span></a> changes nothing about the algorithms below.</p>
+</div>
+</div>
+</section>
+<section id="fitting-w-by-stochastic-gradient-descent" class="level3">
+<h3 class="anchored" data-anchor-id="fitting-w-by-stochastic-gradient-descent">Fitting <span class="math inline">\(w\)</span> by stochastic gradient descent</h3>
+<p>Choose <span class="math inline">\(w\)</span> to minimize the mean squared error against the true value function,</p>
+<p><span id="eq-fa-objective"><span class="math display">\[
+J(w)=\E\Big[\big(v_{\pi}(S)-\hat{v}(S,w)\big)^{2}\Big].
+\tag{3.12}\]</span></span></p>
+<p>This is exactly <a href="02-notes.html#eq-sgd-objective" class="quarto-xref">Equation&nbsp;<span>2.12</span></a>, so <a href="02-notes.html#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> applies. With <span class="math inline">\(f(w,s)=(v_{\pi}(s)-\hat{v}(s,w))^{2}\)</span> the gradient is <span class="math inline">\(-2(v_{\pi}(s)-\hat{v}(s,w))\nabla_{w}\hat{v}(s,w)\)</span>, and absorbing the <span class="math inline">\(2\)</span> into the step size gives gradient <em>ascent</em> on the negative error:</p>
+<p><span id="eq-sgd-value"><span class="math display">\[
+w_{t+1}=w_{t}+\alpha_{t}\big(v_{\pi}(s_{t})-\hat{v}(s_{t},w_{t})\big)\nabla_{w}\hat{v}(s_{t},w_{t}).
+\tag{3.13}\]</span></span></p>
+<p>One term in <a href="#eq-sgd-value" class="quarto-xref">Equation&nbsp;<span>3.13</span></a> is not available: <span class="math inline">\(v_{\pi}(s_{t})\)</span> is the thing being estimated. Every algorithm in this chapter is a different answer to what to put in its place, and each answer is one we have already met.</p>
+<div id="tbl-fa-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fa-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.3: Monte Carlo and TD, in parameter space. The unknown <span class="math inline">\(v_{\pi}(s_{t})\)</span> is replaced by a realized return or by a bootstrapped target: the same choice as <a href="01-notes.html#tbl-mc-td" class="quarto-xref">Table&nbsp;<span>1.1</span></a>, now made inside a gradient step.
+</figcaption>
+<div aria-describedby="tbl-fa-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Substitute for <span class="math inline">\(v_{\pi}(s_{t})\)</span></th>
+<th>Update</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Monte Carlo with FA</strong></td>
+<td><span class="math inline">\(g_{t}\)</span>, the realized discounted return from <span class="math inline">\(s_{t}\)</span></td>
+<td><span class="math inline">\(w_{t+1}=w_{t}+\alpha_{t}\big(g_{t}-\hat{v}(s_{t},w_{t})\big)\nabla_{w}\hat{v}(s_{t},w_{t})\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>TD with FA</strong></td>
+<td>the TD target <span class="math inline">\(r_{t+1}+\gamma\hat{v}(s_{t+1},w_{t})\)</span></td>
+<td><span class="math inline">\(w_{t+1}=w_{t}+\alpha_{t}\big[r_{t+1}+\gamma\hat{v}(s_{t+1},w_{t})-\hat{v}(s_{t},w_{t})\big]\nabla_{w}\hat{v}(s_{t},w_{t})\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="The second row is not actually SGD">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>The second row is not actually SGD
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Monte Carlo row is an honest stochastic gradient step: <span class="math inline">\(g_{t}\)</span> does not depend on <span class="math inline">\(w\)</span>, so the increment really is an unbiased sample of the gradient of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a>.</p>
+<p>The TD row is not. Its target <span class="math inline">\(r_{t+1}+\gamma\hat{v}(s_{t+1},w_{t})\)</span> contains <span class="math inline">\(w_{t}\)</span>, so differentiating <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> properly would produce a second term in <span class="math inline">\(\gamma\nabla_{w}\hat{v}(s_{t+1},w_{t})\)</span> that the update simply drops. Dropping it is deliberate, and the result is called a <strong>semi-gradient</strong> method: it follows the gradient of the error while pretending the target is a constant.</p>
+<p>The cost is that <a href="02-notes.html#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> no longer applies off the shelf, because the increment is not the gradient of anything. What survives is weaker and more conditional: for <strong>linear</strong> <span class="math inline">\(\hat{v}\)</span> and <strong>on-policy</strong> sampling, with states drawn from the stationary distribution induced by <span class="math inline">\(\pi\)</span>, semi-gradient TD converges to the <em>TD fixed point</em>, which is not the minimizer of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> but is within a bounded factor of it. Combine off-policy sampling with function approximation and bootstrapping and it can diverge outright. In exchange one gets what this whole chapter is about: updates that do not wait for the episode to end.</p>
+</div>
+</div>
+</section>
+<section id="sarsa-with-function-approximation" class="level3">
+<h3 class="anchored" data-anchor-id="sarsa-with-function-approximation">Sarsa with function approximation</h3>
+<p>State values still cannot be turned into decisions without a model, so repeat the construction for action values. Approximate <span class="math inline">\(\hat{q}(s,a,w)\approx q_{\pi}(s,a)\)</span> and substitute it into the TD-with-FA row of <a href="#tbl-fa-methods" class="quarto-xref">Table&nbsp;<span>3.3</span></a>:</p>
+<p><span id="eq-sarsa-fa"><span class="math display">\[
+w_{t+1}=w_{t}+\alpha_{t}\big[\,r_{t+1}+\gamma\hat{q}(s_{t+1},a_{t+1},w_{t})-\hat{q}(s_{t},a_{t},w_{t})\,\big]\nabla_{w}\hat{q}(s_{t},a_{t},w_{t}).
+\tag{3.14}\]</span></span></p>
+<p>This is tabular Sarsa <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> with <span class="math inline">\(q\)</span> replaced by <span class="math inline">\(\hat{q}\)</span>, and with the update applied to <span class="math inline">\(w\)</span> rather than to a cell. Pair it with <span class="math inline">\(\eps\)</span>-greedy improvement exactly as before and the policy search algorithm carries over unchanged.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Two threads now run in parallel and should not be confused. <strong>What is estimated</strong> has gone from state values to action values to optimal action values. <strong>How it is stored</strong> has gone from a table to a parameter vector. They are independent choices: Q-learning with function approximation is the combination that, with a neural network for <span class="math inline">\(\hat{q}\)</span>, is Deep Q-learning.</p>
+<p>Chapter 4 changes the question again. Everything here parameterizes a <em>value</em> and reads a policy off it. Policy gradient methods parameterize the <strong>policy</strong> directly and never form a table of values at all.</p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./02-notes.html" class="pagination-link" aria-label="Monte Carlo Methods and Stochastic Approximation">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./04-notes.html" class="pagination-link" aria-label="Policy Gradient and Actor-Critic Methods">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes based on Ben Moll’s reinforcement learning lectures, themselves adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>; all rights in those original materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+
+<title>2&nbsp; Monte Carlo Methods and Stochastic Approximation – Reinforcement Learning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-notes.html" rel="next">
+<link href="./01-notes.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02-notes.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Reinforcement Learning</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Basic Idea of RL, and Its Link to Dynamic Programming</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-notes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#recall-the-mdp-in-rl-notation" id="toc-recall-the-mdp-in-rl-notation" class="nav-link active" data-scroll-target="#recall-the-mdp-in-rl-notation"><span class="header-section-number">2.1</span> Recall: the MDP in RL notation</a></li>
+  <li><a href="#monte-carlo-methods" id="toc-monte-carlo-methods" class="nav-link" data-scroll-target="#monte-carlo-methods"><span class="header-section-number">2.2</span> Monte Carlo methods</a>
+  <ul class="collapse">
+  <li><a href="#where-the-model-still-hides" id="toc-where-the-model-still-hides" class="nav-link" data-scroll-target="#where-the-model-still-hides">Where the model still hides</a></li>
+  <li><a href="#two-expressions-for-the-action-value" id="toc-two-expressions-for-the-action-value" class="nav-link" data-scroll-target="#two-expressions-for-the-action-value">Two expressions for the action value</a></li>
+  <li><a href="#estimating-q-from-episodes" id="toc-estimating-q-from-episodes" class="nav-link" data-scroll-target="#estimating-q-from-episodes">Estimating <span class="math inline">\(q\)</span> from episodes</a></li>
+  <li><a href="#the-mc-basic-algorithm" id="toc-the-mc-basic-algorithm" class="nav-link" data-scroll-target="#the-mc-basic-algorithm">The MC Basic algorithm</a></li>
+  <li><a href="#removing-exploring-starts-eps-greedy-policies" id="toc-removing-exploring-starts-eps-greedy-policies" class="nav-link" data-scroll-target="#removing-exploring-starts-eps-greedy-policies">Removing exploring starts: <span class="math inline">\(\eps\)</span>-greedy policies</a></li>
+  </ul></li>
+  <li><a href="#stochastic-approximation" id="toc-stochastic-approximation" class="nav-link" data-scroll-target="#stochastic-approximation"><span class="header-section-number">2.3</span> Stochastic approximation</a>
+  <ul class="collapse">
+  <li><a href="#motivating-example-mean-estimation" id="toc-motivating-example-mean-estimation" class="nav-link" data-scroll-target="#motivating-example-mean-estimation">Motivating example: mean estimation</a></li>
+  <li><a href="#the-robbins-monro-algorithm" id="toc-the-robbins-monro-algorithm" class="nav-link" data-scroll-target="#the-robbins-monro-algorithm">The Robbins-Monro algorithm</a></li>
+  <li><a href="#why-the-robbins-monro-theorem-is-true" id="toc-why-the-robbins-monro-theorem-is-true" class="nav-link" data-scroll-target="#why-the-robbins-monro-theorem-is-true">Why the Robbins-Monro theorem is true</a></li>
+  <li><a href="#mean-estimation-is-robbins-monro" id="toc-mean-estimation-is-robbins-monro" class="nav-link" data-scroll-target="#mean-estimation-is-robbins-monro">Mean estimation is Robbins-Monro</a></li>
+  <li><a href="#stochastic-gradient-descent" id="toc-stochastic-gradient-descent" class="nav-link" data-scroll-target="#stochastic-gradient-descent">Stochastic gradient descent</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\BR}{\operatorname{BR}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,\vert\,}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sm}{\setminus}
+\newcommand{\defeq}{\equiv}
+\]</span></p>
+</div>
+<p>Chapter 1 ended at a doorway: every RL algorithm starts from Howard policy iteration and replaces its exact policy-evaluation step with something estimated from samples. This chapter walks through that doorway twice. First <strong>directly</strong>, by replacing the evaluation step with a plain sample average of returns, which gives the MC Basic algorithm. Then <strong>more carefully</strong>, by asking what it means to solve an equation when you only ever see noisy observations of it, which is the theory of <strong>stochastic approximation</strong> and the bridge from Monte Carlo to temporal-difference learning.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Source:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ben Moll’s <a href="https://benjaminmoll.com/lectures/">RL lecture slides</a>, Lecture 2.</p>
+</div>
+</div>
+<section id="recall-the-mdp-in-rl-notation" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="recall-the-mdp-in-rl-notation"><span class="header-section-number">2.1</span> Recall: the MDP in RL notation</h2>
+<p>Recall from <a href="01-notes.html#def-mdp" class="quarto-xref">Definition&nbsp;<span>1.2</span></a> the optimal control problem</p>
+<p><span class="math display">\[
+v(s_{0})=\max_{\{a_{t}\}_{t=0}^{\infty}}\E_{0}\!\left[\sum_{t=0}^{\infty}\beta^{t}r(s_{t},a_{t})\right]
+\quad\text{s.t.}\quad s_{t+1}\sim p(\cdot\given s_{t},a_{t}),\ \ s_{0}\text{ given},
+\]</span></p>
+<p>whose solution is an optimal policy <span class="math inline">\(a=\pi(s)\)</span>. That goal does not change in this chapter. Two conventions do.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Notation: from β to γ, and from deterministic to stochastic policies">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Notation: from β to γ, and from deterministic to stochastic policies
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>From here on the book speaks RL rather than dynamic programming:</p>
+<ul>
+<li>the discount factor is written <strong><span class="math inline">\(\gamma\)</span></strong> rather than <span class="math inline">\(\beta\)</span>;</li>
+<li>policies are <strong>stochastic</strong>, <span class="math inline">\(a_{t}\sim\pi(\cdot\given s_{t})\)</span>, so <span class="math inline">\(\pi(a\given s)\)</span> is a probability rather than a chosen action.</li>
+</ul>
+<p>Chapter 1 keeps <span class="math inline">\(\beta\)</span> and deterministic <span class="math inline">\(\pi(s)\)</span> because it is dynamic programming. Nothing about the problem changes at this line; only the dialect does.</p>
+</div>
+</div>
+<p>Under a stochastic policy the maximization in the Bellman equation <a href="01-notes.html#eq-bellman" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> is over <em>distributions</em> over actions rather than over actions, so the one-step reward and the transition both get averaged against <span class="math inline">\(\pi\)</span>:</p>
+<p><span id="eq-bellman-stoch"><span class="math display">\[
+v(s)=\max_{\pi}\sum_{a\in\mathcal{A}}\pi(a\given s)
+\left(r(s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\,v(s')\right).
+\tag{2.1}\]</span></span></p>
+<div id="def-policy-averaged" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.1 (Policy-averaged reward and transition)</strong></span> For a policy <span class="math inline">\(\pi\)</span>, define the <strong>policy-averaged reward</strong> and the <strong>policy-averaged transition</strong> <span class="math display">\[
+r_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,r(s,a),
+\qquad
+p_{\pi}(s'\given s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,p(s'\given s,a).
+\]</span></p>
+</div>
+<p>With <a href="#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>, <a href="#eq-bellman-stoch" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> collapses to the same shape as the deterministic case:</p>
+<p><span id="eq-bellman-pi"><span class="math display">\[
+v(s)=\max_{\pi}\left(r_{\pi}(s)+\gamma\sum_{s'\in\mathcal{S}}p_{\pi}(s'\given s)\,v(s')\right).
+\tag{2.2}\]</span></span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#eq-bellman-pi" class="quarto-xref">Equation&nbsp;<span>2.2</span></a> says a stochastic policy induces an ordinary Markov reward process: fix <span class="math inline">\(\pi\)</span> and the controlled process <span class="math inline">\((r_{\pi},p_{\pi})\)</span> is just an MRP in the sense of <a href="01-notes.html#def-mrp" class="quarto-xref">Definition&nbsp;<span>1.1</span></a>. This is why the matrix-vector machinery of Chapter 1 carries over unchanged, with <span class="math inline">\(\mathbf{r}_{\pi}\)</span> and <span class="math inline">\(\mathbf{P}_{\pi}\)</span> now built from <a href="#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>.</p>
+</div>
+</div>
+</section>
+<section id="monte-carlo-methods" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="monte-carlo-methods"><span class="header-section-number">2.2</span> Monte Carlo methods</h2>
+<p>The goal of this section is one idea: <strong>make policy iteration model-free.</strong></p>
+<section id="where-the-model-still-hides" class="level3">
+<h3 class="anchored" data-anchor-id="where-the-model-still-hides">Where the model still hides</h3>
+<p>Recall the two steps of Howard policy iteration, now in RL notation:</p>
+<p><span id="eq-hpi-rl"><span class="math display">\[
+\begin{cases}
+\mathbf{v}_{\pi_{k}} &amp;= \mathbf{r}_{\pi_{k}}+\gamma\,\mathbf{P}_{\pi_{k}}\mathbf{v}_{\pi_{k}} \\[2pt]
+\boldsymbol{\pi}_{k+1} &amp;= \argmax_{\pi}\big(\mathbf{r}_{\pi}+\gamma\,\mathbf{P}_{\pi}\mathbf{v}_{\pi_{k}}\big)
+\end{cases}
+\tag{2.3}\]</span></span></p>
+<p>the first being policy evaluation (PE) and the second policy improvement (PI). Writing PI out one state at a time exposes what the improvement step is really doing:</p>
+<p><span id="eq-pi-elementwise"><span class="math display">\[
+\begin{aligned}
+\pi_{k+1}(s)
+&amp;=\argmax_{\pi}\sum_{a}\pi(a\given s)\Big[\underbrace{r(s,a)+\gamma\sum_{s'}p(s'\given s,a)\,v_{\pi_{k}}(s')}_{\defeq\ q_{\pi_{k}}(s,a)}\Big]\\
+&amp;=\argmax_{\pi}\sum_{a}\pi(a\given s)\,q_{\pi_{k}}(s,a).
+\end{aligned}
+\tag{2.4}\]</span></span></p>
+<p>So the entire algorithm reduces to one question: <strong>how do we get <span class="math inline">\(q_{\pi_{k}}(s,a)\)</span>?</strong></p>
+</section>
+<section id="two-expressions-for-the-action-value" class="level3">
+<h3 class="anchored" data-anchor-id="two-expressions-for-the-action-value">Two expressions for the action value</h3>
+<p>The action value of <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> can be written in two ways, and they are not equally demanding.</p>
+<p><span id="eq-q-model"><span class="math display">\[
+q_{\pi_{k}}(s,a)=r(s,a)+\gamma\sum_{s'}p(s'\given s,a)\,v_{\pi_{k}}(s')
+\tag{2.5}\]</span></span></p>
+<p><span id="eq-q-mc"><span class="math display">\[
+q_{\pi_{k}}(s,a)=\E_{\pi_{k}}\!\left[\sum_{t=0}^{\infty}\gamma^{t}r(s_{t},a_{t})\ \given\ s_{0}=s,\,a_{0}=a\right]
+\tag{2.6}\]</span></span></p>
+<div id="tbl-q-two-forms" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-q-two-forms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.1: The same action value, obtained from a model or from data.
+</figcaption>
+<div aria-describedby="tbl-q-two-forms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Model-based form <a href="#eq-q-model" class="quarto-xref">Equation&nbsp;<span>2.5</span></a></th>
+<th>Model-free form <a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Needs</strong></td>
+<td>the transition density <span class="math inline">\(p(s'\given s,a)\)</span> and the reward <span class="math inline">\(r(s,a)\)</span></td>
+<td>trajectories generated by <span class="math inline">\(\pi_{k}\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Computed by</strong></td>
+<td>a sum over next states</td>
+<td>an average over sampled returns</td>
+</tr>
+<tr class="odd">
+<td><strong>Available when</strong></td>
+<td>the model is known</td>
+<td>you can only interact with the environment</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The two agree, which is exactly what the derivation under <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> established. <strong>This is the whole trick</strong>: <a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> is an expectation, and Chapter 1 already showed that an expectation you cannot integrate is an expectation you can average.</p>
+</section>
+<section id="estimating-q-from-episodes" class="level3">
+<h3 class="anchored" data-anchor-id="estimating-q-from-episodes">Estimating <span class="math inline">\(q\)</span> from episodes</h3>
+<p>Concretely:</p>
+<ul>
+<li>start from <span class="math inline">\((s,a)\)</span>, follow <span class="math inline">\(\pi_{k}\)</span>, and generate an episode <span class="math inline">\(t=0,1,\dots,T\)</span>;</li>
+<li>do this <span class="math inline">\(N\)</span> times, collecting episodes <span class="math inline">\(i=1,2,\dots,N\)</span>;</li>
+<li>average the realized returns:</li>
+</ul>
+<p><span id="eq-mc-return"><span class="math display">\[
+q_{\pi_{k}}(s,a)
+=\E_{\pi_{k}}\!\left[\sum_{t=0}^{\infty}\gamma^{t}r(s_{t},a_{t})\ \given\ s_{0}=s,\,a_{0}=a\right]
+\approx\frac{1}{N}\sum_{i=1}^{N}\sum_{t=0}^{T}\gamma^{t}r\big(s_{t}^{i},a_{t}^{i}\big).
+\tag{2.7}\]</span></span></p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Two approximation errors, not one">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Two approximation errors, not one
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a> introduces two distinct sources of error:</p>
+<ol type="1">
+<li>a <strong>finite number of episodes</strong> <span class="math inline">\(N\)</span>, which is sampling error;</li>
+<li><strong>truncation</strong> of each episode at a finite horizon <span class="math inline">\(T\)</span>, which is a bias of order <span class="math inline">\(\gamma^{T}\)</span>.</li>
+</ol>
+<p>Both vanish as <span class="math inline">\(N,T\to\infty\)</span>, but they are controlled by different knobs: more episodes reduce the first, longer episodes the second.</p>
+</div>
+</div>
+<div id="fig-2-mc-errors" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-mc-errors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-mc-errors.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-mc-errors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: The two errors of <a href="#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a> die at different rates. <strong>Left:</strong> truncating each episode at <span class="math inline">\(T\)</span> leaves a deterministic bias <span class="math inline">\(\gamma^{T+1}\bar{r}/(1-\gamma)\)</span>, geometric in <span class="math inline">\(T\)</span> but with a rate set by <span class="math inline">\(\gamma\)</span>: at <span class="math inline">\(\gamma=0.9\)</span> two hundred steps buys eight digits, at <span class="math inline">\(\gamma=0.99\)</span> it buys barely one. <strong>Right:</strong> averaging <span class="math inline">\(N\)</span> episodes leaves sampling error of order <span class="math inline">\(N^{-1/2}\)</span> (dots simulated at <span class="math inline">\(\gamma=0.9\)</span>, <span class="math inline">\(T=200\)</span>; dashed line the <span class="math inline">\(-1/2\)</span> reference slope), independent of <span class="math inline">\(\gamma\)</span>. Buying a digit of accuracy costs a <em>fixed</em> number of extra steps but a <em>hundredfold</em> increase in episodes.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="the-mc-basic-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="the-mc-basic-algorithm">The MC Basic algorithm</h3>
+<p>Substituting <a href="#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a> for the evaluation step of <a href="#eq-hpi-rl" class="quarto-xref">Equation&nbsp;<span>2.3</span></a> gives the simplest model-free algorithm there is.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: MC Basic">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: MC Basic
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given an initial policy <span class="math inline">\(\pi_{0}\)</span>, at iteration <span class="math inline">\(k\)</span>, for every state <span class="math inline">\(s\in\mathcal{S}\)</span> and every action <span class="math inline">\(a\in\mathcal{A}(s)\)</span>:</p>
+<ol type="1">
+<li><p><strong>Collect</strong> sufficiently many episodes starting from <span class="math inline">\((s,a)\)</span> and following <span class="math inline">\(\pi_{k}\)</span>.</p></li>
+<li><p><strong>Policy evaluation.</strong> Estimate the action value by the average return over those episodes: <span class="math display">\[
+q_{\pi_{k}}(s,a)\approx q_{k}(s,a)=\text{average return of all collected episodes}.
+\]</span></p></li>
+<li><p><strong>Policy improvement.</strong> Act greedily with respect to the estimate: <span class="math display">\[
+a_{k}^{*}(s)=\argmax_{a}q_{k}(s,a),
+\qquad
+\pi_{k+1}(a\given s)=
+\begin{cases}
+1 &amp; \text{if } a=a_{k}^{*}(s),\\
+0 &amp; \text{otherwise.}
+\end{cases}
+\]</span></p></li>
+</ol>
+</div>
+</div>
+<p>MC Basic is policy iteration with one component swapped out:</p>
+<div id="tbl-mcbasic-hpi" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-mcbasic-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.2: MC Basic is Howard policy iteration with sample averages in place of the exact evaluation step.
+</figcaption>
+<div aria-describedby="tbl-mcbasic-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Howard policy iteration</th>
+<th>MC Basic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Evaluation</strong></td>
+<td>solve <span class="math inline">\(\mathbf{v}_{\pi_{k}}=\mathbf{r}_{\pi_{k}}+\gamma\mathbf{P}_{\pi_{k}}\mathbf{v}_{\pi_{k}}\)</span> exactly</td>
+<td>average sampled returns, <a href="#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a></td>
+</tr>
+<tr class="even">
+<td><strong>Estimates</strong></td>
+<td>state value <span class="math inline">\(v_{\pi_{k}}\)</span></td>
+<td>action value <span class="math inline">\(q_{\pi_{k}}\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Improvement</strong></td>
+<td><span class="math inline">\(\argmax_{\pi}\{\mathbf{r}_{\pi}+\gamma\mathbf{P}_{\pi}\mathbf{v}_{\pi_{k}}\}\)</span>, reads the model</td>
+<td><span class="math inline">\(\argmax_{a}q_{k}(s,a)\)</span>, reads only the estimates</td>
+</tr>
+<tr class="even">
+<td><strong>Needs the model</strong></td>
+<td>yes</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Three remarks are worth making.</p>
+<p><strong>Why action values rather than state values.</strong> Because a state value cannot be turned into a decision on its own: converting <span class="math inline">\(v\)</span> into a policy requires the model, as the improvement row of <a href="#tbl-mcbasic-hpi" class="quarto-xref">Table&nbsp;<span>2.2</span></a> shows. When the model is unavailable, estimate the object that <em>is</em> directly comparable across actions.</p>
+<p><strong>Exploration is smuggled in as an assumption.</strong> Step 1 assumes episodes can be started from <em>any</em> pair <span class="math inline">\((s,a)\)</span>, an assumption usually called <strong>exploring starts</strong>. It is doing all the work of exploration, and it is the one assumption we can actually get rid of, which the next section does.</p>
+<p><strong>Convergence.</strong> Policy iteration converges, and MC Basic is policy iteration, so MC Basic converges too, given sufficiently many episodes at every step.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>MC Basic is not a practical algorithm. It re-collects a fresh batch of episodes for <strong>every</strong> state-action pair at <strong>every</strong> iteration and throws away everything it learned from the previous batch, which makes it hopelessly sample-inefficient. Its purpose here is to isolate the one conceptual move (expectation <span class="math inline">\(\to\)</span> sample average) before the efficiency questions arrive.</p>
+</div>
+</div>
+</section>
+<section id="removing-exploring-starts-eps-greedy-policies" class="level3">
+<h3 class="anchored" data-anchor-id="removing-exploring-starts-eps-greedy-policies">Removing exploring starts: <span class="math inline">\(\eps\)</span>-greedy policies</h3>
+<p>Exploring starts is an assumption about the <em>environment</em>, and usually a false one: you rarely get to reset a system into an arbitrary state-action pair. But notice what it was for. Greedy improvement in step 3 of MC Basic produces a policy that puts probability 1 on one action, so following it never generates data about the others, and an action never tried can never be found to be good. Exploring starts patched that from outside. The alternative is to patch it from inside, by refusing to make the policy fully greedy.</p>
+<div id="def-eps-greedy" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2.2 (ε-greedy policy)</strong></span> For <span class="math inline">\(\eps\in[0,1]\)</span>, the <strong><span class="math inline">\(\eps\)</span>-greedy</strong> policy with respect to <span class="math inline">\(q\)</span> is <span class="math display">\[
+\pi(a\given s)=
+\begin{cases}
+1-\dfrac{\eps}{|\mathcal{A}(s)|}\big(|\mathcal{A}(s)|-1\big) &amp; \text{if } a=\argmax_{a'}q(s,a'),\\[8pt]
+\dfrac{\eps}{|\mathcal{A}(s)|} &amp; \text{otherwise.}
+\end{cases}
+\]</span></p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Read <a href="#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a> as: with probability <span class="math inline">\(1-\eps\)</span> act greedily, and with probability <span class="math inline">\(\eps\)</span> pick uniformly at random among <em>all</em> actions. The greedy action keeps the largest share for any <span class="math inline">\(\eps&lt;1\)</span>, so the policy still improves; but every action keeps probability at least <span class="math inline">\(\eps/|\mathcal{A}(s)|&gt;0\)</span>, so no action is ever starved of data. Setting <span class="math inline">\(\eps=0\)</span> recovers the greedy policy of MC Basic; setting <span class="math inline">\(\eps=1\)</span> gives the uniform policy.</p>
+</div>
+</div>
+<p>This is the <strong>exploitation-exploration trade-off</strong>, and <span class="math inline">\(\eps\)</span> is the dial. An <span class="math inline">\(\eps\)</span>-greedy policy is <em>soft</em>: every action has positive probability everywhere, so a single sufficiently long episode visits every <span class="math inline">\((s,a)\)</span> pair infinitely often, provided every state is reachable under <span class="math inline">\(\pi\)</span> from the start distribution and the induced chain is therefore irreducible on <span class="math inline">\(\mathcal{S}\)</span>. Exploring starts becomes unnecessary, because exploration is now a property of the policy rather than a favour asked of the environment.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nothing is free. Restricting improvement to <span class="math inline">\(\eps\)</span>-greedy policies means the algorithm converges to the best policy <em>among <span class="math inline">\(\eps\)</span>-greedy policies</em>, not to the optimal policy, and the gap grows with <span class="math inline">\(\eps\)</span>. The standard fix is to shrink <span class="math inline">\(\eps\)</span> toward zero as learning proceeds: explore aggressively while the estimates are bad, and act greedily once they are good.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="stochastic-approximation" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="stochastic-approximation"><span class="header-section-number">2.3</span> Stochastic approximation</h2>
+<p>There are two reasons to leave RL for a section and study stochastic approximation on its own terms.</p>
+<ol type="1">
+<li>It is the essential preliminary for <strong>temporal-difference learning</strong>, and so the bridge from Monte Carlo RL to TD, the update Chapter 1 introduced as <a href="01-notes.html#eq-td0" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> without justifying it.</li>
+<li>It has many applications in economics beyond RL.</li>
+</ol>
+<section id="motivating-example-mean-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="motivating-example-mean-estimation">Motivating example: mean estimation</h3>
+<p>Return to the plainest possible version of the problem. Given a random variable <span class="math inline">\(X\)</span> and iid samples <span class="math inline">\(\{x_{i}\}_{i=1}^{N}\)</span>, estimate <span class="math inline">\(\E[X]\)</span> by</p>
+<p><span class="math display">\[
+\E[X]\approx\bar{x}=\frac{1}{N}\sum_{i=1}^{N}x_{i},
+\qquad
+\lim_{N\to\infty}\bar{x}=\E[X].
+\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Why so much attention to a sample mean?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Why so much attention to a sample mean?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Because in RL almost everything is an expectation. Action values are expectations, <a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a>. Policy gradients are expectations. Every algorithm in this book is, underneath, a way of estimating a mean under awkward conditions.</p>
+</div>
+</div>
+<p>The interesting question is not <em>what</em> <span class="math inline">\(\bar{x}\)</span> is but <em>how</em> to compute it.</p>
+<ol type="1">
+<li><strong>Batch.</strong> Collect all samples, then average. The drawback: if samples arrive one at a time over a period, nothing can be reported until the last one lands.</li>
+<li><strong>Incremental.</strong> Update the estimate as each sample arrives.</li>
+</ol>
+<p>Let <span class="math inline">\(w_{k+1}\)</span> denote the average of the first <span class="math inline">\(k\)</span> samples,</p>
+<p><span class="math display">\[
+w_{k+1}=\frac{1}{k}\sum_{i=1}^{k}x_{i},\qquad k=1,2,\dots
+\]</span></p>
+<p>so that <span class="math inline">\(w_{k}=\frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}\)</span>. Then the incremental form follows from algebra alone.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: the incremental mean">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Derivation: the incremental mean
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math display">\[
+\begin{aligned}
+w_{k+1}&amp;=\frac{1}{k}\sum_{i=1}^{k}x_{i}\\
+&amp;=\frac{1}{k}\left(\sum_{i=1}^{k-1}x_{i}+x_{k}\right)\\
+&amp;=\frac{1}{k}\big[(k-1)w_{k}+x_{k}\big]\\
+&amp;=w_{k}+\frac{1}{k}(x_{k}-w_{k}).
+\end{aligned}
+\]</span></p>
+</div>
+</div>
+</div>
+<p><span id="eq-mean-incremental"><span class="math display">\[
+w_{k+1}=w_{k}-\frac{1}{k}\,(w_{k}-x_{k}).
+\tag{2.8}\]</span></span></p>
+<div class="callout callout-style-default callout-note callout-titled" title="Indexing">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Indexing
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a> is <a href="01-notes.html#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> from Chapter 1 with the index shifted: here <span class="math inline">\(w_{k+1}\)</span> is the mean of the first <span class="math inline">\(k\)</span> samples, there <span class="math inline">\(\bar{x}_{k}\)</span> is. The recursion is the same; only the label on the counter moved. This chapter uses the <span class="math inline">\(w\)</span> convention because it is the one the stochastic-approximation literature writes the Robbins-Monro algorithm in.</p>
+</div>
+</div>
+<p>Now generalize by replacing the step <span class="math inline">\(\tfrac{1}{k}\)</span> with an arbitrary positive <span class="math inline">\(\alpha_{k}\)</span>:</p>
+<p><span id="eq-mean-general"><span class="math display">\[
+w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}).
+\tag{2.9}\]</span></span></p>
+<p>This still converges to <span class="math inline">\(\E[X]\)</span> under mild conditions on <span class="math inline">\(\{\alpha_{k}\}\)</span>. Those conditions are the subject of the rest of this section: <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> is a special case of the Robbins-Monro algorithm.</p>
+</section>
+<section id="the-robbins-monro-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="the-robbins-monro-algorithm">The Robbins-Monro algorithm</h3>
+<p><strong>Stochastic approximation (SA)</strong> refers to a broad class of stochastic iterative algorithms for root-finding or optimization. What makes it powerful, relative to gradient-based methods, is that it requires knowing <strong>neither the expression of the objective function nor its derivative</strong>. The <strong>Robbins-Monro (RM)</strong> algorithm is the pioneering work in the field; stochastic gradient descent is a special case of it, and it is what explains why <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> works.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Preliminary: the gradient">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Preliminary: the gradient
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a scalar function <span class="math inline">\(J(w)\)</span> with <span class="math inline">\(w=(w_{1},\dots,w_{m})\in\R^{m}\)</span>, the gradient is the column vector <span class="math display">\[
+\nabla_{w}J(w)=
+\begin{bmatrix}
+\partial J(w)/\partial w_{1}\\
+\partial J(w)/\partial w_{2}\\
+\vdots\\
+\partial J(w)/\partial w_{m}
+\end{bmatrix}.
+\]</span></p>
+</div>
+</div>
+<p><strong>Problem statement.</strong> Find the root of</p>
+<p><span class="math display">\[
+g(w)=0,
+\]</span></p>
+<p>where <span class="math inline">\(w\in\R\)</span> is the variable to be solved for and <span class="math inline">\(g:\R\to\R\)</span>.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="On dimension">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>On dimension
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The theorem and proof below are stated for <strong>scalar</strong> <span class="math inline">\(w\)</span>, because the proof’s mean value theorem step needs a single intermediate point and that is a one-dimensional fact. Everything survives in <span class="math inline">\(\R^{m}\)</span> with two substitutions: replace the mean value theorem by the integral form <span class="math inline">\(g(w_{k})-g(w^{*})=\big[\int_{0}^{1}\nabla_{w}g\big(w^{*}+\tau\Delta_{k}\big)\,d\tau\big]\Delta_{k}\)</span>, and replace condition 1 by a uniform spectral bound <span class="math inline">\(0&lt;c_{1}I\preceq\nabla_{w}g(w)\preceq c_{2}I\)</span> on the Jacobian. The vector case is what Chapters 3 and 4 actually use, since there <span class="math inline">\(w\)</span> and <span class="math inline">\(\theta\)</span> are parameter vectors.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Root-finding is less special than it looks. If <span class="math inline">\(J(w)\)</span> is an objective to be minimized, its first-order condition <span class="math inline">\(g(w)=\nabla_{w}J(w)=0\)</span> is a root-finding problem. Optimization is root-finding on the gradient.</p>
+</div>
+</div>
+<p>How to solve <span class="math inline">\(g(w)=0\)</span> splits along the same line as everything else in this chapter:</p>
+<ul>
+<li><strong>Model-based.</strong> If the expression of <span class="math inline">\(g\)</span> is known, standard numerical algorithms apply.</li>
+<li><strong>Model-free.</strong> What if the expression of <span class="math inline">\(g\)</span> is unknown, and all we obtain are <em>noisy observations</em> of its values?</li>
+</ul>
+<p>RM solves the second case:</p>
+<p><span id="eq-rm"><span class="math display">\[
+w_{k+1}=w_{k}-\alpha_{k}\,\tilde{g}(w_{k},\eta_{k}),
+\tag{2.10}\]</span></span></p>
+<p>where <span class="math inline">\(w_{k}\)</span> is the <span class="math inline">\(k\)</span>-th estimate of the root, <span class="math inline">\(\tilde{g}(w_{k},\eta_{k})=g(w_{k})+\eta_{k}\)</span> is the <span class="math inline">\(k\)</span>-th noisy observation, and <span class="math inline">\(\alpha_{k}&gt;0\)</span> is the step size.</p>
+<div id="thm-robbins-monro" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.1 (Robbins-Monro)</strong></span> In the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a>, suppose</p>
+<ol type="1">
+<li><span class="math inline">\(0&lt;c_{1}\leq\nabla_{w}g(w)\leq c_{2}\)</span> for all <span class="math inline">\(w\)</span>;</li>
+<li><span class="math inline">\(\sum_{k=1}^{\infty}\alpha_{k}=\infty\)</span> and <span class="math inline">\(\sum_{k=1}^{\infty}\alpha_{k}^{2}&lt;\infty\)</span>;</li>
+<li><span class="math inline">\(\E[\eta_{k}\given\mathcal{H}_{k}]=0\)</span> and <span class="math inline">\(\E[\eta_{k}^{2}\given\mathcal{H}_{k}]\leq C\)</span> almost surely, for a constant <span class="math inline">\(C\)</span> not depending on <span class="math inline">\(k\)</span>,</li>
+</ol>
+<p>where <span class="math inline">\(\mathcal{H}_{k}=\{w_{k},w_{k-1},\dots\}\)</span>. Then <span class="math inline">\(w_{k}\)</span> converges with probability 1 to the root <span class="math inline">\(w^{*}\)</span> satisfying <span class="math inline">\(g(w^{*})=0\)</span>.</p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Reading the three conditions">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Reading the three conditions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Each condition rules out one way the iteration could fail.</p>
+<ol type="1">
+<li><strong><span class="math inline">\(g\)</span> is increasing and well-conditioned.</strong> The lower bound <span class="math inline">\(c_{1}&gt;0\)</span> makes the root unique and guarantees the update always points toward it; the upper bound <span class="math inline">\(c_{2}\)</span> stops the steps from overshooting arbitrarily far.</li>
+<li><strong>The steps are large enough in total, small enough individually.</strong> <span class="math inline">\(\sum\alpha_{k}=\infty\)</span> means the iteration can still travel an unbounded distance and so cannot stall short of the root no matter where it starts. <span class="math inline">\(\sum\alpha_{k}^{2}&lt;\infty\)</span> means <span class="math inline">\(\alpha_{k}\to0\)</span> fast enough that the accumulated noise stays finite and the estimate settles. The canonical choice <span class="math inline">\(\alpha_{k}=1/k\)</span> satisfies both, which is exactly the step in <a href="#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a>.</li>
+<li><strong>The noise is zero-mean with finite variance.</strong> Unbiased observations, so errors cancel rather than accumulate into a drift.</li>
+</ol>
+<p>This is the theorem Chapter 1 gestured at when it noted that a <em>constant</em> <span class="math inline">\(\alpha\)</span> violates condition 2: <span class="math inline">\(\sum\alpha=\infty\)</span> holds but <span class="math inline">\(\sum\alpha^{2}=\infty\)</span> too, so the estimate never settles and instead fluctuates around the truth. That is a price paid deliberately, in exchange for the ability to track a moving target.</p>
+</div>
+</div>
+</section>
+<section id="why-the-robbins-monro-theorem-is-true" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-robbins-monro-theorem-is-true">Why the Robbins-Monro theorem is true</h3>
+<p><a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> is usually quoted and not proved. It is worth proving, because the argument is short once the right tool is in hand, and because that same tool proves every convergence result in the next chapter.</p>
+<p>The tool is a classical result of Dvoretzky on stochastic processes of a particular shape.</p>
+<div id="thm-dvoretzky" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2.2 (Dvoretzky)</strong></span> Consider the stochastic process <span id="eq-dvoretzky"><span class="math display">\[
+\Delta_{k+1}=(1-\alpha_{k})\Delta_{k}+\beta_{k}\eta_{k},
+\tag{2.11}\]</span></span> where <span class="math inline">\(\{\alpha_{k}\},\{\beta_{k}\},\{\eta_{k}\}\)</span> are stochastic sequences with <span class="math inline">\(\alpha_{k}\geq0\)</span> and <span class="math inline">\(\beta_{k}\geq0\)</span>. Then <span class="math inline">\(\Delta_{k}\)</span> converges to zero almost surely if</p>
+<ol type="1">
+<li><span class="math inline">\(\sum_{k}\alpha_{k}=\infty\)</span>, <span class="math inline">\(\sum_{k}\alpha_{k}^{2}&lt;\infty\)</span>, and <span class="math inline">\(\sum_{k}\beta_{k}^{2}&lt;\infty\)</span> uniformly almost surely;</li>
+<li><span class="math inline">\(\E[\eta_{k}\given\mathcal{H}_{k}]=0\)</span> and <span class="math inline">\(\E[\eta_{k}^{2}\given\mathcal{H}_{k}]\leq C\)</span> almost surely,</li>
+</ol>
+<p>where <span class="math inline">\(\mathcal{H}_{k}=\{\Delta_{k},\Delta_{k-1},\dots,\eta_{k-1},\dots,\alpha_{k-1},\dots,\beta_{k-1},\dots\}\)</span> is the history.</p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Read <a href="#eq-dvoretzky" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> as a tug of war. The factor <span class="math inline">\((1-\alpha_{k})\)</span> contracts the error toward zero; the term <span class="math inline">\(\beta_{k}\eta_{k}\)</span> kicks it away at random. Condition 1 says the contraction wins: <span class="math inline">\(\sum\alpha_{k}=\infty\)</span> makes the pulling relentless, while <span class="math inline">\(\sum\alpha_{k}^{2},\sum\beta_{k}^{2}&lt;\infty\)</span> make the accumulated kicking finite. Condition 2 says the kicks are unbiased with bounded variance, so they cancel rather than drift.</p>
+<p>Two things separate <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> from the naive argument. First, <span class="math inline">\(\alpha_{k}\)</span> and <span class="math inline">\(\beta_{k}\)</span> are allowed to be <strong>random</strong>, and to depend on the history: that is exactly what is needed below, where the effective step size turns out to depend on the current iterate. Second, the conclusion is almost-sure convergence, not convergence in mean. The proof of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> itself rests on convergence results for quasimartingales and is not reproduced here; the RM theorem is a corollary of it, and that corollary is the part worth seeing.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof of the Robbins-Monro theorem">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof of the Robbins-Monro theorem
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Let <span class="math inline">\(w^{*}\)</span> be the root, so <span class="math inline">\(g(w^{*})=0\)</span>, and write the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> with the noisy observation expanded: <span class="math display">\[
+w_{k+1}=w_{k}-\alpha_{k}\tilde{g}(w_{k},\eta_{k})=w_{k}-\alpha_{k}\big[g(w_{k})+\eta_{k}\big].
+\]</span> Subtract <span class="math inline">\(w^{*}\)</span> from both sides and insert <span class="math inline">\(g(w^{*})=0\)</span> for free: <span class="math display">\[
+w_{k+1}-w^{*}=w_{k}-w^{*}-\alpha_{k}\big[g(w_{k})-g(w^{*})+\eta_{k}\big].
+\]</span> By the mean value theorem there is a <span class="math inline">\(w_{k}'\)</span> between <span class="math inline">\(w_{k}\)</span> and <span class="math inline">\(w^{*}\)</span> with <span class="math display">\[
+g(w_{k})-g(w^{*})=\nabla_{w}g(w_{k}')\,(w_{k}-w^{*}).
+\]</span> Writing <span class="math inline">\(\Delta_{k}\defeq w_{k}-w^{*}\)</span> for the error and substituting, <span class="math display">\[
+\begin{aligned}
+\Delta_{k+1}&amp;=\Delta_{k}-\alpha_{k}\big[\nabla_{w}g(w_{k}')\Delta_{k}+\eta_{k}\big]\\
+&amp;=\Big[1-\underbrace{\alpha_{k}\nabla_{w}g(w_{k}')}_{\defeq\,\bar{\alpha}_{k}}\Big]\Delta_{k}+\underbrace{\alpha_{k}}_{\beta_{k}}(-\eta_{k}),
+\end{aligned}
+\]</span> which is precisely <a href="#eq-dvoretzky" class="quarto-xref">Equation&nbsp;<span>2.11</span></a>. It remains to check its two conditions.</p>
+<p><strong>Condition 1.</strong> By hypothesis 1 of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>, <span class="math inline">\(0&lt;c_{1}\leq\nabla_{w}g(w)\leq c_{2}\)</span> for every <span class="math inline">\(w\)</span>, so the effective step is sandwiched: <span class="math display">\[
+c_{1}\alpha_{k}\leq\bar{\alpha}_{k}\leq c_{2}\alpha_{k}.
+\]</span> Hypothesis 2 gives <span class="math inline">\(\sum_{k}\alpha_{k}=\infty\)</span> and <span class="math inline">\(\sum_{k}\alpha_{k}^{2}&lt;\infty\)</span>; the sandwich transfers both to <span class="math inline">\(\bar{\alpha}_{k}\)</span>, since <span class="math inline">\(\sum\bar{\alpha}_{k}\geq c_{1}\sum\alpha_{k}=\infty\)</span> and <span class="math inline">\(\sum\bar{\alpha}_{k}^{2}\leq c_{2}^{2}\sum\alpha_{k}^{2}&lt;\infty\)</span>. And <span class="math inline">\(\sum_{k}\beta_{k}^{2}=\sum_{k}\alpha_{k}^{2}&lt;\infty\)</span>.</p>
+<p><strong>Condition 2.</strong> Hypothesis 3 gives <span class="math inline">\(\E[\eta_{k}\given\mathcal{H}_{k}]=0\)</span> and the uniform bound <span class="math inline">\(\E[\eta_{k}^{2}\given\mathcal{H}_{k}]\leq C\)</span>, which is what <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> asks for; pointwise finiteness at each <span class="math inline">\(k\)</span> would not be enough, since the constant must not drift with <span class="math inline">\(k\)</span>. Negating <span class="math inline">\(\eta_{k}\)</span> changes neither.</p>
+<p>Both conditions hold, so <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> gives <span class="math inline">\(\Delta_{k}\to0\)</span> almost surely, that is <span class="math inline">\(w_{k}\to w^{*}\)</span>. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice where hypothesis 1 of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> was spent. The lower bound <span class="math inline">\(c_{1}&gt;0\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}=\infty\)</span> from collapsing, which is what stops the iteration stalling at a point where <span class="math inline">\(g\)</span> has gone flat; the upper bound <span class="math inline">\(c_{2}\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}^{2}\)</span> finite, which is what stops a steep <span class="math inline">\(g\)</span> from turning a small step into a large jump. The condition is not a technicality but the precise statement that <span class="math inline">\(g\)</span> is neither too flat nor too steep anywhere.</p>
+<p>Notice also that <span class="math inline">\(\bar{\alpha}_{k}\)</span> depends on <span class="math inline">\(w_{k}'\)</span>, hence on the iterate, hence on the history. A version of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> requiring deterministic step sizes would not close this argument.</p>
+</div>
+</div>
+</section>
+<section id="mean-estimation-is-robbins-monro" class="level3">
+<h3 class="anchored" data-anchor-id="mean-estimation-is-robbins-monro">Mean estimation is Robbins-Monro</h3>
+<p>The claim that <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> converges now follows from <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> in three steps.</p>
+<ol type="1">
+<li><p><strong>Write mean estimation as root-finding.</strong> Define <span class="math display">\[
+g(w)=w-\E[X],
+\]</span> whose root is <span class="math inline">\(w^{*}=\E[X]\)</span>. Note we do <em>not</em> know the expression of <span class="math inline">\(g\)</span>: it contains the very quantity we are trying to estimate.</p></li>
+<li><p><strong>Identify the noisy observation.</strong> With a sample <span class="math inline">\(x\)</span> in hand we can evaluate <span class="math display">\[
+\tilde{g}(w,x)=w-x,
+\]</span> which is exactly <span class="math inline">\(g\)</span> plus zero-mean noise: <span class="math display">\[
+\begin{aligned}
+\tilde{g}(w,x)&amp;=w-x\\
+&amp;=w-x+\E[X]-\E[X]\\
+&amp;=\underbrace{\big(w-\E[X]\big)}_{g(w)}+\underbrace{\big(\E[X]-x\big)}_{\eta}.
+\end{aligned}
+\]</span></p></li>
+<li><p><strong>Apply RM.</strong> Substituting into <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a>, <span class="math display">\[
+w_{k+1}=w_{k}-\alpha_{k}\,\tilde{g}(w_{k},x_{k})=w_{k}-\alpha_{k}(w_{k}-x_{k}),
+\]</span> which is precisely <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a>. Its convergence is therefore not a separate fact to be proved but a corollary of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>.</p></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Check the hypotheses hold here: <span class="math inline">\(\nabla_{w}g(w)=1\)</span>, so condition 1 is satisfied with <span class="math inline">\(c_{1}=c_{2}=1\)</span>; and <span class="math inline">\(\eta=\E[X]-x\)</span> has mean zero by construction, so condition 3 holds whenever <span class="math inline">\(X\)</span> has finite variance. Only condition 2 constrains the algorithm, and it is a constraint on the step sizes we choose, not on the problem.</p>
+</div>
+</div>
+<p>Since condition 2 is the only one with any bite here, it is worth seeing what it does.</p>
+<div id="fig-2-step-size" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-step-size-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/02-step-size.svg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-step-size-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: The recursion <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> run on one shared stream of draws <span class="math inline">\(x_{k}\sim N(1,1)\)</span> from the same starting point <span class="math inline">\(w_{1}=5\)</span>, under three step-size rules. With <span class="math inline">\(\alpha_{k}=1/k\)</span> (thick) both parts of condition 2 hold and the path settles onto <span class="math inline">\(\E[X]\)</span>. With a <strong>constant</strong> <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\sum_{k}\alpha_{k}^{2}=\infty\)</span>, so the path never settles: it keeps fluctuating inside a band of width <span class="math inline">\(\sigma\sqrt{\alpha/(2-\alpha)}\)</span> (shaded), wider for larger <span class="math inline">\(\alpha\)</span>. The bargain of a constant step, exactly as described in Chapter 1: the estimate gives up convergence to a point in exchange for never going deaf.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="stochastic-gradient-descent" class="level3">
+<h3 class="anchored" data-anchor-id="stochastic-gradient-descent">Stochastic gradient descent</h3>
+<p>The same argument, applied to a gradient instead of to a residual, produces the workhorse of everything that follows. Suppose we want to minimize</p>
+<p><span id="eq-sgd-objective"><span class="math display">\[
+J(w)=\E\big[f(w,X)\big]
+\tag{2.12}\]</span></span></p>
+<p>over <span class="math inline">\(w\)</span>, where the expectation is over a random variable <span class="math inline">\(X\)</span> we can sample but whose distribution we do not know. There are three ways to descend.</p>
+<div id="tbl-gd-variants" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-gd-variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.3: Three ways down the same objective <a href="#eq-sgd-objective" class="quarto-xref">Equation&nbsp;<span>2.12</span></a>. Only the last is usable when samples arrive one at a time and the distribution is unknown.
+</figcaption>
+<div aria-describedby="tbl-gd-variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Update</th>
+<th>Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Gradient descent</strong></td>
+<td><span class="math inline">\(w_{k+1}=w_{k}-\alpha_{k}\,\E[\nabla_{w}f(w_{k},X)]\)</span></td>
+<td>the distribution of <span class="math inline">\(X\)</span>, to take the expectation</td>
+</tr>
+<tr class="even">
+<td><strong>Batch gradient descent</strong></td>
+<td><span class="math inline">\(w_{k+1}=w_{k}-\alpha_{k}\,\frac{1}{n}\sum_{i=1}^{n}\nabla_{w}f(w_{k},x_{i})\)</span></td>
+<td><span class="math inline">\(n\)</span> samples per step</td>
+</tr>
+<tr class="odd">
+<td><strong>Stochastic gradient descent</strong></td>
+<td><span class="math inline">\(w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k})\)</span></td>
+<td>one sample per step</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The last row is <strong>stochastic gradient descent (SGD)</strong>:</p>
+<p><span id="eq-sgd"><span class="math display">\[
+w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k}).
+\tag{2.13}\]</span></span></p>
+<p>It replaces the true gradient by a <em>single-sample</em> estimate of it, which is a wildly noisy substitute. That it works at all is <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: SGD is Robbins-Monro on the first-order condition">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Derivation: SGD is Robbins-Monro on the first-order condition
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Minimizing <a href="#eq-sgd-objective" class="quarto-xref">Equation&nbsp;<span>2.12</span></a> means solving its first-order condition, which is a root-finding problem in the sense of the previous section: <span class="math display">\[
+g(w)\defeq\nabla_{w}J(w)=\E\big[\nabla_{w}f(w,X)\big]=0 ,
+\]</span> where the interchange of <span class="math inline">\(\nabla_{w}\)</span> and <span class="math inline">\(\E\)</span> assumes <span class="math inline">\(f(\cdot,x)\)</span> is differentiable and that <span class="math inline">\(\|\nabla_{w}f(w,X)\|\)</span> is dominated near <span class="math inline">\(w\)</span> by an integrable envelope, so dominated convergence applies to the difference quotients. We cannot evaluate <span class="math inline">\(g\)</span>, since it is an expectation over an unknown distribution. But with a sample <span class="math inline">\(x\)</span> in hand we can evaluate <span class="math inline">\(\nabla_{w}f(w,x)\)</span>, and it is <span class="math inline">\(g\)</span> plus zero-mean noise: <span class="math display">\[
+\tilde{g}(w,x)=\nabla_{w}f(w,x)
+=\underbrace{\E\big[\nabla_{w}f(w,X)\big]}_{g(w)}
++\underbrace{\Big(\nabla_{w}f(w,x)-\E\big[\nabla_{w}f(w,X)\big]\Big)}_{\eta} .
+\]</span> Substituting into the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> gives exactly <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a>. So SGD is not a separate algorithm with its own theory: it is RM applied to a gradient, and its convergence conditions are the three of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>, read on <span class="math inline">\(g=\nabla_{w}J\)</span>.</p>
+</div>
+</div>
+</div>
+<p>The circle closes on the example this section started from.</p>
+<div id="exm-mean-sgd" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2.1 (Mean estimation is SGD)</strong></span> Take <span class="math inline">\(f(w,x)=\tfrac{1}{2}|w-x|^{2}\)</span>, so that <span class="math inline">\(J(w)=\tfrac{1}{2}\E|w-X|^{2}\)</span> is minimized at <span class="math inline">\(w^{*}=\E[X]\)</span>. Then <span class="math inline">\(\nabla_{w}f(w,x)=w-x\)</span>, and <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> reads <span class="math display">\[
+w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}),
+\]</span> which is <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> once more. Mean estimation is a special case of SGD, which is a special case of Robbins-Monro. All three are the same recursion seen at three levels of generality.</p>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> is the engine of the rest of the book. Chapter 3 uses it to fit a parametric value function <span class="math inline">\(\hat{v}(s,w)\)</span> by descending the squared error, which is what turns tabular TD learning into TD learning with function approximation. Chapter 4 runs it in the other direction, as stochastic gradient <em>ascent</em> on the value of a parameterized policy, which is what policy gradient methods are.</p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01-notes.html" class="pagination-link" aria-label="The Basic Idea of RL, and Its Link to Dynamic Programming">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Basic Idea of RL, and Its Link to Dynamic Programming</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03-notes.html" class="pagination-link" aria-label="Temporal Difference Learning, Sarsa, and Q-learning">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes based on Ben Moll’s reinforcement learning lectures, themselves adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>; all rights in those original materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

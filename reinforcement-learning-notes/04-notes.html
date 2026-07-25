@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+
+<title>4&nbsp; Policy Gradient and Actor-Critic Methods – Reinforcement Learning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-notes.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./04-notes.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Reinforcement Learning</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Basic Idea of RL, and Its Link to Dynamic Programming</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Monte Carlo Methods and Stochastic Approximation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-notes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#from-value-based-to-policy-based-methods" id="toc-from-value-based-to-policy-based-methods" class="nav-link active" data-scroll-target="#from-value-based-to-policy-based-methods"><span class="header-section-number">4.1</span> From value-based to policy-based methods</a>
+  <ul class="collapse">
+  <li><a href="#why-the-shift" id="toc-why-the-shift" class="nav-link" data-scroll-target="#why-the-shift">Why the shift</a></li>
+  <li><a href="#policies-as-tables-policies-as-functions" id="toc-policies-as-tables-policies-as-functions" class="nav-link" data-scroll-target="#policies-as-tables-policies-as-functions">Policies as tables, policies as functions</a></li>
+  </ul></li>
+  <li><a href="#setting-up-the-optimization" id="toc-setting-up-the-optimization" class="nav-link" data-scroll-target="#setting-up-the-optimization"><span class="header-section-number">4.2</span> Setting up the optimization</a>
+  <ul class="collapse">
+  <li><a href="#problem-1-v_pi-is-not-a-scalar" id="toc-problem-1-v_pi-is-not-a-scalar" class="nav-link" data-scroll-target="#problem-1-v_pi-is-not-a-scalar">Problem 1: <span class="math inline">\(v_{\pi}\)</span> is not a scalar</a></li>
+  <li><a href="#problem-2-the-model-reappears" id="toc-problem-2-the-model-reappears" class="nav-link" data-scroll-target="#problem-2-the-model-reappears">Problem 2: the model reappears</a></li>
+  </ul></li>
+  <li><a href="#the-deterministic-policy-gradient-theorem" id="toc-the-deterministic-policy-gradient-theorem" class="nav-link" data-scroll-target="#the-deterministic-policy-gradient-theorem"><span class="header-section-number">4.3</span> The deterministic policy gradient theorem</a></li>
+  <li><a href="#the-stochastic-policy-gradient-theorem" id="toc-the-stochastic-policy-gradient-theorem" class="nav-link" data-scroll-target="#the-stochastic-policy-gradient-theorem"><span class="header-section-number">4.4</span> The stochastic policy gradient theorem</a>
+  <ul class="collapse">
+  <li><a href="#why-the-log-trick-is-the-whole-point" id="toc-why-the-log-trick-is-the-whole-point" class="nav-link" data-scroll-target="#why-the-log-trick-is-the-whole-point">Why the log trick is the whole point</a></li>
+  <li><a href="#comparing-the-two-theorems" id="toc-comparing-the-two-theorems" class="nav-link" data-scroll-target="#comparing-the-two-theorems">Comparing the two theorems</a></li>
+  </ul></li>
+  <li><a href="#reinforce" id="toc-reinforce" class="nav-link" data-scroll-target="#reinforce"><span class="header-section-number">4.5</span> REINFORCE</a>
+  <ul class="collapse">
+  <li><a href="#a-clarification-about-the-pseudocode" id="toc-a-clarification-about-the-pseudocode" class="nav-link" data-scroll-target="#a-clarification-about-the-pseudocode">A clarification about the pseudocode</a></li>
+  </ul></li>
+  <li><a href="#the-discounted-state-visitation-distribution" id="toc-the-discounted-state-visitation-distribution" class="nav-link" data-scroll-target="#the-discounted-state-visitation-distribution"><span class="header-section-number">4.6</span> The discounted state visitation distribution</a>
+  <ul class="collapse">
+  <li><a href="#the-simple-expectation-form" id="toc-the-simple-expectation-form" class="nav-link" data-scroll-target="#the-simple-expectation-form">The simple expectation form</a></li>
+  </ul></li>
+  <li><a href="#actor-critic-methods" id="toc-actor-critic-methods" class="nav-link" data-scroll-target="#actor-critic-methods"><span class="header-section-number">4.7</span> Actor-critic methods</a>
+  <ul class="collapse">
+  <li><a href="#what-actor-and-critic-mean" id="toc-what-actor-and-critic-mean" class="nav-link" data-scroll-target="#what-actor-and-critic-mean">What actor and critic mean</a></li>
+  <li><a href="#which-critic" id="toc-which-critic" class="nav-link" data-scroll-target="#which-critic">Which critic</a></li>
+  <li><a href="#the-qac-algorithm" id="toc-the-qac-algorithm" class="nav-link" data-scroll-target="#the-qac-algorithm">The QAC algorithm</a></li>
+  </ul></li>
+  <li><a href="#closing-what-the-four-chapters-did" id="toc-closing-what-the-four-chapters-did" class="nav-link" data-scroll-target="#closing-what-the-four-chapters-did"><span class="header-section-number">4.8</span> Closing: what the four chapters did</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="mathdefs">
+<p><span class="math display">\[
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\BR}{\operatorname{BR}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,\vert\,}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sm}{\setminus}
+\newcommand{\defeq}{\equiv}
+\]</span></p>
+</div>
+<p>Every algorithm so far has parameterized a <strong>value</strong> and read a policy off it. Chapter 3 ended by replacing the table of values with a function <span class="math inline">\(\hat{v}(s,w)\)</span> or <span class="math inline">\(\hat{q}(s,a,w)\)</span>, but the decision rule was still whatever <span class="math inline">\(\argmax_{a}\hat{q}(s,a,w)\)</span> happened to be. This chapter parameterizes the <strong>policy</strong> itself, <span class="math inline">\(\pi(a\given s,\theta)\)</span>, and pushes <span class="math inline">\(\theta\)</span> uphill on the value it delivers. That is a different kind of algorithm: the object being learned is the thing you act with, not an intermediate quantity you act on. It is also the family used to post-train large language models, which is the main reason it matters outside a lecture room.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Source:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ben Moll’s <a href="https://benjaminmoll.com/lectures/">RL lecture slides</a>, Lecture 4.</p>
+</div>
+</div>
+<section id="from-value-based-to-policy-based-methods" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="from-value-based-to-policy-based-methods"><span class="header-section-number">4.1</span> From value-based to policy-based methods</h2>
+<section id="why-the-shift" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-shift">Why the shift</h3>
+<p>Chapters 1 to 3 are all <strong>value-based</strong>. They estimate <span class="math inline">\(v_{\pi}\)</span> or <span class="math inline">\(q_{\pi}\)</span>, and the policy is a by-product: greedy or <span class="math inline">\(\eps\)</span>-greedy with respect to the estimate, as in <a href="02-notes.html#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a>. Policy gradient methods are <strong>policy-based</strong>. They write down a family of policies indexed by <span class="math inline">\(\theta\)</span>, define a scalar measure of how good a policy is, and do gradient ascent on it. In the language of Chapter 1, this is a different way of doing step 2 of Howard policy iteration, the improvement step: instead of re-solving an <span class="math inline">\(\argmax\)</span> from scratch each round, nudge the current policy in the direction that raises value. Step 1, policy evaluation, is still done by estimating an action-value function, so nothing from Chapters 2 and 3 is thrown away. It gets repurposed.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Why these are the methods people actually run">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why these are the methods people actually run
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Policy gradient methods dominate practice, and most visibly in the post-training of large language models: <strong>reinforcement learning from human feedback</strong> (RLHF) and <strong>reinforcement learning with verifiable rewards</strong> (RLVR), the recipe behind reasoning models, are both policy gradient. The reason is structural. A language model <em>is</em> already a parameterized stochastic policy: given a context <span class="math inline">\(s\)</span>, it emits a distribution over next tokens <span class="math inline">\(a\)</span>. There is no table of <span class="math inline">\(q\)</span>-values to take an <span class="math inline">\(\argmax\)</span> over, and no sensible way to build one. What there is, is a differentiable <span class="math inline">\(\pi(a\given s,\theta)\)</span> with billions of parameters and a reward signal at the end of a generated sequence. That is exactly the setting the theorems below are written for. The standard workhorse algorithm, <strong>proximal policy optimization</strong> (PPO), is a refinement of the plain gradient step derived in this chapter.</p>
+</div>
+</div>
+</section>
+<section id="policies-as-tables-policies-as-functions" class="level3">
+<h3 class="anchored" data-anchor-id="policies-as-tables-policies-as-functions">Policies as tables, policies as functions</h3>
+<p>Until now a policy has been a <strong>table</strong>. With nine states and five actions it is a <span class="math inline">\(9\times5\)</span> grid whose <span class="math inline">\((s,a)\)</span> cell holds <span class="math inline">\(\pi(a\given s)\)</span>, one number per state-action pair, read by lookup and written by assignment.</p>
+<p>Replace it with a parameterized function</p>
+<p><span id="eq-policy-fa"><span class="math display">\[
+\pi(a\given s,\theta),\qquad \theta\in\R^{m},
+\tag{4.1}\]</span></span></p>
+<p>where <span class="math inline">\(\theta\)</span> might be the weights of a neural network whose input is <span class="math inline">\(s\)</span> and whose outputs are the probabilities of each action. This is the same move Chapter 3 made for values in <a href="03-notes.html#eq-fa" class="quarto-xref">Equation&nbsp;<span>3.11</span></a>, and it buys the same two things for the same two reasons:</p>
+<ol type="1">
+<li><strong>Storage.</strong> The table has <span class="math inline">\(|\mathcal{S}|\times|\mathcal{A}|\)</span> entries. The function has <span class="math inline">\(m\)</span> parameters, and <span class="math inline">\(m\)</span> can be far smaller.</li>
+<li><strong>Generalization.</strong> Changing one cell of a table changes the policy at one state. Changing <span class="math inline">\(\theta\)</span> moves <span class="math inline">\(\pi\)</span> at many states at once, so experience at <span class="math inline">\(s\)</span> informs behaviour at states never visited.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The parallel with <a href="03-notes.html#eq-fa" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> is exact, and it is worth being precise about what is <em>not</em> parallel. <a href="03-notes.html#eq-fa" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> approximates a function, <span class="math inline">\(v_{\pi}\)</span>, that exists independently of the approximation: there is a true <span class="math inline">\(v_{\pi}\)</span> and <span class="math inline">\(\hat{v}(s,w)\)</span> is a fit to it. <a href="#eq-policy-fa" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> is not a fit to anything. There is no “true <span class="math inline">\(\pi\)</span>” being approximated; the parameterized family simply <em>is</em> the set of policies under consideration, and the optimum is the best member of that family. Function approximation for values introduces approximation error. Policy parameterization introduces a restricted feasible set.</p>
+</div>
+</div>
+<p>Notation varies: <span class="math inline">\(\pi(a\given s,\theta)\)</span>, <span class="math inline">\(\pi(a,s,\theta)\)</span>, and <span class="math inline">\(\pi_{\theta}(a\given s)\)</span> all appear in the literature and all mean the same object. This chapter uses the first. For the deterministic case of the next section the policy returns an action rather than a distribution, and is written <span class="math inline">\(a=\pi(s,\theta)\)</span>.</p>
+</section>
+</section>
+<section id="setting-up-the-optimization" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="setting-up-the-optimization"><span class="header-section-number">4.2</span> Setting up the optimization</h2>
+<p>The goal is to choose <span class="math inline">\(\theta\)</span> to maximize</p>
+<p><span class="math display">\[
+v_{\pi}(s)=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}r(s_{t},a_{t})\ \given\ s_{0}=s\right],
+\qquad s_{t+1}\sim p(\cdot\given s_{t},a_{t}),\ \ a_{t}\sim\pi(\cdot\given s_{t},\theta),
+\]</span></p>
+<p>by some version of gradient ascent,</p>
+<p><span id="eq-ascent"><span class="math display">\[
+\theta_{j+1}=\theta_{j}+\alpha\,\nabla_{\theta}J(\theta_{j}),
+\tag{4.2}\]</span></span></p>
+<p>ascent rather than descent because the problem is a maximization. In practice the true gradient is unavailable and <a href="#eq-ascent" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> is run in its stochastic form, which is <a href="02-notes.html#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> with the sign flipped: whenever the gradient can be written <span class="math inline">\(\nabla_{\theta}J(\theta)=\E[\text{something}(\theta)]\)</span>, a single sampled realization of that something is a legitimate step direction. That “whenever” is the entire technical content of this chapter.</p>
+<p>Two problems stand between here and there.</p>
+<section id="problem-1-v_pi-is-not-a-scalar" class="level3">
+<h3 class="anchored" data-anchor-id="problem-1-v_pi-is-not-a-scalar">Problem 1: <span class="math inline">\(v_{\pi}\)</span> is not a scalar</h3>
+<p><span class="math inline">\(v_{\pi}(s)\)</span> is defined for every <span class="math inline">\(s\in\mathcal{S}\)</span>, so it is a vector of length <span class="math inline">\(|\mathcal{S}|\)</span>, or a function when the state space is continuous. Gradient ascent maximizes a <em>number</em>. There is nothing to ascend on until the vector is collapsed to a scalar.</p>
+<p>The collapse is a weighted average across states:</p>
+<p><span id="eq-objective"><span class="math display">\[
+J(\theta)=\sum_{s\in\mathcal{S}}v_{\pi}(s)\,\mu(s),
+\tag{4.3}\]</span></span></p>
+<p>where <span class="math inline">\(\mu\)</span> is some distribution over starting states, for instance uniform. Read <a href="#eq-objective" class="quarto-xref">Equation&nbsp;<span>4.3</span></a> as expected value under a random initial state: <span class="math inline">\(J(\theta)=\E_{s_{0}\sim\mu}[v_{\pi}(s_{0})]\)</span>. The choice of <span class="math inline">\(\mu\)</span> matters for which policy is optimal, since it says which states you care about doing well in, but it is exogenous and does not depend on <span class="math inline">\(\theta\)</span>, which is what makes it harmless to differentiate through.</p>
+</section>
+<section id="problem-2-the-model-reappears" class="level3">
+<h3 class="anchored" data-anchor-id="problem-2-the-model-reappears">Problem 2: the model reappears</h3>
+<p>With a scalar objective in hand, differentiate. Take the deterministic case <span class="math inline">\(a=\pi(s,\theta)\)</span> for a moment, since it makes the difficulty most visible, and start from the Bellman equation for <span class="math inline">\(v_{\pi}\)</span>:</p>
+<p><span class="math display">\[
+v_{\pi}(s)=r\big(s,\pi(s,\theta)\big)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\,p\big(s'\given s,\pi(s,\theta)\big).
+\]</span></p>
+<p>The parameter <span class="math inline">\(\theta\)</span> enters through the action, and the action enters both the reward function and the transition density. So the chain rule produces</p>
+<p><span id="eq-chain-obstacle"><span class="math display">\[
+\nabla_{\theta}v_{\pi}(s)=\Big(\underbrace{\nabla_{a}r(s,\pi)}_{\text{unknown}}+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\underbrace{\nabla_{a}p(s'\given s,\pi)}_{\text{unknown}}\Big)\nabla_{\theta}\pi+\gamma\sum_{s'\in\mathcal{S}}\big(\nabla_{\theta}v_{\pi}(s')\big)\,p(s'\given s,\pi).
+\tag{4.4}\]</span></span></p>
+<p>Both marked terms require the <strong>model</strong>: how the reward responds to a marginal change in the action, and how the transition density does. Neither is available in a model-free setting.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is the same obstruction, in a new place. Chapter 2 met it in the policy <em>improvement</em> step, <span class="math inline">\(\argmax_{\pi}\{\mathbf{r}_{\pi}+\gamma\mathbf{P}_{\pi}\mathbf{v}\}\)</span>, which reads the model to turn a value into a decision, and solved it by working with action values instead: <a href="02-notes.html#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> is an expectation, and expectations can be sampled. Here the same <span class="math inline">\((\mathbf{r},\mathbf{P})\)</span> blocks the <em>gradient</em> rather than the maximization. The resolution is the same, and it is called the policy gradient theorem: rewrite <span class="math inline">\(\nabla_{\theta}J\)</span> so that the model-dependent pieces are absorbed into <span class="math inline">\(q_{\pi}\)</span>, which can be estimated from samples.</p>
+</div>
+</div>
+<p>Two versions follow. The <strong>deterministic</strong> one is more pedagogical and came later historically; the <strong>stochastic</strong> one is the version implemented in practice and is what people mean by “the policy gradient theorem”.</p>
+</section>
+</section>
+<section id="the-deterministic-policy-gradient-theorem" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="the-deterministic-policy-gradient-theorem"><span class="header-section-number">4.3</span> The deterministic policy gradient theorem</h2>
+<div id="thm-dpg" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.1 (Deterministic policy gradient theorem)</strong></span> Let <span class="math inline">\(\mathcal{S}\)</span> be finite, let <span class="math inline">\(\gamma\in(0,1)\)</span>, let the policy be deterministic, <span class="math inline">\(a=\pi(s,\theta)\)</span> and differentiable in <span class="math inline">\(\theta\)</span>, and let <span class="math inline">\(J(\theta)=\sum_{s}v_{\pi}(s)\mu(s)\)</span> as in <a href="#eq-objective" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>. Then</p>
+<p><span id="eq-dpg"><span class="math display">\[
+\nabla_{\theta}J(\theta)=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}\,\nabla_{a}q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\pi(s_{t},\theta)\right],
+\tag{4.5}\]</span></span></p>
+<p>where the expectation is over trajectories with <span class="math inline">\(s_{0}\sim\mu\)</span>, <span class="math inline">\(a_{t}=\pi(s_{t},\theta)\)</span>, and <span class="math inline">\(s_{t+1}\sim p(\cdot\given s_{t},a_{t})\)</span>.</p>
+</div>
+<p>Read the hypotheses back in words. The policy is a deterministic function of the state, so the action space must be continuous for <span class="math inline">\(\nabla_{a}\)</span> to mean anything. The expectation is taken along trajectories generated <em>by the policy being differentiated</em>, so the theorem is a statement about on-policy data in the sense of <a href="03-notes.html#def-on-off-policy" class="quarto-xref">Definition&nbsp;<span>3.3</span></a>. And the model has vanished from the right-hand side entirely: the only unknowns are <span class="math inline">\(q_{\pi}\)</span> and its derivative in the action, both properties of the value function rather than of the environment. The result is due to Silver et al.&nbsp;(2014).</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof of the deterministic policy gradient theorem">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof of the deterministic policy gradient theorem
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Step 1: differentiate the Bellman equation.</strong> This is <a href="#eq-chain-obstacle" class="quarto-xref">Equation&nbsp;<span>4.4</span></a>, restated: <span class="math display">\[
+\nabla_{\theta}v_{\pi}(s)=\Big(\nabla_{a}r(s,\pi)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\nabla_{a}p(s'\given s,\pi)\Big)\nabla_{\theta}\pi+\gamma\sum_{s'\in\mathcal{S}}\big(\nabla_{\theta}v_{\pi}(s')\big)p(s'\given s,\pi).
+\]</span> The first group collects the effect of <span class="math inline">\(\theta\)</span> on <em>today’s</em> action; the second collects its effect on the continuation value, because <span class="math inline">\(v_{\pi}\)</span> at every future state also depends on <span class="math inline">\(\theta\)</span>.</p>
+<p><strong>Step 2: recognize the bracket as <span class="math inline">\(\nabla_{a}q_{\pi}\)</span>.</strong> The action value under <span class="math inline">\(\pi\)</span> is, by <a href="02-notes.html#eq-q-model" class="quarto-xref">Equation&nbsp;<span>2.5</span></a>, <span class="math display">\[
+q_{\pi}(s,a)=r(s,a)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\,p(s'\given s,a).
+\]</span> Differentiate it with respect to <span class="math inline">\(a\)</span>, holding the continuation values <span class="math inline">\(v_{\pi}(s')\)</span> fixed, which is legitimate because <span class="math inline">\(q_{\pi}(s,a)\)</span> is by construction the value of deviating to <span class="math inline">\(a\)</span> <em>today only</em> and following <span class="math inline">\(\pi\)</span> from tomorrow on: <span class="math display">\[
+\nabla_{a}q_{\pi}(s,a)=\nabla_{a}r(s,a)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\,\nabla_{a}p(s'\given s,a).
+\]</span> That is exactly the bracket in Step 1. Substituting, <span id="eq-dpg-bellman"><span class="math display">\[
+\nabla_{\theta}v_{\pi}(s)=\nabla_{a}q_{\pi}\big(s,\pi(s,\theta)\big)\,\nabla_{\theta}\pi(s,\theta)+\gamma\sum_{s'\in\mathcal{S}}\big(\nabla_{\theta}v_{\pi}(s')\big)\,p\big(s'\given s,\pi(s,\theta)\big).
+\tag{4.6}\]</span></span> The two unknown model derivatives have been packed into one object, <span class="math inline">\(\nabla_{a}q_{\pi}\)</span>, and both instances of the model that remain, <span class="math inline">\(p(s'\given s,\pi)\)</span>, sit where a Bellman equation always puts them.</p>
+<p><strong>Step 3: read <a href="#eq-dpg-bellman" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> as a Bellman equation.</strong> Define the unknown function <span class="math inline">\(x(s)\defeq\nabla_{\theta}v_{\pi}(s)\)</span> and the “reward” <span class="math display">\[
+\rho(s)\defeq\nabla_{a}q_{\pi}\big(s,\pi(s,\theta)\big)\,\nabla_{\theta}\pi(s,\theta).
+\]</span> Both are functions of the state alone, since <span class="math inline">\(\theta\)</span> is fixed while we differentiate. Then <a href="#eq-dpg-bellman" class="quarto-xref">Equation&nbsp;<span>4.6</span></a> reads <span class="math display">\[
+x(s)=\rho(s)+\gamma\sum_{s'\in\mathcal{S}}x(s')\,p_{\pi}(s'\given s),
+\]</span> which is <a href="01-notes.html#eq-mrp-dp" class="quarto-xref">Equation&nbsp;<span>1.2</span></a>, the Bellman equation of a Markov reward process in the sense of <a href="01-notes.html#def-mrp" class="quarto-xref">Definition&nbsp;<span>1.1</span></a>, with reward <span class="math inline">\(\rho\)</span> and transition kernel <span class="math inline">\(p_{\pi}\)</span>. Nothing about <a href="01-notes.html#def-mrp" class="quarto-xref">Definition&nbsp;<span>1.1</span></a> requires the reward to be a scalar: run the argument coordinate by coordinate on the <span class="math inline">\(m\)</span> components of <span class="math inline">\(x\)</span> and <span class="math inline">\(\rho\)</span> and it goes through unchanged.</p>
+<p><strong>Step 4: solve it as a present discounted value.</strong> In matrix form, <span class="math inline">\(\mathbf{x}=\boldsymbol{\rho}+\gamma\mathbf{P}_{\pi}\mathbf{x}\)</span>. Since <span class="math inline">\(\mathbf{P}_{\pi}\)</span> is row-stochastic its spectral radius is <span class="math inline">\(1\)</span>, so for <span class="math inline">\(\gamma\in(0,1)\)</span> the matrix <span class="math inline">\(I-\gamma\mathbf{P}_{\pi}\)</span> is invertible and the solution is unique: <span class="math display">\[
+\mathbf{x}=(I-\gamma\mathbf{P}_{\pi})^{-1}\boldsymbol{\rho}=\sum_{t=0}^{\infty}\gamma^{t}\mathbf{P}_{\pi}^{t}\boldsymbol{\rho},
+\]</span> the Neumann series converging because <span class="math inline">\(\|\gamma\mathbf{P}_{\pi}\|&lt;1\)</span>. Row <span class="math inline">\(s\)</span> of <span class="math inline">\(\mathbf{P}_{\pi}^{t}\boldsymbol{\rho}\)</span> is <span class="math inline">\(\E[\rho(s_{t})\given s_{0}=s]\)</span>, so component-wise this says <span class="math display">\[
+\nabla_{\theta}v_{\pi}(s_{0})=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}\,\nabla_{a}q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\pi(s_{t},\theta)\right],
+\qquad a_{t}=\pi(s_{t},\theta),\ \ s_{t+1}\sim p(\cdot\given s_{t},a_{t}).
+\]</span></p>
+<p><strong>Step 5: average over starting states.</strong> By <a href="#eq-objective" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>, <span class="math inline">\(\nabla_{\theta}J(\theta)=\sum_{s}\mu(s)\nabla_{\theta}v_{\pi}(s)\)</span>, since <span class="math inline">\(\mu\)</span> does not depend on <span class="math inline">\(\theta\)</span>. Drawing <span class="math inline">\(s_{0}\sim\mu\)</span> instead of fixing it gives <a href="#eq-dpg" class="quarto-xref">Equation&nbsp;<span>4.5</span></a>. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="What the proof actually did">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>What the proof actually did
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Three moves, and only the middle one is specific to this problem. Differentiate the Bellman equation. Notice that the awkward terms are precisely the derivative of <span class="math inline">\(q_{\pi}\)</span> in the action. Then observe that what is left is <em>itself</em> a Bellman equation, in the new unknown <span class="math inline">\(\nabla_{\theta}v_{\pi}\)</span>, and therefore has the standard present-discounted-value solution.</p>
+<p>The last step is where the model-free property is won. The gradient of the value at <span class="math inline">\(s_{0}\)</span> is a discounted sum of local quantities along a trajectory, and a trajectory is something you can sample. You do not need <span class="math inline">\(p\)</span> to compute the sum; you need <span class="math inline">\(p\)</span> only to <em>generate</em> the states, which the environment does for free.</p>
+</div>
+</div>
+<p>Turning <a href="#eq-dpg" class="quarto-xref">Equation&nbsp;<span>4.5</span></a> into an algorithm is mechanical. It has the form <span class="math inline">\(\nabla_{\theta}J(\theta)=\E[\text{something}(\theta)]\)</span>, so replacing the expectation by one sampled trajectory of length <span class="math inline">\(T\)</span> gives the stochastic gradient ascent step</p>
+<p><span class="math display">\[
+\theta_{j+1}=\theta_{j}+\alpha\sum_{t=0}^{T}\gamma^{t}\,\nabla_{a}q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\pi(s_{t},\theta_{j}).
+\]</span></p>
+<p>Which leaves one thing outstanding: an estimate of <span class="math inline">\(q_{\pi}\)</span>, and of its derivative <span class="math inline">\(\nabla_{a}q_{\pi}\)</span>. Hold that thought.</p>
+</section>
+<section id="the-stochastic-policy-gradient-theorem" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="the-stochastic-policy-gradient-theorem"><span class="header-section-number">4.4</span> The stochastic policy gradient theorem</h2>
+<p>Now let the policy be stochastic, <span class="math inline">\(a_{t}\sim\pi(\cdot\given s_{t},\theta)\)</span>.</p>
+<div id="thm-spg" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 4.2 (Stochastic policy gradient theorem)</strong></span> Let <span class="math inline">\(\mathcal{S}\)</span> and <span class="math inline">\(\mathcal{A}\)</span> be finite, let <span class="math inline">\(\gamma\in(0,1)\)</span>, let <span class="math inline">\(\pi(a\given s,\theta)&gt;0\)</span> be differentiable in <span class="math inline">\(\theta\)</span> for all <span class="math inline">\((s,a)\)</span>, and let <span class="math inline">\(J(\theta)=\sum_{s}v_{\pi}(s)\mu(s)\)</span> as in <a href="#eq-objective" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>. Then</p>
+<p><span id="eq-spg"><span class="math display">\[
+\nabla_{\theta}J(\theta)=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}\,q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta)\right],
+\tag{4.7}\]</span></span></p>
+<p>where the expectation is over trajectories with <span class="math inline">\(s_{0}\sim\mu\)</span>, <span class="math inline">\(a_{t}\sim\pi(\cdot\given s_{t},\theta)\)</span>, and <span class="math inline">\(s_{t+1}\sim p(\cdot\given s_{t},a_{t})\)</span>.</p>
+</div>
+<p>Compare the hypotheses with <a href="#thm-dpg" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>. Positivity of <span class="math inline">\(\pi\)</span> is new and is needed for <span class="math inline">\(\ln\pi\)</span> to be defined; differentiability in <span class="math inline">\(\theta\)</span> replaces differentiability in <span class="math inline">\(a\)</span>, so the action space may now be finite. Compare the conclusions: <span class="math inline">\(\nabla_{a}q_{\pi}\)</span> has become plain <span class="math inline">\(q_{\pi}\)</span>, and <span class="math inline">\(\nabla_{\theta}\pi\)</span> has become <span class="math inline">\(\nabla_{\theta}\ln\pi\)</span>. Both changes come from a single algebraic step in the proof.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof of the stochastic policy gradient theorem">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof of the stochastic policy gradient theorem
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Step 1: differentiate the Bellman equation.</strong> For a fixed stochastic policy <span class="math inline">\(\pi\)</span>, <a href="02-notes.html#eq-bellman-stoch" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> without the maximization reads <span class="math display">\[
+v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s,\theta)\left(r(s,a)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\,p(s'\given s,a)\right).
+\]</span> Differentiate with respect to <span class="math inline">\(\theta\)</span> by the product rule. Note what has changed relative to the deterministic case: <span class="math inline">\(\theta\)</span> now enters <em>only</em> through <span class="math inline">\(\pi\)</span>, because <span class="math inline">\(r(s,a)\)</span> and <span class="math inline">\(p(s'\given s,a)\)</span> are evaluated at fixed actions <span class="math inline">\(a\)</span> that are summed over, not at a <span class="math inline">\(\theta\)</span>-dependent action. So no <span class="math inline">\(\nabla_{a}r\)</span> or <span class="math inline">\(\nabla_{a}p\)</span> can arise: <span class="math display">\[
+\nabla_{\theta}v_{\pi}(s)=\sum_{a\in\mathcal{A}}\nabla_{\theta}\pi(a\given s,\theta)\left(r(s,a)+\gamma\sum_{s'}v_{\pi}(s')p(s'\given s,a)\right)+\sum_{a\in\mathcal{A}}\pi(a\given s,\theta)\,\gamma\sum_{s'}\big(\nabla_{\theta}v_{\pi}(s')\big)p(s'\given s,a).
+\]</span></p>
+<p><strong>Step 2: name the bracket.</strong> By <a href="02-notes.html#eq-q-model" class="quarto-xref">Equation&nbsp;<span>2.5</span></a> the bracket is <span class="math inline">\(q_{\pi}(s,a)\)</span>, so <span class="math display">\[
+\nabla_{\theta}v_{\pi}(s)=\sum_{a\in\mathcal{A}}\nabla_{\theta}\pi(a\given s,\theta)\,q_{\pi}(s,a)+\gamma\sum_{a\in\mathcal{A}}\pi(a\given s,\theta)\sum_{s'\in\mathcal{S}}\big(\nabla_{\theta}v_{\pi}(s')\big)p(s'\given s,a).
+\]</span> The second term is already in Bellman form: it averages <span class="math inline">\(\nabla_{\theta}v_{\pi}(s')\)</span> against <span class="math inline">\(\pi\)</span> and then against <span class="math inline">\(p\)</span>, which is exactly the policy-averaged transition <span class="math inline">\(p_{\pi}\)</span> of <a href="02-notes.html#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>. The first term is not, because its weights are <span class="math inline">\(\nabla_{\theta}\pi(a\given s,\theta)\)</span> rather than <span class="math inline">\(\pi(a\given s,\theta)\)</span>.</p>
+<p><strong>Step 3: the log trick.</strong> Multiply and divide by <span class="math inline">\(\pi\)</span>, which is legitimate because <span class="math inline">\(\pi&gt;0\)</span>: <span id="eq-log-trick"><span class="math display">\[
+\nabla_{\theta}\pi(a\given s,\theta)=\pi(a\given s,\theta)\,\frac{\nabla_{\theta}\pi(a\given s,\theta)}{\pi(a\given s,\theta)}=\pi(a\given s,\theta)\,\nabla_{\theta}\ln\pi(a\given s,\theta),
+\tag{4.8}\]</span></span> the second equality being the chain rule for <span class="math inline">\(\ln\)</span>. Substituting, both terms now carry the same weights <span class="math inline">\(\pi(a\given s,\theta)\)</span> and can be collected: <span id="eq-spg-bellman"><span class="math display">\[
+\nabla_{\theta}v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s,\theta)\left(\nabla_{\theta}\ln\pi(a\given s,\theta)\,q_{\pi}(s,a)+\gamma\sum_{s'\in\mathcal{S}}\big(\nabla_{\theta}v_{\pi}(s')\big)p(s'\given s,a)\right).
+\tag{4.9}\]</span></span></p>
+<p><strong>Step 4: read it as a Bellman equation and solve.</strong> <a href="#eq-spg-bellman" class="quarto-xref">Equation&nbsp;<span>4.9</span></a> has exactly the shape of the stochastic-policy Bellman equation, with unknown <span class="math inline">\(x(s)=\nabla_{\theta}v_{\pi}(s)\)</span> and state-action reward <span class="math display">\[
+\rho(s,a)\defeq q_{\pi}(s,a)\,\nabla_{\theta}\ln\pi(a\given s,\theta).
+\]</span> As in Step 4 of the deterministic proof, <span class="math inline">\(I-\gamma\mathbf{P}_{\pi}\)</span> is invertible for <span class="math inline">\(\gamma\in(0,1)\)</span> because <span class="math inline">\(\mathbf{P}_{\pi}\)</span> is row-stochastic, so the fixed point is unique and equals its present discounted value: <span class="math display">\[
+\nabla_{\theta}v_{\pi}(s_{0})=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}\,q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta)\right],\qquad a_{t}\sim\pi(\cdot\given s_{t},\theta).
+\]</span></p>
+<p><strong>Step 5: average over starting states.</strong> Drawing <span class="math inline">\(s_{0}\sim\mu\)</span> in <a href="#eq-objective" class="quarto-xref">Equation&nbsp;<span>4.3</span></a> gives <a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a>. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<section id="why-the-log-trick-is-the-whole-point" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-log-trick-is-the-whole-point">Why the log trick is the whole point</h3>
+<p><a href="#eq-log-trick" class="quarto-xref">Equation&nbsp;<span>4.8</span></a> looks like a triviality. It is the step that makes the theorem usable, and the reason is worth spelling out.</p>
+<p>Before the trick, the first term of Step 2 is <span class="math inline">\(\sum_{a}\nabla_{\theta}\pi(a\given s,\theta)\,q_{\pi}(s,a)\)</span>: a weighted sum whose weights are gradient components. Those weights are not probabilities. They can be negative, and in fact they sum to zero, since differentiating <span class="math inline">\(\sum_{a}\pi(a\given s,\theta)=1\)</span> gives <span class="math inline">\(\sum_{a}\nabla_{\theta}\pi(a\given s,\theta)=0\)</span>. There is no distribution you could draw an action from to make that sum an average, so there is no Monte-Carlo estimator for it.</p>
+<p>After the trick, the weights are <span class="math inline">\(\pi(a\given s,\theta)\)</span>: the distribution the agent is <em>already sampling from</em> every time it acts. The sum becomes a genuine expectation, and the whole right-hand side of <a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> becomes an expectation over trajectories the agent generates in the ordinary course of running. Chapter 1’s founding observation then applies verbatim: an expectation you cannot integrate is an expectation you can average.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Put differently, the log trick moves the derivative off the <em>measure</em> and onto the <em>integrand</em>. The quantity <span class="math inline">\(\nabla_{\theta}\ln\pi(a\given s,\theta)\)</span>, the <strong>score</strong>, is just another function of <span class="math inline">\((s,a)\)</span> that you evaluate at the sampled pair, and <span class="math inline">\(\pi\)</span> is left where it belongs, as the thing generating the sample. This is why the same device shows up under different names across statistics: it is the score-function identity behind maximum likelihood, and the likelihood-ratio estimator in simulation.</p>
+</div>
+</div>
+<p>The one price is the hypothesis <span class="math inline">\(\pi&gt;0\)</span>. A parameterization that could assign probability zero to an action would make <span class="math inline">\(\ln\pi\)</span> undefined exactly where it is needed. The standard fix builds positivity into the functional form.</p>
+<div id="exm-softmax" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4.1 (Softmax parameterization)</strong></span> Let <span class="math inline">\(h(s,a,\theta)\)</span> be an arbitrary differentiable <strong>preference</strong> function, for example the output of a neural network, and set <span id="eq-softmax"><span class="math display">\[
+\pi(a\given s,\theta)=\frac{e^{h(s,a,\theta)}}{\sum_{a'\in\mathcal{A}}e^{h(s,a',\theta)}}.
+\tag{4.10}\]</span></span> Because the exponential is strictly positive, <span class="math inline">\(\pi(a\given s,\theta)\in(0,1)\)</span> for every <span class="math inline">\((s,a)\)</span> and <span class="math inline">\(\sum_{a}\pi(a\given s,\theta)=1\)</span> automatically. The score has a clean form: <span class="math display">\[
+\nabla_{\theta}\ln\pi(a\given s,\theta)=\nabla_{\theta}h(s,a,\theta)-\sum_{a'\in\mathcal{A}}\pi(a'\given s,\theta)\,\nabla_{\theta}h(s,a',\theta),
+\]</span> the gradient of the chosen action’s preference minus its average across actions. Raising <span class="math inline">\(\theta\)</span> along this direction raises <span class="math inline">\(h\)</span> for the action taken <em>relative to</em> the others, which is what “make good actions more likely” means concretely. In a network implementation this is simply a softmax output layer.</p>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Softmax settles the exploration problem without any of Chapter 2’s machinery. <a href="02-notes.html#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a> kept every action alive by mixing a greedy policy with a uniform one, an external patch on a policy that would otherwise be degenerate. Under <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> every action has strictly positive probability by construction, at every state, for every <span class="math inline">\(\theta\)</span>. Exploration is a property of the parameterization rather than something bolted on afterwards, and it anneals on its own: as the preferences separate, the policy becomes nearly deterministic where it is confident and stays diffuse where it is not.</p>
+</div>
+</div>
+</section>
+<section id="comparing-the-two-theorems" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-the-two-theorems">Comparing the two theorems</h3>
+<div id="tbl-pg-versions" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pg-versions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.1: The two policy gradient theorems. They differ in one requirement, and that requirement decides which one gets implemented.
+</figcaption>
+<div aria-describedby="tbl-pg-versions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Deterministic, <a href="#thm-dpg" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a></th>
+<th>Stochastic, <a href="#thm-spg" class="quarto-xref">Theorem&nbsp;<span>4.2</span></a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Policy</strong></td>
+<td><span class="math inline">\(a=\pi(s,\theta)\)</span>, an action</td>
+<td><span class="math inline">\(a\sim\pi(\cdot\given s,\theta)\)</span>, a distribution</td>
+</tr>
+<tr class="even">
+<td><strong>Gradient</strong></td>
+<td><span class="math inline">\(\E_{0}\big[\sum_{t}\gamma^{t}\nabla_{a}q_{\pi}(s_{t},a_{t})\nabla_{\theta}\pi(s_{t},\theta)\big]\)</span></td>
+<td><span class="math inline">\(\E_{0}\big[\sum_{t}\gamma^{t}q_{\pi}(s_{t},a_{t})\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta)\big]\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Needs estimated</strong></td>
+<td><span class="math inline">\(q_{\pi}\)</span> <em>and</em> its action-derivative <span class="math inline">\(\nabla_{a}q_{\pi}\)</span></td>
+<td><span class="math inline">\(q_{\pi}\)</span> only, at visited pairs</td>
+</tr>
+<tr class="even">
+<td><strong>Action space</strong></td>
+<td>continuous, or <span class="math inline">\(\nabla_{a}\)</span> is meaningless</td>
+<td>finite or continuous</td>
+</tr>
+<tr class="odd">
+<td><strong>Exploration</strong></td>
+<td>none: the policy is a point</td>
+<td>built in, if <span class="math inline">\(\pi&gt;0\)</span> as in <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a></td>
+</tr>
+<tr class="even">
+<td><strong>Where the <span class="math inline">\(\theta\)</span>-derivative sits</strong></td>
+<td>on the action, hence on <span class="math inline">\(r\)</span> and <span class="math inline">\(p\)</span></td>
+<td>on <span class="math inline">\(\pi\)</span> alone, hence never on the model</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The decisive row is the third. Estimating <span class="math inline">\(q_{\pi}(s,a)\)</span> from samples is the problem Chapters 2 and 3 solved three separate ways: Monte-Carlo returns <a href="02-notes.html#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a>, Sarsa <a href="03-notes.html#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>, Sarsa with function approximation <a href="03-notes.html#eq-sarsa-fa" class="quarto-xref">Equation&nbsp;<span>3.14</span></a>. Estimating <span class="math inline">\(\nabla_{a}q_{\pi}(s,a)\)</span> is strictly harder, and not by a constant factor. A derivative is a difference of nearby values divided by a small number, so any noise in the estimate of <span class="math inline">\(q_{\pi}\)</span> is amplified; and to know how <span class="math inline">\(q_{\pi}\)</span> moves in <span class="math inline">\(a\)</span> you need data at <em>neighbouring</em> actions, which a deterministic policy never generates, since it always plays the same action at a given state. The deterministic version therefore has to import an exploration scheme from outside and a differentiable critic in the action, which is what Deep Deterministic Policy Gradient does.</p>
+<p>The stochastic version asks only for <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span> at the state-action pairs actually visited, and generates its own spread of actions for free. That is why <a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a>, not <a href="#eq-dpg" class="quarto-xref">Equation&nbsp;<span>4.5</span></a>, is what “the policy gradient theorem” refers to, and what everything below builds on.</p>
+</section>
+</section>
+<section id="reinforce" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="reinforce"><span class="header-section-number">4.5</span> REINFORCE</h2>
+<p><a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> is a statement of the form <span class="math inline">\(\nabla_{\theta}J(\theta)=\E[\text{something}(\theta)]\)</span>, so <a href="#eq-ascent" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> in its stochastic form says: sample one trajectory, evaluate the something, step. Truncating at horizon <span class="math inline">\(T\)</span>,</p>
+<p><span class="math display">\[
+\theta_{j+1}=\theta_{j}+\alpha\sum_{t=0}^{T}\gamma^{t}\,q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j}).
+\]</span></p>
+<p>The score <span class="math inline">\(\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j})\)</span> is computable: it is a derivative of a function we chose. The action value <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span> is not. Everything in the rest of this chapter is a choice of what to substitute for it, and the two choices available are the two of <a href="03-notes.html#tbl-td-mc" class="quarto-xref">Table&nbsp;<span>3.1</span></a>.</p>
+<p>The first choice is Monte Carlo. By <a href="02-notes.html#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a>, <span class="math inline">\(q_{\pi}(s,a)\)</span> is the expected discounted return from <span class="math inline">\((s,a)\)</span>, so the realized return along the sampled trajectory is an unbiased estimate of it:</p>
+<p><span class="math display">\[
+G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
+\]</span></p>
+<p>Substituting gives the algorithm.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: REINFORCE (Monte-Carlo policy gradient)">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: REINFORCE (Monte-Carlo policy gradient)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Initialize <span class="math inline">\(\theta_{0}\)</span>, a step size <span class="math inline">\(\alpha&gt;0\)</span>, and a discount <span class="math inline">\(\gamma\in(0,1)\)</span>. For each episode <span class="math inline">\(j=0,1,2,\dots\)</span></p>
+<ol type="1">
+<li><strong>Generate</strong> a full episode <span class="math inline">\(s_{0},a_{0},r_{1},\dots,s_{T},a_{T},r_{T+1}\)</span> by following <span class="math inline">\(\pi(\cdot\given\cdot,\theta_{j})\)</span>, indexing rewards as in Chapter 3 so that <span class="math inline">\(r_{t+1}\)</span> is the reward for acting at <span class="math inline">\(t\)</span>.</li>
+<li><strong>Compute</strong> the returns <span class="math inline">\(G_{t}=\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}\)</span> for <span class="math inline">\(t=0,\dots,T\)</span>.</li>
+<li><strong>Update</strong> the policy parameter once: <span id="eq-reinforce"><span class="math display">\[
+\theta_{j+1}=\theta_{j}+\alpha\sum_{t=0}^{T}\gamma^{t}\,G_{t}\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j}).
+\tag{4.11}\]</span></span></li>
+</ol>
+</div>
+</div>
+<p>REINFORCE is <strong>episodic</strong> in the exact sense of <a href="03-notes.html#def-incremental" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>: <span class="math inline">\(G_{0}\)</span> cannot be formed until the reward at <span class="math inline">\(T\)</span> has been observed, so <span class="math inline">\(\theta\)</span> cannot move until the episode is over. That is the same limitation MC Basic had in Chapter 2, arriving now in parameter space rather than in a table.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="What the update does, one term at a time">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>What the update does, one term at a time
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Write a single term of <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> using <a href="#eq-log-trick" class="quarto-xref">Equation&nbsp;<span>4.8</span></a> in reverse: <span class="math display">\[
+\alpha\gamma^{t}G_{t}\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j})=\alpha\gamma^{t}\underbrace{\frac{G_{t}}{\pi(a_{t}\given s_{t},\theta_{j})}}_{\text{weight}}\nabla_{\theta}\pi(a_{t}\given s_{t},\theta_{j}),
+\]</span> which is a gradient-ascent step on the <em>probability</em> <span class="math inline">\(\pi(a_{t}\given s_{t},\theta)\)</span> itself, with the weight in front. Two readings follow, and together they are the whole intuition for policy gradient.</p>
+<p>The weight is proportional to <span class="math inline">\(G_{t}\)</span>: actions that turned out well get their probability pushed up, actions that turned out badly get it pushed down, in proportion to how well. That is <strong>exploitation</strong>.</p>
+<p>The weight is inversely proportional to <span class="math inline">\(\pi(a_{t}\given s_{t},\theta_{j})\)</span>: among two actions with the same return, the one that was <em>unlikely</em> to have been tried gets the larger boost. That is <strong>exploration</strong>, and it falls out of the log rather than being imposed.</p>
+</div>
+</div>
+<section id="a-clarification-about-the-pseudocode" class="level3">
+<h3 class="anchored" data-anchor-id="a-clarification-about-the-pseudocode">A clarification about the pseudocode</h3>
+<p>Standard presentations of REINFORCE, in Zhao, in Sutton and Barto, and in Murphy, write the update as a loop over <span class="math inline">\(t\)</span> inside each episode, which makes it look as though <span class="math inline">\(\theta\)</span> is being updated at every time step. It is not. <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> is one update per episode, and the inner loop is only an efficient way of accumulating its sum.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: the inner loop is an accumulator, not a sequence of updates">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Derivation: the inner loop is an accumulator, not a sequence of updates
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Write <span class="math inline">\(\theta_{j}^{t}\)</span> for the running value of the accumulator inside episode <span class="math inline">\(j\)</span>, initialized at <span class="math inline">\(\theta_{j}^{0}=\theta_{j}\)</span>. The inner loop performs <span class="math display">\[
+\theta_{j}^{t+1}=\theta_{j}^{t}+\alpha\gamma^{t}G_{t}\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j}),\qquad t=0,\dots,T.
+\]</span> The point is the argument of the score: it is <span class="math inline">\(\theta_{j}\)</span>, the parameter that generated the episode, held fixed throughout the loop, and never <span class="math inline">\(\theta_{j}^{t}\)</span>. So every increment is a fixed vector, and unrolling the recursion is just addition: <span class="math display">\[
+\theta_{j}^{T+1}=\theta_{j}^{0}+\alpha\sum_{t=0}^{T}\gamma^{t}G_{t}\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j})=\theta_{j+1},
+\]</span> which is <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>. One episode in, one parameter update out.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="Where implementations depart from the theorem">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Where implementations depart from the theorem
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Some implementations genuinely do refresh <span class="math inline">\(\theta\)</span> inside the loop, evaluating the score at the current running value rather than at <span class="math inline">\(\theta_{j}\)</span>. This is done for sample efficiency, since it extracts several updates from one episode, but it is no longer <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>: the scores are then evaluated at parameters that have drifted away from the policy which generated the data, so the estimator is biased. Worth knowing which one you are reading.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="the-discounted-state-visitation-distribution" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="the-discounted-state-visitation-distribution"><span class="header-section-number">4.6</span> The discounted state visitation distribution</h2>
+<p><a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> is an expectation over whole trajectories, with a <span class="math inline">\(\gamma^{t}\)</span> weight riding on each term. There is an equivalent form that is an expectation over a single state-action pair, and it is the form that licenses incremental algorithms. Getting to it requires one new object.</p>
+<div id="def-visitation" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.1 (Discounted state visitation distribution)</strong></span> For a policy <span class="math inline">\(\pi\)</span> and an initial distribution <span class="math inline">\(\mu\)</span>, define <span id="eq-dvisit"><span class="math display">\[
+d_{\pi,\mu}(s)\defeq(1-\gamma)\sum_{t=0}^{\infty}\gamma^{t}\,\Prob\big(s_{t}=s\ \given\ s_{0}\sim\mu,\ \pi\big).
+\tag{4.12}\]</span></span></p>
+</div>
+<p>Read <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> as: how often the policy is at <span class="math inline">\(s\)</span>, counting a visit at time <span class="math inline">\(t\)</span> as worth <span class="math inline">\(\gamma^{t}\)</span>, normalized so the weights sum to one. It answers “where does this policy spend its discounted time”, starting from <span class="math inline">\(\mu\)</span>. The factor <span class="math inline">\((1-\gamma)\)</span> is exactly the normalization that makes it a probability distribution, which is the first thing to verify.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Proof that $d_{\pi,\mu}$ is a probability distribution">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof that <span class="math inline">\(d_{\pi,\mu}\)</span> is a probability distribution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Non-negativity is immediate: every term in <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> is a probability times a non-negative weight. It remains to show the entries sum to one, and the cleanest way is the matrix-vector notation of Chapter 1.</p>
+<p>Let <span class="math inline">\(\mathbf{P}_{\pi}\)</span> be the <span class="math inline">\(n\times n\)</span> policy-averaged transition matrix built from <a href="02-notes.html#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>, with <span class="math inline">\((\mathbf{P}_{\pi})_{ij}=p_{\pi}(s_{j}\given s_{i})\)</span>, and let <span class="math inline">\(\boldsymbol{\mu}\)</span> be the column vector of initial probabilities. If <span class="math inline">\(\boldsymbol{\mu}_{t}\)</span> denotes the distribution of <span class="math inline">\(s_{t}\)</span> as a column vector, then <span class="math display">\[
+\boldsymbol{\mu}_{t+1}(j)=\sum_{i}\boldsymbol{\mu}_{t}(i)\,(\mathbf{P}_{\pi})_{ij}
+\qquad\Longleftrightarrow\qquad
+\boldsymbol{\mu}_{t+1}=\mathbf{P}_{\pi}^{\!\top}\boldsymbol{\mu}_{t},
+\]</span> so <span class="math inline">\(\boldsymbol{\mu}_{t}=(\mathbf{P}_{\pi}^{\!\top})^{t}\boldsymbol{\mu}\)</span> and <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> is <span class="math display">\[
+\mathbf{d}_{\pi,\mu}=(1-\gamma)\sum_{t=0}^{\infty}\gamma^{t}\big(\mathbf{P}_{\pi}^{\!\top}\big)^{t}\boldsymbol{\mu}.
+\]</span> Now sum the entries by taking the inner product with the vector of ones <span class="math inline">\(\mathbf{1}\)</span>: <span class="math display">\[
+\mathbf{d}_{\pi,\mu}^{\!\top}\mathbf{1}=(1-\gamma)\sum_{t=0}^{\infty}\gamma^{t}\,\boldsymbol{\mu}^{\!\top}\mathbf{P}_{\pi}^{t}\,\mathbf{1}.
+\]</span> Two facts finish it. First, <span class="math inline">\(\mathbf{P}_{\pi}\)</span> is <strong>row-stochastic</strong>, meaning each row is a probability distribution over next states, so <span class="math inline">\(\mathbf{P}_{\pi}\mathbf{1}=\mathbf{1}\)</span>; by induction <span class="math inline">\(\mathbf{P}_{\pi}^{t}\mathbf{1}=\mathbf{1}\)</span> for every <span class="math inline">\(t\)</span>. Second, <span class="math inline">\(\boldsymbol{\mu}\)</span> is a distribution, so <span class="math inline">\(\boldsymbol{\mu}^{\!\top}\mathbf{1}=1\)</span>. Hence every term of the sum collapses to <span class="math inline">\(\gamma^{t}\)</span>, and <span class="math display">\[
+\mathbf{d}_{\pi,\mu}^{\!\top}\mathbf{1}=(1-\gamma)\sum_{t=0}^{\infty}\gamma^{t}=(1-\gamma)\cdot\frac{1}{1-\gamma}=1. \qquad\square
+\]</span></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The geometric series is the whole reason <span class="math inline">\((1-\gamma)\)</span> appears in <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a>. The unnormalized discounted visit counts <span class="math inline">\(\sum_{t}\gamma^{t}\Prob(s_{t}=s)\)</span> sum to <span class="math inline">\(1/(1-\gamma)\)</span>, the expected discounted horizon length, so dividing by that number, equivalently multiplying by <span class="math inline">\((1-\gamma)\)</span>, is what turns a set of occupancy weights into a distribution. This is also where the <span class="math inline">\(1/(1-\gamma)\)</span> in <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> below comes from: it is the same constant, moved to the other side.</p>
+</div>
+</div>
+<section id="the-simple-expectation-form" class="level3">
+<h3 class="anchored" data-anchor-id="the-simple-expectation-form">The simple expectation form</h3>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: from the discounted sum to a single expectation">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Derivation: from the discounted sum to a single expectation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Start from the present-discounted-value form <a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> and exchange the sum and the expectation, which is legitimate by dominated convergence when rewards are bounded and <span class="math inline">\(\gamma&lt;1\)</span>: <span class="math display">\[
+\nabla_{\theta}J(\theta)=\sum_{t=0}^{\infty}\gamma^{t}\,\E\big[q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta)\big].
+\]</span></p>
+<p>Now write out the time-<span class="math inline">\(t\)</span> expectation by conditioning first on the state and then on the action. Given <span class="math inline">\(s_{t}=s\)</span>, the action is drawn from <span class="math inline">\(\pi(\cdot\given s,\theta)\)</span> regardless of <span class="math inline">\(t\)</span>, so <span class="math display">\[
+\E\big[q_{\pi}(s_{t},a_{t})\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta)\big]
+=\sum_{s\in\mathcal{S}}\Prob(s_{t}=s)\underbrace{\sum_{a\in\mathcal{A}}\pi(a\given s,\theta)\,q_{\pi}(s,a)\,\nabla_{\theta}\ln\pi(a\given s,\theta)}_{\defeq\ g(s)},
+\]</span> where <span class="math inline">\(\Prob(s_{t}=s)\)</span> abbreviates <span class="math inline">\(\Prob(s_{t}=s\given s_{0}\sim\mu,\pi)\)</span>. The crucial observation is that <span class="math inline">\(g(s)\)</span> <strong>does not depend on <span class="math inline">\(t\)</span></strong>: it is a property of the state and the fixed policy only. So <span class="math inline">\(t\)</span> appears nowhere except in <span class="math inline">\(\gamma^{t}\)</span> and in <span class="math inline">\(\Prob(s_{t}=s)\)</span>, and the sum over <span class="math inline">\(t\)</span> can be pushed inside the sum over <span class="math inline">\(s\)</span>: <span class="math display">\[
+\nabla_{\theta}J(\theta)=\sum_{s\in\mathcal{S}}\underbrace{\left[\sum_{t=0}^{\infty}\gamma^{t}\Prob(s_{t}=s)\right]}_{=\ d_{\pi,\mu}(s)/(1-\gamma)}g(s)
+=\frac{1}{1-\gamma}\sum_{s\in\mathcal{S}}d_{\pi,\mu}(s)\,g(s),
+\]</span> the identification of the bracket being <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> divided by <span class="math inline">\((1-\gamma)\)</span>. Finally, <span class="math inline">\(\sum_{s}d_{\pi,\mu}(s)(\cdot)\)</span> is an expectation because <a href="#def-visitation" class="quarto-xref">Definition&nbsp;<span>4.1</span></a> is a distribution, and <span class="math inline">\(g(s)\)</span> is itself an expectation over <span class="math inline">\(a\sim\pi(\cdot\given s,\theta)\)</span>. Composing the two gives <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a>. <span class="math inline">\(\square\)</span></p>
+</div>
+</div>
+</div>
+<p><span id="eq-spg-simple"><span class="math display">\[
+\nabla_{\theta}J(\theta)=\frac{1}{1-\gamma}\,\E_{s\sim d_{\pi,\mu},\ a\sim\pi(\cdot\given s,\theta)}\big[\,q_{\pi}(s,a)\,\nabla_{\theta}\ln\pi(a\given s,\theta)\,\big].
+\tag{4.13}\]</span></span></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> and <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> are the same number written two ways, and the difference between them is where the discounting lives. In <a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> it is in the <em>summand</em>, as an explicit <span class="math inline">\(\gamma^{t}\)</span> attached to each term of a trajectory. In <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> it has migrated into the <em>sampling distribution</em>: all the <span class="math inline">\(\gamma^{t}\)</span> weighting is now inside <span class="math inline">\(d_{\pi,\mu}\)</span>, and what is left outside is a single expectation over one state-action pair.</p>
+<p>That is what makes incremental algorithms possible. Estimating <a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> needs a whole trajectory, because the summand is indexed by <span class="math inline">\(t\)</span>. Estimating <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> needs one draw of <span class="math inline">\((s,a)\)</span>, so <strong>a single transition already supports a gradient step</strong>. REINFORCE is episodic because it targets the first form; actor-critic is incremental because it targets the second.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="Two conveniences hidden in the implementation">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Two conveniences hidden in the implementation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The constant <span class="math inline">\(1/(1-\gamma)\)</span> is never computed. It scales the gradient uniformly, so it is absorbed into the step size <span class="math inline">\(\alpha\)</span> and disappears. And drawing <span class="math inline">\(s\)</span> exactly from <span class="math inline">\(d_{\pi,\mu}\)</span> would require restarting from <span class="math inline">\(\mu\)</span> and stopping with probability <span class="math inline">\(1-\gamma\)</span> at each step; implementations instead just use the states encountered along an ongoing trajectory. Both are departures from the theorem as stated, both are standard, and neither is usually flagged.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="actor-critic-methods" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="actor-critic-methods"><span class="header-section-number">4.7</span> Actor-critic methods</h2>
+<section id="what-actor-and-critic-mean" class="level3">
+<h3 class="anchored" data-anchor-id="what-actor-and-critic-mean">What actor and critic mean</h3>
+<div id="def-actor-critic" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 4.2 (Actor and critic)</strong></span> In a policy gradient algorithm, the <strong>actor</strong> is the policy update, the step that moves <span class="math inline">\(\theta\)</span> and hence changes what the agent does. The <strong>critic</strong> is the value estimation that supplies <span class="math inline">\(q_{\pi}\)</span> to the actor, the step that scores the current policy without changing it.</p>
+</div>
+<p>The names are literal. The actor acts; the critic criticizes, by evaluating what the actor did. Note that this is not a new class of algorithm: <strong>actor-critic methods are policy gradient methods</strong>, and the terminology names a structure rather than a mechanism. What it emphasizes is that policy-based and value-based learning are running side by side in the same loop, with the value-based part of Chapters 2 and 3 supplying exactly the one quantity <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> leaves open.</p>
+</section>
+<section id="which-critic" class="level3">
+<h3 class="anchored" data-anchor-id="which-critic">Which critic</h3>
+<p>Take the stochastic gradient ascent step implied by <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a>: draw one pair <span class="math inline">\((s_{t},a_{t})\)</span>, absorb the constant into <span class="math inline">\(\alpha\)</span>, and step.</p>
+<p><span id="eq-ac-actor"><span class="math display">\[
+\theta_{t+1}=\theta_{t}+\alpha\,q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{t}).
+\tag{4.14}\]</span></span></p>
+<p><a href="#eq-ac-actor" class="quarto-xref">Equation&nbsp;<span>4.14</span></a> is the actor, and it is complete except for <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span>. There are exactly two ways to get that, and they are the two ways this book has been comparing since <a href="01-notes.html#tbl-mc-td" class="quarto-xref">Table&nbsp;<span>1.1</span></a>:</p>
+<ul>
+<li><strong>Monte Carlo</strong>, substituting the realized return <span class="math inline">\(G_{t}\)</span>. That is REINFORCE, <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>, and it is episodic.</li>
+<li><strong>Temporal difference</strong>, substituting a bootstrapped estimate maintained by its own recursion. That is <strong>actor-critic</strong>, and it is incremental.</li>
+</ul>
+<p>The step from one to the other is the step from Chapter 2 to Chapter 3, taken a second time, one level up.</p>
+</section>
+<section id="the-qac-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="the-qac-algorithm">The QAC algorithm</h3>
+<p>The simplest instance keeps a parametric action-value function <span class="math inline">\(\hat{q}(s,a,w)\)</span> and trains it by Sarsa with function approximation. It is usually called <strong>Q actor-critic</strong>.</p>
+<div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: Q actor-critic (QAC)">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Algorithm: Q actor-critic (QAC)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Initialize policy parameters <span class="math inline">\(\theta_{0}\)</span>, critic parameters <span class="math inline">\(w_{0}\)</span>, and step sizes <span class="math inline">\(\alpha_{\theta},\alpha_{w}&gt;0\)</span>. At each time step <span class="math inline">\(t\)</span> of each episode:</p>
+<ol type="1">
+<li><p><strong>Interact.</strong> Take <span class="math inline">\(a_{t}\sim\pi(\cdot\given s_{t},\theta_{t})\)</span>, observe <span class="math inline">\(r_{t+1}\)</span> and <span class="math inline">\(s_{t+1}\)</span>, and draw <span class="math inline">\(a_{t+1}\sim\pi(\cdot\given s_{t+1},\theta_{t})\)</span>.</p></li>
+<li><p><strong>Critic (value update).</strong> <span id="eq-qac-critic"><span class="math display">\[
+w_{t+1}=w_{t}+\alpha_{w}\big[\,r_{t+1}+\gamma\hat{q}(s_{t+1},a_{t+1},w_{t})-\hat{q}(s_{t},a_{t},w_{t})\,\big]\nabla_{w}\hat{q}(s_{t},a_{t},w_{t}).
+\tag{4.15}\]</span></span></p></li>
+<li><p><strong>Actor (policy update).</strong> <span id="eq-qac-actor"><span class="math display">\[
+\theta_{t+1}=\theta_{t}+\alpha_{\theta}\,\hat{q}(s_{t},a_{t},w_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{t}).
+\tag{4.16}\]</span></span></p></li>
+</ol>
+</div>
+</div>
+<p>Two observations make the algorithm intelligible.</p>
+<p><strong>The critic is not new.</strong> <a href="#eq-qac-critic" class="quarto-xref">Equation&nbsp;<span>4.15</span></a> is <a href="03-notes.html#eq-sarsa-fa" class="quarto-xref">Equation&nbsp;<span>3.14</span></a>, character for character: Sarsa with function approximation, the last algorithm of Chapter 3. Its bracket is the TD error of <a href="03-notes.html#def-td-target" class="quarto-xref">Definition&nbsp;<span>3.2</span></a> in action-value form, and it is multiplied by <span class="math inline">\(\nabla_{w}\hat{q}\)</span> because the update lands on parameters rather than on a table cell. Nothing about it knows it is serving a policy gradient method.</p>
+<p><strong>The actor is <a href="#eq-ac-actor" class="quarto-xref">Equation&nbsp;<span>4.14</span></a> with the estimate plugged in.</strong> The only difference from <a href="#eq-ac-actor" class="quarto-xref">Equation&nbsp;<span>4.14</span></a> is that the unavailable <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span> has been replaced by the critic’s current guess <span class="math inline">\(\hat{q}(s_{t},a_{t},w_{t})\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Read the two updates as a division of labour">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Read the two updates as a division of labour
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The critic answers “how good was that?” and the actor answers “then do more of it”. Each supplies the other with what it cannot compute: the actor cannot evaluate its own choices, and the critic has no way to change behaviour. Running them at the same time is what makes the method incremental, since neither has to wait for the other to converge before taking its next step.</p>
+</div>
+</div>
+<div id="fig-4-reinforce-qac" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-reinforce-qac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/04-reinforce-vs-qac.svg" class="img-fluid figure-img" style="width:82.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-reinforce-qac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: REINFORCE <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> and QAC <a href="#eq-qac-actor" class="quarto-xref">Equation&nbsp;<span>4.16</span></a> on the same six-state corridor, charged against <strong>environment steps</strong> rather than updates. Every episode starts at <span class="math inline">\(s_{0}\)</span>, one action advances along the corridor and one goes back, stepping off the far end pays <span class="math inline">\(10\)</span> and ends the episode, every other reward is zero in expectation, and every reward carries independent <span class="math inline">\(N(0,3^{2})\)</span> noise; <span class="math inline">\(\gamma=0.95\)</span> and episodes are capped at 80 steps. The policy is the softmax <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> on a table of preferences, so <span class="math inline">\(\pi(a\given s,\theta)&gt;0\)</span> everywhere; the critic is a table trained by <a href="03-notes.html#eq-sarsa-fa" class="quarto-xref">Equation&nbsp;<span>3.14</span></a> with <span class="math inline">\(\alpha_{w}=0.05\)</span>; and both algorithms use the <em>same</em> actor step size <span class="math inline">\(\alpha_{\theta}=0.003\)</span>, because <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> and <a href="#eq-qac-actor" class="quarto-xref">Equation&nbsp;<span>4.16</span></a> are the same actor and only the estimate of <span class="math inline">\(q_{\pi}\)</span> differs. Lines are medians and bands interquartile ranges over 60 runs, with <span class="math inline">\(J(\theta)=v_{\pi}(s_{0})\)</span> solved for exactly at every point, so the width of a band is dispersion in the learned <span class="math inline">\(\theta\)</span> rather than measurement noise. QAC sits still for its first thousand steps, since its actor step is scaled by <span class="math inline">\(\hat{q}\)</span> and the critic starts at zero, and REINFORCE briefly leads. After that the ordering never reverses, for the two reasons of <a href="#tbl-reinforce-ac" class="quarto-xref">Table&nbsp;<span>4.2</span></a>. Timing: 20,000 transitions buy QAC 20,000 parameter updates and REINFORCE about 2,000, one per episode, and by 5,000 steps the median <span class="math inline">\(J\)</span> is <span class="math inline">\(6.9\)</span> against <span class="math inline">\(5.5\)</span>. Variance: <span class="math inline">\(G_{t}\)</span> sums every noisy reward left in the episode while the critic’s target carries one reward plus a bootstrap, so at 10,000 steps REINFORCE’s runs are spread roughly three times as wide. A single run of either would hide that.
+</figcaption>
+</figure>
+</div>
+<div id="tbl-reinforce-ac" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-reinforce-ac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.2: REINFORCE against Q actor-critic. Every row is <a href="03-notes.html#tbl-td-mc" class="quarto-xref">Table&nbsp;<span>3.1</span></a> restated, which is the point: the actor is identical in the two algorithms, and the entire difference is which estimator supplies <span class="math inline">\(q_{\pi}\)</span>.
+</figcaption>
+<div aria-describedby="tbl-reinforce-ac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>REINFORCE, <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a></th>
+<th>QAC, <a href="#eq-qac-actor" class="quarto-xref">Equation&nbsp;<span>4.16</span></a> and <a href="#eq-qac-critic" class="quarto-xref">Equation&nbsp;<span>4.15</span></a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Estimate of <span class="math inline">\(q_{\pi}\)</span></strong></td>
+<td>realized return <span class="math inline">\(G_{t}\)</span>, as in <a href="02-notes.html#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a></td>
+<td>bootstrapped <span class="math inline">\(\hat{q}(s,a,w)\)</span>, as in <a href="03-notes.html#eq-sarsa-fa" class="quarto-xref">Equation&nbsp;<span>3.14</span></a></td>
+</tr>
+<tr class="even">
+<td><strong>Timing</strong></td>
+<td>episodic, in the sense of <a href="03-notes.html#def-incremental" class="quarto-xref">Definition&nbsp;<span>3.1</span></a></td>
+<td>incremental: one update per transition</td>
+</tr>
+<tr class="odd">
+<td><strong>Bias</strong></td>
+<td>unbiased</td>
+<td>biased while <span class="math inline">\(\hat{q}\neq q_{\pi}\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Variance</strong></td>
+<td>high: <span class="math inline">\(G_{t}\)</span> sums many random rewards</td>
+<td>low: one reward plus a bootstrap</td>
+</tr>
+<tr class="odd">
+<td><strong>What is stored</strong></td>
+<td>policy parameters <span class="math inline">\(\theta\)</span></td>
+<td><span class="math inline">\(\theta\)</span> and critic parameters <span class="math inline">\(w\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Task type</strong></td>
+<td>needs terminal states</td>
+<td>handles continuing tasks too</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Policy gradient methods are <strong>on-policy</strong> in the sense of <a href="03-notes.html#def-on-off-policy" class="quarto-xref">Definition&nbsp;<span>3.3</span></a>, and <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> says why. The expectation is taken over <span class="math inline">\(a\sim\pi(\cdot\given s,\theta)\)</span>, the policy currently being learned, so a sample drawn from any other policy estimates the wrong expectation. This is a stronger constraint than Sarsa’s: Sarsa was on-policy because its target happened to need <span class="math inline">\(a_{t+1}\)</span>, whereas here the sampling distribution is written into the theorem itself. Undoing it requires an importance-weighting correction, and that correction, kept from growing too large, is the idea behind PPO.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="No $\eps$-greedy anywhere">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>No <span class="math inline">\(\eps\)</span>-greedy anywhere
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Look at what is missing from QAC relative to policy searching by Sarsa in Chapter 3: there is no improvement step and no <span class="math inline">\(\eps\)</span>-greedy step. The policy is not derived from <span class="math inline">\(\hat{q}\)</span> by maximizing over actions; it is its own parameterized object, moved directly by <a href="#eq-qac-actor" class="quarto-xref">Equation&nbsp;<span>4.16</span></a>. And exploration is guaranteed by <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> keeping <span class="math inline">\(\pi&gt;0\)</span> rather than by mixing in a uniform distribution. The two pieces of scaffolding that Chapter 2 needed to make value-based methods work have both become unnecessary, because the thing they were propping up is no longer how the policy is produced.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="closing-what-the-four-chapters-did" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="closing-what-the-four-chapters-did"><span class="header-section-number">4.8</span> Closing: what the four chapters did</h2>
+<div class="callout callout-style-default callout-important callout-titled" title="One idea, applied four times">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>One idea, applied four times
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The book has a single spine, and it is worth stating in one place. <strong>Every chapter took one more object that dynamic programming computes exactly and replaced it with a sampled estimate.</strong></p>
+<p><strong>Chapter 1</strong> set up the ledger. Dynamic programming computes <span class="math inline">\(\E[\cdot]\)</span> by integrating against a known <span class="math inline">\(p\)</span>; Monte Carlo estimates it by averaging draws. <a href="01-notes.html#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> showed that the average can be built incrementally, one sample at a time, and that swapping <span class="math inline">\(1/k\)</span> for a constant <span class="math inline">\(\alpha\)</span> turns averaging into learning. The doorway at the end of that chapter was Howard policy iteration with its evaluation step marked for replacement.</p>
+<p><strong>Chapter 2</strong> replaced the evaluation step. The exact linear solve <a href="01-notes.html#eq-hpi-pe" class="quarto-xref">Equation&nbsp;<span>1.6</span></a> became an average of sampled returns <a href="02-notes.html#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a>, and improvement was made model-free by working with <span class="math inline">\(q_{\pi}\)</span> rather than <span class="math inline">\(v_{\pi}\)</span>. The theory of <em>why</em> such replacements converge, Robbins-Monro and stochastic approximation, was built there, and <a href="02-notes.html#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> came out of it as the general engine.</p>
+<p><strong>Chapter 3</strong> replaced two more things. The wait for an episode to end became a bootstrap, giving TD, Sarsa, and Q-learning; and the table of values became a parameterized function <a href="03-notes.html#eq-fa" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> fit by <a href="02-notes.html#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a>. After that chapter, what an algorithm stores and what an algorithm waits for had both been made cheap.</p>
+<p><strong>Chapter 4</strong> replaced the last one. Even with <span class="math inline">\(\hat{q}(s,a,w)\)</span> in hand, the policy was still produced by an exactly computed <span class="math inline">\(\argmax\)</span> over actions. Policy gradient parameterizes the policy directly and replaces that maximization with a sampled gradient step, <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a>, whose ingredients are a score you can differentiate and a <span class="math inline">\(q\)</span> you already know three ways to estimate. Nothing in the loop is computed from a model any more.</p>
+<p>Which is the sentence Chapter 1 opened with, now earned rather than asserted: reinforcement learning is Monte-Carlo dynamic programming.</p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./03-notes.html" class="pagination-link" aria-label="Temporal Difference Learning, Sarsa, and Q-learning">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Temporal Difference Learning, Sarsa, and Q-learning</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Chen Gao. Original exposition &amp; figures under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Unofficial study notes based on Ben Moll’s reinforcement learning lectures, themselves adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>; all rights in those original materials remain with their authors.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
