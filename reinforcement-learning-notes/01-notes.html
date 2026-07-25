@@ -21,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -43,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-6e77e0fd038bd32286badfaa030b4a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -171,6 +206,29 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -398,6 +456,9 @@ Table&nbsp;1.1: Monte Carlo vs.&nbsp;TD(0) as estimators of the value function.
 </figure>
 </div>
 <p>TD buys much lower <strong>variance</strong> at the cost of a little <strong>bias</strong>, and trades “wait until the end” for “update online.” The two are endpoints of a spectrum: <span class="math inline">\(n\)</span>-step returns and TD(<span class="math inline">\(\lambda\)</span>) interpolate between them.</p>
+<!-- Deliberately NOT an executable cell: `fig_mc_vs_td()` in figures/01_figures.py takes
+     ~110 s (16 episode budgets x 60 replications x two estimators), far too slow to run at
+     render time. It stays pre-generated; regenerate with `python3 figures/01_figures.py`. -->
 <div id="fig-1-mc-vs-td" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-1-mc-vs-td-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -531,16 +592,97 @@ v(s_{i})=\max_{a\in\mathcal{A}}\Big\{\,r_{a}(s_{i})+\beta\sum_{s_{j}\in\mathcal{
 \pi_{k+1}=\argmax_{\pi}\big\{\,\mathbf{r}_{\pi}+\beta\,\mathbf{P}_{\pi}\mathbf{v}_{\pi_{k}}\,\big\}.
 \]</span></li>
 </ol>
-<p>HPI often converges in far fewer iterations than VFI: each evaluation step solves for a policy’s value <em>exactly</em>, so every improvement acts on the <em>true</em> value of the current policy, a Newton-like step in policy space. With finitely many policies and a strict improvement each round, it reaches the optimum in finitely many iterations.</p>
+<p>HPI often converges in far fewer iterations than VFI: each evaluation step solves for a policy’s value <em>exactly</em>, so every improvement acts on the <em>true</em> value of the current policy, a Newton-like step in policy space. With finitely many policies and a strict improvement each round, it reaches the optimum in finitely many iterations, as <a href="#fig-1-vfi-vs-hpi" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> shows.</p>
+<div id="cell-fig-1-vfi-vs-hpi" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Value function iteration and Howard policy iteration, and their error paths</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vfi(u, v0, iters):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Value function iteration: v_{j+1} = max_{k'} { u + beta v_j }."""</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    v, path <span class="op">=</span> v0.copy(), []</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(iters):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The whole Bellman operator is this one line: `u + BETA * v[None, :]` forms</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># r_a + beta P_a v_k for every state-action pair at once, and the row-wise max</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># is the component-wise maximization. Infeasible k' carry u = -inf, so the max</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># is already a CONSTRAINED maximization.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> np.<span class="bu">max</span>(u <span class="op">+</span> BETA <span class="op">*</span> v[<span class="va">None</span>, :], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        path.append(v.copy())</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(path)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hpi(u, v0, iters):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Howard policy iteration: greedy improvement, then EXACT policy evaluation.</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Starting from a value rather than a policy, the loop improves first and evaluates</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">    second, so iteration k returns v_{pi_{k+1}}.</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    v, path <span class="op">=</span> v0.copy(), []</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(iters):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        pol <span class="op">=</span> np.argmax(u <span class="op">+</span> BETA <span class="op">*</span> v[<span class="va">None</span>, :], axis<span class="op">=</span><span class="dv">1</span>)           <span class="co"># improvement</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Assemble r_pi and P_pi from the greedy policy: under a deterministic policy</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># P_pi is a 0/1 selection matrix with one entry per row, which is what makes</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># the solve below cheap.</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        r_pi <span class="op">=</span> u[np.arange(NK), pol]</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        P_pi <span class="op">=</span> np.zeros((NK, NK))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        P_pi[np.arange(NK), pol] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Exact evaluation: solve (I - beta P_pi) v_pi = r_pi outright rather than</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># iterating it. That solve is the Newton-like step in policy space.</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> np.linalg.solve(np.eye(NK) <span class="op">-</span> BETA <span class="op">*</span> P_pi, r_pi)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        path.append(v.copy())</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(path)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> ncgm_payoff()</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>v0 <span class="op">=</span> np.zeros(NK)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>v_star <span class="op">=</span> vfi(u, v0, <span class="dv">2500</span>)[<span class="op">-</span><span class="dv">1</span>]                                    <span class="co"># converged reference</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>n_v, n_h <span class="op">=</span> <span class="dv">220</span>, <span class="dv">24</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>err_v <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(vfi(u, v0, n_v) <span class="op">-</span> v_star), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>err_h <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(hpi(u, v0, n_h) <span class="op">-</span> v_star), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>floor <span class="op">=</span> <span class="fl">1e-14</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>err_v, err_h <span class="op">=</span> np.maximum(err_v, floor), np.maximum(err_h, floor)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> new_ax(<span class="fl">6.6</span>, <span class="fl">4.4</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>ax.semilogy(np.arange(<span class="dv">1</span>, n_v <span class="op">+</span> <span class="dv">1</span>), err_v, color<span class="op">=</span>COL[<span class="st">"sky"</span>], lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>ax.semilogy(</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    np.arange(<span class="dv">1</span>, n_h <span class="op">+</span> <span class="dv">1</span>), err_h, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], lw<span class="op">=</span><span class="fl">2.2</span>,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="fl">4.5</span>, zorder<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="co"># the theoretical VFI rate: error falls by exactly beta each sweep</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>ax.semilogy(</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    np.arange(<span class="dv">1</span>, n_v <span class="op">+</span> <span class="dv">1</span>), err_v[<span class="dv">0</span>] <span class="op">*</span> BETA <span class="op">**</span> np.arange(n_v),</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>GREY, lw<span class="op">=</span><span class="fl">1.0</span>, ls<span class="op">=</span><span class="st">"--"</span>, zorder<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, <span class="dv">200</span>)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(floor <span class="op">/</span> <span class="dv">3</span>, err_v[<span class="dv">0</span>] <span class="op">*</span> <span class="dv">3</span>)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"iteration"</span>)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="vs">r"</span><span class="dv">$</span><span class="ch">\|</span><span class="vs">v_j - v</span><span class="dv">^</span><span class="op">*</span><span class="ch">\|</span><span class="vs">_</span><span class="er">\</span><span class="vs">infty</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">88</span>, <span class="fl">3.0</span>, <span class="st">"value function iteration"</span>, color<span class="op">=</span>COL[<span class="st">"sky"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">88</span>, <span class="fl">0.45</span>, <span class="vs">r"contracts at rate </span><span class="dv">$\b</span><span class="vs">eta=0</span><span class="dv">.</span><span class="vs">96</span><span class="dv">$</span><span class="vs">, forever"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">28</span>, <span class="fl">1e-13</span>, <span class="st">"Howard policy iteration"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">28</span>, <span class="fl">2e-14</span>, <span class="st">"policy stable at iteration 19"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Neoclassical growth model: HPI terminates, VFI only decays"</span>)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="co"># The figure's central claim, asserted rather than eyeballed: HPI really does reach</span></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="co"># VFI's fixed point, to machine precision, inside the 24 iterations plotted. If this</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="co"># ever stops holding, the book fails to render rather than shipping a false figure.</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(hpi(u, v0, <span class="dv">20</span>)[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> v_star)) <span class="op">&lt;</span> <span class="fl">1e-12</span>, <span class="st">"HPI missed v*"</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
 <div id="fig-1-vfi-vs-hpi" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-1-vfi-vs-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/01-vfi-vs-hpi.svg" class="img-fluid figure-img" style="width:82.0%">
+<img src="01-notes_files/figure-html/fig-1-vfi-vs-hpi-output-1.png" width="577" height="401" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-vfi-vs-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1.2: The two algorithms on the neoclassical growth model of <a href="#exm-ncgm" class="quarto-xref">Example&nbsp;<span>1.1</span></a>, capital discretised onto a 250-point grid with <span class="math inline">\(\beta=0.96\)</span>. VFI is a contraction of modulus <span class="math inline">\(\beta\)</span>, so its error falls by a constant factor every sweep: a straight line on a log scale, which never actually terminates. HPI does terminate. The policy stops changing at iteration 19, and one iteration earlier the error drops off a cliff to machine precision, because an evaluation step that is <em>exact</em> returns the true value of a policy that has stopped improving. Matching that accuracy by VFI takes on the order of <span class="math inline">\(\log(10^{-15})/\log\beta\approx850\)</span> sweeps.
 </figcaption>
 </figure>
+</div>
+</div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">

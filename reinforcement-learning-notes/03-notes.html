@@ -21,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -43,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-6e77e0fd038bd32286badfaa030b4a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -171,6 +206,29 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -526,6 +584,19 @@ q_{t+1}(s_{t},a_{t})=q_{t}(s_{t},a_{t})+\alpha_{t}(s_{t},a_{t})\big[\,r_{t+1}+\g
 <p>with <span class="math inline">\(q_{t+1}(s,a)=q_{t}(s,a)\)</span> for all <span class="math inline">\((s,a)\neq(s_{t},a_{t})\)</span>.</p>
 </div>
 </div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Where the code is">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Where the code is
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>There is no separate listing for <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>. Sarsa and Q-learning share one loop and part company on a single line, so the implementation is given once, with Q-learning below.</p>
+</div>
+</div>
 <p>Three questions answer themselves from <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>.</p>
 <p><strong>Why the name?</strong> Each update consumes the quintuple <span class="math inline">\((s_{t},a_{t},r_{t+1},s_{t+1},a_{t+1})\)</span>: <strong>s</strong>tate, <strong>a</strong>ction, <strong>r</strong>eward, <strong>s</strong>tate, <strong>a</strong>ction. Sarsa.</p>
 <p><strong>How does it relate to TD?</strong> Replace the state value <span class="math inline">\(v(s)\)</span> in <a href="#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a> by the action value <span class="math inline">\(q(s,a)\)</span> and you have <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>. Sarsa <em>is</em> the TD algorithm, in action-value form.</p>
@@ -537,7 +608,7 @@ q_{\pi}(s,a)=\E\big[R+\gamma q_{\pi}(S',A')\ \given\ s,a\big],
 <p>which is the action-value form of the policy-evaluation Bellman equation for the fixed policy <span class="math inline">\(\pi\)</span>: <a href="02-notes.html#eq-bellman-pi" class="quarto-xref">Equation&nbsp;<span>2.2</span></a> with the maximization over <span class="math inline">\(\pi\)</span> removed.</p>
 <p>The claim deserves a proof, because <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> does not look like anything in Chapter 2. There is no sum over actions in it, and the policy <span class="math inline">\(\pi\)</span> appears nowhere. Both are hiding inside the expectation.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof that the Sarsa fixed point is the Bellman equation">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -546,7 +617,7 @@ q_{\pi}(s,a)=\E\big[R+\gamma q_{\pi}(S',A')\ \given\ s,a\big],
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Write <span class="math inline">\(p(r\given s,a)\)</span> for the distribution of the immediate reward and <span class="math inline">\(p(s'\given s,a)\)</span> for the transition, both conditional on the pair <span class="math inline">\((s,a)\)</span>. Expanding the right-hand side of <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> by the definition of expectation,</p>
 <p><span class="math display">\[
@@ -579,7 +650,7 @@ v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
 </div>
 <p>The hypotheses read exactly as in <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> with one word changed: the Robbins-Monro conditions must now hold <strong>pair by pair</strong> rather than state by state. The conclusion changes in the same mechanical way, from the whole vector of state values to the whole table of action values. So does the proof, and it is worth showing precisely how rather than asserting it.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof of the convergence of Sarsa">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -588,7 +659,7 @@ v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Nothing new is needed. Sarsa is the TD algorithm with its index set enlarged from states to state-action pairs, so the proof of <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> carries over under a dictionary. Here are the substitutions, in the order that proof uses them.</p>
 <p><strong>The index set.</strong> Replace <span class="math inline">\(\mathcal{S}\)</span> by <span class="math inline">\(\mathcal{S}\times\mathcal{A}\)</span> everywhere. It is still finite, which is all <a href="#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> ever asked of it, and the norm becomes <span class="math inline">\(\|x\|_{\infty}=\max_{(s,a)}|x(s,a)|\)</span>, a maximum over pairs.</p>
@@ -644,6 +715,28 @@ v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
 </ol>
 </div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled" title="Implementation: eps-greedy action selection">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Implementation: eps-greedy action selection
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Step 3 in code, for the two-action chain behind <a href="#fig-3-sarsa-q" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>. With <span class="math inline">\(|\mathcal{A}|=2\)</span>, <a href="02-notes.html#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a> puts <span class="math inline">\(1-\eps/2\)</span> on the greedy action and <span class="math inline">\(\eps/2\)</span> on the other, which is exactly what the coin flip below does; <code>q</code> is the table, <code>g</code> the index of its larger entry at <code>s</code>, and <span class="math inline">\(\eps=0.2\)</span> throughout this chapter.</p>
+<div id="63cc704a" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> eps_greedy(q, s):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""The eps-greedy policy of @def-eps-greedy at s, for the two actions here."""</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> <span class="bu">int</span>(q[s, <span class="dv">1</span>] <span class="op">&gt;</span> q[s, <span class="dv">0</span>])</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">-</span> g <span class="cf">if</span> RNG.random() <span class="op">&lt;</span> EPS <span class="op">/</span> <span class="dv">2</span> <span class="cf">else</span> g</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -676,6 +769,64 @@ Tip
 q_{t+1}(s_{t},a_{t})=q_{t}(s_{t},a_{t})+\alpha_{t}(s_{t},a_{t})\Big[\,r_{t+1}+\gamma\max_{a\in\mathcal{A}}q_{t}(s_{t+1},a)-q_{t}(s_{t},a_{t})\,\Big],
 \tag{3.9}\]</span></span></p>
 <p>with <span class="math inline">\(q_{t+1}(s,a)=q_{t}(s,a)\)</span> for all <span class="math inline">\((s,a)\neq(s_{t},a_{t})\)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Implementation: Sarsa and Q-learning, one loop">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Implementation: Sarsa and Q-learning, one loop
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Both algorithms, in the one loop that produces <a href="#fig-3-sarsa-q" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>. <code>step(s, a)</code> returns the next state, the realized reward, and whether the episode ended; the chain has <code>N_DEC = 4</code> decision states and <span class="math inline">\(\gamma=0.9\)</span>; and <code>use_max</code> is where the two part company. It appears <strong>twice</strong>. First it selects the target: either the <span class="math inline">\(\max\)</span> of <a href="#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> or the value of the action <code>eps_greedy</code> actually drew, <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a>. Second, at the bottom of the loop, it decides whether the action just used in the target is the one actually taken next, which is on-policy Sarsa, or is discarded in favour of a fresh draw, which is off-policy Q-learning. That second branch is where on-policy versus off-policy physically lives. Everything else, the visit-count step size <span class="math inline">\(\alpha_{t}=1/n(s,a)\)</span> that supplies the Robbins-Monro schedule of <a href="#thm-sarsa-convergence" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a>, the uniform starting states that hold the two algorithms’ visitation equal, and the update itself, is shared verbatim. The two lines that record <code>qs</code> and <code>vals</code> at the episode counts listed in <code>checks</code> are bookkeeping for the figure and play no part in the algorithm.</p>
+<div id="ff8df76c" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run(use_max, n_ep, checks):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""One learning run; `use_max` selects the TD target of @tbl-sarsa-q.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">    use_max=True is Q-learning @eq-qlearning, whose target maxes over the table.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    use_max=False is Sarsa @eq-sarsa, whose target uses the action a_{t+1} that the</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    eps-greedy behavior policy actually draws. Everything else is shared.</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Episodes begin at a uniformly drawn decision state. That exploring-starts device</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">    holds the two algorithms' visitation equal, so the difference the figure shows</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">    cannot be an artifact of one of them wandering somewhere the other does not: the</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">    only thing left that differs is the target. Step sizes are 1/n(s, a), the</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">    Robbins-Monro schedule both convergence theorems ask for.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> RNG.normal(<span class="fl">0.0</span>, <span class="fl">1e-3</span>, (N_DEC, <span class="dv">2</span>))  <span class="co"># jitter only breaks the initial ties</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> np.zeros((N_DEC, <span class="dv">2</span>))               <span class="co"># visit counts, so alpha = 1 / n(s, a)</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    wanted <span class="op">=</span> <span class="bu">set</span>(checks.tolist())</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    qs, vals <span class="op">=</span> [], []</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ep <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_ep <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> <span class="bu">int</span>(RNG.integers(N_DEC))       <span class="co"># uniform state starts, not exploring starts:</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">#                                   the first action is still drawn eps-greedily</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        a <span class="op">=</span> eps_greedy(q, s)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            s2, r, done <span class="op">=</span> step(s, a)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> use_max:</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> q[s2].<span class="bu">max</span>()   <span class="co"># Q-learning: max over the table</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                a2 <span class="op">=</span> eps_greedy(q, s2)             <span class="co"># Sarsa: the action drawn next,</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> q[s2, a2]     <span class="co"># read before the update</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>            n[s, a] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>            q[s, a] <span class="op">+=</span> (target <span class="op">-</span> q[s, a]) <span class="op">/</span> n[s, a]</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            s, a <span class="op">=</span> s2, (eps_greedy(q, s2) <span class="cf">if</span> use_max <span class="cf">else</span> a2)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ep <span class="kw">in</span> wanted:</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            qs.append(q.copy())</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            vals.append(policy_value(q[:, <span class="dv">1</span>] <span class="op">&gt;</span> q[:, <span class="dv">0</span>]))</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(qs), np.array(vals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>One boolean, read in two places, is the entire difference between an on-policy and an off-policy algorithm, and between converging to <span class="math inline">\(q_{\pi}\)</span> and converging to <span class="math inline">\(q^{*}\)</span>.</p>
+</div>
 </div>
 </div>
 <p>Set <a href="#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> beside <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> and exactly one thing has changed, the TD target:</p>
@@ -718,7 +869,7 @@ q(s,a)=\E\Big[R+\gamma\max_{a'\in\mathcal{A}}q(S',a')\ \given\ s,a\Big],
 <p>whose solution is <span class="math inline">\(q^{*}\)</span>. So Q-learning estimates the optimal action values directly, and needs no separate policy improvement step at all.</p>
 <p>Calling <a href="#eq-bellman-opt-q" class="quarto-xref">Equation&nbsp;<span>3.10</span></a> an optimality equation is a claim worth checking, because it does not look like one. Its only maximization sits inside the expectation, over the <em>next</em> action; nothing is maximized over policies, and the unknown carries no <span class="math inline">\(\pi\)</span> subscript at all.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof that the Q-learning fixed point is the Bellman optimality equation">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -727,7 +878,7 @@ q(s,a)=\E\Big[R+\gamma\max_{a'\in\mathcal{A}}q(S',a')\ \given\ s,a\Big],
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><strong>Step 1: expand the expectation.</strong> Exactly as for Sarsa, write the right-hand side as sums against the conditional distributions of the reward and of the next state. What differs is that the next <em>action</em> is not random: the <span class="math inline">\(\max\)</span> has already chosen it, so only <span class="math inline">\(r\)</span> and <span class="math inline">\(s'\)</span> are integrated out and no policy is needed to average over <span class="math inline">\(a'\)</span>, <span class="math display">\[
 q(s,a)=\sum_{r}r\,p(r\given s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\max_{a'\in\mathcal{A}}q(s',a').
@@ -789,15 +940,82 @@ Tip
 <p>Compare this with policy searching by Sarsa: there is no <span class="math inline">\(a_{t+1}\)</span> anywhere. This version still generates its own data with an <span class="math inline">\(\eps\)</span>-greedy behavior policy, which makes it a convenient but not a <em>fully</em> off-policy implementation. A fully off-policy version draws all its data from a fixed exploratory behavior policy and never updates it.</p>
 </div>
 </div>
+<div id="cell-fig-3-sarsa-q" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>240 runs of each algorithm on the ledge chain, scored two ways</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>n_runs, n_ep <span class="op">=</span> <span class="dv">240</span>, <span class="dv">1200</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>checks <span class="op">=</span> np.unique(np.<span class="bu">round</span>(np.logspace(<span class="dv">0</span>, np.log10(n_ep), <span class="dv">44</span>)).astype(<span class="bu">int</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>algos <span class="op">=</span> ((<span class="st">"qlearning"</span>, <span class="va">True</span>, COL[<span class="st">"vermilion"</span>]), (<span class="st">"sarsa"</span>, <span class="va">False</span>, COL[<span class="st">"sky"</span>]))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ref <span class="op">=</span> {name: reference_q(<span class="fl">0.0</span> <span class="cf">if</span> use_max <span class="cf">else</span> EPS) <span class="cf">for</span> name, use_max, _ <span class="kw">in</span> algos}</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> {name: np.zeros(<span class="bu">len</span>(checks)) <span class="cf">for</span> name, _, _ <span class="kw">in</span> algos}</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>val <span class="op">=</span> {name: np.zeros(<span class="bu">len</span>(checks)) <span class="cf">for</span> name, _, _ <span class="kw">in</span> algos}</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_runs):</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, use_max, _ <span class="kw">in</span> algos:</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        qs, vs <span class="op">=</span> run(use_max, n_ep, checks)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        err[name] <span class="op">+=</span> np.sqrt(np.mean((qs <span class="op">-</span> ref[name]) <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">2</span>)))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        val[name] <span class="op">+=</span> vs</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, _, _ <span class="kw">in</span> algos:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># as a share of the gap the run started from, so the two rates are comparable</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    err[name] <span class="op">/=</span> n_runs <span class="op">*</span> np.sqrt(np.mean(ref[name] <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    val[name] <span class="op">/=</span> n_runs</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># The figure's two claims, checked on the runs it plots. Q-learning must end nearer the</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># values its own equation defines AND imply the better greedy policy; Sarsa settles</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># strictly below because it prices in the exploration it actually does.</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> err[<span class="st">"qlearning"</span>][<span class="op">-</span><span class="dv">1</span>] <span class="op">&lt;</span> err[<span class="st">"sarsa"</span>][<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> val[<span class="st">"qlearning"</span>][<span class="op">-</span><span class="dv">1</span>] <span class="op">&gt;</span> val[<span class="st">"sarsa"</span>][<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> <span class="fl">1.0</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>fig, (axL, axR) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.4</span>, <span class="fl">3.9</span>))</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>trim(axL), trim(axR)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># --- left: distance to each algorithm's own fixed point ------------------</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, _, colour <span class="kw">in</span> algos:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    axL.loglog(checks, err[name], color<span class="op">=</span>colour, lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>lo <span class="op">=</span> err[<span class="st">"qlearning"</span>][<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>axL.set_xlim(<span class="dv">1</span>, n_ep)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>axL.set_ylim(lo <span class="op">*</span> <span class="fl">0.5</span>, <span class="fl">1.3</span>)  <span class="co"># room under the curves for the two direct labels</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>axL.set_xlabel(<span class="st">"episodes"</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>axL.set_ylabel(<span class="st">"share of the initial error left"</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>label_at(axL, <span class="fl">1.6</span>, lo <span class="op">*</span> <span class="fl">2.4</span>, <span class="vs">r"Sarsa </span><span class="dv">$</span><span class="ch">\t</span><span class="vs">o q_{</span><span class="er">\</span><span class="vs">pi}</span><span class="dv">$</span><span class="vs">"</span>, color<span class="op">=</span>COL[<span class="st">"sky"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>label_at(axL, <span class="fl">1.6</span>, lo <span class="op">*</span> <span class="fl">0.8</span>, <span class="vs">r"Q-learning </span><span class="dv">$</span><span class="ch">\t</span><span class="vs">o q</span><span class="dv">^</span><span class="vs">{</span><span class="op">*</span><span class="vs">}</span><span class="dv">$</span><span class="vs">"</span>,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>axL.set_title(<span class="st">"Each settles on its own fixed point, Q-learning sooner"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co"># --- right: value of the greedy policy each one implies ------------------</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"># The reference lines stop at the last episode, leaving the right margin clear for</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co"># their tags rather than running a dashed rule straight through the text.</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>v_star, v_safe <span class="op">=</span> policy_value([<span class="va">False</span>] <span class="op">*</span> N_DEC), R_SAFE</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> v <span class="kw">in</span> (v_star, v_safe):</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    axR.plot([<span class="dv">0</span>, n_ep], [v, v], color<span class="op">=</span>GREY, lw<span class="op">=</span><span class="fl">0.9</span>, ls<span class="op">=</span><span class="st">"--"</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, _, colour <span class="kw">in</span> algos:</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    axR.plot(checks, val[name], color<span class="op">=</span>colour, lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>axR.set_xlim(<span class="dv">0</span>, n_ep <span class="op">*</span> <span class="fl">1.42</span>)  <span class="co"># headroom on the right for the two reference tags</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>axR.set_xticks([<span class="dv">0</span>, <span class="dv">400</span>, <span class="dv">800</span>, <span class="dv">1200</span>])  <span class="co"># the headroom carries tags, not data</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>axR.set_xlabel(<span class="st">"episodes"</span>)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>axR.set_ylabel(<span class="vs">r"value at </span><span class="dv">$</span><span class="vs">s_</span><span class="op">{0}</span><span class="dv">$</span><span class="vs"> of the implied greedy policy"</span>)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>label_at(axR, n_ep <span class="op">*</span> <span class="fl">1.04</span>, v_star, <span class="vs">r"</span><span class="dv">$</span><span class="vs">v</span><span class="dv">^</span><span class="vs">{</span><span class="op">*</span><span class="vs">}</span><span class="kw">(</span><span class="vs">s_</span><span class="op">{0}</span><span class="kw">)</span><span class="dv">$</span><span class="vs">: the ledge"</span>,</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>label_at(axR, n_ep <span class="op">*</span> <span class="fl">1.04</span>, v_safe, <span class="st">"the safe route"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>label_at(axR, n_ep <span class="op">*</span> <span class="fl">0.42</span>, <span class="fl">6.25</span>, <span class="st">"Q-learning"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>label_at(axR, n_ep <span class="op">*</span> <span class="fl">0.42</span>, <span class="fl">4.05</span>, <span class="st">"Sarsa"</span>, color<span class="op">=</span>COL[<span class="st">"sky"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>axR.set_title(<span class="st">"Sarsa keeps the safe route it can afford to explore"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
 <div id="fig-3-sarsa-q" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-3-sarsa-q-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/03-sarsa-vs-q.svg" class="img-fluid figure-img" style="width:100.0%">
+<img src="03-notes_files/figure-html/fig-3-sarsa-q-output-1.png" width="891" height="361" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-sarsa-q-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.1: Sarsa and Q-learning on a five-state chain, run on identical experience with <span class="math inline">\(\gamma=0.9\)</span> and <span class="math inline">\(\eps=0.2\)</span>. Walking the ledge pays 10 on arrival but a mis-step off it costs <span class="math inline">\(-12\)</span> and ends the episode; stepping aside at the start is a safe route worth 5. Acting optimally, the ledge wins (<span class="math inline">\(v^{*}(s_{0})=7.29\)</span>); acting <span class="math inline">\(\eps\)</span>-greedily it does not, because the exploration itself keeps falling off. <strong>Left:</strong> each algorithm converges to the fixed point of <em>its own</em> equation, Sarsa to <span class="math inline">\(q_{\pi}\)</span> for the best <span class="math inline">\(\eps\)</span>-greedy policy and Q-learning to <span class="math inline">\(q^{*}\)</span>, plotted as the share of the initial error still left. They are level until values have to be bootstrapped back along the chain; after that Q-learning pulls away, because its <span class="math inline">\(\max\)</span> target carries the best continuation immediately instead of waiting for the behavior policy to happen to pick it. <strong>Right:</strong> the same runs scored by the value of the greedy policy each currently implies. Sarsa settles on the safe route, worth 5, because on-policy it is valuing what it will actually do, exploration and all. Q-learning settles on the ledge, worth 7.29, because off-policy it is valuing what it <em>would</em> do if it stopped exploring. Neither is converging badly: they are answering different questions.
 </figcaption>
 </figure>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -821,6 +1039,107 @@ Figure&nbsp;3.1: Sarsa and Q-learning on a five-state chain, run on identical ex
 <p><span class="theorem-title"><strong>Example 3.1 (Fitting a line)</strong></span> Suppose the states <span class="math inline">\(s_{1},\dots,s_{|\mathcal{S}|}\)</span> are one-dimensional and <span class="math inline">\(|\mathcal{S}|\)</span> is very large. The crudest approximation is a straight line: <span class="math display">\[
 \hat{v}(s,w)=as+b=\underbrace{[\,s\ \ 1\,]}_{\phi^{\!\top}(s)}\underbrace{\begin{bmatrix}a\\ b\end{bmatrix}}_{w}=\phi^{\!\top}(s)\,w .
 \]</span> Here <span class="math inline">\(w\)</span> is the <strong>parameter vector</strong>, <span class="math inline">\(\phi(s)\)</span> is the <strong>feature vector</strong> of <span class="math inline">\(s\)</span>, and <span class="math inline">\(\hat{v}\)</span> is linear in <span class="math inline">\(w\)</span>. Two numbers now stand in for <span class="math inline">\(|\mathcal{S}|\)</span> of them.</p>
+</div>
+<p>That example is deliberately crude, and it is worth seeing what a feature map actually buys before the algorithms that fit one arrive. <a href="#fig-3-function-approx" class="quarto-xref">Figure&nbsp;<span>3.2</span></a> sets a table, the line above, and a slightly richer set of features against the same value function, and then visits a single state to see what each of them does to the rest.</p>
+<div id="cell-fig-3-function-approx" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Fitting a 200-state value function with six numbers</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A 200-state chain on [0, 1]. The policy induces a reflecting random walk, so v_pi</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># solves (I - gamma P) v = r exactly: nothing below is estimated, this is the object</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># the algorithms of this chapter are chasing and the object a table has to store.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>N, GAMMA <span class="op">=</span> <span class="dv">200</span>, <span class="fl">0.98</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, N)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> np.arange(N)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.zeros((N, N))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>np.add.at(P, (i, np.clip(i <span class="op">-</span> <span class="dv">1</span>, <span class="dv">0</span>, N <span class="op">-</span> <span class="dv">1</span>)), <span class="fl">0.5</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>np.add.at(P, (i, np.clip(i <span class="op">+</span> <span class="dv">1</span>, <span class="dv">0</span>, N <span class="op">-</span> <span class="dv">1</span>)), <span class="fl">0.5</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>R <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">-</span> GAMMA) <span class="op">*</span> (<span class="fl">8.0</span> <span class="op">*</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((S <span class="op">-</span> <span class="fl">0.30</span>) <span class="op">/</span> <span class="fl">0.13</span>) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                     <span class="op">-</span> <span class="fl">4.0</span> <span class="op">*</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((S <span class="op">-</span> <span class="fl">0.78</span>) <span class="op">/</span> <span class="fl">0.15</span>) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                     <span class="op">+</span> <span class="fl">1.6</span> <span class="op">*</span> S <span class="op">+</span> <span class="fl">0.4</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>V <span class="op">=</span> np.linalg.solve(np.eye(N) <span class="op">-</span> GAMMA <span class="op">*</span> P, R)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Two feature maps. PHI_L is @exm-linear-fa verbatim, so w is two numbers; PHI_R</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># spreads six bumps across the state space, so w is six.</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>CENTRES, WIDTH <span class="op">=</span> np.linspace(<span class="fl">0.05</span>, <span class="fl">0.95</span>, <span class="dv">6</span>), <span class="fl">0.13</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>PHI_L <span class="op">=</span> np.stack([S, np.ones_like(S)], axis<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>PHI_R <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((S[:, <span class="va">None</span>] <span class="op">-</span> CENTRES) <span class="op">/</span> WIDTH) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Least squares against v_pi under a uniform state distribution is exactly the</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># minimizer of @eq-fa-objective, so these are the two families at their best.</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>fit_l <span class="op">=</span> PHI_L <span class="op">@</span> np.linalg.lstsq(PHI_L, V, rcond<span class="op">=</span><span class="va">None</span>)[<span class="dv">0</span>]</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>fit_r <span class="op">=</span> PHI_R <span class="op">@</span> np.linalg.lstsq(PHI_R, V, rcond<span class="op">=</span><span class="va">None</span>)[<span class="dv">0</span>]</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co"># One update at one visited state. w starts at zero, so the estimate starts flat and</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co"># the error at s_t is v_pi(s_t) itself. The step size is the one that lands the</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate at s_t exactly on that target, which is what a table with alpha = 1 does</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># too. All three therefore move by the SAME amount at s_t, and differ only elsewhere.</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>IT <span class="op">=</span> <span class="bu">int</span>(np.argmin(np.<span class="bu">abs</span>(S <span class="op">-</span> <span class="fl">0.32</span>)))</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>ST, TARGET <span class="op">=</span> S[IT], V[IT]</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>up_l <span class="op">=</span> TARGET <span class="op">*</span> (PHI_L <span class="op">@</span> PHI_L[IT]) <span class="op">/</span> (PHI_L[IT] <span class="op">@</span> PHI_L[IT])</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>up_r <span class="op">=</span> TARGET <span class="op">*</span> (PHI_R <span class="op">@</span> PHI_R[IT]) <span class="op">/</span> (PHI_R[IT] <span class="op">@</span> PHI_R[IT])</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co"># The two claims the figure makes, checked on the numbers it plots. Six parameters</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="co"># track v_pi an order of magnitude better than two; and one update at s_t moves every</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="co"># state within 0.15 of it closer to the truth while leaving distant states nearly</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="co"># untouched, which the two-feature update cannot do.</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>near, far <span class="op">=</span> np.<span class="bu">abs</span>(S <span class="op">-</span> ST) <span class="op">&lt;</span> <span class="fl">0.15</span>, np.<span class="bu">abs</span>(S <span class="op">-</span> ST) <span class="op">&gt;</span> <span class="fl">0.40</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.sqrt(np.mean((V <span class="op">-</span> fit_r) <span class="op">**</span> <span class="dv">2</span>)) <span class="op">&lt;</span> <span class="fl">0.3</span> <span class="op">&lt;</span> <span class="fl">2.0</span> <span class="op">&lt;</span> np.sqrt(np.mean((V <span class="op">-</span> fit_l) <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.<span class="bu">all</span>(np.<span class="bu">abs</span>(V[near] <span class="op">-</span> up_r[near]) <span class="op">&lt;</span> np.<span class="bu">abs</span>(V[near]))</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(up_r[far])) <span class="op">&lt;</span> <span class="fl">0.15</span> <span class="op">*</span> np.<span class="bu">min</span>(np.<span class="bu">abs</span>(up_l[far]))</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>fig, (axL, axR) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.4</span>, <span class="fl">3.9</span>))</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>trim(axL), trim(axR)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Left: the same curve, stored three ways.</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>axL.plot(S, fit_l, color<span class="op">=</span>COL[<span class="st">"orange"</span>], lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>axL.plot(S, fit_r, color<span class="op">=</span>COL[<span class="st">"blue"</span>], lw<span class="op">=</span><span class="fl">1.8</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>axL.plot(S, V, ls<span class="op">=</span><span class="st">"none"</span>, marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="fl">2.0</span>, color<span class="op">=</span>GREY, zorder<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>axL.set_xlim(<span class="op">-</span><span class="fl">0.02</span>, <span class="fl">1.02</span>)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>axL.set_ylim(<span class="op">-</span><span class="fl">4.4</span>, <span class="fl">11.0</span>)</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>axL.set_xlabel(<span class="st">"state $s$"</span>)</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>axL.set_ylabel(<span class="st">"value"</span>)</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>axL.set_title(<span class="st">"Six numbers stand in for two hundred"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>label_at(axL, <span class="fl">0.02</span>, <span class="fl">10.2</span>, <span class="vs">r"</span><span class="dv">$</span><span class="vs">v_{</span><span class="er">\</span><span class="vs">pi}</span><span class="dv">$</span><span class="vs">: 200 table entries"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>label_at(axL, <span class="fl">0.47</span>, <span class="fl">8.4</span>, <span class="st">"6 features: 6 numbers"</span>, color<span class="op">=</span>COL[<span class="st">"blue"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>label_at(axL, <span class="fl">0.66</span>, <span class="fl">2.6</span>, <span class="vs">r"</span><span class="dv">$</span><span class="pp">[</span><span class="ch">\,</span><span class="pp">s</span><span class="ch">\ \ </span><span class="pp">1</span><span class="ch">\,</span><span class="pp">]</span><span class="dv">$</span><span class="vs">: 2 numbers"</span>, color<span class="op">=</span>COL[<span class="st">"orange"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Right: one update at one state. The dots on zero are the table entries that</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="co"># @eq-td-untouched leaves alone; the arrow is the one entry the table does move.</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>axR.plot(S, V, ls<span class="op">=</span><span class="st">"none"</span>, marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="fl">2.0</span>, color<span class="op">=</span>GREY, alpha<span class="op">=</span><span class="fl">0.5</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>axR.plot(S[::<span class="dv">4</span>], np.zeros(N)[::<span class="dv">4</span>], ls<span class="op">=</span><span class="st">"none"</span>, marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="fl">2.6</span>,</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], alpha<span class="op">=</span><span class="fl">0.75</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>axR.plot(S, up_l, color<span class="op">=</span>COL[<span class="st">"orange"</span>], lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>axR.plot(S, up_r, color<span class="op">=</span>COL[<span class="st">"blue"</span>], lw<span class="op">=</span><span class="fl">1.8</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>axR.annotate(<span class="st">""</span>, xy<span class="op">=</span>(ST, TARGET), xytext<span class="op">=</span>(ST, <span class="fl">0.0</span>),</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>             arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">"-&gt;"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], lw<span class="op">=</span><span class="fl">1.3</span>))</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>axR.plot([ST], [TARGET], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="fl">6.5</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], zorder<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>axR.set_xlim(<span class="op">-</span><span class="fl">0.02</span>, <span class="fl">1.02</span>)</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>axR.set_ylim(<span class="op">-</span><span class="fl">4.4</span>, <span class="fl">11.0</span>)</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>axR.set_xlabel(<span class="st">"state $s$"</span>)</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>axR.set_ylabel(<span class="st">"estimate after one update"</span>)</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>axR.set_title(<span class="st">"One visit, and the neighbours move too"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.02</span>, <span class="fl">10.3</span>, <span class="st">"2 features: every state moves"</span>, color<span class="op">=</span>COL[<span class="st">"orange"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.55</span>, <span class="fl">6.3</span>, <span class="st">"6 features: nearby states move"</span>, color<span class="op">=</span>COL[<span class="st">"blue"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.02</span>, <span class="op">-</span><span class="fl">1.7</span>, <span class="st">"a table moves this entry only"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.345</span>, <span class="fl">0.8</span>, <span class="vs">r"</span><span class="dv">$</span><span class="vs">s_{t}</span><span class="dv">$</span><span class="vs">"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.84</span>, <span class="op">-</span><span class="fl">3.3</span>, <span class="vs">r"</span><span class="dv">$</span><span class="vs">v_{</span><span class="er">\</span><span class="vs">pi}</span><span class="dv">$</span><span class="vs">"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-3-function-approx" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-function-approx-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-notes_files/figure-html/fig-3-function-approx-output-1.png" width="882" height="362" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-function-approx-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: A 200-state chain on <span class="math inline">\([0,1]\)</span> at <span class="math inline">\(\gamma=0.98\)</span>: the policy induces a reflecting random walk, so <span class="math inline">\(v_{\pi}\)</span> solves <span class="math inline">\((I-\gamma P)v_{\pi}=r\)</span> exactly, and the grey dots are its 200 entries, one per state, which is everything a table has to store. <strong>Left:</strong> each feature map at its best, fitted by least squares, which under a uniform state distribution is exactly the minimizer of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a>. The line of <a href="#exm-linear-fa" class="quarto-xref">Example&nbsp;<span>3.1</span></a> has two numbers and cannot bend, so it misses by an RMSE of 2.65; six Gaussian bumps spread across the state space have six numbers and track a curve spanning nearly 11 units of value to an RMSE of 0.23. <strong>Right:</strong> the payoff that storage alone does not explain. Every estimate starts at <span class="math inline">\(\hat{v}\equiv0\)</span>, a single state <span class="math inline">\(s_{t}\)</span> is visited, and the step size is set so the update lands <span class="math inline">\(\hat{v}(s_{t},w)\)</span> exactly on its target, which is what a table with <span class="math inline">\(\alpha=1\)</span> does as well. All three therefore move by the same amount at <span class="math inline">\(s_{t}\)</span> and differ only away from it: <a href="#eq-td-untouched" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> leaves the table’s other 199 entries precisely where they were, six features lift the whole neighbourhood while moving states more than <span class="math inline">\(0.4\)</span> away by at most <span class="math inline">\(0.78\)</span>, and two features lift every state in the chain by at least <span class="math inline">\(7.7\)</span>, including the ones whose true value is negative. That is the bargain <a href="#eq-fa" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> buys and the reason the feature map is a modelling choice rather than a storage detail: too coarse a basis and one visit rewrites states it has learned nothing about.
+</figcaption>
+</figure>
+</div>
+</div>
 </div>
 <p>Nothing requires <span class="math inline">\(\hat{v}\)</span> to be linear. Taking <span class="math inline">\(\hat{v}(s,w)\)</span> to be a deep neural network, with <span class="math inline">\(w\)</span> its weights, is what people mean by <strong>deep reinforcement learning</strong>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -896,6 +1215,127 @@ Table&nbsp;3.3: Monte Carlo and TD, in parameter space. The unknown <span class=
 <p>The Monte Carlo row is an honest stochastic gradient step: <span class="math inline">\(g_{t}\)</span> does not depend on <span class="math inline">\(w\)</span>, so the increment really is an unbiased sample of the gradient of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a>.</p>
 <p>The TD row is not. Its target <span class="math inline">\(r_{t+1}+\gamma\hat{v}(s_{t+1},w_{t})\)</span> contains <span class="math inline">\(w_{t}\)</span>, so differentiating <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> properly would produce a second term in <span class="math inline">\(\gamma\nabla_{w}\hat{v}(s_{t+1},w_{t})\)</span> that the update simply drops. Dropping it is deliberate, and the result is called a <strong>semi-gradient</strong> method: it follows the gradient of the error while pretending the target is a constant.</p>
 <p>The cost is that <a href="02-notes.html#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> no longer applies off the shelf, because the increment is not the gradient of anything. What survives is weaker and more conditional: for <strong>linear</strong> <span class="math inline">\(\hat{v}\)</span> and <strong>on-policy</strong> sampling, with states drawn from the stationary distribution induced by <span class="math inline">\(\pi\)</span>, semi-gradient TD converges to the <em>TD fixed point</em>, which is not the minimizer of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> but is within a bounded factor of it. Combine off-policy sampling with function approximation and bootstrapping and it can diverge outright. In exchange one gets what this whole chapter is about: updates that do not wait for the episode to end.</p>
+</div>
+</div>
+<p>Diverging outright deserves more than a clause, because the failure is cheap to arrange. <a href="#fig-3-off-policy-divergence" class="quarto-xref">Figure&nbsp;<span>3.3</span></a> needs no more than two states, one weight and a problem the approximator represents exactly, and it blows up on nothing worse than a change in where the data comes from.</p>
+<div id="cell-fig-3-off-policy-divergence" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Off-policy semi-gradient TD diverging on a two-state chain</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>RNG <span class="op">=</span> np.random.default_rng(<span class="dv">20260725</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- two states, one parameter -----------------------------------------------</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># phi(s1) = 1 and phi(s2) = 2, so v(s1, w) = w and v(s2, w) = 2w: one weight moves</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># both estimates, which is the whole point of function approximation. Every reward is</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># mean zero, so v_pi = 0 at both states and the approximator represents the answer</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># EXACTLY, at w = 0. Nothing is wrong with the function class. At s1 there are two</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># actions, advance to s2 and dawdle at s1; at s2 the single action returns to s1.</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>GAMMA, PHI <span class="op">=</span> <span class="fl">0.9</span>, np.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>ALPHA, SIGMA <span class="op">=</span> <span class="fl">0.01</span>, <span class="fl">0.3</span>          <span class="co"># step size, and the sd of the mean-zero reward</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>Q_TARGET, P_BEHAV <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">0.1</span>      <span class="co"># P(advance | s1) under the target, and behavior, policy</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>W0, N_STEPS, N_RUNS <span class="op">=</span> <span class="fl">1.0</span>, <span class="dv">1600</span>, <span class="dv">60</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run(p_advance, n_steps, alpha<span class="op">=</span>ALPHA, rng<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Semi-gradient TD, the TD row of @tbl-fa-methods, on data from `p_advance`.</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">    The update is w += alpha * rho * delta * phi(s). The importance ratio</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">    rho = pi(a|s) / b(a|s) corrects the ACTION the behavior policy took, and nothing</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">    corrects the STATE distribution its dawdling induces. Setting p_advance = Q_TARGET</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">    makes rho equal 1 at every step, which is exactly the on-policy run.</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> RNG <span class="cf">if</span> rng <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> rng</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    w, s, out <span class="op">=</span> W0, <span class="dv">0</span>, np.empty(n_steps <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    out[<span class="dv">0</span>] <span class="op">=</span> w</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(n_steps):</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> s <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>            adv <span class="op">=</span> rng.random() <span class="op">&lt;</span> p_advance</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>            pi_a, b_a <span class="op">=</span> (Q_TARGET, p_advance) <span class="cf">if</span> adv <span class="cf">else</span> (<span class="fl">1.0</span> <span class="op">-</span> Q_TARGET, <span class="fl">1.0</span> <span class="op">-</span> p_advance)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>            rho, s2 <span class="op">=</span> (pi_a <span class="op">/</span> b_a <span class="cf">if</span> b_a <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="fl">0.0</span>), (<span class="dv">1</span> <span class="cf">if</span> adv <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>            rho, s2 <span class="op">=</span> <span class="fl">1.0</span>, <span class="dv">0</span>      <span class="co"># s2 offers a single action, so no correction is needed</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>        delta <span class="op">=</span> rng.normal(<span class="fl">0.0</span>, SIGMA) <span class="op">+</span> GAMMA <span class="op">*</span> PHI[s2] <span class="op">*</span> w <span class="op">-</span> PHI[s] <span class="op">*</span> w</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        w <span class="op">+=</span> alpha <span class="op">*</span> rho <span class="op">*</span> delta <span class="op">*</span> PHI[s]</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        out[t <span class="op">+</span> <span class="dv">1</span>] <span class="op">=</span> w</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> s2</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> drift(d1):</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Coefficient in E[dw] = alpha * c(d1) * w when a share d1 of updates land at s1.</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co">    At s1 the TD error is gamma*2w - w and the gradient is phi = 1, contributing</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co">    2*gamma - 1. That is POSITIVE for gamma &gt; 1/2: raising the estimate w at s1 raises</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co">    its own bootstrapped target 2w twice as fast, so the correction enlarges the error</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co">    it was sent to fix. Only updates at s2, worth 2*(gamma - 2), pull back.</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> d1 <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> GAMMA <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> d1) <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> (GAMMA <span class="op">-</span> <span class="dv">2</span>)</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rms(p_advance):</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    paths <span class="op">=</span> np.array([run(p_advance, N_STEPS) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_RUNS)])</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.sqrt((paths <span class="op">**</span> <span class="dv">2</span>).mean(axis<span class="op">=</span><span class="dv">0</span>))</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>on, off <span class="op">=</span> rms(Q_TARGET), rms(P_BEHAV)</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>steps <span class="op">=</span> np.arange(N_STEPS <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="co"># The blow-up is structural, not a step size chosen to produce it: the drift</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="co"># coefficient is positive whatever alpha is, so shrinking alpha only slows the exit.</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> (<span class="fl">0.001</span>, <span class="fl">0.003</span>, <span class="fl">0.01</span>):</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>    ends <span class="op">=</span> [<span class="bu">abs</span>(run(P_BEHAV, <span class="dv">2000</span>, alpha<span class="op">=</span>a, rng<span class="op">=</span>np.random.default_rng(k))[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)]</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">min</span>(ends) <span class="op">&gt;</span> W0, (a, <span class="bu">min</span>(ends))</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> off[<span class="op">-</span><span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">100</span> <span class="op">*</span> off[<span class="dv">0</span>] <span class="kw">and</span> on[<span class="op">-</span><span class="dv">1</span>] <span class="op">&lt;</span> on[<span class="dv">0</span>] <span class="op">/</span> <span class="dv">10</span>, (off[<span class="op">-</span><span class="dv">1</span>], on[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>fig, (axL, axR) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.4</span>, <span class="fl">3.9</span>))</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>trim(axL), trim(axR)</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="co"># --- left: one approximator, one update rule, two sampling distributions ------</span></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>axL.semilogy(steps, off, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>axL.semilogy(steps, on, color<span class="op">=</span>COL[<span class="st">"sky"</span>], lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>axL.set_xlim(<span class="dv">0</span>, N_STEPS)</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>axL.set_ylim(on.<span class="bu">min</span>() <span class="op">*</span> <span class="fl">0.45</span>, off.<span class="bu">max</span>() <span class="op">*</span> <span class="dv">8</span>)  <span class="co"># air above the red curve, and below the blue</span></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>axL.set_xlabel(<span class="st">"updates"</span>)</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>axL.set_ylabel(<span class="st">"root mean square weight ($w=0$ is exact)"</span>)</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>axL.set_title(<span class="st">"Off-policy, the weight runs away geometrically"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>label_at(axL, N_STEPS <span class="op">*</span> <span class="fl">0.30</span>, off.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">2.2</span>, <span class="st">"off-policy sampling"</span>,</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>label_at(axL, N_STEPS <span class="op">*</span> <span class="fl">0.42</span>, on[<span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> <span class="fl">6.0</span>, <span class="st">"on-policy sampling"</span>,</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>COL[<span class="st">"sky"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="co"># --- right: the sign of the drift, against where the updates land -------------</span></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a><span class="co"># Each tag sits just below and to the right of its own dot, on the empty side of</span></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a><span class="co"># the line, so neither the line nor the other tag comes near it.</span></span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">200</span>)</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>axR.plot([<span class="dv">0</span>, <span class="fl">1.02</span>], [<span class="dv">0</span>, <span class="dv">0</span>], color<span class="op">=</span>GREY, lw<span class="op">=</span><span class="fl">0.9</span>, ls<span class="op">=</span><span class="st">"--"</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>axR.plot(d, drift(d), color<span class="op">=</span>INK, lw<span class="op">=</span><span class="fl">1.6</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, colour <span class="kw">in</span> ((<span class="fl">0.5</span>, COL[<span class="st">"sky"</span>]), (<span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> P_BEHAV), COL[<span class="st">"vermilion"</span>])):</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>    axR.plot([x], [drift(x)], <span class="st">"o"</span>, color<span class="op">=</span>colour, ms<span class="op">=</span><span class="dv">7</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>axR.set_xlim(<span class="dv">0</span>, <span class="fl">1.22</span>)</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>axR.set_xticks([<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1.0</span>])  <span class="co"># the margin past 1 gives the tag room to sit</span></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>axR.set_ylim(<span class="op">-</span><span class="fl">2.45</span>, <span class="fl">1.05</span>)</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>axR.set_xlabel(<span class="st">"share of updates made at $s_</span><span class="sc">{1}</span><span class="st">$"</span>)</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>axR.set_ylabel(<span class="vs">r"drift in </span><span class="dv">$</span><span class="vs">w</span><span class="dv">$</span><span class="vs"> per update, in units of </span><span class="dv">$</span><span class="ch">\a</span><span class="vs">lpha w</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>axR.set_title(<span class="st">"The sign of the drift is set by the sampling"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.95</span>, <span class="fl">0.22</span>, <span class="st">"off-policy"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.56</span>, <span class="op">-</span><span class="fl">1.00</span>, <span class="st">"on-policy"</span>, color<span class="op">=</span>COL[<span class="st">"sky"</span>], fontsize<span class="op">=</span><span class="fl">9.5</span>)</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.03</span>, <span class="fl">0.30</span>, <span class="st">"$w$ runs away"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>label_at(axR, <span class="fl">0.03</span>, <span class="op">-</span><span class="fl">0.36</span>, <span class="st">"$w$ contracts to $0$"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-3-off-policy-divergence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-off-policy-divergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-notes_files/figure-html/fig-3-off-policy-divergence-output-1.png" width="889" height="360" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-off-policy-divergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.3: The divergence the warning above asserts, in the smallest object that exhibits it. Two states share a single parameter: <span class="math inline">\(\phi(s_{1})=1\)</span> and <span class="math inline">\(\phi(s_{2})=2\)</span>, so <span class="math inline">\(\hat{v}(s_{1},w)=w\)</span> and <span class="math inline">\(\hat{v}(s_{2},w)=2w\)</span>. Every reward is mean zero, so <span class="math inline">\(v_{\pi}\equiv 0\)</span> and the approximator represents the answer <em>exactly</em>, at <span class="math inline">\(w=0\)</span>; nothing that follows is a failure of the function class. From <span class="math inline">\(s_{1}\)</span> the target policy always advances to <span class="math inline">\(s_{2}\)</span>, while the behavior policy dawdles at <span class="math inline">\(s_{1}\)</span> nine times out of ten, and the update is the TD row of <a href="#tbl-fa-methods" class="quarto-xref">Table&nbsp;<span>3.3</span></a> carrying the importance ratio <span class="math inline">\(\rho_{t}=\pi(a_{t}|s_{t})/b(a_{t}|s_{t})\)</span>, which corrects the action taken but not the states the behavior policy loiters in. <strong>Left:</strong> one update rule and one approximator, fed the two streams of data, with <span class="math inline">\(\gamma=0.9\)</span>, <span class="math inline">\(\alpha=0.01\)</span> and mean-zero reward noise. On-policy the weight collapses onto <span class="math inline">\(0\)</span> and settles into a sampling band. Off-policy it multiplies by about <span class="math inline">\(1.005\)</span> per update, running from <span class="math inline">\(1\)</span> to <span class="math inline">\(4\times 10^{3}\)</span> in sixteen hundred of them, and no step size repairs this: shrinking <span class="math inline">\(\alpha\)</span> only slows the exit. <strong>Right:</strong> why. An update at <span class="math inline">\(s_{1}\)</span> has TD error <span class="math inline">\(\gamma\,2w-w=(2\gamma-1)w\)</span>, which is <em>positive</em> for <span class="math inline">\(\gamma&gt;1/2\)</span>, because raising the estimate <span class="math inline">\(w\)</span> also raises the bootstrapped target <span class="math inline">\(2w\)</span> it is chasing, twice as fast, so the correction enlarges the very error it was sent to fix. Only updates at <span class="math inline">\(s_{2}\)</span>, worth <span class="math inline">\(2(\gamma-2)w\)</span>, pull back. The expected drift is linear in the share of updates landing at <span class="math inline">\(s_{1}\)</span> and changes sign at <span class="math inline">\(0.73\)</span>; on-policy sampling is pinned at <span class="math inline">\(0.5\)</span> by the chain itself, off-policy sampling is under no such obligation, and this behavior policy sits at <span class="math inline">\(0.91\)</span>.
+</figcaption>
+</figure>
+</div>
 </div>
 </div>
 </section>
