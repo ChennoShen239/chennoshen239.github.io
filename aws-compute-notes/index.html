@@ -350,7 +350,61 @@ head node, t3.large (public subnet, runs Slurm)
 <section id="what-transfers" class="level2">
 <h2 class="anchored" data-anchor-id="what-transfers">What transfers</h2>
 <p>The shape that fits: tasks independent of one another, CPU-hungry but data-light, with no chatter between nodes. Batches split by horizon, by bootstrap draw, by simulation seed, by grid point, or by region all qualify. The misfits are just as clear: tasks that need to talk to each other constantly (that is MPI territory); data under compliance or residency constraints (settle the permissions before the architecture); and any case where the campus cluster’s queue is short and its software current, because free is the best price.</p>
-<p>The deep-learning side of my work takes a different route for the same reason in reverse. Training a neural network is one long job on one GPU, so I rent a single pod on RunPod instead of building a cluster: no scheduler, no NAT, just a machine with an SSH port. The workflow still rhymes with the one above, and I keep it in a pair of small scripts (<a href="https://github.com/ChennoShen239/runpod_scripts">runpod_scripts</a>): <code>rsync</code> the project to the pod’s <code>/workspace</code>, build the environment once with <code>uv sync</code>, run the entry file inside <code>tmux</code> so the job survives a dropped connection, and mail the results back when it ends. Same discipline, opposite topology: many small CPU tasks want a queue; one long GPU job wants a single rented box that is easy to keep alive and easy to kill.</p>
+<p>The deep-learning side of my work takes the opposite route for the same reason. Training a neural network is one long job on one GPU, so there I rent a single pod on RunPod instead of building a cluster: no scheduler, no NAT, just a machine with an SSH port. The workflow still rhymes with the one above, and I keep it in a pair of small scripts (<a href="https://github.com/ChennoShen239/runpod_scripts">runpod_scripts</a>): <code>rsync</code> the project to the pod’s <code>/workspace</code>, build the environment once with <code>uv sync</code>, run the entry file inside <code>tmux</code> so the job survives a dropped connection, and mail the results back when it ends.</p>
+<p>Side by side, the two setups are the same discipline on opposite topologies:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>ParallelCluster + Slurm</th>
+<th>RunPod pod</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Task shape</td>
+<td>many independent CPU tasks</td>
+<td>one long GPU job</td>
+</tr>
+<tr class="even">
+<td>Startup</td>
+<td>NAT up + create cluster, ~10 min</td>
+<td>rent a pod, about a minute</td>
+</tr>
+<tr class="odd">
+<td>Environment</td>
+<td><code>uv sync</code> once, on the shared volume</td>
+<td><code>uv sync</code> once, in <code>/workspace</code></td>
+</tr>
+<tr class="even">
+<td>Submit</td>
+<td><code>sbatch --array</code></td>
+<td>entry script inside <code>tmux</code></td>
+</tr>
+<tr class="odd">
+<td>Billing unit</td>
+<td>per node-hour, 4 nodes + head + NAT</td>
+<td>per GPU-hour, metered by the second</td>
+</tr>
+<tr class="even">
+<td>Shutdown</td>
+<td>results out → delete cluster → NAT down</td>
+<td>results mailed out → kill the pod</td>
+</tr>
+</tbody>
+</table>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/fig_quadrant.svg" class="img-fluid figure-img" alt="Two-by-two quadrant diagram with axes one job versus many independent jobs and CPU-bound versus GPU-bound: your laptop for one CPU job, ParallelCluster plus Slurm highlighted in red for many CPU jobs, a rented GPU pod for one GPU job, and GPU queue or serverless, marked not covered here, for many GPU jobs"></p>
+<figcaption>Task shape picks the tool: many independent CPU tasks want a batch queue; one long GPU job wants a single rented machine. The fourth quadrant is outside this note’s scope.</figcaption>
+</figure>
+</div>
+<p>For price anchors, RunPod’s posted on-demand rates as of August 2026: an RTX 4090 is $0.69 per hour, an 80 GB A100 about $1.4–1.5, an H100 about $2.9–3.2. So an H100 rents for a bit more per hour than one entire 48-vCPU compute node, and a 4090 for about a third of one. And one detail of RunPod’s pricing encodes this note’s whole moral better than I could: a pod’s volume disk bills at $0.10 per GB-month while the pod runs and $0.20 once it stops. Storage attached to a machine that does nothing costs double. Retrieve your results, kill the machine.</p>
 </section>
 <section id="the-checklist-i-now-run" class="level2">
 <h2 class="anchored" data-anchor-id="the-checklist-i-now-run">The checklist I now run</h2>
