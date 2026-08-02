@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Chen Gao (高琛)">
+
+<title>Research Computing on AWS</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="index_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="index_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap-0f94754cf0ff7830df8502da6662f91c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/custom.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#why-the-cloud" id="toc-why-the-cloud" class="nav-link active" data-scroll-target="#why-the-cloud">Why the cloud</a></li>
+  <li><a href="#why-parallelcluster-slurm" id="toc-why-parallelcluster-slurm" class="nav-link" data-scroll-target="#why-parallelcluster-slurm">Why ParallelCluster + Slurm</a></li>
+  <li><a href="#the-cluster" id="toc-the-cluster" class="nav-link" data-scroll-target="#the-cluster">The cluster</a></li>
+  <li><a href="#one-full-run" id="toc-one-full-run" class="nav-link" data-scroll-target="#one-full-run">One full run</a></li>
+  <li><a href="#the-traps" id="toc-the-traps" class="nav-link" data-scroll-target="#the-traps">The traps</a></li>
+  <li><a href="#what-it-costs" id="toc-what-it-costs" class="nav-link" data-scroll-target="#what-it-costs">What it costs</a></li>
+  <li><a href="#what-transfers" id="toc-what-transfers" class="nav-link" data-scroll-target="#what-transfers">What transfers</a></li>
+  <li><a href="#the-checklist-i-now-run" id="toc-the-checklist-i-now-run" class="nav-link" data-scroll-target="#the-checklist-i-now-run">The checklist I now run</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Research Computing on AWS</h1>
+<p class="subtitle lead">A field note on ParallelCluster, Slurm, and the traps between them</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Chen Gao (高琛) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This summer I moved the heavy compute of <a href="https://chennoshen239.github.io/research.html">a forecasting paper of mine</a> onto AWS. This note records the setup that worked and the traps that cost time or money. It is not about the paper: everything below is about the computing pattern, which transfers to any project whose jobs look like “the same script, many times, with different arguments.” All timings and dollar figures come from the run logs, a benchmark record kept at the time, and the EC2 instance records.</p>
+<section id="why-the-cloud" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-cloud">Why the cloud</h2>
+<p>The workload was hyperparameter tuning for gradient-boosted trees, done separately for each forecast horizon from 1 to 24, where every candidate in the grid is refit over hundreds of rolling origins. The 24 horizons never talk to each other, so the job is embarrassingly parallel: what I needed was not a bigger computer but many ordinary ones, started together and thrown away after.</p>
+<p>The routine tuning grid takes tens of minutes per horizon on eight vCPUs, about a day if run sequentially on a laptop. The real problem was a denser robustness grid in mid-June. Folding the EC2 instance records into vCPU terms, that run came to about 5,300 vCPU-hours (111 node-hours × 48 vCPU). Even granting my laptop’s eight logical cores the same per-core speed, running around the clock, that is nearly 28 days.</p>
+</section>
+<section id="why-parallelcluster-slurm" class="level2">
+<h2 class="anchored" data-anchor-id="why-parallelcluster-slurm">Why ParallelCluster + Slurm</h2>
+<p>I considered two other routes. Bare EC2 is the most direct, but it means hand-writing node startup, task dispatch, retry, and teardown: a part-time job as a scheduler. Managed ML platforms center on “training jobs” and want your code repackaged into their entry points and storage conventions; my scripts were already plain “command-line arguments in, files out,” so the script body needed no changes, only a Slurm submission file.</p>
+<p>I settled on <a href="https://docs.aws.amazon.com/parallelcluster/">AWS ParallelCluster</a>: one YAML file describes a head node, a compute queue, and a shared filesystem; one command assembles the whole thing in about ten minutes; and what you get is a standard Slurm queue, so <code>sbatch</code> and <code>squeue</code> work the way they always have. Moving back to a campus cluster later, the script body typically stays intact; what changes is environment configuration, the partition, account, modules, and file paths.</p>
+</section>
+<section id="the-cluster" class="level2">
+<h2 class="anchored" data-anchor-id="the-cluster">The cluster</h2>
+<pre class="text"><code>laptop
+   │  rsync / ssh
+   ▼
+head node, t3.large (public subnet, runs Slurm)
+   │
+   ├── EFS shared volume /shared (code, venv, results)
+   │
+   └── compute nodes × 4: c7i.12xlarge, 48 vCPU / 96 GiB (private subnet)
+              │
+              ▼
+        NAT gateway (the private subnet's only route out;
+        node bootstrap: software mirrors and AWS APIs)</code></pre>
+<p>The lines of the config that actually shape the experience (ParallelCluster 3.15, us-east-1):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Scheduling</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">Scheduler</span><span class="kw">:</span><span class="at"> slurm</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmSettings</span><span class="kw">:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ScaledownIdletime</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span><span class="co">          # idle nodes terminate after 2 min</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmQueues</span><span class="kw">:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">CapacityType</span><span class="kw">:</span><span class="at"> ONDEMAND</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">AllocationStrategy</span><span class="kw">:</span><span class="at"> lowest-price</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">ComputeResources</span><span class="kw">:</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu48</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">Instances</span><span class="kw">:</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7a.12xlarge</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7i.12xlarge</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MinCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MaxCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The two-type pool lets EC2 Fleet order the candidates by price and try the cheaper one first; it is a preference, not a guarantee. The June run happened to land on c7i.12xlarge throughout, so the diagram and the cost table below are stated in c7i terms.</p>
+<p>Three configuration choices that mattered later:</p>
+<ul>
+<li><code>MinCount: 0</code> means precisely “keep no compute nodes when there is no work”; with the two-minute scale-down, nodes vanish on their own after a job. It does not mean an idle cluster is free: the head node, the shared volume, and a NAT left up keep billing.</li>
+<li>Do not starve the head node. My first attempt used a t3.small and the dependency install ran out of memory; t3.large ended the problem.</li>
+<li>Instance generations are not cosmetic: on my XGBoost tasks, the same batch ran about 20% slower on previous-generation c6i than on c7i at nearly the same hourly price, so the pool holds current-generation types only.</li>
+</ul>
+<p>One question worth answering before it is asked: the tasks are restartable, so why on-demand rather than the cheaper spot capacity? On the dense grid a single horizon runs about 20 hours and writes its output only at the end, so a reclaimed node loses the whole task, and I had no per-task checkpointing; for a first production run I also wanted a predictable finish time. And I had not set up the extra IAM piece spot requires (the service-linked role), which removed any temptation to improvise. If the grid were split into many shorter tasks, spot would be the better call.</p>
+</section>
+<section id="one-full-run" class="level2">
+<h2 class="anchored" data-anchor-id="one-full-run">One full run</h2>
+<p>Compressed, a run has six beats:</p>
+<ol type="1">
+<li>Bring up the NAT gateway (see the traps), then create the cluster. About ten minutes.</li>
+<li><code>rsync</code> the code and the few input files it needs to the shared volume. Never the virtualenv, never data the run will not touch.</li>
+<li>Build the environment once on the shared volume (<code>uv sync</code>). Compute nodes <code>source</code> it and need no project dependencies installed locally.</li>
+<li>Smoke-test a single task (<code>sbatch --array=1</code>), read its log, and only then submit the full array.</li>
+<li>Pull the results back with <code>rsync</code>.</li>
+<li>Delete the cluster, take the NAT down.</li>
+</ol>
+<p>Steps 5 and 6 are in that order on purpose.</p>
+<p>The full submission is an ordinary Slurm array, one task per horizon:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-24%24        # up to 24 tasks concurrent</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=8      # reserves 8 vCPU per task</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/run_forecast.py <span class="at">--horizon</span> <span class="st">"</span><span class="va">${SLURM_ARRAY_TASK_ID}</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each task requests 8 vCPU, so the full array needs 24 × 8 = 192 vCPU, exactly four 48-vCPU nodes at six tasks each. One easy misunderstanding: <code>--cpus-per-task=8</code> only reserves the vCPUs; the program will not use them by itself. The code has to read <code>SLURM_CPUS_PER_TASK</code> explicitly (my script passes it to XGBoost’s <code>nthread</code>).</p>
+<p>Once four nodes are up, all 24 horizons are already running, so adding a fifth node cannot shorten the pass. Adding threads per task buys little either: the per-fit data is small enough that a single fit saturates around eight threads. What the measured 796% utilization (of an 800% ceiling) does show is that the packing wasted almost nothing. Four nodes are the saturation point for this task split; going faster means making the single task faster, or splitting the grid into more, shorter tasks.</p>
+</section>
+<section id="the-traps" class="level2">
+<h2 class="anchored" data-anchor-id="the-traps">The traps</h2>
+<p><strong>The NAT blackhole.</strong> Compute nodes live in a private subnet; during boot they need outbound access (software mirrors, AWS’s own APIs), which flows through a NAT gateway. A NAT costs about a dollar a day, so between runs I delete it. But the subnet’s route table still points at the deleted NAT, the route becomes a <code>blackhole</code>, and the next cluster’s nodes hang in <code>CONFIGURING</code>; nothing in the status output or logs I was checking pointed anywhere near the cause. In July this bit me even though my own runbook said “NAT up before the cluster”: I worked from memory, skipped the line, and watched a node sit in <code>CONFIGURING</code> for 36 minutes, get replaced, and the replacement sit for another 36. While writing this note I queried the route table again; the last teardown had left the default route in place, state and all (output excerpt):</p>
+<pre class="text"><code>$ aws ec2 describe-route-tables --region us-east-1 \
+    --query 'RouteTables[].Routes[?State==`blackhole`]'
+{
+  "DestinationCidrBlock": "0.0.0.0/0",
+  "NatGatewayId": "nat-098c…",
+  "State": "blackhole"
+}</code></pre>
+<p>I now manage the NAT with a small up/down script. Its core, with the route-table lookup and guard rails omitted:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># up: allocate an EIP, create the NAT, point the default route at it</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">EIP_ALLOC_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 allocate-address <span class="at">--domain</span> vpc <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> AllocationId <span class="at">--output</span> text<span class="va">)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="va">NAT_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 create-nat-gateway <span class="at">--subnet-id</span> <span class="st">"</span><span class="va">$PUBLIC_SUBNET</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> NatGateway.NatGatewayId <span class="at">--output</span> text<span class="va">)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-available <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 replace-route <span class="at">--route-table-id</span> <span class="st">"</span><span class="va">$RTB</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--destination-cidr-block</span> 0.0.0.0/0 <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># down: delete the NAT, wait, then release the address</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 delete-nat-gateway <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-deleted <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 release-address <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Releasing the address is the step people miss. AWS now bills every public IPv4 address by the hour, attached or not, about $0.005 per hour or $3.6 per month; a deleted NAT strands its Elastic IP, and forgetting to release it just keeps that meter going.</p>
+<p><strong>The most dangerous default.</strong> In my configuration the shared EFS volume is part of the cluster and is deleted with it, the default <code>DeletionPolicy: Delete</code>. It can be set to <code>Retain</code> instead; I chose not to, preferring a clean site per run with the local copy as ground truth over a standing cloud volume that bills monthly and might hold the only copy of something. The price of that choice is discipline: retrieve first, tear down second, every time.</p>
+<p><strong>Quotas.</strong> A fresh account’s on-demand vCPU quota is far below four 48-vCPU nodes. Check Service Quotas and request the raise days before the deadline run, not the night of.</p>
+<p><strong>Failed bootstraps still bill.</strong> Instances bill from launch whether or not they ever join the queue. The July incident, priced from the instance records:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 40%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Item</th>
+<th>Detail</th>
+<th style="text-align: right;">Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Compute idling</td>
+<td>two failed bootstraps, one c7i.12xlarge each, 36.1 + 35.9 min</td>
+<td style="text-align: right;">≈ $2.57</td>
+</tr>
+<tr class="even">
+<td>Head node waiting</td>
+<td>t3.large, ~2 h of diagnosis and waiting for my manual approval</td>
+<td style="text-align: right;">≈ $0.17</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td>plus about two hours of schedule slip</td>
+<td style="text-align: right;"><strong>≈ $2.7</strong></td>
+</tr>
+</tbody>
+</table>
+<p>$2.7 for zero compute. This is what the smoke test is for: make the mistakes on one node, then scale.</p>
+</section>
+<section id="what-it-costs" class="level2">
+<h2 class="anchored" data-anchor-id="what-it-costs">What it costs</h2>
+<p>The June robustness grid was the largest single run. From the benchmark record, at us-east-1 on-demand prices as of June 2026:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 28%">
+<col style="width: 24%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Item</th>
+<th>Usage</th>
+<th>Rate</th>
+<th style="text-align: right;">Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Compute, c7i.12xlarge × 4</td>
+<td>~111 node-hours</td>
+<td>$2.142/h</td>
+<td style="text-align: right;">≈ $239</td>
+</tr>
+<tr class="even">
+<td>Head node, t3.large</td>
+<td>~28.7 h</td>
+<td>$0.0832/h</td>
+<td style="text-align: right;">≈ $2</td>
+</tr>
+<tr class="odd">
+<td>NAT gateway</td>
+<td>~28.7 h</td>
+<td>$0.045/h + data processing</td>
+<td style="text-align: right;">&lt; $2</td>
+</tr>
+<tr class="even">
+<td>Public IPv4 (head node + NAT EIP)</td>
+<td>2 × ~28.7 h</td>
+<td>$0.005/h each</td>
+<td style="text-align: right;">≈ $0.29</td>
+</tr>
+<tr class="odd">
+<td>EFS shared volume</td>
+<td>a few GB, metered</td>
+<td></td>
+<td style="text-align: right;">&lt; $1</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td>end to end ~28 h</td>
+<td></td>
+<td style="text-align: right;"><strong>≈ $243</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The NAT’s hourly charge works out to about $1.3; the rest of that line is a small data-processing fee. About 5,300 vCPU-hours, nearly four laptop-weeks of work, done in a day and change for $243. The routine grid is a different order: about an hour per pass, ten dollars or so.</p>
+<p>Reading the two tables together, the plainest conclusion is that AWS does not distinguish between a machine that is computing, one that is debugging, and one stuck in bootstrap: a running instance bills every minute at the same rate. On the routine grid a lapse costs a few dollars; with four compute nodes up, letting the same lapse sit for a few hours runs into tens of dollars.</p>
+</section>
+<section id="what-transfers" class="level2">
+<h2 class="anchored" data-anchor-id="what-transfers">What transfers</h2>
+<p>The shape that fits: tasks independent of one another, CPU-hungry but data-light, with no chatter between nodes. Batches split by horizon, by bootstrap draw, by simulation seed, by grid point, or by region all qualify. The misfits are just as clear: tasks that need to talk to each other constantly (that is MPI territory); data under compliance or residency constraints (settle the permissions before the architecture); and any case where the campus cluster’s queue is short and its software current, because free is the best price.</p>
+</section>
+<section id="the-checklist-i-now-run" class="level2">
+<h2 class="anchored" data-anchor-id="the-checklist-i-now-run">The checklist I now run</h2>
+<p>The discipline that matters is not hunting for cheap instances; it is turning things off.</p>
+<p>Before a run:</p>
+<ol type="1">
+<li>NAT up? The default route must point at a live gateway.</li>
+<li>Quota enough? Service Quotas approvals take days, not minutes.</li>
+<li>Smoke test passed? One task, a few minutes, caps the cost of a config mistake at one node.</li>
+</ol>
+<p>After a run:</p>
+<ol type="1">
+<li>Results <code>rsync</code>’d back?</li>
+<li>Cluster fully deleted? Wait for the delete to actually finish.</li>
+<li>NAT down, Elastic IP released?</li>
+</ol>
+<p>The checklist is boring, and it is also the conclusion: correct compute turned out cheaper than I expected, every wasted dollar maps to one specific mistake, and the meter only ever spun uselessly on mine. The checklist exists to keep it still.</p>
+<hr>
+<p><a href="https://chennoshen239.github.io/notes.html">← Notes &amp; code</a></p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<script src="index_files/libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
