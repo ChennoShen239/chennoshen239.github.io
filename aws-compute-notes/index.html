@@ -199,7 +199,19 @@ head node, t3.large (public subnet, runs Slurm)
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/run_forecast.py <span class="at">--horizon</span> <span class="st">"</span><span class="va">${SLURM_ARRAY_TASK_ID}</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Each task requests 8 vCPU, so the full array needs 24 × 8 = 192 vCPU, exactly four 48-vCPU nodes at six tasks each. One easy misunderstanding: <code>--cpus-per-task=8</code> only reserves the vCPUs; the program will not use them by itself. The code has to read <code>SLURM_CPUS_PER_TASK</code> explicitly (my script passes it to XGBoost’s <code>nthread</code>).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/fig_packing.svg" class="img-fluid figure-img" alt="Diagram of four nodes, each holding six 8-vCPU task chips labeled h1 through h24, plus a dashed fifth node marked idle: nothing left to schedule"></p>
+<figcaption>Exact tiling: 24 tasks of 8 vCPU fill four 48-vCPU nodes, six per node; a fifth node would sit idle.</figcaption>
+</figure>
+</div>
 <p>Once four nodes are up, all 24 horizons are already running, so adding a fifth node cannot shorten the pass. Adding threads per task buys little either: the per-fit data is small enough that a single fit saturates around eight threads. What the measured 796% utilization (of an 800% ceiling) does show is that the packing wasted almost nothing. Four nodes are the saturation point for this task split; going faster means making the single task faster, or splitting the grid into more, shorter tasks.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/fig_wall_by_horizon.svg" class="img-fluid figure-img" alt="Dot plot of wall-clock hours by forecast horizon, declining from about 21.6 hours at h equals 1 to about 19.2 hours at h equals 24, with the h equals 1 point highlighted in red as the job wall"></p>
+<figcaption>Measured wall-clock per horizon task in the June run: all 24 run concurrently, so the pass ends with the slowest (h = 1, ≈ 21.55 h). Wall falls with horizon because longer horizons truncate the earliest rolling-training windows.</figcaption>
+</figure>
+</div>
 </section>
 <section id="the-traps" class="level2">
 <h2 class="anchored" data-anchor-id="the-traps">The traps</h2>
@@ -227,6 +239,16 @@ head node, t3.large (public subnet, runs Slurm)
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-deleted <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 release-address <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Releasing the address is the step people miss. AWS now bills every public IPv4 address by the hour, attached or not, about $0.005 per hour or $3.6 per month; a deleted NAT strands its Elastic IP, and forgetting to release it just keeps that meter going.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Screenshot to add.</strong> AWS console → VPC → Route tables: the compute subnet’s <code>0.0.0.0/0</code> route with <strong>Status: Blackhole</strong>. Redact the account ID and VPC/subnet IDs before publishing.</p>
+</div>
+</div>
+</div>
 <p><strong>The most dangerous default.</strong> In my configuration the shared EFS volume is part of the cluster and is deleted with it, the default <code>DeletionPolicy: Delete</code>. It can be set to <code>Retain</code> instead; I chose not to, preferring a clean site per run with the local copy as ground truth over a standing cloud volume that bills monthly and might hold the only copy of something. The price of that choice is discipline: retrieve first, tear down second, every time.</p>
 <p><strong>Quotas.</strong> A fresh account’s on-demand vCPU quota is far below four 48-vCPU nodes. Check Service Quotas and request the raise days before the deadline run, not the night of.</p>
 <p><strong>Failed bootstraps still bill.</strong> Instances bill from launch whether or not they ever join the queue. The July incident, priced from the instance records:</p>
@@ -321,6 +343,16 @@ head node, t3.large (public subnet, runs Slurm)
 </tbody>
 </table>
 <p>The NAT’s hourly charge works out to about $1.3; the rest of that line is a small data-processing fee. About 5,300 vCPU-hours, nearly four laptop-weeks of work, done in a day and change for $243. The routine grid is a different order: about an hour per pass, ten dollars or so.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Screenshot to add.</strong> Cost Explorer, June 2026, grouped by service: EC2 dominating at ≈ $243, NAT and EFS as slivers.</p>
+</div>
+</div>
+</div>
 <p>Reading the two tables together, the plainest conclusion is that AWS does not distinguish between a machine that is computing, one that is debugging, and one stuck in bootstrap: a running instance bills every minute at the same rate. On the routine grid a lapse costs a few dollars; with four compute nodes up, letting the same lapse sit for a few hours runs into tens of dollars.</p>
 </section>
 <section id="what-transfers" class="level2">
