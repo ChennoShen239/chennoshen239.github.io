@@ -144,34 +144,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="the-cluster" class="level2">
 <h2 class="anchored" data-anchor-id="the-cluster">The cluster</h2>
-<pre class="text"><code>laptop
-   │  rsync / ssh
-   ▼
-head node, t3.large (public subnet, runs Slurm)
-   │
-   ├── EFS shared volume /shared (code, venv, results)
-   │
-   └── compute nodes × 4: c7i.12xlarge, 48 vCPU / 96 GiB (private subnet)
-              │
-              ▼
-        NAT gateway (the private subnet's only route out;
-        node bootstrap: software mirrors and AWS APIs)</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/fig_architecture.svg" class="img-fluid figure-img" alt="Architecture diagram: a laptop connects by rsync and ssh to a t3.large head node in the public subnet running Slurm, which shares an EFS volume holding code, virtualenv, and results with four c7i.12xlarge compute nodes of 48 vCPU each in a private subnet, whose only route out is a NAT gateway, drawn in red, used during node bootstrap for software mirrors and AWS APIs"></p>
+<figcaption>The disposable cluster: a head node schedules, four 48-vCPU compute nodes work, everything shares one EFS volume, and the private subnet reaches the world only through the NAT gateway. Remember the red box.</figcaption>
+</figure>
+</div>
 <p>The lines of the config that actually shape the experience (ParallelCluster 3.15, us-east-1):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Scheduling</span><span class="kw">:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">Scheduler</span><span class="kw">:</span><span class="at"> slurm</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmSettings</span><span class="kw">:</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ScaledownIdletime</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span><span class="co">          # idle nodes terminate after 2 min</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmQueues</span><span class="kw">:</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">CapacityType</span><span class="kw">:</span><span class="at"> ONDEMAND</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">AllocationStrategy</span><span class="kw">:</span><span class="at"> lowest-price</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">ComputeResources</span><span class="kw">:</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu48</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">Instances</span><span class="kw">:</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7a.12xlarge</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7i.12xlarge</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MinCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MaxCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Scheduling</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">Scheduler</span><span class="kw">:</span><span class="at"> slurm</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmSettings</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ScaledownIdletime</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span><span class="co">          # idle nodes terminate after 2 min</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmQueues</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">CapacityType</span><span class="kw">:</span><span class="at"> ONDEMAND</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">AllocationStrategy</span><span class="kw">:</span><span class="at"> lowest-price</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">ComputeResources</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu48</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">Instances</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7a.12xlarge</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7i.12xlarge</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MinCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MaxCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The two-type pool lets EC2 Fleet order the candidates by price and try the cheaper one first; it is a preference, not a guarantee. The June run happened to land on c7i.12xlarge throughout, so the diagram and the cost table below are stated in c7i terms.</p>
 <p>Three configuration choices that mattered later:</p>
 <ul>
@@ -194,10 +188,10 @@ head node, t3.large (public subnet, runs Slurm)
 </ol>
 <p>Steps 5 and 6 are in that order on purpose.</p>
 <p>The full submission is an ordinary Slurm array, one task per horizon:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-24%24        # up to 24 tasks concurrent</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=8      # reserves 8 vCPU per task</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/run_forecast.py <span class="at">--horizon</span> <span class="st">"</span><span class="va">${SLURM_ARRAY_TASK_ID}</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-24%24        # up to 24 tasks concurrent</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=8      # reserves 8 vCPU per task</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/run_forecast.py <span class="at">--horizon</span> <span class="st">"</span><span class="va">${SLURM_ARRAY_TASK_ID}</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Each task requests 8 vCPU, so the full array needs 24 × 8 = 192 vCPU, exactly four 48-vCPU nodes at six tasks each. One easy misunderstanding: <code>--cpus-per-task=8</code> only reserves the vCPUs; the program will not use them by itself. The code has to read <code>SLURM_CPUS_PER_TASK</code> explicitly (my script passes it to XGBoost’s <code>nthread</code>).</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -224,20 +218,20 @@ head node, t3.large (public subnet, runs Slurm)
   "State": "blackhole"
 }</code></pre>
 <p>I now manage the NAT with a small up/down script. Its core, with the route-table lookup and guard rails omitted:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># up: allocate an EIP, create the NAT, point the default route at it</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">EIP_ALLOC_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 allocate-address <span class="at">--domain</span> vpc <span class="dt">\</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> AllocationId <span class="at">--output</span> text<span class="va">)</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="va">NAT_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 create-nat-gateway <span class="at">--subnet-id</span> <span class="st">"</span><span class="va">$PUBLIC_SUBNET</span><span class="st">"</span> <span class="dt">\</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span> <span class="dt">\</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> NatGateway.NatGatewayId <span class="at">--output</span> text<span class="va">)</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-available <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 replace-route <span class="at">--route-table-id</span> <span class="st">"</span><span class="va">$RTB</span><span class="st">"</span> <span class="dt">\</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--destination-cidr-block</span> 0.0.0.0/0 <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># down: delete the NAT, wait, then release the address</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 delete-nat-gateway <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-deleted <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 release-address <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># up: allocate an EIP, create the NAT, point the default route at it</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">EIP_ALLOC_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 allocate-address <span class="at">--domain</span> vpc <span class="dt">\</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> AllocationId <span class="at">--output</span> text<span class="va">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="va">NAT_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 create-nat-gateway <span class="at">--subnet-id</span> <span class="st">"</span><span class="va">$PUBLIC_SUBNET</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> NatGateway.NatGatewayId <span class="at">--output</span> text<span class="va">)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-available <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 replace-route <span class="at">--route-table-id</span> <span class="st">"</span><span class="va">$RTB</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--destination-cidr-block</span> 0.0.0.0/0 <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># down: delete the NAT, wait, then release the address</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 delete-nat-gateway <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-deleted <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 release-address <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Releasing the address is the step people miss. AWS now bills every public IPv4 address by the hour, attached or not, about $0.005 per hour or $3.6 per month; a deleted NAT strands its Elastic IP, and forgetting to release it just keeps that meter going.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
