@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Chen Gao: Notes &amp; Research</title>
+    <link>https://chennoshen239.github.io/</link>
+    <description>New posts, notes, and working papers by Chen Gao.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 02 Aug 2026 19:43:16 +0800</lastBuildDate>
+    <atom:link href="https://chennoshen239.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>Research Computing on AWS</title>
+      <link>https://chennoshen239.github.io/aws-compute-notes/</link>
+      <guid isPermaLink="false">tag:chennoshen239.github.io,2026-08-02:research-computing-on-aws</guid>
+      <pubDate>Sun, 02 Aug 2026 14:29:45 +0800</pubDate>
+      <category>Post</category>
+      <description>A short field note on ParallelCluster and Slurm: the setup, the traps, and the cost.</description>
+    </item>
+
+    <item>
+      <title>Reinforcement Learning</title>
+      <link>https://chennoshen239.github.io/reinforcement-learning-notes/</link>
+      <guid isPermaLink="false">tag:chennoshen239.github.io,2026-07-25:reinforcement-learning</guid>
+      <pubDate>Sat, 25 Jul 2026 13:48:07 +0800</pubDate>
+      <category>Note</category>
+      <description>Monte Carlo and stochastic approximation, temporal difference learning, and policy gradient methods, for economists.</description>
+    </item>
+
+    <item>
+      <title>Numerical Analysis</title>
+      <link>https://chennoshen239.github.io/numerical-analysis-notes/</link>
+      <guid isPermaLink="false">tag:chennoshen239.github.io,2026-07-17:numerical-analysis</guid>
+      <pubDate>Fri, 17 Jul 2026 14:40:17 -0400</pubDate>
+      <category>Note</category>
+      <description>Interpolation, quadrature, ODE solvers, and numerical linear algebra from the two-semester Berkeley sequence Math 128A/128B.</description>
+    </item>
+
+    <item>
+      <title>Forecasting Inflation with Microdata: An Adaptive Machine Learning Approach</title>
+      <link>https://chennoshen239.github.io/research.html#forecasting-inflation-with-microdata</link>
+      <guid isPermaLink="false">tag:chennoshen239.github.io,2026-07-14:forecasting-inflation-with-microdata</guid>
+      <pubDate>Tue, 14 Jul 2026 00:40:23 +0800</pubDate>
+      <category>Working paper</category>
+      <description>An adaptive forecasting pipeline that tests when price-change microdata add predictive value and uses them only when they perform well.</description>
+    </item>
+  </channel>
+</rss>

@@ -134,6 +134,8 @@ details.abstract[open] .ab-state::after{content:'Hide'}
 /* footer */
 .site-footer{border-top:1px solid var(--line);margin-top:8px}
 .site-footer .bar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:24px;font-family:var(--sans);font-size:15px;color:var(--muted)}
+.site-footer a{color:var(--ink);border-bottom:1px solid var(--line-2);transition:color .18s var(--ease),border-color .18s var(--ease)}
+.site-footer a:hover{color:var(--red);border-bottom-color:var(--red)}
 
 /* page head (interior pages) */
 .page-head{padding:58px 0 0}

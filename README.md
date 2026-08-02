@@ -22,6 +22,7 @@ Edit the HTML/CSS on `main` and push. Plain HTML + two shared CSS files + self-h
 | Social / OpenGraph share card (1200×630) | `assets/img/og.png` (referenced in each page `<head>`) |
 | CV and paper PDFs | `files/` — e.g. `files/cv.pdf`, `files/bounded_default.pdf`, `files/iesn-notes.pdf`, `files/dmp-notes.pdf` |
 | SEO / metadata | the `<head>` of each page (title, description, canonical, OG/Twitter, JSON-LD on `index.html`) + `sitemap.xml` + `robots.txt` |
+| RSS feed | `feed.xml` for release entries; RSS autodiscovery and the visible footer link live in the four main page files |
 | The DMP lecture note | Now a **PDF**: `files/dmp-notes.pdf`, compiled from the owner's LyX master at `Website/notes/DMP.lyx`. To update, recompile that LyX → PDF and overwrite the file. `notes/dmp.html` is just a redirect to the PDF (the Quarto/HTML version is retired). |
 
 The header / nav / footer markup is **duplicated in all four page files** (there are no includes).
@@ -59,6 +60,18 @@ marked with `aria-current="page"`.
 - **SSH to github.com is blocked on the owner's network.** Push over **HTTPS**. The owner's clone has an HTTPS remote
   named `deploy` → `https://github.com/ChennoShen239/chennoshen239.github.io.git`. `github.com:443` is sometimes flaky;
   just retry the push a few times.
+
+## RSS feed
+
+`feed.xml` is a hand-maintained RSS 2.0 feed titled **Chen Gao: Notes & Research**. It announces new Posts, first public releases of Notes and Working papers, and Major revisions. It does not announce Work in progress, routine revisions, CV changes, or site maintenance.
+
+For each qualifying release:
+
+1. Add a new `<item>` at the top of `feed.xml` in the same commit as the content.
+2. Use the original title, a one- or two-sentence summary, the canonical page URL, the real publication time, and the appropriate `Post`, `Note`, `Working paper`, or `Major revision` category.
+3. Give the item a stable, unique tag URI in `<guid isPermaLink="false">`. Major revisions use a new GUID and the title `Revised: <original title>`.
+4. Update `<lastBuildDate>` and retain only the latest 20 items.
+5. Validate before deployment with `xmllint --noout feed.xml`.
 
 ---
 
