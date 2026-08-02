@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-08-02T16:39:57.003047</dc:date>
+    <dc:date>2026-08-02T18:00:22.523146</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -40,7 +40,7 @@ Q 35.943431 10.69272 35.943431 16.51392
 L 35.943431 114.31008 
 Q 35.943431 120.13128 46.266431 120.13128 
 z
-" clip-path="url(#pb9f8a4dc0c)" style="fill: #ffffff; stroke: #d8dbe0; stroke-width: 1.1; stroke-linejoin: miter"/>
+" clip-path="url(#p0334673030)" style="fill: #ffffff; stroke: #d8dbe0; stroke-width: 1.1; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 252.726431 120.13128 
@@ -53,7 +53,7 @@ Q 242.403431 10.69272 242.403431 16.51392
 L 242.403431 114.31008 
 Q 242.403431 120.13128 252.726431 120.13128 
 z
-" clip-path="url(#pb9f8a4dc0c)" style="fill: #ffffff; stroke: #94070a; stroke-width: 1.6; stroke-linejoin: miter"/>
+" clip-path="url(#p0334673030)" style="fill: #ffffff; stroke: #94070a; stroke-width: 1.6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 46.266431 236.55528 
@@ -66,7 +66,7 @@ Q 35.943431 127.11672 35.943431 132.93792
 L 35.943431 230.73408 
 Q 35.943431 236.55528 46.266431 236.55528 
 z
-" clip-path="url(#pb9f8a4dc0c)" style="fill: #ffffff; stroke: #4f5763; stroke-width: 1.1; stroke-linejoin: miter"/>
+" clip-path="url(#p0334673030)" style="fill: #ffffff; stroke: #4f5763; stroke-width: 1.1; stroke-linejoin: miter"/>
    </g>
    <g id="patch_5">
     <path d="M 252.726431 236.55528 
@@ -79,7 +79,7 @@ Q 242.403431 127.11672 242.403431 132.93792
 L 242.403431 230.73408 
 Q 242.403431 236.55528 252.726431 236.55528 
 z
-" clip-path="url(#pb9f8a4dc0c)" style="fill: #ffffff; stroke: #d8dbe0; stroke-width: 1.1; stroke-linejoin: miter"/>
+" clip-path="url(#p0334673030)" style="fill: #ffffff; stroke: #d8dbe0; stroke-width: 1.1; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
     <!-- your laptop -->
@@ -1210,7 +1210,7 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="pb9f8a4dc0c">
+  <clipPath id="p0334673030">
    <rect x="29.749631" y="7.2" width="412.92" height="232.848"/>
   </clipPath>
  </defs>

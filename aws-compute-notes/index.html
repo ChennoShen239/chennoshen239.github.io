@@ -93,7 +93,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#the-traps" id="toc-the-traps" class="nav-link" data-scroll-target="#the-traps">The traps</a></li>
   <li><a href="#what-it-costs" id="toc-what-it-costs" class="nav-link" data-scroll-target="#what-it-costs">What it costs</a></li>
   <li><a href="#what-transfers" id="toc-what-transfers" class="nav-link" data-scroll-target="#what-transfers">What transfers</a></li>
-  <li><a href="#the-checklist-i-now-run" id="toc-the-checklist-i-now-run" class="nav-link" data-scroll-target="#the-checklist-i-now-run">The checklist I now run</a></li>
+  <li><a href="#a-closing-checklist" id="toc-a-closing-checklist" class="nav-link" data-scroll-target="#a-closing-checklist">A closing checklist</a></li>
   </ul>
 </nav>
 </div>
@@ -135,12 +135,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="why-the-cloud" class="level2">
 <h2 class="anchored" data-anchor-id="why-the-cloud">Why the cloud</h2>
 <p>The workload was hyperparameter tuning for gradient-boosted trees, done separately for each forecast horizon from 1 to 24, where every candidate in the grid is refit over hundreds of rolling origins. The 24 horizons never talk to each other, so the job is embarrassingly parallel: what I needed was not a bigger computer but many ordinary ones, started together and thrown away after.</p>
-<p>The routine tuning grid takes tens of minutes per horizon on eight vCPUs, about a day if run sequentially on a laptop. The real problem was a denser robustness grid in mid-June. Folding the EC2 instance records into vCPU terms, that run came to about 5,300 vCPU-hours (111 node-hours × 48 vCPU). Even granting my laptop’s eight logical cores the same per-core speed, running around the clock, that is nearly 28 days.</p>
+<p>The routine tuning grid takes tens of minutes per horizon on eight vCPUs, about a day if run sequentially on a laptop; with nothing else to do, my MacBook could just about absorb that. The paper’s production configuration could not be treated the same way: a denser grid that, folding the EC2 instance records into vCPU terms, came to about 5,300 vCPU-hours (111 node-hours × 48 vCPU). Even granting my laptop’s eight logical cores the same per-core speed, running around the clock, that is nearly 28 days. And a laptop is never fully available anyway: memory aside, a multi-day full-load run turns the machine into a hand warmer, an argument with more appeal in winter.</p>
 </section>
 <section id="why-parallelcluster-slurm" class="level2">
 <h2 class="anchored" data-anchor-id="why-parallelcluster-slurm">Why ParallelCluster + Slurm</h2>
 <p>I considered two other routes. Bare EC2 is the most direct, but it means hand-writing node startup, task dispatch, retry, and teardown: a part-time job as a scheduler. Managed ML platforms center on “training jobs” and want your code repackaged into their entry points and storage conventions; my scripts were already plain “command-line arguments in, files out,” so the script body needed no changes, only a Slurm submission file.</p>
-<p>I settled on <a href="https://docs.aws.amazon.com/parallelcluster/">AWS ParallelCluster</a>: one YAML file describes a head node, a compute queue, and a shared filesystem; one command assembles the whole thing in about ten minutes; and what you get is a standard Slurm queue, so <code>sbatch</code> and <code>squeue</code> work the way they always have. Moving back to a campus cluster later, the script body typically stays intact; what changes is environment configuration, the partition, account, modules, and file paths.</p>
+<p>I settled on <a href="https://docs.aws.amazon.com/parallelcluster/">AWS ParallelCluster</a>: one YAML file describes a head node, a compute queue, and a shared filesystem; one command assembles the whole thing in about ten minutes; and what you get is a standard Slurm queue, so <code>sbatch</code> and <code>squeue</code> work the way they always have. Moving back to a campus cluster later, the script body typically stays intact; what changes is environment configuration, the partition, account, modules, and file paths, while the training parameters that matter live in the Slurm scripts and carry over as they are. In this project’s case the same scripts run essentially unchanged on Stanford’s cluster.</p>
 </section>
 <section id="the-cluster" class="level2">
 <h2 class="anchored" data-anchor-id="the-cluster">The cluster</h2>
@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="the-traps" class="level2">
 <h2 class="anchored" data-anchor-id="the-traps">The traps</h2>
-<p><strong>The NAT blackhole.</strong> Compute nodes live in a private subnet; during boot they need outbound access (software mirrors, AWS’s own APIs), which flows through a NAT gateway. A NAT costs about a dollar a day, so between runs I delete it. But the subnet’s route table still points at the deleted NAT, the route becomes a <code>blackhole</code>, and the next cluster’s nodes hang in <code>CONFIGURING</code>; nothing in the status output or logs I was checking pointed anywhere near the cause. In July this bit me even though my own runbook said “NAT up before the cluster”: I worked from memory, skipped the line, and watched a node sit in <code>CONFIGURING</code> for 36 minutes, get replaced, and the replacement sit for another 36. While writing this note I queried the route table again; the last teardown had left the default route in place, state and all (output excerpt):</p>
+<p><strong>The NAT blackhole.</strong> Compute nodes live in a private subnet; during boot they need outbound access (software mirrors, AWS’s own APIs), which flows through a NAT gateway. A NAT costs about a dollar a day, so between runs I delete it. But the subnet’s route table still points at the deleted NAT, the route becomes a <code>blackhole</code>, and the next cluster’s nodes hang in <code>CONFIGURING</code>; nothing in the status output or logs I was checking pointed anywhere near the cause. In July this bit me even though the runbook I keep for my agent says “NAT up before the cluster”: that day I worked from memory, skipped the line, and watched a node sit in <code>CONFIGURING</code> for 36 minutes, get replaced, and the replacement sit for another 36. While writing this note I queried the route table again; the last teardown had left the default route in place, state and all (output excerpt):</p>
 <pre class="text"><code>$ aws ec2 describe-route-tables --region us-east-1 \
     --query 'RouteTables[].Routes[?State==`blackhole`]'
 {
@@ -240,7 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p><strong>The most dangerous default.</strong> In my configuration the shared EFS volume is part of the cluster and is deleted with it, the default <code>DeletionPolicy: Delete</code>. It can be set to <code>Retain</code> instead; I chose not to, preferring a clean site per run with the local copy as ground truth over a standing cloud volume that bills monthly and might hold the only copy of something. The price of that choice is discipline: retrieve first, tear down second, every time.</p>
-<p><strong>Quotas.</strong> A fresh account’s on-demand vCPU quota is far below four 48-vCPU nodes. Check Service Quotas and request the raise days before the deadline run, not the night of.</p>
+<p><strong>Quotas.</strong> A fresh account’s on-demand vCPU quota is far below four 48-vCPU nodes. Check Service Quotas and request the raise days before the deadline run, not the night of. I asked for 1,024 vCPUs; the reviewers granted my freshly created account 500, which turned out to be plenty.</p>
 <p><strong>Failed bootstraps still bill.</strong> Instances bill from launch whether or not they ever join the queue. The July incident, priced from the instance records:</p>
 <table class="caption-top table">
 <colgroup>
@@ -273,7 +273,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>$2.7 for zero compute. This is what the smoke test is for: make the mistakes on one node, then scale.</p>
+<p>$2.7 that bought no compute, but did cap the damage. This is what the smoke test is for: make the mistakes on one node, then scale up to the real run.</p>
 </section>
 <section id="what-it-costs" class="level2">
 <h2 class="anchored" data-anchor-id="what-it-costs">What it costs</h2>
@@ -398,11 +398,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Task shape picks the tool: many independent CPU tasks want a batch queue; one long GPU job wants a single rented machine. The fourth quadrant is outside this note’s scope.</figcaption>
 </figure>
 </div>
-<p>For price anchors, RunPod’s posted on-demand rates as of August 2026: an RTX 4090 is $0.69 per hour, an 80 GB A100 about $1.4–1.5, an H100 about $2.9–3.2. So an H100 rents for a bit more per hour than one entire 48-vCPU compute node, and a 4090 for about a third of one. And one detail of RunPod’s pricing encodes this note’s whole moral better than I could: a pod’s volume disk bills at $0.10 per GB-month while the pod runs and $0.20 once it stops. Storage attached to a machine that does nothing costs double. Retrieve your results, kill the machine.</p>
+<p>For price anchors, RunPod’s posted on-demand rates as of August 2026: an RTX 4090 is $0.69 per hour, an 80 GB A100 about $1.4–1.5, an H100 about $2.9–3.2. So an H100 rents for a bit more per hour than one entire 48-vCPU compute node, and a 4090 for about a third of one.</p>
 </section>
-<section id="the-checklist-i-now-run" class="level2">
-<h2 class="anchored" data-anchor-id="the-checklist-i-now-run">The checklist I now run</h2>
-<p>The discipline that matters is not hunting for cheap instances; it is turning things off.</p>
+<section id="a-closing-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="a-closing-checklist">A closing checklist</h2>
+<p>Several rounds in, the discipline that actually saves money is not hunting for cheap instances; it is turning things off.</p>
 <p>Before a run:</p>
 <ol type="1">
 <li>NAT up? The default route must point at a live gateway.</li>
@@ -415,7 +415,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Cluster fully deleted? Wait for the delete to actually finish.</li>
 <li>NAT down, Elastic IP released?</li>
 </ol>
-<p>The checklist is boring, and it is also the conclusion: correct compute turned out cheaper than I expected, every wasted dollar maps to one specific mistake, and the meter only ever spun uselessly on mine. The checklist exists to keep it still.</p>
+<p>The checklist is boring, and it is what keeps correct compute surprisingly cheap: every wasted dollar above maps to one specific mistake, and the checklist’s whole job is to keep the waste frozen at the numbers you have just seen. By the time this note went up, the runs behind it had consumed a healthy pile of money; thanks to the checklist, the wasted slice has stayed where you saw it.</p>
 <hr>
 <p><a href="https://chennoshen239.github.io/notes.html">← Notes &amp; code</a></p>
 </section>
