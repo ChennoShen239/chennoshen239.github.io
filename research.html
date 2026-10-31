@@ -25,69 +25,37 @@
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-<div class="page">
-  <header class="site-header">
-    <div class="wrap">
-      <div class="bar">
-        <a class="wordmark" href="index.html">Chen&nbsp;Gao</a>
-        <nav class="nav">
-          <a href="research.html" aria-current="page">Research</a>
-          <a href="notes.html">Notes &amp; Code</a>
-          <a href="teaching.html">Teaching</a>
-          <a href="https://chennoshen239.github.io/files/cv.pdf">CV</a>
-        </nav>
-      </div>
-      <div class="head-rule"></div>
-    </div>
-  </header>
+<header>
+  <div class="wrap">
+    <a class="home" href="index.html">Chen Gao</a>
+    <nav>
+      <a href="research.html" aria-current="page">Research</a>
+      <a href="notes.html">Notes &amp; Code</a>
+      <a href="teaching.html">Teaching</a>
+      <a href="https://chennoshen239.github.io/files/cv.pdf">CV</a>
+    </nav>
+  </div>
+</header>
 
-  <main class="wrap">
-    <div class="page-head reveal reveal-1">
-      <p class="eyebrow">Research</p>
-      <h1 class="page-title">Working papers &amp; projects</h1>
-    </div>
-    <div class="divider"></div>
+<main class="wrap">
+<h1>Research</h1>
 
-    <article class="row reveal reveal-2" id="forecasting-inflation-with-microdata">
-      <div class="aside">
-        <p class="kicker">Working paper</p>
-        <p class="meta">July 2026 · Preliminary</p>
-      </div>
-      <div class="body">
-        <h2 class="title">Forecasting Inflation with Microdata: An Adaptive Machine Learning Approach</h2>
-        <p class="note-ref" style="font-size:17px;line-height:1.6">with
-          <a class="link" href="https://icme.stanford.edu/people/catherine-chen">Catherine Chen</a>,
-          <a class="link" href="https://www.jhazell.co.uk/">Jonathon Hazell</a>,
-          <a class="link" href="https://lihualei71.github.io/">Lihua Lei</a>, and
-          <a class="link" href="https://sites.google.com/view/chenlian/home">Chen Lian</a>.
-        </p>
-        <div class="btn-row" style="margin-top:8px;margin-bottom:24px">
-          <a class="btn btn-sm" href="https://chennoshen239.github.io/files/Inflation_Forecasting.pdf">Paper (PDF)</a>
-          <a class="btn btn-sm" href="https://arxiv.org/abs/2607.12345">arXiv</a>
-        </div>
-        <details class="abstract">
-          <summary>
-            <span class="ab-label">Abstract</span>
-            <span class="ab-caret">▸</span>
-            <span class="ab-state"></span>
-          </summary>
-          <div class="prose">
-            <p>Does microeconomic heterogeneity help to forecast aggregate inflation in a non-stationary environment? We develop a scan test for whether one forecast outperforms another, over an interval with unknown starting point and duration. To exploit any occasional forecasting power that the scan test detects, we design an adaptive machine learning pipeline. We encode the distribution of price changes into a high-dimensional vector, which we combine with a gradient boosted trees algorithm. We then combine this micro forecast with other benchmark forecasts, using an adaptive algorithm that makes use of the micro forecast only when it performs well. We apply the pipeline to UK microdata, with four main results. First, the micro forecast outperforms a univariate benchmark, but only in the volatile period after 2020. Second, the scan test detects periods of micro outperformance, so the micro forecast enters the combined forecast. Third, the combined forecast performs comparably to the univariate benchmark before 2020 and better at every horizon after 2020. Fourth, the value of microdata for the combined forecast materializes after 2020. We conclude that microdata are valuable for forecasting aggregate inflation, but only after large shocks.</p>
-          </div>
-        </details>
-      </div>
-    </article>
+<article id="forecasting-inflation-with-microdata">
+  <h2>Forecasting Inflation with Microdata: An Adaptive Machine Learning Approach</h2>
+  <p>with <a href="https://icme.stanford.edu/people/catherine-chen">Catherine Chen</a>, <a href="https://www.jhazell.co.uk/">Jonathon Hazell</a>, <a href="https://lihualei71.github.io/">Lihua Lei</a>, and <a href="https://sites.google.com/view/chenlian/home">Chen Lian</a></p>
+  <p class="muted">Working paper, July 2026 (preliminary) · <a href="https://chennoshen239.github.io/files/Inflation_Forecasting.pdf">PDF</a> · <a href="https://arxiv.org/abs/2607.12345">arXiv</a></p>
+  <details>
+    <summary>Abstract</summary>
+    <p>Does microeconomic heterogeneity help to forecast aggregate inflation in a non-stationary environment? We develop a scan test for whether one forecast outperforms another, over an interval with unknown starting point and duration. To exploit any occasional forecasting power that the scan test detects, we design an adaptive machine learning pipeline. We encode the distribution of price changes into a high-dimensional vector, which we combine with a gradient boosted trees algorithm. We then combine this micro forecast with other benchmark forecasts, using an adaptive algorithm that makes use of the micro forecast only when it performs well. We apply the pipeline to UK microdata, with four main results. First, the micro forecast outperforms a univariate benchmark, but only in the volatile period after 2020. Second, the scan test detects periods of micro outperformance, so the micro forecast enters the combined forecast. Third, the combined forecast performs comparably to the univariate benchmark before 2020 and better at every horizon after 2020. Fourth, the value of microdata for the combined forecast materializes after 2020. We conclude that microdata are valuable for forecasting aggregate inflation, but only after large shocks.</p>
+  </details>
+</article>
+</main>
 
-  </main>
-
-  <footer class="site-footer">
-    <div class="wrap">
-      <div class="bar">
-        <span>© 2026 Chen Gao</span>
-        <span><a href="feed.xml">RSS</a> · chengao0716 at gmail dot com</span>
-      </div>
-    </div>
-  </footer>
-</div>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Chen Gao</span>
+    <a href="feed.xml">RSS</a>
+  </div>
+</footer>
 </body>
 </html>

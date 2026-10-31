@@ -25,100 +25,50 @@
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-<div class="page">
-  <header class="site-header">
-    <div class="wrap">
-      <div class="bar">
-        <a class="wordmark" href="index.html">Chen&nbsp;Gao</a>
-        <nav class="nav">
-          <a href="research.html">Research</a>
-          <a href="notes.html" aria-current="page">Notes &amp; Code</a>
-          <a href="teaching.html">Teaching</a>
-          <a href="https://chennoshen239.github.io/files/cv.pdf">CV</a>
-        </nav>
-      </div>
-      <div class="head-rule"></div>
-    </div>
-  </header>
+<header>
+  <div class="wrap">
+    <a class="home" href="index.html">Chen Gao</a>
+    <nav>
+      <a href="research.html">Research</a>
+      <a href="notes.html" aria-current="page">Notes &amp; Code</a>
+      <a href="teaching.html">Teaching</a>
+      <a href="https://chennoshen239.github.io/files/cv.pdf">CV</a>
+    </nav>
+  </div>
+</header>
 
-  <main class="wrap">
-    <div class="page-head reveal reveal-1">
-      <p class="eyebrow">Notes &amp; Code</p>
-      <h1 class="page-title">Notes &amp; code</h1>
-    </div>
-    <div class="divider"></div>
+<main class="wrap">
+<h1>Notes &amp; Code</h1>
 
-    <section class="row reveal reveal-2">
-      <h2 class="side-label">Notes</h2>
-      <div class="body">
-        <div class="linklist">
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/dynamic-optimization-notes/">Dynamic Optimization</a>
-            <p>The calculus of variations, optimal control, and dynamic programming, with economic applications.</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/game-theory-notes/">Game Theory</a>
-            <p>Static and dynamic games under complete and incomplete information (PKU, Fall 2024).</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/numerical-analysis-notes/">Numerical Analysis</a>
-            <p>Interpolation, quadrature, ODE solvers, and numerical linear algebra (UC Berkeley, Math 128A/128B).</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/reinforcement-learning-notes/">Reinforcement Learning</a>
-            <p>Monte Carlo and stochastic approximation, temporal difference learning, and policy gradient methods, for economists.</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/files/dmp-notes.pdf">Search and Matching: The DMP Model</a>
-            <p>Unemployment dynamics and the Diamond–Mortensen–Pissarides model.</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/files/iesn-notes.pdf">Introduction to Economic and Social Networks</a>
-            <p>Network games, centrality, and cooperation on networks (PKU, Fall 2025).</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/compecon-notes/">Quantitative Macro using JAX</a>
-            <p>Graduate Computational Economics in JAX (PKU, Spring 2026).</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://chennoshen239.github.io/aws-compute-notes/">Research Computing on AWS</a>
-            <p>A short field note on ParallelCluster and Slurm: the setup, the traps, and the cost.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+<section>
+  <h2>Notes</h2>
+  <ul>
+    <li><a href="https://chennoshen239.github.io/dynamic-optimization-notes/">Dynamic Optimization</a></li>
+    <li><a href="https://chennoshen239.github.io/game-theory-notes/">Game Theory</a> <span class="muted">PKU, Fall 2024</span></li>
+    <li><a href="https://chennoshen239.github.io/numerical-analysis-notes/">Numerical Analysis</a> <span class="muted">UC Berkeley, Math 128A/128B</span></li>
+    <li><a href="https://chennoshen239.github.io/reinforcement-learning-notes/">Reinforcement Learning</a></li>
+    <li><a href="https://chennoshen239.github.io/files/dmp-notes.pdf">Search and Matching: The DMP Model</a></li>
+    <li><a href="https://chennoshen239.github.io/files/iesn-notes.pdf">Introduction to Economic and Social Networks</a> <span class="muted">PKU, Fall 2025</span></li>
+    <li><a href="https://chennoshen239.github.io/compecon-notes/">Quantitative Macro using JAX</a> <span class="muted">PKU, Spring 2026</span></li>
+    <li><a href="https://chennoshen239.github.io/aws-compute-notes/">Research Computing on AWS</a></li>
+  </ul>
+</section>
 
-    <div class="divider"></div>
+<section>
+  <h2>Code</h2>
+  <ul>
+    <li><a href="https://github.com/ChennoShen239/runpod_scripts">RunPod Scripts</a></li>
+    <li id="sepia-memo"><a href="https://typst.app/universe/package/sepia-memo/">sepia-memo</a> · <a href="https://github.com/ChennoShen239/sepia-memo">source</a></li>
+    <li><a href="https://github.com/ChennoShen239/typst_templates">Typst Templates</a></li>
+  </ul>
+</section>
+</main>
 
-    <section class="row reveal reveal-3">
-      <h2 class="side-label">Code</h2>
-      <div class="body">
-        <div class="linklist">
-          <div class="entry">
-            <a class="entry-title" href="https://github.com/ChennoShen239/runpod_scripts">RunPod Scripts</a>
-            <p>Scripts that automatically send files to a remote server, execute code, and email back the results.</p>
-          </div>
-          <div class="entry" id="sepia-memo">
-            <a class="entry-title" href="https://typst.app/universe/package/sepia-memo/">sepia-memo</a>
-            <p>A Typst template for research memos with Garamond typography, drop capitals, and margin notes. <a class="link" href="https://github.com/ChennoShen239/sepia-memo">Source on GitHub</a>.</p>
-          </div>
-          <div class="entry">
-            <a class="entry-title" href="https://github.com/ChennoShen239/typst_templates">Typst Templates</a>
-            <p>A collection of Typst templates for academic presentations and course notes.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="wrap">
-      <div class="bar">
-        <span>© 2026 Chen Gao</span>
-        <span><a href="feed.xml">RSS</a> · chengao0716 at gmail dot com</span>
-      </div>
-    </div>
-  </footer>
-</div>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Chen Gao</span>
+    <a href="feed.xml">RSS</a>
+  </div>
+</footer>
 </body>
 </html>

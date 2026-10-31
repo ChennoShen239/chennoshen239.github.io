@@ -1,118 +1,17 @@
-# Chen Gao — personal website
+# chennoshen239.github.io
 
-The **`main` branch is the live, hand-edited static site** served at <https://chennoshen239.github.io>.
-GitHub Pages serves from `main` / root (Settings → Pages; legacy branch-deploy, no Actions, no build step).
-Edit the HTML/CSS on `main` and push. Plain HTML + two shared CSS files + self-hosted fonts. No JS framework, no Quarto.
+Source for my academic homepage, https://chennoshen239.github.io. Plain HTML and one stylesheet (`assets/site.css`), served by GitHub Pages from `main`. There is no build step.
 
-> ⚠️ **One live branch only: `main`.** The old Quarto source is archived on the **`legacy-quarto`** branch,
-> kept for reference. Never `quarto publish` it or merge it into `main`; that would overwrite this
-> hand-authored static site. (History: the site used to live on a separate `gh-pages` branch with `main`
-> holding Quarto; those were consolidated into a single `main`.)
+- Header and footer are repeated in `index.html`, `research.html`, `notes.html` and `teaching.html`; change all four.
+- Fonts are self-hosted in `assets/fonts/` because Google Fonts is blocked in mainland China. The Noto Serif SC files only contain 高 and 琛.
+- The note sites (`*-notes/`) are separate Quarto builds with their own styles. The old Quarto source of the homepage is on the `legacy-quarto` branch; don't publish it over `main`.
+- Keep `.nojekyll`.
+- When adding a paper or notes, add an item to `feed.xml` and check it with `xmllint --noout feed.xml`.
 
----
-
-## Where to change what
-
-| You want to change… | Edit this |
-|---|---|
-| Page text, papers, news, links, nav labels | the four page files: `index.html`, `research.html`, `notes.html`, `teaching.html` |
-| Colors, type sizes, fonts in use, spacing, buttons, animations, responsive | `assets/site.css` — design tokens are the CSS variables in `:root{…}` at the very top |
-| Which font files load (`@font-face`) | `assets/fonts.css` + the `.woff2` files in `assets/fonts/` |
-| Portrait photo | `assets/img/portrait.jpg` |
-| Social / OpenGraph share card (1200×630) | `assets/img/og.png` (referenced in each page `<head>`) |
-| CV and paper PDFs | `files/` — e.g. `files/cv.pdf`, `files/bounded_default.pdf`, `files/iesn-notes.pdf`, `files/dmp-notes.pdf` |
-| SEO / metadata | the `<head>` of each page (title, description, canonical, OG/Twitter, JSON-LD on `index.html`) + `sitemap.xml` + `robots.txt` |
-| RSS feed | `feed.xml` for release entries; RSS autodiscovery and the visible footer link live in the four main page files |
-| The DMP lecture note | Now a **PDF**: `files/dmp-notes.pdf`, compiled from the owner's LyX master at `Website/notes/DMP.lyx`. To update, recompile that LyX → PDF and overwrite the file. `notes/dmp.html` is just a redirect to the PDF (the Quarto/HTML version is retired). |
-
-The header / nav / footer markup is **duplicated in all four page files** (there are no includes).
-If you change the nav, the wordmark, or the footer, update all four by hand. The active nav link is
-marked with `aria-current="page"`.
-
----
-
-## Design system (current)
-
-- **Fonts** (defined in `assets/fonts.css`, self-hosted under `assets/fonts/`):
-  - **Space Grotesk** — headings, wordmark, nav, labels, dates, buttons, footer (all the sans UI). Weights 400/500/700.
-  - **Spectral** — serif body prose (regular + italic).
-  - **Noto Serif SC** — *only* the Chinese name 高琛 (see the subset warning below).
-- **CSS tokens** (`:root` in `site.css`): `--red:#94070a` (the CV red — the only accent color), `--red-2:#7a0608`,
-  `--ink:#16181d`, `--text:#2a2f38`, `--muted:#4f5763`, `--body` (Spectral), `--sans` (Space Grotesk),
-  `--maxw:1080px`, `--pad:40px`.
-- **Buttons** are underline-links, not boxes: base `.btn` is ink text with a faint resting underline that
-  turns red on hover; `.btn-primary` (Email) is red. They are class-driven — restyle in `site.css`, don't touch markup.
-- Single responsive breakpoint at `max-width:760px`. All animations are gated behind `prefers-reduced-motion`.
-
----
-
-## House rules & gotchas
-
-- **No em-dashes (—) in prose.** Owner preference. En-dash numeric ranges (e.g. `2022–2026`) are fine.
-- **Fonts must work from mainland China.** Google Fonts (`fonts.gstatic.com`) is **blocked** there, which is why
-  fonts are self-hosted. To add/replace a font, fetch the `.woff2` from **Fontsource via jsDelivr** (reachable in China):
-  `https://cdn.jsdelivr.net/fontsource/fonts/<family>@latest/latin-<weight>-normal.woff2`
-  — drop it in `assets/fonts/` and add an `@font-face` rule in `fonts.css`.
-- **Chinese text is subset to just 高 and 琛.** The Noto Serif SC `@font-face` blocks use
-  `unicode-range:U+9AD8` (高) and `U+741B` (琛). Any *other* Chinese character will not render. To add more Chinese
-  you must regenerate the Noto subset with the new glyphs **and** widen the `unicode-range`.
-- **`.nojekyll` must stay** at the repo root (it stops GitHub Pages from running Jekyll over the files).
-- **SSH to github.com is blocked on the owner's network.** Push over **HTTPS**. The owner's clone has an HTTPS remote
-  named `deploy` → `https://github.com/ChennoShen239/chennoshen239.github.io.git`. `github.com:443` is sometimes flaky;
-  just retry the push a few times.
-
-## RSS feed
-
-`feed.xml` is a hand-maintained RSS 2.0 feed titled **Chen Gao: Notes & Research**. It announces new Posts, first public releases of Notes and Working papers, and Major revisions. It does not announce Work in progress, routine revisions, CV changes, or site maintenance.
-
-For each qualifying release:
-
-1. Add a new `<item>` at the top of `feed.xml` in the same commit as the content.
-2. Use the original title, a one- or two-sentence summary, the canonical page URL, the real publication time, and the appropriate `Post`, `Note`, `Working paper`, or `Major revision` category.
-3. Give the item a stable, unique tag URI in `<guid isPermaLink="false">`. Major revisions use a new GUID and the title `Revised: <original title>`.
-4. Update `<lastBuildDate>` and retain only the latest 20 items.
-5. Validate before deployment with `xmllint --noout feed.xml`.
-
----
-
-## Deploy
+Preview locally:
 
 ```sh
-# on the main branch of a clone of this repo
-#   …edit the .html / assets/*.css …
-git add -A
-git commit -m "describe the change"
-git push deploy main              # HTTPS remote; retry if it times out
+python3 -m http.server 8000
 ```
 
-GitHub Pages rebuilds in ~30–60s. The CDN can lag **per file** (one file updates before another), so verify the
-live result with cache-busted requests, e.g.:
-
-```sh
-curl -s "https://chennoshen239.github.io/assets/site.css?cb=$RANDOM" | grep muted
-```
-
-## Preview locally
-
-Open a page file in a browser, or screenshot it headless:
-
-```sh
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
-  --screenshot=out.png --window-size=1280,1700 --force-device-scale-factor=2 \
-  "file:///ABS/PATH/index.html"
-```
-
-> Caveat: this headless build forces a **~500px minimum layout width**. So "mobile" screenshots are not truly
-> 390px, and the right edge of desktop shots can look cropped. Don't diagnose overflow from the crop — measure it:
-> compare `document.documentElement.scrollWidth` against `window.innerWidth`.
-
----
-
-## Notes for future agents
-
-- The richest running history of *why* things are the way they are lives in the owner's Claude memory
-  (`personal-website-quarto.md`), not here.
-- Content currently on the site: bilingual hero + bio (`index.html`); a working paper "Default with
-  Policy-Randomness Overestimation" + a WIP inflation-forecasting paper (`research.html`); lecture/course
-  notes + code links (`notes.html`); two TA roles (`teaching.html`).
-- Keep it scholarly. This is an academic homepage for an economist; favor restraint over flourish.
+then open http://localhost:8000.
