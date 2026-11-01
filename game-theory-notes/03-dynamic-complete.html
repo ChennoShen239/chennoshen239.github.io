@@ -712,17 +712,17 @@ s_i : \bigcup_{t=0}^{T-1} H_t \to A_i ,
 <section id="finitely-repeated-games" class="level3">
 <h3 class="anchored" data-anchor-id="finitely-repeated-games">Finitely repeated games</h3>
 <p>When the horizon is finite, backward induction starts from the last period. There the future is empty, so each player simply plays the stage game, and an SPE must therefore prescribe a stage Nash equilibrium at the end.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Lemma 3.1 (last-period play).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Lemma 3.1 (last-period play).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Lemma 3.1 (last-period play).</strong> Suppose <span class="math inline">\(s\)</span> is an SPE of a finitely repeated game. In the last period, after any history, <span class="math inline">\(s\)</span> must play a stage Nash equilibrium. (After different histories, different stage equilibria may be played.)</p>
+<p>Suppose <span class="math inline">\(s\)</span> is an SPE of a finitely repeated game. In the last period, after any history, <span class="math inline">\(s\)</span> must play a stage Nash equilibrium. (After different histories, different stage equilibria may be played.)</p>
 </div>
 </div>
 <p>The lemma gives the next theorem: repeating any single stage equilibrium is always an SPE, and if the stage game has a <em>unique</em> Nash equilibrium then that repetition is the <em>only</em> SPE, so a finite horizon buys no extra cooperation when the stage game is “solved”.</p>
@@ -824,17 +824,17 @@ Figure&nbsp;3.10: Skeleton of the twice-repeated partnership game: the stage gam
 <section id="infinitely-repeated-games" class="level3">
 <h3 class="anchored" data-anchor-id="infinitely-repeated-games">Infinitely repeated games</h3>
 <p>With an infinite horizon there is no last period to anchor backward induction, but the structure is in some ways simpler: every subgame looks exactly like the whole game. Indeed, after any history <span class="math inline">\(h\)</span> of length <span class="math inline">\(t\)</span> the continuation game is itself an infinitely repeated <span class="math inline">\(G\)</span>, and the continuation payoff differs from a fresh start’s only by the discount factor <span class="math inline">\(\delta^{t}\)</span>. This self-similarity gives a clean characterisation.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Lemma 3.2 (SPE characterisation).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Lemma 3.2 (SPE characterisation).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Lemma 3.2 (SPE characterisation).</strong> Consider a profile <span class="math inline">\(s\)</span> in an infinitely repeated game. Then <span class="math inline">\(s\)</span> is an SPE <strong>if and only if</strong> the continuation play of <span class="math inline">\(s\)</span> after any history <span class="math inline">\(h\)</span> is itself a Nash equilibrium of the original repeated game.</p>
+<p>Consider a profile <span class="math inline">\(s\)</span> in an infinitely repeated game. Then <span class="math inline">\(s\)</span> is an SPE <strong>if and only if</strong> the continuation play of <span class="math inline">\(s\)</span> after any history <span class="math inline">\(h\)</span> is itself a Nash equilibrium of the original repeated game.</p>
 </div>
 </div>
 <p>The justification is exactly the self-similarity just described: a subgame of an infinitely repeated game is equivalent (up to a <span class="math inline">\(\delta^{t}\)</span> factor) to the whole repeated game, so “Nash in every subgame” reduces to “every continuation is Nash in the repeated game”. With this in hand, the analogue of the finite-horizon repetition result is immediate.</p>

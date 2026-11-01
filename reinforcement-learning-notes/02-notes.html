@@ -296,7 +296,7 @@ window.Quarto = {
 \]</span></p>
 </div>
 <p>Replacing Howard policy iteration’s exact evaluation step with a sample average of returns gives the MC Basic algorithm. Stochastic approximation then provides convergence results for equations observed with noise and the basis for temporal-difference learning.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-context callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -697,7 +697,7 @@ Warning
 w_{k+1}=\frac{1}{k}\sum_{i=1}^{k}x_{i},\qquad k=1,2,\dots
 \]</span></p>
 <p>so that <span class="math inline">\(w_{k}=\frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}\)</span>. Then the incremental form follows from algebra alone.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Derivation: the incremental mean">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: the incremental mean">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -897,7 +897,7 @@ Tip
 <p>Two features of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> are useful here. First, <span class="math inline">\(\alpha_{k}\)</span> and <span class="math inline">\(\beta_{k}\)</span> are allowed to be <strong>random</strong>, and to depend on the history: that is exactly what is needed below, where the effective step size turns out to depend on the current iterate. Second, the conclusion is almost-sure convergence, not convergence in mean. The proof of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> itself rests on convergence results for quasimartingales and is not reproduced here; the RM theorem follows as a corollary.</p>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled" title="Proof of the Robbins-Monro theorem">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of the Robbins-Monro theorem">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -1085,7 +1085,7 @@ Table&nbsp;2.3: Three ways down the same objective <a href="#eq-sgd-objective" c
 w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k}).
 \tag{2.13}\]</span></span></p>
 <p>It replaces the true gradient with a noisy single-sample estimate. Its convergence follows from <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> under that theorem’s assumptions.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Derivation: SGD is Robbins-Monro on the first-order condition">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: SGD is Robbins-Monro on the first-order condition">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>

@@ -310,7 +310,7 @@ window.Quarto = {
 \]</span></p>
 </div>
 <p>Chapter 3 approximated values by <span class="math inline">\(\hat{v}(s,w)\)</span> or <span class="math inline">\(\hat{q}(s,a,w)\)</span> and obtained the policy by <span class="math inline">\(\argmax_{a}\hat{q}(s,a,w)\)</span>. This chapter parameterizes the policy directly as <span class="math inline">\(\pi(a\given s,\theta)\)</span> and updates <span class="math inline">\(\theta\)</span> to raise its value. These methods are also used to post-train large language models.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-context callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -429,7 +429,7 @@ Important
 <p>where the expectation is over trajectories with <span class="math inline">\(s_{0}\sim\mu\)</span>, <span class="math inline">\(a_{t}=\pi(s_{t},\theta)\)</span>, and <span class="math inline">\(s_{t+1}\sim p(\cdot\given s_{t},a_{t})\)</span>.</p>
 </div>
 <p>Read the hypotheses back in words. The policy is a deterministic function of the state, so the action space must be continuous for <span class="math inline">\(\nabla_{a}\)</span> to mean anything. The expectation is taken along trajectories generated <em>by the policy being differentiated</em>, so the theorem is a statement about on-policy data in the sense of <a href="03-notes.html#def-on-off-policy" class="quarto-xref">Definition&nbsp;<span>3.3</span></a>. And the model has vanished from the right-hand side entirely: the only unknowns are <span class="math inline">\(q_{\pi}\)</span> and its derivative in the action, both properties of the value function rather than of the environment. The result is due to Silver et al.&nbsp;(2014).</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Proof of the deterministic policy gradient theorem">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of the deterministic policy gradient theorem">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -466,7 +466,7 @@ x(s)=\rho(s)+\gamma\sum_{s'\in\mathcal{S}}x(s')\,p_{\pi}(s'\given s),
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Proof structure">
+<div class="block-proof callout callout-style-default callout-tip callout-titled" title="Proof structure">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -497,7 +497,7 @@ x(s)=\rho(s)+\gamma\sum_{s'\in\mathcal{S}}x(s')\,p_{\pi}(s'\given s),
 <p>where the expectation is over trajectories with <span class="math inline">\(s_{0}\sim\mu\)</span>, <span class="math inline">\(a_{t}\sim\pi(\cdot\given s_{t},\theta)\)</span>, and <span class="math inline">\(s_{t+1}\sim p(\cdot\given s_{t},a_{t})\)</span>.</p>
 </div>
 <p>Compare the hypotheses with <a href="#thm-dpg" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>. Positivity of <span class="math inline">\(\pi\)</span> is new and is needed for <span class="math inline">\(\ln\pi\)</span> to be defined; differentiability in <span class="math inline">\(\theta\)</span> replaces differentiability in <span class="math inline">\(a\)</span>, so the action space may now be finite. Compare the conclusions: <span class="math inline">\(\nabla_{a}q_{\pi}\)</span> has become plain <span class="math inline">\(q_{\pi}\)</span>, and <span class="math inline">\(\nabla_{\theta}\pi\)</span> has become <span class="math inline">\(\nabla_{\theta}\ln\pi\)</span>. Both changes come from a single algebraic step in the proof.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Proof of the stochastic policy gradient theorem">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of the stochastic policy gradient theorem">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -686,7 +686,7 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 <section id="a-clarification-about-the-pseudocode" class="level3">
 <h3 class="anchored" data-anchor-id="a-clarification-about-the-pseudocode">Parameters in the post-episode loop</h3>
 <p><a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> evaluates every score at the parameter <span class="math inline">\(\theta_j\)</span> that generated the episode, as in Moll’s episode-level formula and Murphy’s equation (3.19).</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Derivation: accumulating the episode gradient">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: accumulating the episode gradient">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -919,7 +919,7 @@ Figure&nbsp;4.1: The most abstract object in this chapter, drawn. Same six-state
 </div>
 <section id="the-simple-expectation-form" class="level3">
 <h3 class="anchored" data-anchor-id="the-simple-expectation-form">The simple expectation form</h3>
-<div class="callout callout-style-default callout-note callout-titled" title="Derivation: from the discounted sum to a single expectation">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: from the discounted sum to a single expectation">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>

@@ -410,30 +410,30 @@ Important
 \]</span></p>
 </div>
 <p>A perfect Bayesian equilibrium is a strategy profile and a system of beliefs satisfying four requirements.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Requirement 1 (Beliefs exist).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Requirement 1 (Beliefs exist).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Requirement 1 (Beliefs exist).</strong> Every player has a well-defined belief over where they are in each of their information sets. That is, the game comes equipped with a system of beliefs <span class="math inline">\(\mu\)</span>.</p>
+<p>Every player has a well-defined belief over where they are in each of their information sets. That is, the game comes equipped with a system of beliefs <span class="math inline">\(\mu\)</span>.</p>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Requirement 2 (Consistency).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Requirement 2 (Consistency).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Requirement 2 (Consistency).</strong> Let <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots,
+<p>Let <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots,
 \sigma_n^*)\)</span> be a Bayesian Nash equilibrium profile. On the equilibrium path, beliefs must be <strong>consistent with Bayes’ rule</strong>. Given <span class="math inline">\(\sigma^*\)</span> and Nature’s move, let <span class="math inline">\(\Prob^{\sigma^*}(x)\)</span> be the probability that node <span class="math inline">\(x\)</span> is reached, and <span class="math display">\[
 \Prob^{\sigma^*}(h) \equiv \sum_{x \in h} \Prob^{\sigma^*}(x).
 \]</span> An information set <span class="math inline">\(h\)</span> is on the path iff <span class="math inline">\(\Prob^{\sigma^*}(h) &gt; 0\)</span>, and in that case Requirement 2 demands <span id="eq-5-bayes"><span class="math display">\[
@@ -442,30 +442,30 @@ Note
 \tag{5.1}\]</span></span></p>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Requirement 3 (Off-path beliefs).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Requirement 3 (Off-path beliefs).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Requirement 3 (Off-path beliefs).</strong> At off-path information sets, <span class="math inline">\(\Prob^{\sigma^*}(h) = 0\)</span> and Bayes’ rule does not apply. Any belief may be assigned.</p>
+<p>At off-path information sets, <span class="math inline">\(\Prob^{\sigma^*}(h) = 0\)</span> and Bayes’ rule does not apply. Any belief may be assigned.</p>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Requirement 4 (Sequential rationality).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Requirement 4 (Sequential rationality).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Requirement 4 (Sequential rationality).</strong> Given their beliefs, players’ strategies must be sequentially rational: at every information set a player plays a best response to their belief. If <span class="math inline">\(h\)</span> is player <span class="math inline">\(i\)</span>’s information set, then <span class="math inline">\(\sigma_i\)</span> is sequentially rational at <span class="math inline">\(h\)</span> given <span class="math inline">\(\sigma_{-i}\)</span> and <span class="math inline">\(\mu\)</span> if <span id="eq-5-seqrat"><span class="math display">\[
+<p>Given their beliefs, players’ strategies must be sequentially rational: at every information set a player plays a best response to their belief. If <span class="math inline">\(h\)</span> is player <span class="math inline">\(i\)</span>’s information set, then <span class="math inline">\(\sigma_i\)</span> is sequentially rational at <span class="math inline">\(h\)</span> given <span class="math inline">\(\sigma_{-i}\)</span> and <span class="math inline">\(\mu\)</span> if <span id="eq-5-seqrat"><span class="math display">\[
 \E\!\big[v_i(\sigma_i, \sigma_{-i}, \theta) \given h, \mu\big] \ge
 \E\!\big[v_i(s_i, \sigma_{-i}, \theta) \given h, \mu\big] \qquad
 \text{for all } s_i .
@@ -716,17 +716,17 @@ U(H) = 6 &lt; 8 = \min_{a_2 \in BR_2(\Theta \sm D(D),\, D)} v_1(D, a_2, H) .
 v_2(a_2, \theta) = -(a_2 - \theta)^2, \qquad
 v_1(a_2, \theta) = -(a_2 - b - \theta)^2,
 \]</span> with a constant <strong>bias</strong> <span class="math inline">\(b &gt; 0\)</span>. For each <span class="math inline">\(\theta\)</span>, the receiver most prefers <span class="math inline">\(a_2 = \theta\)</span> while the sender most prefers <span class="math inline">\(a_2 = b + \theta\)</span>: the sender always wants the receiver to choose <em>higher</em> than the receiver would, and <span class="math inline">\(b\)</span> measures the conflict of interest.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Claim 5.1 (No fully revealing PBE).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Claim 5.1 (No fully revealing PBE).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Claim 5.1 (No fully revealing PBE).</strong> There is no PBE in which the message fully reveals the type: i.e.&nbsp;no equilibrium such that for all <span class="math inline">\(\theta\)</span>, <span class="math inline">\(a_1 \in
+<p>There is no PBE in which the message fully reveals the type: i.e.&nbsp;no equilibrium such that for all <span class="math inline">\(\theta\)</span>, <span class="math inline">\(a_1 \in
 \operatorname{supp}\sigma_1^*(\theta)\)</span> implies <span class="math inline">\(\mu(\theta \mid a_1) = 1\)</span>. In particular the truthful strategy <span class="math inline">\(s_1(\theta) = \theta\)</span> cannot appear in any equilibrium.</p>
 </div>
 </div>
@@ -738,17 +738,17 @@ Note
 </ul>
 <p>Either way the type-<span class="math inline">\(0\)</span> sender has a profitable deviation, contradicting equilibrium. <span class="math inline">\(\square\)</span></p>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Claim 5.2 (A babbling equilibrium always exists).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Claim 5.2 (A babbling equilibrium always exists).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Claim 5.2 (A babbling equilibrium always exists).</strong> There is always a <em>babbling</em> PBE in which the message reveals nothing and the receiver chooses the action that maximises his expected payoff under the prior.</p>
+<p>There is always a <em>babbling</em> PBE in which the message reveals nothing and the receiver chooses the action that maximises his expected payoff under the prior.</p>
 </div>
 </div>
 <div class="proof">
@@ -756,17 +756,17 @@ Note
 \tfrac12\)</span> for all <span class="math inline">\(a_1\)</span>, and <span class="math inline">\(\mu(\cdot \mid a_1) = p\)</span> for all <span class="math inline">\(a_1\)</span>. Since <span class="math inline">\(s_2^*\)</span> is constant, the sender’s action cannot influence the receiver, so no sender type has a profitable deviation. Given the prior belief, the receiver’s expected payoff after any message is <span class="math inline">\(\int_0^1 -(s_2 - \theta)^2\, d\theta\)</span>, which is maximised at <span class="math inline">\(s_2 = \tfrac12 = \E[\theta]\)</span>, the mean of the uniform prior. Finally, <span class="math inline">\(a_1 = 0\)</span> is the only on-path message and conveys no information, so <span class="math inline">\(\mu(\cdot \mid 0) = p\)</span> is consistent. <span class="math inline">\(\square\)</span></p>
 </div>
 <p>Between full revelation and babbling is a <strong>two-message</strong> equilibrium in which the sender partitions the type space into two intervals.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Claim 5.3 (Structure of a two-message equilibrium).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Claim 5.3 (Structure of a two-message equilibrium).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Claim 5.3 (Structure of a two-message equilibrium).</strong> Suppose the sender uses only two messages: there is a set <span class="math inline">\(L \subset \Theta\)</span> and messages <span class="math inline">\(a_1, a_1'\)</span> with <span class="math inline">\(s_1(\theta) = a_1\)</span> for <span class="math inline">\(\theta \in L\)</span> and <span class="math inline">\(s_1(\theta) = a_1'\)</span> otherwise, and (without loss) <span class="math inline">\(s_2(a_1) &lt; s_2(a_1')\)</span>. If this profile together with some consistent beliefs is a PBE, then there is a cutoff <span class="math inline">\(\theta^* \in (0,1)\)</span> such that</p>
+<p>Suppose the sender uses only two messages: there is a set <span class="math inline">\(L \subset \Theta\)</span> and messages <span class="math inline">\(a_1, a_1'\)</span> with <span class="math inline">\(s_1(\theta) = a_1\)</span> for <span class="math inline">\(\theta \in L\)</span> and <span class="math inline">\(s_1(\theta) = a_1'\)</span> otherwise, and (without loss) <span class="math inline">\(s_2(a_1) &lt; s_2(a_1')\)</span>. If this profile together with some consistent beliefs is a PBE, then there is a cutoff <span class="math inline">\(\theta^* \in (0,1)\)</span> such that</p>
 <ol type="i">
 <li><p>the sender uses a cutoff rule, <span class="math inline">\(s_1(\theta) = a_1\)</span> if <span class="math inline">\(\theta &lt; \theta^*\)</span> and <span class="math inline">\(s_1(\theta) = a_1'\)</span> if <span class="math inline">\(\theta &gt; \theta^*\)</span>;</p></li>
 <li><p>type <span class="math inline">\(\theta^*\)</span> is indifferent between the two messages;</p></li>
@@ -785,17 +785,17 @@ Note
 -(s_2(a_1) - b - \theta^*)^2 = -(s_2(a_1') - b - \theta^*)^2 .
 \]</span> For the receiver: after <span class="math inline">\(a_1\)</span> the posterior is uniform on <span class="math inline">\([0, \theta^*]\)</span>, so the optimal action is its mean <span class="math inline">\(s_2(a_1) = \tfrac{\theta^*}{2}\)</span>; after <span class="math inline">\(a_1'\)</span> the posterior is uniform on <span class="math inline">\([\theta^*, 1]\)</span>, so <span class="math inline">\(s_2(a_1') = \tfrac{1+\theta^*}{2}\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-result callout callout-style-default callout-note callout-titled" title="Claim 5.4 (A two-message PBE exists iff the bias is small).">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Claim 5.4 (A two-message PBE exists iff the bias is small).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Claim 5.4 (A two-message PBE exists iff the bias is small).</strong> A two-message PBE exists if and only if <span class="math inline">\(b &lt; \tfrac14\)</span>, in which case the cutoff is <span class="math inline">\(\theta^* =
+<p>A two-message PBE exists if and only if <span class="math inline">\(b &lt; \tfrac14\)</span>, in which case the cutoff is <span class="math inline">\(\theta^* =
 \tfrac12 - 2b\)</span>.</p>
 </div>
 </div>

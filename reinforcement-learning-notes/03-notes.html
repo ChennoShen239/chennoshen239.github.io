@@ -300,7 +300,7 @@ window.Quarto = {
 \]</span></p>
 </div>
 <p>Chapter 2 developed Monte Carlo methods for model-free learning. <strong>Temporal difference (TD) learning</strong> updates after each transition, while MC Basic waits until an episode ends. This chapter develops TD for state values, for action values under a fixed policy (<strong>Sarsa</strong>), and for optimal action values (<strong>Q-learning</strong>). It then relaxes the assumption, used since Chapter 1, that values can be stored in a table.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="block-context callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -383,7 +383,7 @@ v_{t+1}(s)=v_{t}(s)\qquad\text{for all } s\neq s_{t}.
 <section id="why-barv_t-deserves-the-name-target" class="level3">
 <h3 class="anchored" data-anchor-id="why-barv_t-deserves-the-name-target">Why <span class="math inline">\(\bar{v}_{t}\)</span> deserves the name “target”</h3>
 <p>The update moves <span class="math inline">\(v(s_{t})\)</span> toward the target.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Derivation: the update contracts the gap to the target">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: the update contracts the gap to the target">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -446,7 +446,7 @@ Tip
 <p>Condition 2 controls the bias. <a href="02-notes.html#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> demanded unbiased noise; here the bias may be nonzero but must be a <strong>strict contraction</strong> of the current error, shrinking it by a factor <span class="math inline">\(\gamma&lt;1\)</span>. In the proof below, <span class="math inline">\(\gamma\)</span> turns out to be the discount factor, which supplies the strict contraction used to prove convergence.</p>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled" title="Proof of the convergence of TD learning">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of the convergence of TD learning">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -606,7 +606,7 @@ q_{\pi}(s,a)=\E\big[R+\gamma q_{\pi}(S',A')\ \given\ s,a\big],
 \tag{3.8}\]</span></span></p>
 <p>which is the action-value form of the policy-evaluation Bellman equation for the fixed policy <span class="math inline">\(\pi\)</span>: <a href="02-notes.html#eq-bellman-pi" class="quarto-xref">Equation&nbsp;<span>2.2</span></a> with the maximization over <span class="math inline">\(\pi\)</span> removed.</p>
 <p>In <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a>, the expectation incorporates the policy <span class="math inline">\(\pi\)</span> and the sum over actions. Expanding it recovers the Chapter 2 equation.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Proof that the Sarsa fixed point is the Bellman equation">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof that the Sarsa fixed point is the Bellman equation">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -648,7 +648,7 @@ v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
 <p><span class="theorem-title"><strong>Theorem 3.3 (Convergence of Sarsa)</strong></span> For a fixed policy <span class="math inline">\(\pi\)</span>, assume <span class="math inline">\(\gamma\in(0,1)\)</span>, finite <span class="math inline">\(\mathcal S\)</span> and <span class="math inline">\(\mathcal A\)</span>, and bounded rewards. Here <span class="math inline">\(\mathcal H_t\)</span> includes the current <span class="math inline">\((s_t,a_t)\)</span> but precedes the next reward, state, and action. Use <span class="math inline">\(\mathcal H_t\)</span>-measurable step sizes, with <span class="math inline">\(\alpha_t(s,a)=0\)</span> for unvisited pairs and <span class="math inline">\(0&lt;\alpha_t(s_t,a_t)\le1\)</span>. Then <a href="#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> gives <span class="math inline">\(q_t(s,a)\to q_\pi(s,a)\)</span> almost surely for every pair if <span class="math inline">\(\sum_t\alpha_t(s,a)=\infty\)</span> and <span class="math inline">\(\sum_t\alpha_t^2(s,a)&lt;\infty\)</span> almost surely for every <span class="math inline">\((s,a)\)</span>.</p>
 </div>
 <p>Relative to <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a>, the Robbins-Monro conditions apply to each state-action pair, and the conclusion concerns the action-value table. The proof uses the same change of index set.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Proof of the convergence of Sarsa">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of the convergence of Sarsa">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -872,7 +872,7 @@ q(s,a)=\E\Big[R+\gamma\max_{a'\in\mathcal{A}}q(S',a')\ \given\ s,a\Big],
 \tag{3.10}\]</span></span></p>
 <p>whose solution is <span class="math inline">\(q^{*}\)</span>. So Q-learning estimates the optimal action values directly, and needs no separate policy improvement step at all.</p>
 <p>In <a href="#eq-bellman-opt-q" class="quarto-xref">Equation&nbsp;<span>3.10</span></a>, maximization over the next action replaces averaging under <span class="math inline">\(\pi\)</span>. The following derivation connects this equation to Bellman optimality.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Proof that the Q-learning fixed point is the Bellman optimality equation">
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof that the Q-learning fixed point is the Bellman optimality equation">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
