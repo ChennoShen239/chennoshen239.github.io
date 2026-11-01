@@ -86,14 +86,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul class="collapse">
-  <li><a href="#why-the-cloud" id="toc-why-the-cloud" class="nav-link active" data-scroll-target="#why-the-cloud">Workload</a></li>
-  <li><a href="#why-parallelcluster-slurm" id="toc-why-parallelcluster-slurm" class="nav-link" data-scroll-target="#why-parallelcluster-slurm">ParallelCluster and Slurm</a></li>
-  <li><a href="#the-cluster" id="toc-the-cluster" class="nav-link" data-scroll-target="#the-cluster">Configuration</a></li>
-  <li><a href="#one-full-run" id="toc-one-full-run" class="nav-link" data-scroll-target="#one-full-run">Running the job</a></li>
-  <li><a href="#the-traps" id="toc-the-traps" class="nav-link" data-scroll-target="#the-traps">Operational issues</a></li>
-  <li><a href="#what-it-costs" id="toc-what-it-costs" class="nav-link" data-scroll-target="#what-it-costs">Costs</a></li>
-  <li><a href="#what-transfers" id="toc-what-transfers" class="nav-link" data-scroll-target="#what-transfers">Other workloads</a></li>
-  <li><a href="#a-closing-checklist" id="toc-a-closing-checklist" class="nav-link" data-scroll-target="#a-closing-checklist">Run checklist</a></li>
+  <li><a href="#why-the-cloud" id="toc-why-the-cloud" class="nav-link active" data-scroll-target="#why-the-cloud">Getting the runs off my laptop</a></li>
+  <li><a href="#why-parallelcluster-slurm" id="toc-why-parallelcluster-slurm" class="nav-link" data-scroll-target="#why-parallelcluster-slurm">Keeping the scripts I already had</a></li>
+  <li><a href="#one-full-run" id="toc-one-full-run" class="nav-link" data-scroll-target="#one-full-run">One horizon first</a></li>
+  <li><a href="#the-traps" id="toc-the-traps" class="nav-link" data-scroll-target="#the-traps">The node that stayed in CONFIGURING</a></li>
+  <li><a href="#efs-storage" id="toc-efs-storage" class="nav-link" data-scroll-target="#efs-storage">Getting the files back</a></li>
+  <li><a href="#what-it-costs" id="toc-what-it-costs" class="nav-link" data-scroll-target="#what-it-costs">The June run and its cost</a></li>
+  <li><a href="#what-transfers" id="toc-what-transfers" class="nav-link" data-scroll-target="#what-transfers">Where I use this workflow</a></li>
+  <li><a href="#a-closing-checklist" id="toc-a-closing-checklist" class="nav-link" data-scroll-target="#a-closing-checklist">Before the next run</a></li>
   </ul>
 </nav>
 </div>
@@ -102,7 +102,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Research Computing on AWS</h1>
-<p class="subtitle lead">A field note on ParallelCluster, Slurm, and the traps between them</p>
+<p class="subtitle lead">Moving a batch of forecasts off my laptop</p>
 </div>
 
 
@@ -131,300 +131,154 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This summer I used AWS for the tuning runs in <a href="https://chennoshen239.github.io/research.html">my forecasting paper</a>. Run timings and AWS cost estimates come from the run logs, the benchmark record and EC2 instance records.</p>
+<p>This summer I moved the heavier runs for <a href="https://chennoshen239.github.io/research.html">my forecasting paper</a> onto AWS. The code already worked on my laptop. I wanted to run a much denser tuning grid without tying up the machine I use for everything else.</p>
 <section id="why-the-cloud" class="level2">
-<h2 class="anchored" data-anchor-id="why-the-cloud">Workload</h2>
-<p>I tuned gradient-boosted trees separately for forecast horizons 1 to 24. Each grid candidate was refit over hundreds of rolling origins. The horizons run independently, so I could distribute them across CPU nodes and delete the nodes after the run.</p>
-<p>The routine grid took tens of minutes per horizon on eight vCPUs, about a day if run sequentially on my laptop. The denser production grid used about 5,300 vCPU-hours (111 node-hours × 48 vCPU). Even if my laptop’s eight logical cores matched EC2’s per-core speed, that would take nearly 28 days of continuous use.</p>
+<h2 class="anchored" data-anchor-id="why-the-cloud">Getting the runs off my laptop</h2>
+<p>I estimated gradient-boosted trees separately for horizons from one to 24 months, refitting every grid candidate over hundreds of rolling origins. Each horizon could run independently, which made it straightforward to distribute the work across machines.</p>
+<p>The smaller grid I used during development took tens of minutes per horizon on eight vCPUs. Running the horizons one after another could occupy my laptop for about a day. That was manageable for an occasional check; it became inconvenient as I added runs.</p>
+<p>In June I ran a denser, 49-candidate grid for two sets of forecasts: one using roughly 1,500 microeconomic features, the other using a much smaller set of macroeconomic features. The two batches took about 28 hours altogether on four rented machines. I could leave those running and continue working locally.</p>
 </section>
 <section id="why-parallelcluster-slurm" class="level2">
-<h2 class="anchored" data-anchor-id="why-parallelcluster-slurm">ParallelCluster and Slurm</h2>
-<p>I used <a href="https://docs.aws.amazon.com/parallelcluster/">AWS ParallelCluster</a>. A YAML file specifies the head node, compute queue and shared filesystem. One command creates the cluster in about ten minutes, with Slurm handling submission and scheduling through <code>sbatch</code> and <code>squeue</code>.</p>
-<p>Bare EC2 would require scripts for node startup, dispatch, retries and teardown. Managed ML platforms require their own entry points and storage conventions. My code already took command-line arguments and wrote files, so I only needed a Slurm submission file.</p>
-<p>The script body also runs essentially unchanged on Stanford’s cluster. Porting changes the environment configuration, partition, account, modules and paths; the training parameters in the Slurm scripts carry over.</p>
-</section>
-<section id="the-cluster" class="level2">
-<h2 class="anchored" data-anchor-id="the-cluster">Configuration</h2>
+<h2 class="anchored" data-anchor-id="why-parallelcluster-slurm">Keeping the scripts I already had</h2>
+<p>My scripts took command-line arguments and wrote results to files. I chose <a href="https://docs.aws.amazon.com/parallelcluster/">AWS ParallelCluster</a> because it gave me a Slurm queue for those scripts. I added submission files specifying the resources and arguments for each task. On the head node I could submit work with <code>sbatch</code> and inspect the queue with <code>squeue</code>.</p>
+<p>ParallelCluster creates the head node, compute nodes and shared filesystem from a YAML configuration. In my setup, creating the cluster took about ten minutes. This saved me from writing my own machinery to start EC2 instances and distribute tasks across them. It also left me with scripts I could use on a university cluster: the same script bodies run essentially unchanged at Stanford, with adjustments to partitions, accounts, modules and paths.</p>
+<section id="the-cluster" class="level3">
+<h3 class="anchored" data-anchor-id="the-cluster">A shared working directory</h3>
+<p>I copied the project and required inputs to an EFS filesystem mounted at <code>/shared</code> on every node. I left the laptop’s virtual environment behind and built a Linux environment there with <code>uv sync</code>. Each compute node could then activate the same environment and read the same files. I did not have to install the project separately on four machines.</p>
+<p>Even this setup step needed more memory than I had allowed for. My first head node was a t3.small; it ran out of memory while installing dependencies. A t3.large completed the installation, and I kept that for later runs.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/fig_architecture.svg" class="img-fluid figure-img" alt="Architecture diagram: a laptop connects by rsync and ssh to a t3.large head node in the public subnet running Slurm, which shares an EFS volume holding code, virtualenv, and results with four c7i.12xlarge compute nodes of 48 vCPU each in a private subnet, whose only route out is a NAT gateway, drawn in red, used during node bootstrap for software mirrors and AWS APIs"></p>
-<figcaption>The June cluster: a head node schedules four 48-vCPU compute nodes. Code, environment and results share an EFS volume. Compute nodes reach the internet through a NAT gateway.</figcaption>
+<figcaption>The June setup. The shared filesystem let every compute node use the same project directory and environment. The NAT gateway provided outbound access during startup.</figcaption>
 </figure>
 </div>
-<p>The main settings used ParallelCluster 3.15 in us-east-1:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Scheduling</span><span class="kw">:</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">Scheduler</span><span class="kw">:</span><span class="at"> slurm</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmSettings</span><span class="kw">:</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ScaledownIdletime</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span><span class="co">          # idle nodes terminate after 2 min</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmQueues</span><span class="kw">:</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">CapacityType</span><span class="kw">:</span><span class="at"> ONDEMAND</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">AllocationStrategy</span><span class="kw">:</span><span class="at"> lowest-price</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">ComputeResources</span><span class="kw">:</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu48</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">Instances</span><span class="kw">:</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7a.12xlarge</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7i.12xlarge</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MinCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MaxCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The pool asks EC2 Fleet to try the cheaper instance type first. The June run used c7i.12xlarge throughout, so the diagram and cost table use that type.</p>
-<ul>
-<li><code>MinCount: 0</code> lets the compute queue scale to zero. Idle compute nodes terminate after two minutes; the head node, EFS volume and NAT continue billing until removed.</li>
-<li>My first head node, a t3.small, ran out of memory during dependency installation. A t3.large completed it.</li>
-<li>On my XGBoost batch, c6i ran about 20% slower than c7i at nearly the same hourly price, so I used only c7 types in the pool.</li>
-</ul>
-<p>I chose on-demand capacity for the first production run. Each horizon on the dense grid takes about 20 hours and writes output at the end. Without per-task checkpointing, a Spot interruption loses the whole task’s work. I wanted a predictable finish time and had not configured Spot’s service-linked IAM role. Spot was cheaper and the tasks could be restarted; I would use it for a grid split into shorter tasks.</p>
+<p>I used on-demand instances for the first production run. A micro-model task on the dense grid took about 20 hours and saved its output at the end. I had no checkpoints within a task, so a Spot interruption would mean repeating those hours. I wanted a predictable finish time; I had also not configured the service-linked IAM role for Spot. Shorter tasks or checkpointing would make Spot easier to use on a later run.</p>
+</section>
 </section>
 <section id="one-full-run" class="level2">
-<h2 class="anchored" data-anchor-id="one-full-run">Running the job</h2>
-<ol type="1">
-<li>Bring up the NAT gateway, then create the cluster. Startup takes about ten minutes.</li>
-<li>Use <code>rsync</code> to copy the code and required inputs to the shared volume. Exclude the local virtualenv and unused data.</li>
-<li>Build the environment once on the shared volume (<code>uv sync</code>). Compute nodes <code>source</code> it and need no local project dependency installation.</li>
-<li>Smoke-test one task (<code>sbatch --array=1</code>), check its log, then submit the full array.</li>
-<li>Retrieve the results with <code>rsync</code>.</li>
-<li>Delete the cluster, then take down the NAT gateway.</li>
-</ol>
-<p>The submission is a Slurm array with one task per horizon:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-24%24        # up to 24 tasks concurrent</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=8      # reserves 8 vCPU per task</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/run_forecast.py <span class="at">--horizon</span> <span class="st">"</span><span class="va">${SLURM_ARRAY_TASK_ID}</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Each task requests 8 vCPU. The 24 tasks need 192 vCPU: six tasks on each of four 48-vCPU nodes. <code>--cpus-per-task=8</code> reserves the vCPUs; set the program’s thread count separately. My script reads <code>SLURM_CPUS_PER_TASK</code> and passes it to XGBoost’s <code>nthread</code>.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figures/fig_packing.svg" class="img-fluid figure-img" alt="Diagram of four nodes, each holding six 8-vCPU task chips labeled h1 through h24, plus a dashed fifth node marked idle: nothing left to schedule"></p>
-<figcaption>24 tasks of 8 vCPU fill four 48-vCPU nodes, six tasks per node. A fifth node would be idle.</figcaption>
-</figure>
-</div>
-<p>All 24 horizons run concurrently on four nodes, so a fifth node adds no parallel work. Scaling within a fit was limited beyond eight threads on these small per-fit datasets. Measured CPU utilization was 796% of an 800% allocation. A faster run would require faster individual tasks or a finer split of the grid.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figures/fig_wall_by_horizon.svg" class="img-fluid figure-img" alt="Dot plot of wall-clock hours by forecast horizon, declining from about 21.6 hours at h equals 1 to about 19.2 hours at h equals 24, with the h equals 1 point highlighted in red as the job wall"></p>
-<figcaption>Wall-clock time by horizon in the June run. All 24 tasks ran concurrently; horizon 1 finished last at about 21.55 hours. Longer horizons truncate the earliest rolling-training windows and finish sooner.</figcaption>
-</figure>
-</div>
+<h2 class="anchored" data-anchor-id="one-full-run">One horizon first</h2>
+<p>After building the environment, I submitted one horizon and checked its log before submitting the full array. This exercised the path from node startup through loading the data and running the estimation. A successful environment installation on the head node alone could not check all of that.</p>
+<details>
+<summary>
+Micro-model submission script
+</summary>
+<p>This shortened micro-model submission script assumes submission from the project root on the shared filesystem, an existing <code>.venv</code>, and a <code>slurm_logs</code> directory created before calling <code>sbatch</code>. The 40-hour limit was for the dense grid.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --partition=cpu</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-24%24</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --ntasks=1</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=8</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --time=40:00:00</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --output=slurm_logs/micro_%A_%a.out</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --error=slurm_logs/micro_%A_%a.err</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="st">"</span><span class="va">$SLURM_SUBMIT_DIR</span><span class="st">"</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> Code/Experts/micro.py <span class="at">--horizon</span> <span class="st">"</span><span class="va">$SLURM_ARRAY_TASK_ID</span><span class="st">"</span> <span class="at">--grid</span> fine</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p>The array runs one task per horizon, with up to 24 tasks at once. At eight vCPUs each, they fit six to a 48-vCPU node, filling four nodes. Adding a fifth node would leave it with no task to run under this split. To use more machines, I would need to divide the work more finely, for example by splitting the tuning grid within a horizon.</p>
+<p>The CPU request and the program’s thread count are separate settings. My Python code reads <code>SLURM_CPUS_PER_TASK</code> and passes it to XGBoost’s <code>nthread</code>.</p>
 </section>
 <section id="the-traps" class="level2">
-<h2 class="anchored" data-anchor-id="the-traps">Operational issues</h2>
+<h2 class="anchored" data-anchor-id="the-traps">The node that stayed in CONFIGURING</h2>
 <section id="nat-routes" class="level3">
-<h3 class="anchored" data-anchor-id="nat-routes">NAT routes</h3>
-<p>Bootstrapping uses the NAT gateway to reach software mirrors and AWS APIs. I delete the gateway between runs because its base charge was about a dollar a day. The subnet’s default route then points at a deleted NAT and enters the <code>blackhole</code> state. On the next launch, compute nodes hang in <code>CONFIGURING</code>.</p>
-<p>In July I skipped the NAT step despite having it in my runbook. One node spent 36 minutes in <code>CONFIGURING</code>; its replacement spent another 36. The status output and logs I checked did not identify the route problem. After the last teardown, the route table still contained this entry:</p>
-<pre class="text"><code>$ aws ec2 describe-route-tables --region us-east-1 \
-    --query 'RouteTables[].Routes[?State==`blackhole`]'
-{
-  "DestinationCidrBlock": "0.0.0.0/0",
-  "NatGatewayId": "nat-098c…",
-  "State": "blackhole"
-}</code></pre>
-<p>I now use an up/down script for the NAT gateway. This excerpt omits route-table lookup and safety checks:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># up: allocate an EIP, create the NAT, point the default route at it</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">EIP_ALLOC_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 allocate-address <span class="at">--domain</span> vpc <span class="dt">\</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> AllocationId <span class="at">--output</span> text<span class="va">)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="va">NAT_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> ec2 create-nat-gateway <span class="at">--subnet-id</span> <span class="st">"</span><span class="va">$PUBLIC_SUBNET</span><span class="st">"</span> <span class="dt">\</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span> <span class="dt">\</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> NatGateway.NatGatewayId <span class="at">--output</span> text<span class="va">)</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-available <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 replace-route <span class="at">--route-table-id</span> <span class="st">"</span><span class="va">$RTB</span><span class="st">"</span> <span class="dt">\</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--destination-cidr-block</span> 0.0.0.0/0 <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># down: delete the NAT, wait, then release the address</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 delete-nat-gateway <span class="at">--nat-gateway-id</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 wait nat-gateway-deleted <span class="at">--nat-gateway-ids</span> <span class="st">"</span><span class="va">$NAT_ID</span><span class="st">"</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> ec2 release-address <span class="at">--allocation-id</span> <span class="st">"</span><span class="va">$EIP_ALLOC_ID</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>At the June 2026 rate, an allocated public IPv4 address cost about $0.005 per hour or $3.6 per month, whether attached or idle. Deleting the gateway leaves its Elastic IP allocated. Release it after deleting the NAT.</p>
+<h3 class="anchored" data-anchor-id="nat-routes">A deleted gateway, an unchanged route</h3>
+<p>The compute nodes were in a private subnet. During startup they needed outbound access to software mirrors and AWS APIs through a NAT gateway. I deleted that gateway between runs to avoid its base charge of about a dollar a day.</p>
+<p>In July I launched a run from memory and skipped the NAT step in my own runbook. One node spent 36 minutes in <code>CONFIGURING</code>, was replaced, and the replacement spent another 36 minutes there. The status output and logs I was checking did not point me to the network.</p>
+<p>Deleting the gateway had left the subnet’s default route pointing at it. AWS marked the route as <code>blackhole</code>: traffic still had a destination in the route table, but the gateway no longer existed. Replacing the compute node could not fix that route.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/screenshot_route_blackhole.png" class="img-fluid figure-img" alt="AWS VPC console showing a route table named parallelcluster:route-table-private with two routes: 0.0.0.0/0 pointing at a NAT gateway with status Blackhole in red, and 10.0.0.0/16 local with status Active"></p>
-<figcaption>Route table after teardown: the default route still points at the deleted NAT gateway and has Blackhole status (IDs redacted).</figcaption>
+<figcaption>The private subnet’s default route after teardown, still pointing at the deleted NAT gateway. IDs are redacted.</figcaption>
 </figure>
 </div>
-</section>
-<section id="efs-storage" class="level3">
-<h3 class="anchored" data-anchor-id="efs-storage">EFS storage</h3>
-<p>In my configuration, deleting the cluster also deletes its shared EFS volume (<code>DeletionPolicy: Delete</code>, the default). The policy can be set to <code>Retain</code>. I kept the local copy as the master and retrieved results before teardown. Each run started with a fresh volume, so storage charges ended with the run.</p>
-</section>
-<section id="vcpu-quotas" class="level3">
-<h3 class="anchored" data-anchor-id="vcpu-quotas">vCPU quotas</h3>
-<p>A fresh account’s on-demand vCPU quota is below the 192 vCPU needed here. Check Service Quotas and request an increase several days before a deadline run. I requested 1,024 vCPUs; AWS granted my new account 500, which covered the four-node cluster.</p>
+<p>I now use an up/down script that creates the gateway and updates the route together. On shutdown it waits for the gateway to be deleted, then releases its Elastic IP. Deleting the gateway leaves that address allocated and billing; at the June 2026 rate, keeping an address cost about $0.005 per hour.</p>
 </section>
 <section id="failed-bootstrap-costs" class="level3">
-<h3 class="anchored" data-anchor-id="failed-bootstrap-costs">Failed bootstrap costs</h3>
-<p>Instances bill from launch even if they never join the queue. The July failure cost, from the instance records:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 30%">
-<col style="width: 40%">
-<col style="width: 30%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Item</th>
-<th>Detail</th>
-<th style="text-align: right;">Cost</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Compute idling</td>
-<td>two failed bootstraps, one c7i.12xlarge each, 36.1 + 35.9 min</td>
-<td style="text-align: right;">≈ $2.57</td>
-</tr>
-<tr class="even">
-<td>Head node waiting</td>
-<td>t3.large, ~2 h of diagnosis and waiting for my manual approval</td>
-<td style="text-align: right;">≈ $0.17</td>
-</tr>
-<tr class="odd">
-<td><strong>Total</strong></td>
-<td>plus about two hours of schedule slip</td>
-<td style="text-align: right;"><strong>≈ $2.7</strong></td>
-</tr>
-</tbody>
-</table>
-<p>The smoke test kept the failure to one compute node at a time before scaling up.</p>
+<h3 class="anchored" data-anchor-id="failed-bootstrap-costs">Paying for a failed start</h3>
+<p>The two failed compute-node launches cost about $2.57, with another $0.17 for the head node during diagnosis and waiting. The delay was about two hours. Testing one task first kept this to one compute node at a time. I would much rather discover a broken route at that stage than after submitting the whole batch.</p>
 </section>
+</section>
+<section id="efs-storage" class="level2">
+<h2 class="anchored" data-anchor-id="efs-storage">Getting the files back</h2>
+<p>My EFS volume belonged to the cluster. Under its default <code>DeletionPolicy: Delete</code>, deleting the cluster also deletes the code, environment and results on that volume. I kept that policy and used the local project as the master copy, so each run started with a fresh working directory in the cloud. The results had to come back with <code>rsync</code> before I deleted anything.</p>
+<p>For someone who wants to keep the same cloud working directory across runs, the managed EFS policy can be set to <a href="https://docs.aws.amazon.com/parallelcluster/latest/ug/SharedStorage-v3.html"><code>Retain</code></a>. That changes what survives teardown and what continues to incur storage charges. In my case, rebuilding the environment was acceptable, and I preferred to keep the lasting copy locally.</p>
 </section>
 <section id="what-it-costs" class="level2">
-<h2 class="anchored" data-anchor-id="what-it-costs">Costs</h2>
-<p>The June robustness grid was the largest single run. The benchmark record uses us-east-1 on-demand prices as of June 2026:</p>
+<h2 class="anchored" data-anchor-id="what-it-costs">The June run and its cost</h2>
+<p>The dense-grid run consisted of two 24-horizon batches, run back to back. The micro batch finished after 21.55 hours; the macro rents batch then took 6.31 hours. From the first submission to the last output, it was about 27.9 hours.</p>
+<p>For budgeting, I estimated compute cost by allowing four nodes for the full duration of each batch. At the us-east-1 on-demand rate recorded in June 2026, $2.142 per c7i.12xlarge-hour, this gives:</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 24%">
-<col style="width: 28%">
-<col style="width: 24%">
-<col style="width: 24%">
-</colgroup>
 <thead>
 <tr class="header">
-<th>Item</th>
-<th>Usage</th>
-<th>Rate</th>
-<th style="text-align: right;">Cost</th>
+<th>Batch</th>
+<th style="text-align: right;">Elapsed time</th>
+<th style="text-align: right;">Estimated node-hours</th>
+<th style="text-align: right;">Estimated compute cost</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Compute, c7i.12xlarge × 4</td>
-<td>~111 node-hours</td>
-<td>$2.142/h</td>
-<td style="text-align: right;">≈ $239</td>
+<td>Micro forecasts</td>
+<td style="text-align: right;">21.55 h</td>
+<td style="text-align: right;">86.2</td>
+<td style="text-align: right;">$185</td>
 </tr>
 <tr class="even">
-<td>Head node, t3.large</td>
-<td>~28.7 h</td>
-<td>$0.0832/h</td>
-<td style="text-align: right;">≈ $2</td>
-</tr>
-<tr class="odd">
-<td>NAT gateway</td>
-<td>~28.7 h</td>
-<td>$0.045/h + data processing</td>
-<td style="text-align: right;">&lt; $2</td>
-</tr>
-<tr class="even">
-<td>Public IPv4 (head node + NAT EIP)</td>
-<td>2 × ~28.7 h</td>
-<td>$0.005/h each</td>
-<td style="text-align: right;">≈ $0.29</td>
-</tr>
-<tr class="odd">
-<td>EFS shared volume</td>
-<td>a few GB, metered</td>
-<td></td>
-<td style="text-align: right;">&lt; $1</td>
-</tr>
-<tr class="even">
-<td><strong>Total</strong></td>
-<td>end to end ~28 h</td>
-<td></td>
-<td style="text-align: right;"><strong>≈ $243</strong></td>
+<td>Macro rents forecasts</td>
+<td style="text-align: right;">6.31 h</td>
+<td style="text-align: right;">25.2</td>
+<td style="text-align: right;">$54</td>
 </tr>
 </tbody>
 </table>
-<p>The NAT’s base charge was about $1.3, plus a small data-processing fee. A routine-grid pass took about an hour and cost around ten dollars.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figures/screenshot_cost_explorer.png" class="img-fluid figure-img" alt="AWS Cost Explorer showing total cost US$236.96 across June 16 to 18 with daily stacked bars dominated by EC2 instances, about $152 on June 16 and $84 on June 17, with the report parameters panel showing the date range, daily granularity, and grouping by service"></p>
-<figcaption>Cost Explorer, June 16–18: US$236.96 of actual unblended cost, compared with the estimated $243 from node-hours. EC2 instances account for most of the cost.</figcaption>
-</figure>
-</div>
+<p>That is about 111 node-hours across both batches. Adding the head node, NAT, public IP addresses and shared storage brought the estimate to roughly $243. It uses each batch’s slowest task and assumes all four nodes remain allocated throughout; exact billed usage requires the instance lifetimes. The account’s Cost Explorer report showed $236.96 for June 16–18, grouped by service, without isolating this run.</p>
+<p>My configuration allowed both c7a.12xlarge and c7i.12xlarge, with <code>lowest-price</code> selecting by hourly instance price. June’s run used c7i throughout. Both types advertise 48 vCPUs, but <a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html">AWS lists different CPU layouts</a>: 48 physical cores for c7a, and 24 cores with two threads each for c7i. I have no matched comparison of this batch on the two types. For choosing between them, I would time the same horizon on each and compare cost per completed task.</p>
+<p>The smaller development grid was much cheaper: around an hour per pass and roughly ten dollars. I could use it to check the workflow before committing to the dense grid. Once four compute nodes were running, their combined rate was about $8.57 an hour, including time spent waiting or debugging.</p>
 </section>
 <section id="what-transfers" class="level2">
-<h2 class="anchored" data-anchor-id="what-transfers">Other workloads</h2>
-<p>This setup fits independent CPU tasks with little data and no communication between nodes: forecast horizons, bootstrap draws, simulation seeds, grid points or regions. Frequent inter-node communication calls for MPI. Obtain permission before choosing infrastructure for data with compliance or residency restrictions. I prefer a campus cluster when its queue is short and its software current, since access is free.</p>
-<p>For single-GPU training runs, I rent a RunPod pod with SSH access, with no scheduler or NAT to configure. My pair of scripts (<a href="https://github.com/ChennoShen239/runpod_scripts">runpod_scripts</a>) use <code>rsync</code> to copy the project to <code>/workspace</code>, build the environment with <code>uv sync</code>, run the entry file inside <code>tmux</code> so it survives a dropped connection, and email the results when it finishes.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th>ParallelCluster + Slurm</th>
-<th>RunPod pod</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Task shape</td>
-<td>many independent CPU tasks</td>
-<td>one long GPU job</td>
-</tr>
-<tr class="even">
-<td>Startup</td>
-<td>NAT up + create cluster, ~10 min</td>
-<td>rent a pod, about a minute</td>
-</tr>
-<tr class="odd">
-<td>Environment</td>
-<td><code>uv sync</code> once, on the shared volume</td>
-<td><code>uv sync</code> once, in <code>/workspace</code></td>
-</tr>
-<tr class="even">
-<td>Submit</td>
-<td><code>sbatch --array</code></td>
-<td>entry script inside <code>tmux</code></td>
-</tr>
-<tr class="odd">
-<td>Billing unit</td>
-<td>per node-hour, 4 nodes + head + NAT</td>
-<td>per GPU-hour, metered by the second</td>
-</tr>
-<tr class="even">
-<td>Shutdown</td>
-<td>results out → delete cluster → NAT down</td>
-<td>results mailed out → kill the pod</td>
-</tr>
-</tbody>
-</table>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figures/fig_quadrant.svg" class="img-fluid figure-img" alt="Two-by-two quadrant diagram with axes one job versus many independent jobs and CPU-bound versus GPU-bound: your laptop for one CPU job, ParallelCluster plus Slurm highlighted in red for many CPU jobs, a rented GPU pod for one GPU job, and GPU queue or serverless, marked not covered here, for many GPU jobs"></p>
-<figcaption>ParallelCluster handles many independent CPU tasks; a rented GPU pod handles one long GPU job.</figcaption>
-</figure>
-</div>
-<p>RunPod’s posted on-demand rates as of August 2026 were $0.69 per hour for an RTX 4090, about $1.4–1.5 for an 80 GB A100, and about $2.9–3.2 for an H100. The H100’s hourly rate exceeded that of one 48-vCPU compute node; the 4090 cost about a third as much.</p>
+<h2 class="anchored" data-anchor-id="what-transfers">Where I use this workflow</h2>
+<p>Slurm has been useful here because the forecasts separate into independent tasks. I can change the number of rented nodes without changing how each horizon is estimated. When a university cluster has a short enough queue and the software I need, I prefer to submit there and avoid the AWS setup and bill.</p>
+<p>For my single-GPU training jobs, I rent one RunPod machine with SSH access. I use <a href="https://github.com/ChennoShen239/runpod_scripts">a pair of scripts</a> to copy the project to <code>/workspace</code>, build the environment, and run the entry file in <code>tmux</code> so a dropped connection leaves it running. The scripts email the results when the job finishes. One rented machine is enough for those jobs; I have no batch of horizons to schedule across nodes.</p>
 </section>
 <section id="a-closing-checklist" class="level2">
-<h2 class="anchored" data-anchor-id="a-closing-checklist">Run checklist</h2>
-<p>Before a run:</p>
+<h2 class="anchored" data-anchor-id="a-closing-checklist">Before the next run</h2>
+<section id="vcpu-quotas" class="level3">
+<h3 class="anchored" data-anchor-id="vcpu-quotas">Quota and runbook</h3>
+<p>I requested an on-demand quota of 1,024 vCPUs for my new account and received 500, enough for this cluster. An increase needs approval, so I would check the quota several days before a deadline run.</p>
+<p>The sequence I keep in the runbook is:</p>
 <ol type="1">
-<li>Confirm the default route points at a live NAT gateway.</li>
-<li>Confirm the vCPU quota covers the requested nodes. Allow several days for approval.</li>
-<li>Run one task and check its log before submitting the full array.</li>
+<li>Bring up the NAT and confirm the private subnet’s default route points at the live gateway.</li>
+<li>Create the cluster, copy the required code and inputs, and build the shared environment.</li>
+<li>Submit one task and inspect its log before submitting the full array.</li>
+<li>Copy results back, wait for cluster deletion to finish, then delete the NAT and release its Elastic IP.</li>
 </ol>
-<p>After a run:</p>
-<ol type="1">
-<li>Retrieve results with <code>rsync</code>.</li>
-<li>Wait for cluster deletion to finish.</li>
-<li>Delete the NAT gateway and release its Elastic IP.</li>
-</ol>
+<details>
+<summary>
+Compute queue settings
+</summary>
+<p>This is the scheduling excerpt from my ParallelCluster 3.15 configuration in us-east-1. The full configuration also needs the head node, networking and shared storage.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Scheduling</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">Scheduler</span><span class="kw">:</span><span class="at"> slurm</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmSettings</span><span class="kw">:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ScaledownIdletime</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span><span class="co">          # idle nodes terminate after 2 min</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmQueues</span><span class="kw">:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">CapacityType</span><span class="kw">:</span><span class="at"> ONDEMAND</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">AllocationStrategy</span><span class="kw">:</span><span class="at"> lowest-price</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">ComputeResources</span><span class="kw">:</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">Name</span><span class="kw">:</span><span class="at"> cpu48</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">Instances</span><span class="kw">:</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7a.12xlarge</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> </span><span class="fu">InstanceType</span><span class="kw">:</span><span class="at"> c7i.12xlarge</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MinCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MaxCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>MinCount: 0</code> lets the compute queue scale to zero, with idle nodes terminating after two minutes. The head node, shared storage and NAT keep billing until removed.</p>
+</details>
 <hr>
 <p><a href="https://chennoshen239.github.io/notes.html">← Notes &amp; code</a></p>
+</section>
 </section>
 
 </main>
