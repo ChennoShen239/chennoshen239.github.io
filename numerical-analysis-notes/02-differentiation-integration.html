@@ -301,7 +301,6 @@ window.Quarto = {
   <li><a href="#sec-2-gauss-error" id="toc-sec-2-gauss-error" class="nav-link" data-scroll-target="#sec-2-gauss-error">Error of Gaussian quadrature</a></li>
   </ul></li>
   <li><a href="#sec-2-double" id="toc-sec-2-double" class="nav-link" data-scroll-target="#sec-2-double"><span class="header-section-number">2.9</span> Double integrals</a></li>
-  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">2.10</span> Chapter summary</a></li>
   </ul>
 </nav>
     </div>
@@ -355,17 +354,16 @@ window.Quarto = {
 \newcommand{\defeq}{:=}
 \]</span></p>
 </div>
-<p>Interpolation (<a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>) gave us a polynomial that stands in for a function known only at nodes. Differentiating or integrating that polynomial approximates the corresponding operation on <span class="math inline">\(f\)</span>. In differentiation, shrinking the step size <span class="math inline">\(h\)</span> eventually increases round-off error. Integrating the interpolant of <span class="math inline">\(f\)</span> gives the classical <strong>quadrature</strong> rules, whose averaging makes them stable and accurate. We also develop the parametric curves introduced in <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>.</p>
+<p>Differentiating or integrating the interpolant (<a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>) approximates the corresponding operation on <span class="math inline">\(f\)</span>.</p>
 <section id="sec-2-bezier" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="sec-2-bezier"><span class="header-section-number">2.1</span> Parametric and Bézier curves</h2>
-<p>A curve in the plane need not be the graph of a function: it may double back, cross itself, or close up. The device is to treat it <strong>parametrically</strong>, as <span class="math inline">\((x(t),y(t))\)</span> for <span class="math inline">\(t\)</span> in some interval, and to interpolate each coordinate against the parameter <span class="math inline">\(t\)</span> separately. Given <span class="math inline">\(n+1\)</span> data points <span class="math inline">\((x_j,y_j)=(x(t_j),y(t_j))\)</span>, one may fit <span class="math inline">\(x(t)\)</span> and <span class="math inline">\(y(t)\)</span> by any of the tools of <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>: a single high-degree polynomial for each coordinate, or a spline for each. The polynomial route inherits the Runge oscillations of <a href="01-interpolation.html#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>; splines are steadier but solve a global system. Interactive design wants something local: a handle you can drag that reshapes one stretch of the curve without disturbing the rest.</p>
-<p><strong>Bézier curves</strong> provide exactly that by building the curve from <strong>piecewise cubic Hermite</strong> pieces (<a href="01-interpolation.html#sec-1-hermite" class="quarto-xref"><span>Section 1.4</span></a>), one cubic per pair of adjacent data points. On a single piece, reparametrised to <span class="math inline">\(t\in[0,1]\)</span> with endpoints <span class="math inline">\((x_0,y_0)\)</span> and <span class="math inline">\((x_1,y_1)\)</span>, a cubic Hermite polynomial in each coordinate carries four degrees of freedom: the two endpoint positions and the two endpoint derivatives <span class="math inline">\(x'(0),x'(1)\)</span> and <span class="math inline">\(y'(0),y'(1)\)</span>. Prescribing the endpoints uses two of them; the derivatives are the free handles. Bézier specifies those derivatives through two <strong>guidepoints</strong> placed near the ends, <span class="math display">\[
+<p>A <strong>parametric curve</strong> <span class="math inline">\((x(t),y(t))\)</span> can double back, cross itself, or close up. Interpolate each coordinate against <span class="math inline">\(t\)</span> separately. Given <span class="math inline">\(n+1\)</span> data points <span class="math inline">\((x_j,y_j)=(x(t_j),y(t_j))\)</span>, one may fit <span class="math inline">\(x(t)\)</span> and <span class="math inline">\(y(t)\)</span> by any of the tools of <a href="01-interpolation.html" class="quarto-xref"><span>Chapter 1</span></a>: a single high-degree polynomial for each coordinate, or a spline for each. The polynomial route inherits the Runge oscillations of <a href="01-interpolation.html#fig-1-runge" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>; splines are steadier but solve a global system. <strong>Bézier curves</strong> use <strong>piecewise cubic Hermite</strong> pieces (<a href="01-interpolation.html#sec-1-hermite" class="quarto-xref"><span>Section 1.4</span></a>), one cubic per pair of adjacent data points. On a single piece, reparametrised to <span class="math inline">\(t\in[0,1]\)</span> with endpoints <span class="math inline">\((x_0,y_0)\)</span> and <span class="math inline">\((x_1,y_1)\)</span>, a cubic Hermite polynomial in each coordinate carries four degrees of freedom: the two endpoint positions and the two endpoint derivatives <span class="math inline">\(x'(0),x'(1)\)</span> and <span class="math inline">\(y'(0),y'(1)\)</span>. Prescribing the endpoints uses two of them; the derivatives are the free handles. Bézier specifies those derivatives through two <strong>guidepoints</strong> placed near the ends, <span class="math display">\[
 (x_0+\alpha_0,\;y_0+\beta_0)\quad\text{and}\quad (x_1-\alpha_1,\;y_1-\beta_1),
 \]</span> by setting <span class="math display">\[
 \begin{pmatrix}x'(0)\\ y'(0)\end{pmatrix}=\begin{pmatrix}\alpha_0\\ \beta_0\end{pmatrix},
 \qquad
 \begin{pmatrix}x'(1)\\ y'(1)\end{pmatrix}=\begin{pmatrix}\alpha_1\\ \beta_1\end{pmatrix}.
-\]</span> The tangent direction the eye actually sees is the slope <span class="math inline">\(\dd y/\dd x\)</span>, and by the chain rule at the endpoints it is <span class="math display">\[
+\]</span> The endpoint slopes follow from the chain rule: <span class="math display">\[
 \left.\diff{y}{x}\right|_{t=0}=\frac{y'(0)}{x'(0)}=\frac{\beta_0}{\alpha_0},
 \qquad
 \left.\diff{y}{x}\right|_{t=1}=\frac{y'(1)}{x'(1)}=\frac{\beta_1}{\alpha_1}.
@@ -380,19 +378,7 @@ Figure&nbsp;2.1: A cubic Bézier segment (solid) with its endpoints (circles) an
 </figcaption>
 </figure>
 </div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Why guidepoints instead of raw slopes
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>A cubic Hermite piece needs a slope at each end, but a slope is an abstract number a designer cannot see. A guidepoint is a <em>point on the screen</em> lying along that slope, so the same four cubic coefficients are fixed by four visible handles: two anchors and two guidepoints. Because each piece depends only on its own four handles, editing one segment leaves the rest of the curve untouched, the property both single high-degree interpolation and global splines lack.</p>
-</div>
-</div>
+<p><span id="why-guidepoints-instead-of-raw-slopes"></span></p>
 </section>
 <section id="sec-2-numdiff" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="sec-2-numdiff"><span class="header-section-number">2.2</span> Numerical differentiation</h2>
@@ -430,12 +416,11 @@ f'(x_0)-\frac{\widehat f(x_0+h)-\widehat f(x_0-h)}{2h}
 \]</span> and with <span class="math inline">\(\abs{f^{(3)}}\le M\)</span> the triangle inequality yields the total error bound <span id="eq-2-total-error"><span class="math display">\[
 \left| f'(x_0)-\frac{\widehat f(x_0+h)-\widehat f(x_0-h)}{2h}\right|
 \le \frac{\eps}{h}+\frac{Mh^2}{6}\;\defeq\; e(h).
-\tag{2.5}\]</span></span> The two terms pull in opposite directions: the truncation term <span class="math inline">\(Mh^2/6\)</span> wants <span class="math inline">\(h\)</span> small, while the <strong>round-off term</strong> <span class="math inline">\(\eps/h\)</span> blows up as <span class="math inline">\(h\to 0\)</span> because the subtraction <span class="math inline">\(\widehat f(x_0+h)-\widehat
-f(x_0-h)\)</span> cancels significant digits and the result is divided by the tiny <span class="math inline">\(2h\)</span>. Minimising <span class="math inline">\(e(h)\)</span> by setting <span class="math inline">\(e'(h)=-\eps/h^2+Mh/3=0\)</span> gives <span class="math display">\[
+\tag{2.5}\]</span></span> Cancellation in <span class="math inline">\(\widehat f(x_0+h)-\widehat f(x_0-h)\)</span> produces the round-off term <span class="math inline">\(\eps/h\)</span>. Setting <span class="math inline">\(e'(h)=-\eps/h^2+Mh/3=0\)</span> gives <span class="math display">\[
 h_{\min}=\left(\frac{3\eps}{M}\right)^{1/3}=\bigO(\eps^{1/3}),
 \qquad
 e_{\min}=\tfrac12\bigl(9M\eps^2\bigr)^{1/3}=\bigO(\eps^{2/3}).
-\]</span> For this three-point formula and error model, the bound is minimized at <span class="math inline">\(h_{\min}\)</span> (<a href="#fig-2-roundoff" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>). With double precision <span class="math inline">\(\eps\approx 10^{-16}\)</span> and <span class="math inline">\(M\)</span> of order one, <span class="math inline">\(h_{\min}\)</span> is around <span class="math inline">\(10^{-5}\)</span> and the minimum bound is of order <span class="math inline">\(10^{-11}\)</span>. Smaller steps increase the round-off term. Higher-order formulas have a different balance.</p>
+\]</span> With double precision <span class="math inline">\(\eps\approx 10^{-16}\)</span> and <span class="math inline">\(M\)</span> of order one, <span class="math inline">\(h_{\min}\)</span> is around <span class="math inline">\(10^{-5}\)</span> and the minimum bound is of order <span class="math inline">\(10^{-11}\)</span> (<a href="#fig-2-roundoff" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>). Higher-order formulas have a different balance.</p>
 <div id="fig-2-roundoff" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-2-roundoff-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -445,19 +430,6 @@ e_{\min}=\tfrac12\bigl(9M\eps^2\bigr)^{1/3}=\bigO(\eps^{2/3}).
 Figure&nbsp;2.2: The total error bound <span class="math inline">\(e(h)=\eps/h+Mh^2/6\)</span> (solid) is the sum of a round-off branch <span class="math inline">\(\eps/h\)</span> that grows as <span class="math inline">\(h\to 0\)</span> and a truncation branch <span class="math inline">\(Mh^2/6\)</span> that grows as <span class="math inline">\(h\)</span> increases. It is minimised at <span class="math inline">\(h_{\min}=(3\eps/M)^{1/3}\)</span>; shrinking <span class="math inline">\(h\)</span> further only amplifies round-off.
 </figcaption>
 </figure>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Important
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Round-off instability is specific to <em>differentiation</em>, where dividing by <span class="math inline">\(h\)</span> magnifies cancellation. Integration, developed next, multiplies function values by weights of size <span class="math inline">\(\bigO(h)\)</span> and <strong>sums</strong> them, so errors average out rather than amplify: the composite rules of <a href="#sec-2-composite" class="quarto-xref"><span>Section 2.5</span></a> are numerically stable.</p>
-</div>
 </div>
 </section>
 </section>
@@ -471,7 +443,7 @@ M-N_1(\tfrac h2)=K_1\tfrac h2+K_2\tfrac{h^2}{4}+K_3\tfrac{h^3}{8}+\cdots,
 M-N_2(h)=-\tfrac12 K_2 h^2-\tfrac34 K_3 h^3-\cdots=\bigO(h^2),
 \qquad
 N_2(h)\defeq N_1(\tfrac h2)+\bigl(N_1(\tfrac h2)-N_1(h)\bigr).
-\]</span> The new formula <span class="math inline">\(N_2\)</span> is one order more accurate, and it is built only from evaluations of <span class="math inline">\(N_1\)</span>. Because <span class="math inline">\(M-N_2(h)\)</span> is again a power series, the process repeats. In general define <span id="eq-2-rich-table"><span class="math display">\[
+\]</span> Repeating the cancellation gives <span id="eq-2-rich-table"><span class="math display">\[
 N_j(h)=N_{j-1}(\tfrac h2)+\frac{N_{j-1}(h/2)-N_{j-1}(h)}{2^{\,j-1}-1},
 \qquad M-N_j(h)=\bigO(h^{j}),
 \tag{2.7}\]</span></span> which fills a triangular table: column <span class="math inline">\(1\)</span> holds <span class="math inline">\(N_1(h),N_1(h/2),N_1(h/4),\dots\)</span>, and each further column is one order higher.</p>
@@ -539,11 +511,10 @@ f(x)=P_3(x)+\frac{f^{(4)}(\xi(x))}{4!}(x-x_0)(x-x_1)^2(x-x_2).
 </section>
 <section id="sec-2-dop" class="level3">
 <h3 class="anchored" data-anchor-id="sec-2-dop">Degree of precision</h3>
-<p>A quadrature rule is characterized by the highest-degree polynomial it integrates exactly.</p>
 <div id="def-2-degree-precision" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.1 (Degree of precision)</strong></span> A quadrature rule <span class="math inline">\(\int_a^b f(x)\,\dd x\approx\sum_{j} a_j f(x_j)\)</span> has <strong>degree of precision</strong> <span class="math inline">\(m\)</span> if it is exact for <span class="math inline">\(f(x)=x^k\)</span> for every <span class="math inline">\(k=0,1,\dots,m\)</span> but not for <span class="math inline">\(f(x)=x^{m+1}\)</span>. By linearity this is equivalent to the rule being exact for <em>all</em> polynomials of degree <span class="math inline">\(\le m\)</span>.</p>
 </div>
-<p>Testing the monomials <span class="math inline">\(1,x,x^2,\dots\)</span> (and, by shift and scale, one may check them on <span class="math inline">\([0,1]\)</span> alone) shows the trapezoidal rule has degree of precision <span class="math inline">\(1\)</span> (its error <a href="#eq-2-trapezoid" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> carries <span class="math inline">\(f''\)</span>, which vanishes for <span class="math inline">\(f=1,x\)</span>) while Simpson’s rule has degree of precision <span class="math inline">\(3\)</span>, its error <a href="#eq-2-simpson" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> carrying <span class="math inline">\(f^{(4)}\)</span>. The table below, integrating a handful of functions over <span class="math inline">\([0,2]\)</span>, shows Simpson’s markedly closer answers.</p>
+<p>Testing the monomials <span class="math inline">\(1,x,x^2,\dots\)</span> (and, by shift and scale, one may check them on <span class="math inline">\([0,1]\)</span> alone) shows the trapezoidal rule has degree of precision <span class="math inline">\(1\)</span> (its error <a href="#eq-2-trapezoid" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> carries <span class="math inline">\(f''\)</span>, which vanishes for <span class="math inline">\(f=1,x\)</span>) while Simpson’s rule has degree of precision <span class="math inline">\(3\)</span>, its error <a href="#eq-2-simpson" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> carrying <span class="math inline">\(f^{(4)}\)</span>. <a href="#tbl-2-simpson-wins" class="quarto-xref">Table&nbsp;<span>2.1</span></a> gives examples on <span class="math inline">\([0,2]\)</span>.</p>
 <div id="tbl-2-simpson-wins" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-simpson-wins-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -604,7 +575,7 @@ Table&nbsp;2.1: Single-panel trapezoidal vs.&nbsp;Simpson on <span class="math i
 \int_a^b f(x)\,\dd x
 =\frac h3\!\left(f(a)+2\sum_{j=1}^{m-1}f(x_{2j})+4\sum_{j=1}^{m}f(x_{2j-1})+f(b)\right)
 -\frac{(b-a)h^4}{180}f^{(4)}(\mu).
-\tag{2.13}\]</span></span> The interior even-indexed nodes carry weight <span class="math inline">\(2\)</span> (shared endpoints of neighbouring Simpson panels), the odd-indexed midpoints carry weight <span class="math inline">\(4\)</span>. The error is <span class="math inline">\(\bigO(h^4)\)</span>, two orders better than the composite trapezoidal’s <span class="math inline">\(\bigO(h^2)\)</span>, and still keyed to <span class="math inline">\(f^{(4)}\)</span>, so the degree of precision stays <span class="math inline">\(3\)</span>.</p>
+\tag{2.13}\]</span></span> Shared endpoints of neighbouring Simpson panels have weight <span class="math inline">\(2\)</span>; the degree of precision remains <span class="math inline">\(3\)</span>.</p>
 <div id="exm-2-comp-simpson" class="theorem example">
 <p><span class="theorem-title"><strong>Example 2.2 (Meeting a tolerance)</strong></span> To compute <span class="math inline">\(\int_0^\pi\sin x\,\dd x=2\)</span> with error at most <span class="math inline">\(10^{-5}\)</span>: since <span class="math inline">\(\abs{f^{(4)}}=\abs{\sin
 x}\le 1\)</span>, <a href="#eq-2-comp-simpson" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> bounds the error by <span class="math inline">\(\pi h^4/180=\pi^5/(180\,n^4)\)</span>. Requiring <span class="math inline">\(\pi^5/(180\,n^4)\le 10^{-5}\)</span> gives <span class="math inline">\(n\ge \pi(\pi/(180\cdot 10^{-5}))^{1/4}\approx 20.3\)</span>, so take the even value <span class="math inline">\(n=22\)</span> (<span class="math inline">\(m=11\)</span>, <span class="math inline">\(h=\pi/22\)</span>). The rule then returns <span class="math inline">\(\approx 2.0000046\)</span>, within tolerance.</p>
@@ -708,7 +679,7 @@ R_{k,j}=R_{k,j-1}+\frac{R_{k,j-1}-R_{k-1,j-1}}{4^{\,j-1}-1},\qquad j\ge 2,
 <h2 data-number="2.7" class="anchored" data-anchor-id="sec-2-adaptive"><span class="header-section-number">2.7</span> Adaptive quadrature</h2>
 <p>Composite and Romberg rules spread nodes <em>uniformly</em>. A function like <span class="math inline">\(y(x)=e^{-3x}\sin 4x\)</span> (oscillatory near <span class="math inline">\(x=0\)</span>, nearly flat for large <span class="math inline">\(x\)</span>) receives excess nodes in the smooth tail and too few in the oscillatory region. <strong>Adaptive quadrature</strong> instead refines only where the estimated error is large, subdividing recursively until each piece meets its share of the tolerance.</p>
 <p>The method uses Simpson’s rule with a built-in error estimate. On <span class="math inline">\([a,b]\)</span> with <span class="math inline">\(h=(b-a)/2\)</span>, write the one-panel Simpson value <span class="math inline">\(S(a,b)=\tfrac h3(f(a)+4f(a+h)+f(b))\)</span>, whose error is <span class="math inline">\(-\tfrac{h^5}{90}
-f^{(4)}(\xi)\)</span>. Halving the interval and applying Simpson to each half gives <span class="math inline">\(Q_1=S(a,\tfrac{a+b}{2})+S(\tfrac{a+b}{2},b)\)</span>, whose error, at step <span class="math inline">\(h/2\)</span> on two panels, is about <span class="math inline">\(\tfrac{1}{16}\)</span> of the one-panel error (assuming <span class="math inline">\(f^{(4)}\)</span> roughly constant). That <span class="math inline">\(\tfrac1{16}\)</span> is pure <span class="math inline">\(h^5\)</span> arithmetic: halving the interval drops the Simpson step from <span class="math inline">\(h\)</span> to <span class="math inline">\(h/2\)</span>, so by the <span class="math inline">\(h^5\)</span> error of <a href="#eq-2-simpson" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> each of the two half-panels carries about <span class="math inline">\((1/2)^5=1/32\)</span> of the one-panel error, and <span class="math inline">\(2\cdot\tfrac1{32}=\tfrac1{16}\)</span> together. Subtracting the two estimates therefore <em>reveals</em> the error: <span class="math display">\[
+f^{(4)}(\xi)\)</span>. Halving the interval and applying Simpson to each half gives <span class="math inline">\(Q_1=S(a,\tfrac{a+b}{2})+S(\tfrac{a+b}{2},b)\)</span>, whose error, at step <span class="math inline">\(h/2\)</span> on two panels, is about <span class="math inline">\(\tfrac{1}{16}\)</span> of the one-panel error (assuming <span class="math inline">\(f^{(4)}\)</span> roughly constant). Since <span class="math inline">\(2(1/2)^5=1/16\)</span>, subtracting the estimates gives <span class="math display">\[
 \int_a^b f-Q_1\approx\frac{1}{15}\bigl(Q_1-S(a,b)\bigr),
 \]</span> so <span class="math inline">\(\abs{Q_1-S(a,b)}\)</span> is a computable proxy for the error of <span class="math inline">\(Q_1\)</span>, and the Richardson combination <span class="math inline">\(Q=Q_1+\tfrac{1}{15}(Q_1-S(a,b))\)</span> is more accurate still.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -728,7 +699,6 @@ f^{(4)}(\xi)\)</span>. Halving the interval and applying Simpson to each half gi
 </ol>
 </div>
 </div>
-<p>The recursion drives points into the oscillatory region and leaves the flat tail coarse (<a href="#fig-2-adaptive-nodes" class="quarto-xref">Figure&nbsp;<span>2.4</span></a>): the same accuracy for far fewer evaluations than a uniform mesh fine enough for the worst spot.</p>
 <div id="fig-2-adaptive-nodes" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-2-adaptive-nodes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -742,7 +712,7 @@ Figure&nbsp;2.4: Adaptive Simpson on <span class="math inline">\(y=e^{-3x}\sin 4
 </section>
 <section id="sec-2-gauss" class="level2" data-number="2.8">
 <h2 data-number="2.8" class="anchored" data-anchor-id="sec-2-gauss"><span class="header-section-number">2.8</span> Gaussian quadrature</h2>
-<p>Newton–Cotes fixes the nodes (equispaced) and solves only for the weights, reaching degree of precision <span class="math inline">\(n\)</span> (or <span class="math inline">\(n+1\)</span>) with <span class="math inline">\(n+1\)</span> nodes. <strong>Gaussian quadrature</strong> frees the nodes too. Here the meaning of <span class="math inline">\(n\)</span> changes. In Newton–Cotes <span class="math inline">\(n\)</span> was the <em>degree</em> of the interpolant, so a rule used <span class="math inline">\(n+1\)</span> nodes; in this section <span class="math inline">\(n\)</span> is the <em>number of nodes</em> outright, and the degree of precision will read <span class="math inline">\(2n-1\)</span>. Thus <span class="math inline">\(n\)</span> in <span class="math inline">\(2n-1\)</span> counts nodes. On the reference interval <span class="math inline">\([-1,1]\)</span> we seek <span class="math inline">\(n\)</span> nodes <span class="math inline">\(x_1,\dots,x_n\)</span> <em>and</em> <span class="math inline">\(n\)</span> weights <span class="math inline">\(c_1,\dots,c_n\)</span>, <span id="eq-2-gauss-rule"><span class="math display">\[
+<p>Newton–Cotes fixes the nodes (equispaced) and solves only for the weights, reaching degree of precision <span class="math inline">\(n\)</span> (or <span class="math inline">\(n+1\)</span>) with <span class="math inline">\(n+1\)</span> nodes. <strong>Gaussian quadrature</strong> frees the nodes too. Here <span class="math inline">\(n\)</span> denotes the number of nodes, rather than the interpolant degree used in Newton–Cotes. On the reference interval <span class="math inline">\([-1,1]\)</span> we seek <span class="math inline">\(n\)</span> nodes <span class="math inline">\(x_1,\dots,x_n\)</span> <em>and</em> <span class="math inline">\(n\)</span> weights <span class="math inline">\(c_1,\dots,c_n\)</span>, <span id="eq-2-gauss-rule"><span class="math display">\[
 \int_{-1}^1 f(x)\,\dd x\approx\sum_{j=1}^n c_j f(x_j),
 \tag{2.16}\]</span></span> choosing all <span class="math inline">\(2n\)</span> parameters to maximise the degree of precision. With <span class="math inline">\(2n\)</span> free parameters we can hope to match <span class="math inline">\(2n\)</span> conditions (exactness for <span class="math inline">\(1,x,x^2,\dots,x^{2n-1}\)</span>) and indeed this is achievable, giving degree of precision <span class="math inline">\(2n-1\)</span>, nearly double what <span class="math inline">\(n\)</span> Newton–Cotes nodes attain.</p>
 <p>For <span class="math inline">\(n=2\)</span> the four exactness conditions <span class="math display">\[
@@ -836,21 +806,8 @@ y^4=-96(x+2y)^{-4}\)</span>, bounded by <span class="math inline">\(0.916\)</spa
 <p><strong>Gaussian tensor product.</strong> The same nesting with Gauss–Legendre rules is more accurate per evaluation. Map both variables to <span class="math inline">\([-1,1]\)</span> by <span class="math inline">\(x=\tfrac{a+b}{2}+\tfrac{b-a}{2}u\)</span>, <span class="math inline">\(y=\tfrac{c+d}{2}+\tfrac{d-c}{2}v\)</span>, so <span class="math display">\[
 \iint_R f\,\dd A=\frac{(b-a)(d-c)}{4}\int_{-1}^1\!\!\int_{-1}^1 f\bigl(x(u),y(v)\bigr)\,\dd v\,\dd u
 \approx\frac{(b-a)(d-c)}{4}\sum_{i=1}^n\sum_{j=1}^m c_i\hat c_j\,f(x_i,y_j),
-\]</span> with <span class="math inline">\(x_i,y_j\)</span> the mapped Legendre roots and <span class="math inline">\(c_i,\hat c_j\)</span> the Gauss weights. The tensor-product idea extends to any region reducible to nested one-dimensional integrals; only the bookkeeping grows.</p>
-</section>
-<section id="chapter-summary" class="level2" data-number="2.10">
-<h2 data-number="2.10" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">2.10</span> Chapter summary</h2>
-<ul>
-<li><strong>Bézier curves</strong> (<a href="#sec-2-bezier" class="quarto-xref"><span>Section 2.1</span></a>) build a parametric curve from piecewise cubic Hermite pieces whose endpoint slopes <span class="math inline">\(\beta/\alpha\)</span> are set by visible <strong>guidepoints</strong>, giving local editing that single high-degree interpolation and global splines lack (<a href="#fig-2-bezier" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>).</li>
-<li><strong>Numerical differentiation</strong> differentiates the interpolant: the <span class="math inline">\((n+1)\)</span>-point formula <a href="#eq-2-npoint" class="quarto-xref">Equation&nbsp;<span>2.2</span></a>, with the central formulas <a href="#eq-2-midpoint" class="quarto-xref">Equation&nbsp;<span>2.4</span></a> and <a href="#eq-2-second-central" class="quarto-xref">Equation&nbsp;<span>2.3</span></a> for equispaced nodes. Dividing by <span class="math inline">\(h\)</span> makes it <strong>round-off unstable</strong>. For the three-point formula and error model <a href="#eq-2-total-error" class="quarto-xref">Equation&nbsp;<span>2.5</span></a>, the bound is minimized at <span class="math inline">\(h_{\min}=\bigO(\eps^{1/3})\)</span>; below this scale, shrinking <span class="math inline">\(h\)</span> increases the bound (<a href="#fig-2-roundoff" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>).</li>
-<li><strong>Richardson extrapolation</strong> (<a href="#eq-2-rich-table" class="quarto-xref">Equation&nbsp;<span>2.7</span></a>, <a href="#eq-2-rich-even" class="quarto-xref">Equation&nbsp;<span>2.8</span></a>) annihilates the leading error term by combining estimates at <span class="math inline">\(h\)</span> and <span class="math inline">\(h/2\)</span>, climbing a triangular table one (or, for even-power series, two) orders per column.</li>
-<li><strong>Newton–Cotes</strong> rules integrate the equispaced interpolant: <strong>trapezoidal</strong> <a href="#eq-2-trapezoid" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> (degree of precision <span class="math inline">\(1\)</span>) and <strong>Simpson</strong> <a href="#eq-2-simpson" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> (degree of precision <span class="math inline">\(3\)</span>, via the double-node trick). <strong>Degree of precision</strong> is <a href="#def-2-degree-precision" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>.</li>
-<li><strong>Composite</strong> rules <a href="#eq-2-comp-trap" class="quarto-xref">Equation&nbsp;<span>2.12</span></a>, <a href="#eq-2-comp-simpson" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> keep panels short and are numerically <strong>stable</strong> (total weight <span class="math inline">\(b-a\)</span>); <strong>Romberg</strong> integration <a href="#eq-2-romberg-extrap" class="quarto-xref">Equation&nbsp;<span>2.15</span></a> is Richardson on halved composite-trapezoidal meshes; <strong>adaptive</strong> quadrature refines only where a Simpson error estimate is large.</li>
-<li><strong>Gaussian quadrature</strong> frees the nodes to the roots of the Legendre polynomials <a href="#eq-2-legendre-recur" class="quarto-xref">Equation&nbsp;<span>2.17</span></a> and attains degree of precision <span class="math inline">\(2n-1\)</span> (<a href="#thm-2-gauss-quad" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>), with the rapidly decaying error <a href="#eq-2-gauss-error" class="quarto-xref">Equation&nbsp;<span>2.19</span></a>; <strong>double integrals</strong> reduce to nested one-dimensional quadrature
-<ol class="example" type="1">
-<li></li>
-</ol></li>
-</ul>
+\]</span> with <span class="math inline">\(x_i,y_j\)</span> the mapped Legendre roots and <span class="math inline">\(c_i,\hat c_j\)</span> the Gauss weights. The tensor-product construction extends to regions reducible to nested one-dimensional integrals.</p>
+<p><span id="chapter-summary"></span></p>
 
 
 </section>

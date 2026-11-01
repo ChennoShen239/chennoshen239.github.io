@@ -295,7 +295,6 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>Replacing Howard policy iteration’s exact evaluation step with a sample average of returns gives the MC Basic algorithm. Stochastic approximation then provides convergence results for equations observed with noise and the basis for temporal-difference learning.</p>
 <div class="block-context callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -332,7 +331,6 @@ v(s_{0})=\max_{\{a_{t}\}_{t=0}^{\infty}}\E_{0}\!\left[\sum_{t=0}^{\infty}\beta^{
 <li>the discount factor is written <strong><span class="math inline">\(\gamma\)</span></strong> rather than <span class="math inline">\(\beta\)</span>;</li>
 <li>policies are <strong>stochastic</strong>, <span class="math inline">\(a_{t}\sim\pi(\cdot\given s_{t})\)</span>, so <span class="math inline">\(\pi(a\given s)\)</span> is a probability rather than a chosen action.</li>
 </ul>
-<p>Chapter 1 uses <span class="math inline">\(\beta\)</span> and deterministic <span class="math inline">\(\pi(s)\)</span>; the underlying control problem is unchanged.</p>
 </div>
 </div>
 <p>Under a stochastic policy the maximization in the Bellman equation <a href="01-notes.html#eq-bellman" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> is over <em>distributions</em> over actions rather than over actions, so the one-step reward and the transition both get averaged against <span class="math inline">\(\pi\)</span>:</p>
@@ -361,13 +359,12 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><a href="#eq-bellman-pi" class="quarto-xref">Equation&nbsp;<span>2.2</span></a> says a stochastic policy induces an ordinary Markov reward process: fix <span class="math inline">\(\pi\)</span> and the controlled process <span class="math inline">\((r_{\pi},p_{\pi})\)</span> is just an MRP in the sense of <a href="01-notes.html#def-mrp" class="quarto-xref">Definition&nbsp;<span>1.1</span></a>. This is why the matrix-vector machinery of Chapter 1 carries over unchanged, with <span class="math inline">\(\mathbf{r}_{\pi}\)</span> and <span class="math inline">\(\mathbf{P}_{\pi}\)</span> now built from <a href="#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>.</p>
+<p>Fixing <span class="math inline">\(\pi\)</span> gives an MRP (<a href="01-notes.html#def-mrp" class="quarto-xref">Definition&nbsp;<span>1.1</span></a>) with reward <span class="math inline">\(r_{\pi}\)</span> and transition <span class="math inline">\(p_{\pi}\)</span>. Chapter 1’s matrix equations apply with <span class="math inline">\(\mathbf{r}_{\pi}\)</span> and <span class="math inline">\(\mathbf{P}_{\pi}\)</span> from <a href="#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>.</p>
 </div>
 </div>
 </section>
 <section id="monte-carlo-methods" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="monte-carlo-methods"><span class="header-section-number">2.2</span> Monte Carlo methods</h2>
-<p>Monte Carlo policy iteration estimates action values from sampled returns.</p>
 <section id="where-the-model-still-hides" class="level3">
 <h3 class="anchored" data-anchor-id="where-the-model-still-hides">Where the model still hides</h3>
 <p>Recall the two steps of Howard policy iteration, now in RL notation:</p>
@@ -385,11 +382,10 @@ Tip
 &amp;=\argmax_{\pi}\sum_{a}\pi(a\given s)\,q_{\pi_{k}}(s,a).
 \end{aligned}
 \tag{2.4}\]</span></span></p>
-<p>The remaining task is to estimate <span class="math inline">\(q_{\pi_{k}}(s,a)\)</span>.</p>
 </section>
 <section id="two-expressions-for-the-action-value" class="level3">
 <h3 class="anchored" data-anchor-id="two-expressions-for-the-action-value">Two expressions for the action value</h3>
-<p>The action value of <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> can be written in two ways, and they are not equally demanding.</p>
+<p>The action value of <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> has a model-based and a return-based expression:</p>
 <p><span id="eq-q-model"><span class="math display">\[
 q_{\pi_{k}}(s,a)=r(s,a)+\gamma\sum_{s'}p(s'\given s,a)\,v_{\pi_{k}}(s')
 \tag{2.5}\]</span></span></p>
@@ -436,7 +432,7 @@ Table&nbsp;2.1: The same action value, obtained from a model or from data.
 </div>
 </figure>
 </div>
-<p>The derivation under <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> establishes their equivalence. Since <a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> is an expectation, it can be estimated by averaging sampled returns.</p>
+<p>The derivation under <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> establishes their equivalence.</p>
 </section>
 <section id="estimating-q-from-episodes" class="level3">
 <h3 class="anchored" data-anchor-id="estimating-q-from-episodes">Estimating <span class="math inline">\(q\)</span> from episodes</h3>
@@ -465,7 +461,7 @@ q_{\pi_{k}}(s,a)
 <li>a <strong>finite number of episodes</strong> <span class="math inline">\(N\)</span>, which is sampling error;</li>
 <li><strong>truncation</strong> of each episode at a finite horizon <span class="math inline">\(T\)</span>, which is a bias of order <span class="math inline">\(\gamma^{T}\)</span>.</li>
 </ol>
-<p>Both vanish as <span class="math inline">\(N,T\to\infty\)</span>: more episodes reduce sampling error, and longer episodes reduce truncation bias.</p>
+<p>Both vanish as <span class="math inline">\(N,T\to\infty\)</span>.</p>
 </div>
 </div>
 <div id="cell-fig-2-mc-errors" class="cell" data-execution_count="2">
@@ -555,7 +551,6 @@ a_{k}^{*}(s)=\argmax_{a}q_{k}(s,a),
 </ol>
 </div>
 </div>
-<p>MC Basic is policy iteration with one component swapped out:</p>
 <div id="tbl-mcbasic-hpi" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-mcbasic-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -601,7 +596,6 @@ Table&nbsp;2.2: MC Basic is Howard policy iteration with sample averages in plac
 </div>
 </figure>
 </div>
-<p>A state value cannot be turned into a decision on its own: converting <span class="math inline">\(v\)</span> into a policy requires the model, as the improvement row of <a href="#tbl-mcbasic-hpi" class="quarto-xref">Table&nbsp;<span>2.2</span></a> shows. When the model is unavailable, estimate the object that <em>is</em> directly comparable across actions.</p>
 <p>Step 1 assumes episodes can be started from <em>any</em> pair <span class="math inline">\((s,a)\)</span>, an assumption usually called <strong>exploring starts</strong>. This supplies exploration; the next section replaces it with policy-based exploration.</p>
 <p><strong>Convergence.</strong> Policy iteration converges, and MC Basic is policy iteration, so MC Basic converges too, given sufficiently many episodes at every step.</p>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -614,7 +608,7 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>MC Basic collects a fresh batch of episodes for every state-action pair at every iteration and discards previous batches. This makes it sample-inefficient. It illustrates the replacement expectation <span class="math inline">\(\to\)</span> sample average.</p>
+<p>MC Basic discards previous batches and collects fresh episodes for every state-action pair at every iteration, making it sample-inefficient.</p>
 </div>
 </div>
 </section>
@@ -661,44 +655,21 @@ Warning
 </section>
 <section id="stochastic-approximation" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="stochastic-approximation"><span class="header-section-number">2.3</span> Stochastic approximation</h2>
-<p>Stochastic approximation is useful here for two reasons.</p>
-<ol type="1">
-<li>It is the essential preliminary for <strong>temporal-difference learning</strong>, and so the bridge from Monte Carlo RL to TD, the update Chapter 1 introduced as <a href="01-notes.html#eq-td0" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> without justifying it.</li>
-<li>It has many applications in economics beyond RL.</li>
-</ol>
 <section id="motivating-example-mean-estimation" class="level3">
 <h3 class="anchored" data-anchor-id="motivating-example-mean-estimation">Motivating example: mean estimation</h3>
-<p>Consider mean estimation. Given a random variable <span class="math inline">\(X\)</span> and iid samples <span class="math inline">\(\{x_{i}\}_{i=1}^{N}\)</span>, estimate <span class="math inline">\(\E[X]\)</span> by</p>
+<p>Given a random variable <span class="math inline">\(X\)</span> and iid samples <span class="math inline">\(\{x_{i}\}_{i=1}^{N}\)</span>, estimate <span class="math inline">\(\E[X]\)</span> by</p>
 <p><span class="math display">\[
 \E[X]\approx\bar{x}=\frac{1}{N}\sum_{i=1}^{N}x_{i},
 \qquad
 \lim_{N\to\infty}\bar{x}=\E[X].
 \]</span></p>
-<div class="callout callout-style-default callout-tip callout-titled" title="Why so much attention to a sample mean?">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Why so much attention to a sample mean?
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Action values (<a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a>) and policy gradients are expectations, so mean estimation underlies the algorithms developed here.</p>
-</div>
-</div>
-<p>There are two ways to compute <span class="math inline">\(\bar{x}\)</span>.</p>
-<ol type="1">
-<li><strong>Batch.</strong> Collect all samples, then average. The drawback: if samples arrive one at a time over a period, nothing can be reported until the last one lands.</li>
-<li><strong>Incremental.</strong> Update the estimate as each sample arrives.</li>
-</ol>
 <p>Let <span class="math inline">\(w_{k+1}\)</span> denote the average of the first <span class="math inline">\(k\)</span> samples,</p>
 <p><span class="math display">\[
 w_{k+1}=\frac{1}{k}\sum_{i=1}^{k}x_{i},\qquad k=1,2,\dots
 \]</span></p>
-<p>so that <span class="math inline">\(w_{k}=\frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}\)</span>. Then the incremental form follows from algebra alone.</p>
+<p>so that <span class="math inline">\(w_{k}=\frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}\)</span>. The incremental form is:</p>
 <div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: the incremental mean">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -707,7 +678,7 @@ w_{k+1}=\frac{1}{k}\sum_{i=1}^{k}x_{i},\qquad k=1,2,\dots
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-10" class="callout-10-contents callout-collapse collapse show">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p><span class="math display">\[
 \begin{aligned}
@@ -733,7 +704,7 @@ w_{k+1}=w_{k}-\frac{1}{k}\,(w_{k}-x_{k}).
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><a href="#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a> is <a href="01-notes.html#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> from Chapter 1 with the index shifted: here <span class="math inline">\(w_{k+1}\)</span> is the mean of the first <span class="math inline">\(k\)</span> samples, there <span class="math inline">\(\bar{x}_{k}\)</span> is. The recursion is the same; only the label on the counter moved. This chapter uses the <span class="math inline">\(w\)</span> convention because it is the one the stochastic-approximation literature writes the Robbins-Monro algorithm in.</p>
+<p><a href="#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a> is <a href="01-notes.html#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> from Chapter 1 with the index shifted: here <span class="math inline">\(w_{k+1}\)</span> is the mean of the first <span class="math inline">\(k\)</span> samples, there <span class="math inline">\(\bar{x}_{k}\)</span> is. The <span class="math inline">\(w\)</span> convention matches the Robbins-Monro notation below.</p>
 </div>
 </div>
 <p>Now generalize by replacing the step <span class="math inline">\(\tfrac{1}{k}\)</span> with an arbitrary positive <span class="math inline">\(\alpha_{k}\)</span>:</p>
@@ -741,7 +712,7 @@ w_{k+1}=w_{k}-\frac{1}{k}\,(w_{k}-x_{k}).
 w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}).
 \tag{2.9}\]</span></span></p>
 <div class="callout callout-style-default callout-note callout-titled" title="Implementation: the generalized incremental mean">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -750,9 +721,9 @@ w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}).
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>The loop body is <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> verbatim; <code>alpha</code> is either a float, giving a constant step, or an array of per-iteration steps <span class="math inline">\(\alpha_{k}\)</span>. Passing <span class="math inline">\(\alpha_{k}=1/k\)</span> recovers the running mean of the first <span class="math inline">\(k\)</span> samples exactly, whatever the starting guess <span class="math inline">\(w_{0}\)</span>, and that is what the closing assertion checks.</p>
+<p>In <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a>, <code>alpha</code> is a constant or an array of steps <span class="math inline">\(\alpha_{k}\)</span>. With <span class="math inline">\(\alpha_{k}=1/k\)</span>, the estimate is the mean of the first <span class="math inline">\(k\)</span> samples regardless of <span class="math inline">\(w_{0}\)</span>.</p>
 <div id="675ddcb8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mean_estimation_path(x, alpha, w0):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Run w_{k+1} = w_k - alpha_k (w_k - x_k) over the sample stream x.</span></span>
@@ -774,7 +745,7 @@ w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}).
 </div>
 </div>
 </div>
-<p>This still converges to <span class="math inline">\(\E[X]\)</span> under mild conditions on <span class="math inline">\(\{\alpha_{k}\}\)</span>. Those conditions are the subject of the rest of this section: <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> is a special case of the Robbins-Monro algorithm.</p>
+<p>Convergence to <span class="math inline">\(\E[X]\)</span> follows from the Robbins-Monro conditions on <span class="math inline">\(\{\alpha_{k}\}\)</span> below.</p>
 </section>
 <section id="the-robbins-monro-algorithm" class="level3">
 <h3 class="anchored" data-anchor-id="the-robbins-monro-algorithm">The Robbins-Monro algorithm</h3>
@@ -828,7 +799,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Optimization also leads to root-finding. If <span class="math inline">\(J(w)\)</span> is an objective to be minimized, its first-order condition <span class="math inline">\(g(w)=\nabla_{w}J(w)=0\)</span> is a root-finding problem. Optimization is root-finding on the gradient.</p>
+<p>Optimization also leads to root-finding. If <span class="math inline">\(J(w)\)</span> is an objective to be minimized, its first-order condition <span class="math inline">\(g(w)=\nabla_{w}J(w)=0\)</span> is a root-finding problem.</p>
 </div>
 </div>
 <p>The method for solving <span class="math inline">\(g(w)=0\)</span> depends on the information available:</p>
@@ -860,13 +831,12 @@ w_{k+1}=w_{k}-\alpha_{k}\,\tilde{g}(w_{k},\eta_{k}),
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Each condition rules out one way the iteration could fail.</p>
 <ol type="1">
 <li><strong><span class="math inline">\(g\)</span> is increasing and well-conditioned.</strong> The lower bound <span class="math inline">\(c_{1}&gt;0\)</span> makes the root unique and guarantees the update always points toward it; the upper bound <span class="math inline">\(c_{2}\)</span> stops the steps from overshooting arbitrarily far.</li>
 <li><strong>The steps are large enough in total, small enough individually.</strong> <span class="math inline">\(\sum\alpha_{k}=\infty\)</span> means the iteration can still travel an unbounded distance and so cannot stall short of the root no matter where it starts. <span class="math inline">\(\sum\alpha_{k}^{2}&lt;\infty\)</span> means <span class="math inline">\(\alpha_{k}\to0\)</span> fast enough that the accumulated noise stays finite and the estimate settles. The canonical choice <span class="math inline">\(\alpha_{k}=1/k\)</span> satisfies both, which is exactly the step in <a href="#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a>.</li>
 <li><strong>The noise is zero-mean with finite variance.</strong> Unbiased observations, so errors cancel rather than accumulate into a drift.</li>
 </ol>
-<p>This is the theorem Chapter 1 gestured at when it noted that a <em>constant</em> <span class="math inline">\(\alpha\)</span> violates condition 2: <span class="math inline">\(\sum\alpha=\infty\)</span> holds but <span class="math inline">\(\sum\alpha^{2}=\infty\)</span> too, so the estimate never settles and instead fluctuates around the truth. That is a price paid deliberately, in exchange for the ability to track a moving target.</p>
+<p>A constant <span class="math inline">\(\alpha\)</span> violates condition 2: <span class="math inline">\(\sum\alpha=\infty\)</span> holds, but <span class="math inline">\(\sum\alpha^{2}=\infty\)</span> too.</p>
 </div>
 </div>
 </section>
@@ -893,12 +863,11 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In <a href="#eq-dvoretzky" class="quarto-xref">Equation&nbsp;<span>2.11</span></a>, contraction competes with noise. The factor <span class="math inline">\((1-\alpha_{k})\)</span> contracts the error toward zero; the term <span class="math inline">\(\beta_{k}\eta_{k}\)</span> adds random noise. Condition 1 says the contraction wins: <span class="math inline">\(\sum\alpha_{k}=\infty\)</span> gives unbounded cumulative contraction, while <span class="math inline">\(\sum\alpha_{k}^{2},\sum\beta_{k}^{2}&lt;\infty\)</span> bound the accumulated noise. Condition 2 requires zero-mean noise with bounded variance, so it adds no systematic drift.</p>
-<p>Two features of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> are useful here. First, <span class="math inline">\(\alpha_{k}\)</span> and <span class="math inline">\(\beta_{k}\)</span> are allowed to be <strong>random</strong>, and to depend on the history: that is exactly what is needed below, where the effective step size turns out to depend on the current iterate. Second, the conclusion is almost-sure convergence, not convergence in mean. The proof of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> itself rests on convergence results for quasimartingales and is not reproduced here; the RM theorem follows as a corollary.</p>
+<p>The steps <span class="math inline">\(\alpha_{k}\)</span> and <span class="math inline">\(\beta_{k}\)</span> may depend on the history, which allows the effective step size in the RM proof below. The conclusion is almost-sure convergence. The proof of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> rests on quasimartingale convergence and is not reproduced here.</p>
 </div>
 </div>
 <div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of the Robbins-Monro theorem">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -907,7 +876,7 @@ Tip
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-18" class="callout-18-contents callout-collapse collapse show">
+<div id="callout-17" class="callout-17-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Let <span class="math inline">\(w^{*}\)</span> be the root, so <span class="math inline">\(g(w^{*})=0\)</span>, and write the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> with the noisy observation expanded: <span class="math display">\[
 w_{k+1}=w_{k}-\alpha_{k}\tilde{g}(w_{k},\eta_{k})=w_{k}-\alpha_{k}\big[g(w_{k})+\eta_{k}\big].
@@ -939,8 +908,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Notice where hypothesis 1 of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> was spent. The lower bound <span class="math inline">\(c_{1}&gt;0\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}=\infty\)</span> from collapsing, which is what stops the iteration stalling at a point where <span class="math inline">\(g\)</span> has gone flat; the upper bound <span class="math inline">\(c_{2}\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}^{2}\)</span> finite, which is what stops a steep <span class="math inline">\(g\)</span> from turning a small step into a large jump. The condition bounds the slope of <span class="math inline">\(g\)</span> away from zero and infinity.</p>
-<p>Notice also that <span class="math inline">\(\bar{\alpha}_{k}\)</span> depends on <span class="math inline">\(w_{k}'\)</span>, hence on the iterate, hence on the history. A version of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> requiring deterministic step sizes would not close this argument.</p>
+<p>The effective step <span class="math inline">\(\bar{\alpha}_{k}\)</span> depends on <span class="math inline">\(w_{k}'\)</span>, so the proof requires the history-dependent steps allowed by <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a>.</p>
 </div>
 </div>
 </section>
@@ -950,7 +918,7 @@ Note
 <ol type="1">
 <li><p><strong>Write mean estimation as root-finding.</strong> Define <span class="math display">\[
 g(w)=w-\E[X],
-\]</span> whose root is <span class="math inline">\(w^{*}=\E[X]\)</span>. Note we do <em>not</em> know the expression of <span class="math inline">\(g\)</span>: it contains the very quantity we are trying to estimate.</p></li>
+\]</span> whose root is <span class="math inline">\(w^{*}=\E[X]\)</span>. Its value is unknown because it contains the mean being estimated.</p></li>
 <li><p><strong>Identify the noisy observation.</strong> With a sample <span class="math inline">\(x\)</span> in hand we can evaluate <span class="math display">\[
 \tilde{g}(w,x)=w-x,
 \]</span> which is exactly <span class="math inline">\(g\)</span> plus zero-mean noise: <span class="math display">\[
@@ -974,10 +942,9 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Check the hypotheses hold here: <span class="math inline">\(\nabla_{w}g(w)=1\)</span>, so condition 1 is satisfied with <span class="math inline">\(c_{1}=c_{2}=1\)</span>; and <span class="math inline">\(\eta=\E[X]-x\)</span> has mean zero by construction, so condition 3 holds whenever <span class="math inline">\(X\)</span> has finite variance. Only condition 2 constrains the algorithm, and it is a constraint on the step sizes we choose, not on the problem.</p>
+<p>Check the hypotheses hold here: <span class="math inline">\(\nabla_{w}g(w)=1\)</span>, so condition 1 is satisfied with <span class="math inline">\(c_{1}=c_{2}=1\)</span>; and <span class="math inline">\(\eta=\E[X]-x\)</span> has mean zero by construction, so condition 3 holds whenever <span class="math inline">\(X\)</span> has finite variance. Condition 2 constrains the chosen step sizes.</p>
 </div>
 </div>
-<p>The figure compares step sizes that satisfy or violate condition 2.</p>
 <div id="cell-fig-2-step-size" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>One sample stream, three step-size rules, run through <span class="citation" data-cites="eq-mean-general">@eq-mean-general</span></summary>
@@ -1026,7 +993,16 @@ Note
 <img src="02-notes_files/figure-html/fig-2-step-size-output-1.png" width="543" height="417" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-step-size-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.2: The recursion <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> run on one shared stream of draws <span class="math inline">\(x_{k}\sim N(1,1)\)</span> from the same starting point <span class="math inline">\(w_{1}=5\)</span>, under three step-size rules. With <span class="math inline">\(\alpha_{k}=1/k\)</span> (thick) both parts of condition 2 hold and the path settles onto <span class="math inline">\(\E[X]\)</span>. With a <strong>constant</strong> <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\sum_{k}\alpha_{k}^{2}=\infty\)</span>, so the path never settles: it keeps fluctuating inside a band of width <span class="math inline">\(\sigma\sqrt{\alpha/(2-\alpha)}\)</span> (shaded), wider for larger <span class="math inline">\(\alpha\)</span>. The bargain of a constant step, exactly as described in Chapter 1: the estimate gives up convergence to a point in exchange for never going deaf.
+Figure 2.2: The recursion <span class="citation"
+data-cites="eq-mean-general"><a class="quarto-xref" href="#eq-mean-general">Equation <span>2.9</span></a></span> uses one stream of
+draws <span class="math inline">\(x_k\sim N(1,1)\)</span> and starts at
+<span class="math inline">\(w_1=5\)</span>. With <span
+class="math inline">\(\alpha_k=1/k\)</span> (thick), the estimate
+converges to <span class="math inline">\(\E[X]\)</span>. Constant steps
+retain fluctuations under this sampling noise. Shading marks one
+stationary standard deviation, <span
+class="math inline">\(\sigma\sqrt{\alpha/(2-\alpha)}\)</span>, on either
+side of the mean; larger steps give wider bands.
 </figcaption>
 </figure>
 </div>
@@ -1043,7 +1019,7 @@ J(w)=\E\big[f(w,X)\big]
 <div id="tbl-gd-variants" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-gd-variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2.3: Three ways down the same objective <a href="#eq-sgd-objective" class="quarto-xref">Equation&nbsp;<span>2.12</span></a>. Only the last is usable when samples arrive one at a time and the distribution is unknown.
+Table&nbsp;2.3: Gradient estimates for <a href="#eq-sgd-objective" class="quarto-xref">Equation&nbsp;<span>2.12</span></a>.
 </figcaption>
 <div aria-describedby="tbl-gd-variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1086,7 +1062,7 @@ w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k}).
 \tag{2.13}\]</span></span></p>
 <p>It replaces the true gradient with a noisy single-sample estimate. Its convergence follows from <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> under that theorem’s assumptions.</p>
 <div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: SGD is Robbins-Monro on the first-order condition">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1095,7 +1071,7 @@ w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k}).
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-21" class="callout-21-contents callout-collapse collapse show">
+<div id="callout-20" class="callout-20-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Minimizing <a href="#eq-sgd-objective" class="quarto-xref">Equation&nbsp;<span>2.12</span></a> means solving its first-order condition, which is a root-finding problem in the sense of the previous section: <span class="math display">\[
 g(w)\defeq\nabla_{w}J(w)=\E\big[\nabla_{w}f(w,X)\big]=0 ,
@@ -1110,20 +1086,7 @@ g(w)\defeq\nabla_{w}J(w)=\E\big[\nabla_{w}f(w,X)\big]=0 ,
 <div id="exm-mean-sgd" class="theorem example">
 <p><span class="theorem-title"><strong>Example 2.1 (Mean estimation is SGD)</strong></span> Take <span class="math inline">\(f(w,x)=\tfrac{1}{2}|w-x|^{2}\)</span>, so that <span class="math inline">\(J(w)=\tfrac{1}{2}\E|w-X|^{2}\)</span> is minimized at <span class="math inline">\(w^{*}=\E[X]\)</span>. Then <span class="math inline">\(\nabla_{w}f(w,x)=w-x\)</span>, and <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> reads <span class="math display">\[
 w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}),
-\]</span> which is <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> once more. Mean estimation is a special case of SGD, which is a special case of Robbins-Monro. All three are the same recursion seen at three levels of generality.</p>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Important
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The following chapters use <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> in two ways. Chapter 3 uses it to fit a parametric value function <span class="math inline">\(\hat{v}(s,w)\)</span> by descending the squared error, which is what turns tabular TD learning into TD learning with function approximation. Chapter 4 runs it in the other direction, as stochastic gradient <em>ascent</em> on the value of a parameterized policy, which is what policy gradient methods are.</p>
-</div>
+\]</span> which is <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> once more. Mean estimation is a special case of SGD, which is a special case of Robbins-Monro.</p>
 </div>
 
 

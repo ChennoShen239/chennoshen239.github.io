@@ -322,25 +322,18 @@ window.Quarto = {
 </header>
 
 
-<p>The calculus of variations is the classical entry point to dynamic optimization. Where differential calculus studies how a <em>function of numbers</em> changes when its argument is perturbed, the calculus of variations studies how a <strong>functional</strong>, a number assigned to a whole <em>function</em>, changes when that function is perturbed. The decision variable is an entire path <span class="math inline">\(x(\cdot)\)</span>, and we ask which path makes an integral</p>
+<p>The calculus of variations chooses a path <span class="math inline">\(x(\cdot)\)</span> to maximize the functional</p>
 <p><span class="math display">\[
 J[x] \;=\; \int_0^T F\bigl(t,\,x(t),\,\dot x(t)\bigr)\,\mathrm{d}t
 \]</span></p>
-<p>as large as possible.</p>
 <p>The subject grew out of three eighteenth-century problems, the <strong>brachistochrone</strong> (the curve of fastest descent), the <strong>catenary</strong> (the shape of a hanging chain, equivalently the minimal surface of revolution), and the <strong>isoperimetric</strong> problem (maximal area for given perimeter). Euler and Lagrange turned these puzzles into a method; in the twentieth century Pontryagin and Rockafellar extended it into optimal control. Its first economic uses were Ramsey’s theory of saving <span class="citation" data-cites="ramsey1928">(<a href="references.html#ref-ramsey1928" role="doc-biblioref">Ramsey 1928</a>)</span> and Hotelling’s theory of exhaustible resources <span class="citation" data-cites="hotelling1931">(<a href="references.html#ref-hotelling1931" role="doc-biblioref">Hotelling 1931</a>)</span>, both of which reappear below.</p>
-<p>Two necessary conditions organize the whole chapter:</p>
-<ul>
-<li>the <strong>Euler equation</strong>, a <em>local</em> condition: an optimal path cannot be improved by a small bump at any interior instant while the endpoints are held fixed;</li>
-<li>the <strong>transversality condition (TVC)</strong>, a <em>boundary</em> condition: at any free endpoint the optimal path must leave (or arrive) in a particular direction.</li>
-</ul>
-<p>Sufficient conditions are weaker and rest on concavity; we treat them in <a href="#sec-cov-sufficiency" class="quarto-xref"><span>Section 3.3</span></a>.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p><strong>Reduction of the Bolza problem.</strong> We treat only the <em>standard</em> problem with integrand <span class="math inline">\(F(t,x,\dot x)\)</span>, because a Bolza problem, one carrying an extra terminal <em>salvage</em> term <span class="math inline">\(G\bigl(T,x(T)\bigr)\)</span>, reduces to it whenever <span class="math inline">\(x(0)\)</span> is fixed and <span class="math inline">\(G\)</span> is smooth. Indeed <span class="math display">\[
+<p><strong>Reduction of the Bolza problem.</strong> A terminal salvage term <span class="math inline">\(G\bigl(T,x(T)\bigr)\)</span> can be absorbed into the integrand when <span class="math inline">\(x(0)\)</span> is fixed and <span class="math inline">\(G\)</span> is smooth: <span class="math display">\[
 \int_0^T F\,\mathrm{d}t + G\bigl(T,x(T)\bigr)
 = \int_0^T\Bigl(F + \tfrac{\mathrm{d}}{\mathrm{d}t}G\Bigr)\mathrm{d}t + G\bigl(0,x(0)\bigr)
 = \int_0^T\bigl(F + G_t + G_x\dot x\bigr)\mathrm{d}t + \text{const},
@@ -367,7 +360,7 @@ J[x] \;=\; \int_0^T F\bigl(t,\,x(t),\,\dot x(t)\bigr)\,\mathrm{d}t
 \qquad
 0\ge\frac{\mathrm{d}^2}{\mathrm{d}\varepsilon^2}f(x_0+\varepsilon y)\Big|_{0}=y^\top\nabla^2 f(x_0)\,y,
 \]</span></p>
-<p>giving <span class="math inline">\(\nabla f(x_0)=0\)</span> and <span class="math inline">\(\nabla^2 f(x_0)\)</span> negative semidefinite. Transplanting this idea to paths is <strong>Lagrange’s method</strong>, our first derivation of the Euler equation.</p>
+<p>giving <span class="math inline">\(\nabla f(x_0)=0\)</span> and a negative-semidefinite Hessian. Applying the same directional perturbations to paths gives <strong>Lagrange’s method</strong>.</p>
 <section id="sec-euler" class="level3">
 <h3 class="anchored" data-anchor-id="sec-euler">The Euler equation</h3>
 <div id="thm-euler" class="theorem">
@@ -416,7 +409,6 @@ F_x = F_{t\dot x} + F_{x\dot x}\,\dot x + F_{\dot x\dot x}\,\ddot x,
 </div>
 </div>
 </div>
-<p>A second, more economic derivation makes the “no local improvement” idea explicit.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -507,12 +499,11 @@ J[y]-J[x]=\int_{t_0+\delta t_0}^{t_1+\delta t_1}\!\!F(t,y,\dot y)\,\mathrm{d}t-\
 \tag{3.11}\]</span></span></p>
 <p>where the <strong>endpoint variations</strong> of the path value are <span class="math display">\[
 \delta x_i=h(t_i)+\dot x(t_i)\,\delta t_i,\qquad i=0,1,
-\]</span> the difference between the perturbed path’s endpoint and the original’s. Equation <a href="#eq-first-variation" class="quarto-xref">Equation&nbsp;<span>3.11</span></a> is the master formula of the chapter: optimality requires <span class="math inline">\(\delta J\le0\)</span> for all admissible variations, and <em>both</em> the Euler equation and every transversality condition fall out of it.</p>
+\]</span> the displacement of each endpoint. Optimality requires <span class="math inline">\(\delta J\le0\)</span> for all admissible variations.</p>
 <p>Indeed, restricting first to variations that fix the time interval and the endpoint values (so all bracketed terms vanish) returns the interior condition <span class="math inline">\(\int(F_x-\frac{\mathrm d}{\mathrm dt}F_{\dot x})h\le0\)</span> and hence <a href="#eq-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a>. <em>Given</em> the Euler equation, the integral term drops and, with the initial point fixed, optimality reduces to</p>
 <p><span id="eq-tvc-master"><span class="math display">\[
 \delta J=(F-\dot xF_{\dot x})\big|_{t_1}\delta t_1+F_{\dot x}\big|_{t_1}\delta x_1\le 0 .
 \tag{3.12}\]</span></span></p>
-<p>Reading <a href="#eq-tvc-master" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> off for each type of free terminal yields the transversality conditions.</p>
 </section>
 <section id="transversality-conditions" class="level3">
 <h3 class="anchored" data-anchor-id="transversality-conditions">Transversality conditions</h3>
@@ -564,12 +555,11 @@ J[y]-J[x]=\int_{t_0+\delta t_0}^{t_1+\delta t_1}\!\!F(t,y,\dot y)\,\mathrm{d}t-\
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>Each line specializes <a href="#eq-tvc-master" class="quarto-xref">Equation&nbsp;<span>3.12</span></a>. <em>Terminal on a curve <span class="math inline">\(\varphi\)</span>, <span class="math inline">\(T\)</span> free:</em> the endpoint must track the curve, so <span class="math inline">\(\delta x(T)=\dot\varphi(T)\,\delta T\)</span> and <span class="math inline">\(\delta J=\bigl(F+(\dot\varphi-\dot x)F_{\dot x}\bigr)\big|_T\,\delta T\)</span>; since <span class="math inline">\(\delta T\)</span> is a free real, its coefficient must vanish. <em>Inequality terminal <span class="math inline">\(x(T)\ge x_1\)</span>, <span class="math inline">\(T\)</span> fixed:</em> now <span class="math inline">\(\delta x(T)\ge0\)</span> when <span class="math inline">\(x(T)=x_1\)</span> binds and is free otherwise, so <span class="math inline">\(F_{\dot x}\big|_T\delta x(T)\le0\)</span> for all admissible <span class="math inline">\(\delta x(T)\)</span> gives <span class="math inline">\(F_{\dot x}\big|_T\le 0\)</span> with complementary slackness, the variational KKT condition. The mixed-sign cases (<span class="math inline">\(T\le t_1\)</span>) follow identically, the one-sided constraint on <span class="math inline">\(\delta T\)</span> producing the inequality. <span class="math inline">\(\;\blacksquare\)</span></p>
 </div>
-<p>The geometric content is sharpest in the two classic distance problems.</p>
 <div id="exm-point-line" class="theorem example">
 <p><span class="theorem-title"><strong>Example 3.5 (Shortest distance from a point to a line)</strong></span> Minimize <span class="math inline">\(\int_0^1\sqrt{1+\dot x^2}\,\mathrm{d}t\)</span> with <span class="math inline">\(x(0)=0\)</span> and <span class="math inline">\(x(1)\)</span> free (the terminal lies anywhere on the vertical line <span class="math inline">\(t=1\)</span>). By Case IV the stationary path is a line <span class="math inline">\(x=ct\)</span>, and the free-terminal TVC <span class="math inline">\(F_{\dot x}\big|_{t=1}=0\)</span> gives <span class="math inline">\(c/\sqrt{1+c^2}=0\)</span>, i.e.&nbsp;<span class="math inline">\(c=0\)</span>. So the optimal path is <span class="math inline">\(x\equiv0\)</span>: Euler makes it straight, and transversality makes it hit the line <em>perpendicularly</em>.</p>
 </div>
 <div id="exm-point-curve" class="theorem example">
-<p><span class="theorem-title"><strong>Example 3.6 (Shortest distance from a point to the curve <span class="math inline">\(xy=1\)</span>)</strong></span> Minimize <span class="math inline">\(\int_0^T\sqrt{1+\dot x^2}\,\mathrm{d}t\)</span> from the origin to the curve <span class="math inline">\(x(T)=1/T\)</span>, with <span class="math inline">\(T\)</span> free (work in the first quadrant by symmetry). The stationary path is again a line <span class="math inline">\(x=ct\)</span> through the origin, and the terminal-on-a-curve TVC with <span class="math inline">\(\varphi(t)=1/t\)</span> gives, after simplification, <span class="math inline">\(c=T^2\)</span>; combined with <span class="math inline">\(cT=1/T\)</span> this yields <span class="math inline">\(c=T=1\)</span> and the path <span class="math inline">\(x=t\)</span>, at distance <span class="math inline">\(\sqrt2\)</span>, exactly the elementary answer (the nearest point is <span class="math inline">\((1,1)\)</span>). Because <span class="math inline">\(F=\sqrt{1+\dot x^2}\)</span> is convex in <span class="math inline">\((x,\dot x)\)</span>, the value <span class="math inline">\(V(T)=\sqrt{T^2+T^{-2}}\)</span> of the <span class="math inline">\(T\)</span>-fixed problem is minimized at <span class="math inline">\(T=1\)</span>, confirming global optimality.</p>
+<p><span class="theorem-title"><strong>Example 3.6 (Shortest distance from a point to the curve <span class="math inline">\(xy=1\)</span>)</strong></span> Minimize <span class="math inline">\(\int_0^T\sqrt{1+\dot x^2}\,\mathrm{d}t\)</span> from the origin to the curve <span class="math inline">\(x(T)=1/T\)</span>, with <span class="math inline">\(T\)</span> free (work in the first quadrant by symmetry). The stationary path is again a line <span class="math inline">\(x=ct\)</span> through the origin, and the terminal-on-a-curve TVC with <span class="math inline">\(\varphi(t)=1/t\)</span> gives, after simplification, <span class="math inline">\(c=T^2\)</span>; combined with <span class="math inline">\(cT=1/T\)</span> this yields <span class="math inline">\(c=T=1\)</span> and the path <span class="math inline">\(x=t\)</span>, at distance <span class="math inline">\(\sqrt2\)</span>, with nearest point <span class="math inline">\((1,1)\)</span>. Because <span class="math inline">\(F=\sqrt{1+\dot x^2}\)</span> is convex in <span class="math inline">\((x,\dot x)\)</span>, the value <span class="math inline">\(V(T)=\sqrt{T^2+T^{-2}}\)</span> of the <span class="math inline">\(T\)</span>-fixed problem is minimized at <span class="math inline">\(T=1\)</span>, confirming global optimality.</p>
 </div>
 </section>
 <section id="further-generalizations" class="level3">
@@ -629,7 +619,6 @@ x-a=b(\varphi-\sin\varphi),\qquad y-\alpha=b(1-\cos\varphi).
 </div>
 </div>
 </div>
-<p>The argument uses a path-independent integral, analogous to a conservative line integral.</p>
 <div id="thm-hilbert" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 3.4 (Hilbert invariant integral)</strong></span> In a field of extremals with slope <span class="math inline">\(p(x,y)\)</span>, the line integral <span class="math display">\[
 I^\ast[C]=\int_{C}\Bigl[\bigl(F-pF_{\dot y}\bigr)\big|_{(x,y,p)}\,\mathrm{d}x+F_{\dot y}\big|_{(x,y,p)}\,\mathrm{d}y\Bigr]
@@ -651,11 +640,11 @@ I[C]-I[E]=\int_C F(x,y,\dot y)\,\mathrm{d}x-\int_C\bigl[(F-pF_{\dot y})\,\mathrm
 =\int_C\bigl[F(x,y,\dot y)-F(x,y,p)-(\dot y-p)F_{\dot y}(x,y,p)\bigr]\mathrm{d}x,
 \]</span> using <span class="math inline">\(\mathrm{d}y=\dot y\,\mathrm{d}x\)</span> along <span class="math inline">\(C\)</span>. This is <span class="math inline">\(\int_C\mathcal{E}\,\mathrm{d}x\)</span>, and convexity of <span class="math inline">\(F\)</span> in <span class="math inline">\(\dot y\)</span> makes <span class="math inline">\(\mathcal{E}\ge0\)</span> (it is the gap between <span class="math inline">\(F\)</span> and its tangent in <span class="math inline">\(\dot y\)</span> at <span class="math inline">\(p\)</span>). <span class="math inline">\(\;\blacksquare\)</span></p>
 </div>
-<p>For the brachistochrone the excess function takes a transparent geometric form. Writing the action as <span class="math inline">\(I[C]=\int_C \mathrm{d}s/\sqrt{y-\alpha}\)</span> (dropping <span class="math inline">\(1/\sqrt{2g}\)</span>) and letting <span class="math inline">\(\theta\)</span> be the angle at <span class="math inline">\(M\)</span> between the competitor <span class="math inline">\(C\)</span> and the field direction, the Hilbert integral evaluates to <span class="math inline">\(I^\ast[C]=\int_C \cos\theta\,\mathrm{d}s/\sqrt{y-\alpha}\)</span>, so</p>
+<p>For the brachistochrone, write the action as <span class="math inline">\(I[C]=\int_C \mathrm{d}s/\sqrt{y-\alpha}\)</span> (dropping <span class="math inline">\(1/\sqrt{2g}\)</span>) and letting <span class="math inline">\(\theta\)</span> be the angle at <span class="math inline">\(M\)</span> between the competitor <span class="math inline">\(C\)</span> and the field direction, the Hilbert integral evaluates to <span class="math inline">\(I^\ast[C]=\int_C \cos\theta\,\mathrm{d}s/\sqrt{y-\alpha}\)</span>, so</p>
 <p><span id="eq-brachisto-excess"><span class="math display">\[
 I[C]-I[E]=\int_{C}\frac{1-\cos\theta}{\sqrt{\,y-\alpha\,}}\;\mathrm{d}s\;\ge\;0,
 \tag{3.17}\]</span></span></p>
-<p>with equality only when <span class="math inline">\(\cos\theta\equiv1\)</span>, that is, when <span class="math inline">\(C\)</span> is everywhere tangent to the field and hence <em>is</em> the cycloid <span class="math inline">\(E\)</span> <span class="citation" data-cites="xie2009">(<a href="references.html#ref-xie2009" role="doc-biblioref">Xie 2009</a>)</span>. The cycloid is therefore the strict minimizer: every other descent path is slower (<a href="#fig-brachisto" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>).</p>
+<p>with equality only when <span class="math inline">\(\cos\theta\equiv1\)</span>, that is, when <span class="math inline">\(C\)</span> is everywhere tangent to the field and hence <em>is</em> the cycloid <span class="math inline">\(E\)</span> <span class="citation" data-cites="xie2009">(<a href="references.html#ref-xie2009" role="doc-biblioref">Xie 2009</a>)</span>. Thus <span class="math inline">\(E\)</span> is the strict minimizer among admissible curves in the field (<a href="#fig-brachisto" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>).</p>
 <div id="fig-brachisto" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-brachisto-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -669,11 +658,11 @@ Figure&nbsp;3.2: The cycloid through <span class="math inline">\(A\)</span> and 
 </section>
 <section id="infinite-horizon-problems" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="infinite-horizon-problems"><span class="header-section-number">3.5</span> Infinite-horizon problems</h2>
-<p>Most economic problems run forever. The infinite-horizon problem</p>
+<p>The infinite-horizon problem</p>
 <p><span id="eq-infinite"><span class="math display">\[
 \max_x\ \int_0^\infty F(t,x,\dot x)\,\mathrm{d}t,\qquad x(0)=x_0,
 \tag{3.18}\]</span></span></p>
-<p>requires first that admissible paths make the integral <strong>converge</strong>. The interior condition is unchanged, the optimal path still solves the Euler equation <a href="#eq-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a>, but the boundary condition now lives “at infinity”, and <em>which</em> limit form holds (<span class="math inline">\(F_{\dot x}\big|_\infty=0\)</span>, <span class="math inline">\((F-\dot xF_{\dot x})\big|_\infty=0\)</span>, or <span class="math inline">\(xF_{\dot x}\big|_\infty=0\)</span>) is genuinely subtle and was settled only later <span class="citation" data-cites="michel1982 kamihigashi2001">(<a href="references.html#ref-michel1982" role="doc-biblioref">Michel 1982</a>; <a href="references.html#ref-kamihigashi2001" role="doc-biblioref">Kamihigashi 2001</a>)</span>.</p>
+<p>requires first that admissible paths make the integral <strong>converge</strong>. The interior condition is unchanged, the optimal path still solves the Euler equation <a href="#eq-euler" class="quarto-xref">Equation&nbsp;<span>3.2</span></a>, but the boundary condition depends on the admissible tails. Alternative limit forms include <span class="math inline">\(F_{\dot x}\big|_\infty=0\)</span>, <span class="math inline">\((F-\dot xF_{\dot x})\big|_\infty=0\)</span>, and <span class="math inline">\(xF_{\dot x}\big|_\infty=0\)</span> <span class="citation" data-cites="michel1982 kamihigashi2001">(<a href="references.html#ref-michel1982" role="doc-biblioref">Michel 1982</a>; <a href="references.html#ref-kamihigashi2001" role="doc-biblioref">Kamihigashi 2001</a>)</span>.</p>
 <p>The workhorse case is the <strong>autonomous discounted</strong> problem <span id="eq-autonomous"><span class="math display">\[
 \max_x\ \int_0^\infty e^{-\rho t}F(x,\dot x)\,\mathrm{d}t,\qquad x(0)=x_0,\ \rho&gt;0,
 \tag{3.19}\]</span></span> whose Euler equation is the second-order autonomous system <span id="eq-euler-autonomous"><span class="math display">\[
@@ -686,7 +675,6 @@ F_x=-\rho F_{\dot x}+F_{x\dot x}\dot x+F_{\dot x\dot x}\ddot x,
 x(t)=(x_0-\bar x)e^{r_2 t}+\bar x,\qquad \dot x=r_2(x-\bar x).
 \]</span> The optimum is an <strong>adjustment path</strong>: <span class="math inline">\(x\)</span> approaches <span class="math inline">\(\bar x\)</span> at a rate proportional to the remaining gap. (Both candidate TVCs hold along it, and <a href="#thm-cov-suff-infinite" class="quarto-xref">Theorem&nbsp;<span>3.6</span></a> below confirms optimality.) Contrast <span class="math inline">\(\max\int_0^\infty(2x-x^2-\dot x-\dot x^2)\,\mathrm{d}t\)</span>, <span class="math inline">\(x(0)=2\)</span>: its only Euler-and-finiteness candidate <span class="math inline">\(x=e^{-t}+1\)</span> makes the integral <em>diverge</em>, so that problem has <strong>no</strong> solution: convergence is required for feasibility.</p>
 </div>
-<p>A sufficiency theorem adapted to the infinite horizon closes the necessary–sufficient gap.</p>
 <div id="thm-cov-suff-infinite" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 3.6 (Infinite-horizon sufficiency)</strong></span> Let <span class="math inline">\(F\)</span> be concave in <span class="math inline">\((x,\dot x)\)</span> and let <span class="math inline">\(x\)</span> satisfy the Euler equation. If, for every admissible <span class="math inline">\(y\)</span>, <span class="math display">\[
 \liminf_{t\to\infty}F_{\dot x}\bigl(t,x,\dot x\bigr)\bigl(y(t)-x(t)\bigr)\le0,
@@ -751,20 +739,10 @@ Figure&nbsp;3.4: The most rapid approach path (red) for <a href="#exm-mrap" clas
 </figcaption>
 </figure>
 </div>
-<div class="callout callout-style-simple callout-note">
-<div class="callout-body d-flex">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-body-container">
-<p><strong>The turnpike metaphor.</strong> To drive from <span class="math inline">\(A\)</span> to <span class="math inline">\(B\)</span> you get onto the motorway as fast as you can, cruise, and exit as near <span class="math inline">\(B\)</span> as possible. The cruising road <span class="math inline">\(x\equiv x_s\)</span> is itself infeasible unless you start on it; <em>turnpike theorems</em>, pervasive in growth and resource economics, formalize exactly this “rush to the turnpike” structure.</p>
-</div>
-</div>
-</div>
 </section>
 <section id="other-forms-of-constraint" class="level2" data-number="3.7">
 <h2 data-number="3.7" class="anchored" data-anchor-id="other-forms-of-constraint"><span class="header-section-number">3.7</span> Other forms of constraint</h2>
-<p>Side constraints are handled by an <strong>Euler–Lagrange</strong> equation built from a Lagrangian <span class="math inline">\(L=F+\sum_k\lambda_k g_k\)</span>. Whether a solution of it solves the <em>optimization</em> problem must, as always, be checked by concavity or by the problem’s economic meaning.</p>
+<p>Side constraints are handled by an <strong>Euler–Lagrange</strong> equation built from a Lagrangian <span class="math inline">\(L=F+\sum_k\lambda_k g_k\)</span>. Optimality requires a sufficiency argument.</p>
 <p><strong>Equality constraints</strong> <span class="math inline">\(g_k(t,x)=0\)</span> (<span class="math inline">\(k=1,\dots,m&lt;n\)</span>, independent) introduce multiplier <em>functions</em> <span class="math inline">\(\lambda_k(t)\)</span>, and the system <span class="math inline">\(L_{x_k}=\frac{\mathrm{d}}{\mathrm{d}t}L_{\dot x_k}\)</span> holds alongside <span class="math inline">\(g_k=0\)</span>. <strong>Differential-equation constraints</strong> <span class="math inline">\(g_k(t,x,\dot x)=0\)</span> are handled identically. <strong>Inequality constraints</strong> <span class="math inline">\(g_k(t,x,\dot x)\ge0\)</span> bring <em>non-negative</em> multipliers <span class="math inline">\(\lambda_k\ge0\)</span> with complementary slackness <span class="math inline">\(\lambda_k g_k=0\)</span>, the variational KKT system.</p>
 <p><strong>Integral (isoperimetric) constraints</strong> <span class="math inline">\(\int_0^T G_k\,\mathrm{d}t=c_k\)</span> reduce to ODE constraints by defining <span class="math inline">\(y_k(t)=\int_0^t G_k\)</span> with <span class="math inline">\(y_k(0)=0,\ y_k(T)=c_k\)</span>; the resulting Euler–Lagrange equations show each multiplier is a <strong>constant</strong>, so one may simply form <span class="math inline">\(L=F-\sum_k\lambda_kG_k\)</span> with constant <span class="math inline">\(\lambda_k\)</span> and solve.</p>
 <div id="exm-isoperimetric" class="theorem example">
@@ -819,11 +797,11 @@ x(t)=\frac{\rho B}{1-e^{-\rho T}}\,e^{-\rho t}.
 <p><em>Multiplier method.</em> Both functionals depend on <span class="math inline">\(x\)</span> only, so with <span class="math inline">\(L=e^{-\rho t}x-\lambda\sqrt x\)</span> the Euler–Lagrange equation is the pointwise <span class="math inline">\(e^{-\rho t}-\lambda/(2\sqrt x)=0\)</span>, giving <span class="math inline">\(\sqrt x=\tfrac{\lambda}{2}e^{\rho t}\)</span>. The constraint <span class="math inline">\(\int_0^1\sqrt x\,\mathrm{d}t=1\)</span> fixes <span class="math inline">\(\lambda=\dfrac{2\rho}{e^{\rho}-1}\)</span>, so <span class="math display">\[
 x(t)=\Bigl(\frac{\rho}{e^{\rho}-1}\Bigr)^2 e^{2\rho t}.
 \]</span></p>
-<p><em>Substitution method.</em> With <span class="math inline">\(y(t)=\int_0^t\sqrt x\)</span>, <span class="math inline">\(\dot y=\sqrt x\)</span>, so <span class="math inline">\(x=\dot y^2\)</span>, <span class="math inline">\(y(0)=0,\ y(1)=1\)</span>, and the problem becomes <span class="math inline">\(\min\int_0^1e^{-\rho t}\dot y^2\,\mathrm{d}t\)</span>. This is Case I: <span class="math inline">\(F_{\dot y}=2e^{-\rho t}\dot y\)</span> is constant, so <span class="math inline">\(\dot y=\tfrac{\kappa}{2}e^{\rho t}\)</span>, and <span class="math inline">\(y(1)-y(0)=1\)</span> gives <span class="math inline">\(\kappa=\dfrac{2\rho}{e^{\rho}-1}\)</span>. Then <span class="math inline">\(x=\dot y^2\)</span> reproduces the same answer, a useful check that the multiplier and substitution routes agree.</p>
+<p><em>Substitution method.</em> With <span class="math inline">\(y(t)=\int_0^t\sqrt x\)</span>, <span class="math inline">\(\dot y=\sqrt x\)</span>, so <span class="math inline">\(x=\dot y^2\)</span>, <span class="math inline">\(y(0)=0,\ y(1)=1\)</span>, and the problem becomes <span class="math inline">\(\min\int_0^1e^{-\rho t}\dot y^2\,\mathrm{d}t\)</span>. This is Case I: <span class="math inline">\(F_{\dot y}=2e^{-\rho t}\dot y\)</span> is constant, so <span class="math inline">\(\dot y=\tfrac{\kappa}{2}e^{\rho t}\)</span>, and <span class="math inline">\(y(1)-y(0)=1\)</span> gives <span class="math inline">\(\kappa=\dfrac{2\rho}{e^{\rho}-1}\)</span>. Then <span class="math inline">\(x=\dot y^2\)</span> gives the same solution.</p>
 <p>The remaining problems are left as practice; 13–15 are MRAP problems solved exactly as in <a href="#exm-mrap" class="quarto-xref">Example&nbsp;<span>3.8</span></a> (note the cautionary tail-condition failure flagged in 15), and 7–8 are free-terminal problems handled by the TVCs of <a href="#thm-tvc" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a>.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-hotelling1931" class="csl-entry" role="listitem">
 Hotelling, Harold. 1931. <span>“The Economics of Exhaustible Resources.”</span> <em>Journal of Political Economy</em> 39 (2): 137–75.
 </div>

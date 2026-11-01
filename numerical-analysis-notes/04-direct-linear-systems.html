@@ -262,7 +262,6 @@ window.Quarto = {
   </ul></li>
   <li><a href="#tridiagonal-systems" id="toc-tridiagonal-systems" class="nav-link" data-scroll-target="#tridiagonal-systems"><span class="header-section-number">4.7</span> Tridiagonal systems</a></li>
   <li><a href="#conditioning-of-a-linear-system" id="toc-conditioning-of-a-linear-system" class="nav-link" data-scroll-target="#conditioning-of-a-linear-system"><span class="header-section-number">4.8</span> Conditioning of a linear system</a></li>
-  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">4.9</span> Chapter summary</a></li>
   </ul>
 </nav>
     </div>
@@ -316,12 +315,12 @@ window.Quarto = {
 \newcommand{\defeq}{:=}
 \]</span></p>
 </div>
-<p>Linear systems <span class="math inline">\(Ax=b\)</span> occur in many numerical problems: the tridiagonal system for the cubic spline of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a>, the normal equations of least squares (<a href="06-approximation-theory.html" class="quarto-xref"><span>Chapter 6</span></a>), the Jacobian solve inside an implicit ODE step (<a href="03-ivp-odes.html" class="quarto-xref"><span>Chapter 3</span></a>). This chapter develops the <em>direct</em> methods, those that produce the exact answer in finitely many arithmetic operations, up to round-off, starting from Gaussian elimination and refining it into the factorizations (<span class="math inline">\(PA=LU\)</span>, Cholesky, tridiagonal <span class="math inline">\(LU\)</span>) that make solving fast, reusable, and, with pivoting, numerically safe. The <em>iterative</em> methods, which trade exactness for cheap approximate solves on large sparse systems, are the subject of <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a>.</p>
+<p>Linear systems <span class="math inline">\(Ax=b\)</span> occur in many numerical problems: the tridiagonal system for the cubic spline of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a>, the normal equations of least squares (<a href="06-approximation-theory.html" class="quarto-xref"><span>Chapter 6</span></a>), the Jacobian solve inside an implicit ODE step (<a href="03-ivp-odes.html" class="quarto-xref"><span>Chapter 3</span></a>). <strong>Direct methods</strong> solve the system in finitely many arithmetic operations, up to round-off. For iterative methods on large sparse systems, see <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a>.</p>
 <p>Throughout, <span class="math inline">\(A=(a_{ij})\in\R^{n\times n}\)</span> is the coefficient matrix, <span class="math inline">\(b\in\R^n\)</span> the right-hand side, and <span class="math inline">\(x\in\R^n\)</span> the unknown, with row <span class="math inline">\(j\)</span> of <span class="math inline">\(A\)</span> standing for the equation <span class="math inline">\(E_j\)</span> and column <span class="math inline">\(k\)</span> for the variable <span class="math inline">\(x_k\)</span>.</p>
 <section id="gaussian-elimination" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="gaussian-elimination"><span class="header-section-number">4.1</span> Gaussian elimination</h2>
-<p>The schoolbook method for a linear system uses two elementary operations that leave the solution set unchanged: adding a multiple of one equation to another, <span class="math inline">\((E_i+\lambda E_j)\to (E_i)\)</span>, and swapping two equations, <span class="math inline">\((E_i)\leftrightarrow(E_j)\)</span>. Gaussian elimination applies the first systematically to drive the system to upper-triangular form, which is then solved by back-substitution.</p>
-<p>Take the <span class="math inline">\(2\times2\)</span> case to fix the pattern. With <span class="math inline">\(a_{11}\ne 0\)</span>, the multiplier <span class="math inline">\(\ell=a_{21}/a_{11}\)</span> makes <span class="math inline">\((E_2-\ell E_1)\to(E_2)\)</span> eliminate <span class="math inline">\(x_1\)</span>: <span class="math display">\[
+<p>Two elementary row operations preserve the solution set: adding a multiple of one equation to another, <span class="math inline">\((E_i+\lambda E_j)\to (E_i)\)</span>, and swapping two equations, <span class="math inline">\((E_i)\leftrightarrow(E_j)\)</span>. Gaussian elimination applies the first systematically to drive the system to upper-triangular form, which is then solved by back-substitution.</p>
+<p>For a <span class="math inline">\(2\times2\)</span> system with <span class="math inline">\(a_{11}\ne 0\)</span>, the multiplier <span class="math inline">\(\ell=a_{21}/a_{11}\)</span> makes <span class="math inline">\((E_2-\ell E_1)\to(E_2)\)</span> eliminate <span class="math inline">\(x_1\)</span>: <span class="math display">\[
 a_{22}\leftarrow a_{22}-\ell\,a_{12},\qquad b_2\leftarrow b_2-\ell\,b_1,
 \]</span> after which the system is triangular and <span class="math display">\[
 x_2=\frac{b_2}{a_{22}},\qquad x_1=\frac{b_1-a_{12}x_2}{a_{11}}.
@@ -350,11 +349,11 @@ x_s=\frac{b_s-\sum_{k=s+1}^{n}a_{sk}x_k}{a_{ss}}.
 E_1&amp;: x_1 - x_2 + 2x_3 - x_4 = -8, &amp; E_2&amp;: 2x_1 - 2x_2 + 3x_3 - 3x_4 = -20,\\
 E_3&amp;: x_1 + x_2 + x_3 = -2,        &amp; E_4&amp;: x_1 - x_2 + 4x_3 + 3x_4 = 4,
 \end{aligned}
-\]</span> after eliminating <span class="math inline">\(x_1\)</span> leaves <span class="math inline">\(E_2\)</span> in the form <span class="math inline">\(-x_3-x_4=(\cdots)\)</span> with <strong>no</strong> <span class="math inline">\(x_2\)</span> term: the pivot in column <span class="math inline">\(2\)</span> is zero. Swapping <span class="math inline">\(E_2\leftrightarrow E_3\)</span> brings a nonzero coefficient into the pivot position, and elimination continues to the solution <span class="math inline">\(x=(-7,3,2,2)^\top\)</span>. Pivoting determines which row to swap into the pivot position.</p>
+\]</span> after eliminating <span class="math inline">\(x_1\)</span> leaves <span class="math inline">\(E_2\)</span> in the form <span class="math inline">\(-x_3-x_4=(\cdots)\)</span> with <strong>no</strong> <span class="math inline">\(x_2\)</span> term: the pivot in column <span class="math inline">\(2\)</span> is zero. Swapping <span class="math inline">\(E_2\leftrightarrow E_3\)</span> permits elimination to continue, giving <span class="math inline">\(x=(-7,3,2,2)^\top\)</span>.</p>
 </section>
 <section id="partial-and-complete-pivoting" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="partial-and-complete-pivoting"><span class="header-section-number">4.2</span> Partial and complete pivoting</h2>
-<p>Even when <span class="math inline">\(a_{ss}\ne 0\)</span>, a <em>small</em> pivot is dangerous. Dividing by a pivot close to zero amplifies the round-off already present in the entries above it, and the computed solution can be badly wrong even though the system is well posed (<a href="#fig-4-pivot-vs-cond" class="quarto-xref">Figure&nbsp;<span>4.4</span></a> makes this failure, and its cure, quantitative). The cure is to swap into the pivot position the equation with the largest available coefficient.</p>
+<p>Even when <span class="math inline">\(a_{ss}\ne 0\)</span>, a <em>small</em> pivot is dangerous. Dividing by a pivot close to zero amplifies the round-off already present in the entries above it, and the computed solution can be badly wrong even though the system is well posed (<a href="#fig-4-pivot-vs-cond" class="quarto-xref">Figure&nbsp;<span>4.4</span></a>).</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -410,7 +409,7 @@ Figure&nbsp;4.1: Maximum residual <span class="math inline">\(\max_i\abs{r_i}\)<
 </div>
 <p><strong>Complete pivoting</strong> removes even this worst-case growth by searching the entire remaining submatrix, not just one column: choose <span class="math display">\[
 (\mathrm{ip},\mathrm{jp})\defeq\argmax_{s\le i,j\le n}\abs{a_{ij}},
-\]</span> swap row <span class="math inline">\(s\leftrightarrow \mathrm{ip}\)</span> <em>and</em> column <span class="math inline">\(s\leftrightarrow \mathrm{jp}\)</span> (the column swap permutes the unknowns and must be undone at the end), then eliminate. Searching an <span class="math inline">\((n-s+1)^2\)</span> block at every stage costs <span class="math inline">\(\bigO(n^3)\)</span> comparisons overall, comparable to the arithmetic itself, so complete pivoting is generally too expensive to be worthwhile. In practice partial pivoting is the default, with the Wilkinson example standing as a reminder that “stable in practice” is not the same as “provably stable.”</p>
+\]</span> swap row <span class="math inline">\(s\leftrightarrow \mathrm{ip}\)</span> <em>and</em> column <span class="math inline">\(s\leftrightarrow \mathrm{jp}\)</span> (the column swap permutes the unknowns and must be undone at the end), then eliminate. Searching an <span class="math inline">\((n-s+1)^2\)</span> block at every stage costs <span class="math inline">\(\bigO(n^3)\)</span> comparisons overall, comparable to the arithmetic itself, so complete pivoting is generally too expensive to be worthwhile. Partial pivoting is the usual choice.</p>
 </section>
 <section id="cost-of-gaussian-elimination" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="cost-of-gaussian-elimination"><span class="header-section-number">4.3</span> Cost of Gaussian elimination</h2>
@@ -425,8 +424,7 @@ Figure&nbsp;4.1: Maximum residual <span class="math inline">\(\max_i\abs{r_i}\)<
 \sum_{s=1}^{n-1} 2(n-s)^2=2\sum_{m=1}^{n-1} m^2=2\cdot\frac{(n-1)n(2n-1)}{6}=\frac23 n^3+\bigO(n^2),
 \]</span> using <span class="math inline">\(\sum_{k=1}^{N}k^2=\tfrac16 N(N+1)(2N+1)\)</span>. The multiplier and right-hand-side work, <span class="math inline">\(\sum_s (n-s)\)</span> and <span class="math inline">\(\sum_s 2(n-s)\)</span>, are each <span class="math inline">\(\bigO(n^2)\)</span>. Back-substitution costs <span class="math inline">\(\sum_{s=1}^{n}2(n-s)=n^2+\bigO(n)\)</span>. The cubic term therefore comes entirely from elimination. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>The lopsided split (<span class="math inline">\(\bigO(n^3)\)</span> to triangularize but only <span class="math inline">\(\bigO(n^2)\)</span> to back-substitute) is the reason to reuse a factorization. If we must solve several systems with the <em>same</em> matrix <span class="math inline">\(A\)</span> but different right-hand sides, we should triangularize <span class="math inline">\(A\)</span> <strong>once</strong> and reuse the result. Storing the elimination as a factorization is exactly what makes that reuse possible.</p>
-<p><a href="#fig-4-factor-reuse" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> compares the costs. Solving <span class="math inline">\(k\)</span> systems from scratch costs <span class="math inline">\(k\cdot\tfrac23 n^3\)</span>, a line whose slope is the full factorization cost; factoring once and reusing the result costs <span class="math inline">\(\tfrac23 n^3\)</span> up front and only <span class="math inline">\(2n^2\)</span> per additional right-hand side, a line so shallow it is nearly flat on the same axes. At <span class="math inline">\(n=500\)</span> the one-time factorization is <span class="math inline">\(\tfrac23 n^3\approx 8.3\times10^{7}\)</span> flops while each extra solve is <span class="math inline">\(2n^2=5\times10^{5}\)</span>, over a hundred times cheaper.</p>
+<p>For multiple right-hand sides, factor <span class="math inline">\(A\)</span> once and reuse the factors (<a href="#fig-4-factor-reuse" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>). At <span class="math inline">\(n=500\)</span>, factorization costs <span class="math inline">\(\tfrac23 n^3\approx8.3\times10^7\)</span> flops; each additional solve costs <span class="math inline">\(2n^2=5\times10^5\)</span>.</p>
 <div id="fig-4-factor-reuse" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-4-factor-reuse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -440,11 +438,11 @@ Figure&nbsp;4.2: Total flop count against the number of right-hand sides <span c
 </section>
 <section id="matrix-algebra" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="matrix-algebra"><span class="header-section-number">4.4</span> Matrix algebra</h2>
-<p>Elimination is cleanest to reason about in matrix language, so we record the algebra we need. For <span class="math inline">\(A,B\in\R^{n\times m}\)</span> and scalars <span class="math inline">\(\alpha,\beta\)</span>, the linear combination <span class="math inline">\(\alpha A+\beta B\)</span> is formed entrywise. The <strong>matrix–vector product</strong> <span class="math inline">\(Ax\in\R^n\)</span> has <span class="math inline">\(j\)</span>-th component the dot product of row <span class="math inline">\(j\)</span> of <span class="math inline">\(A\)</span> with <span class="math inline">\(x\)</span>, <span class="math display">\[
+<p>For <span class="math inline">\(A,B\in\R^{n\times m}\)</span> and scalars <span class="math inline">\(\alpha,\beta\)</span>, the linear combination <span class="math inline">\(\alpha A+\beta B\)</span> is formed entrywise. The <strong>matrix–vector product</strong> <span class="math inline">\(Ax\in\R^n\)</span> has <span class="math inline">\(j\)</span>-th component the dot product of row <span class="math inline">\(j\)</span> of <span class="math inline">\(A\)</span> with <span class="math inline">\(x\)</span>, <span class="math display">\[
 (Ax)_j=\sum_{k=1}^{m}a_{jk}x_k,
 \]</span> so the system of equations is precisely <span class="math inline">\(Ax=b\)</span>. The <strong>matrix–matrix product</strong> of <span class="math inline">\(A\in\R^{n\times m}\)</span> and <span class="math inline">\(B\in\R^{m\times p}\)</span> is defined column by column, <span class="math inline">\(AB=(Ab_1\ \cdots\ Ab_p)\)</span>, giving the entrywise formula <span class="math display">\[
 (AB)_{jk}=\sum_{i=1}^{m}a_{ji}b_{ik}.
-\]</span> The single algebraic fact elimination leans on is <strong>associativity</strong>.</p>
+\]</span></p>
 <div id="thm-4-assoc" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 4.2 (Associativity of matrix multiplication)</strong></span> For <span class="math inline">\(A\in\R^{n\times m}\)</span>, <span class="math inline">\(B\in\R^{m\times p}\)</span>, <span class="math inline">\(C\in\R^{p\times k}\)</span>, <span class="math inline">\(A(BC)=(AB)C\)</span>.</p>
 </div>
@@ -466,7 +464,7 @@ Figure&nbsp;4.2: Total flop count against the number of right-hand sides <span c
 </section>
 <section id="lu-factorization" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="lu-factorization"><span class="header-section-number">4.5</span> LU factorization</h2>
-<p>Return to elimination without pivoting and watch what the multipliers record. The first stage subtracts <span class="math inline">\(\ell_{j1}=a_{j1}/a_{11}\)</span> times row <span class="math inline">\(1\)</span> from row <span class="math inline">\(j\)</span>; in matrix form this is exactly <span class="math display">\[
+<p>The first elimination stage without pivoting subtracts <span class="math inline">\(\ell_{j1}=a_{j1}/a_{11}\)</span> times row <span class="math inline">\(1\)</span> from row <span class="math inline">\(j\)</span>; in matrix form this is exactly <span class="math display">\[
 A=\begin{pmatrix}1&amp;&amp;&amp;\\ \ell_{21}&amp;1&amp;&amp;\\ \vdots&amp;&amp;\ddots&amp;\\ \ell_{n1}&amp;&amp;&amp;1\end{pmatrix}
 \begin{pmatrix}a_{11}&amp;a_{12}&amp;\cdots&amp;a_{1n}\\ 0&amp;a'_{22}&amp;\cdots&amp;a'_{2n}\\
 \vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ 0&amp;a'_{n2}&amp;\cdots&amp;a'_{nn}\end{pmatrix},
@@ -480,7 +478,7 @@ A=\begin{pmatrix}1&amp;1&amp;0&amp;3\\ 2&amp;1&amp;-1&amp;1\\ 3&amp;-1&amp;-1&am
 \underbrace{\begin{pmatrix}1&amp;1&amp;0&amp;3\\ 0&amp;-1&amp;-1&amp;-5\\ 0&amp;0&amp;3&amp;13\\ 0&amp;0&amp;0&amp;-13\end{pmatrix}}_{U}.
 \]</span> Once <span class="math inline">\(A=LU\)</span> is in hand, solving <span class="math inline">\(Ax=b\)</span> splits into two triangular solves: <span class="math display">\[
 Ly=b\ \text{(forward substitution)},\qquad Ux=y\ \text{(back-substitution)}.
-\]</span> Each triangular solve costs <span class="math inline">\(n^2+\bigO(n)\)</span> (by the same <span class="math inline">\(\sum_s(n-s)\)</span> count as back-substitution in <a href="#thm-4-ge-cost" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>), so the pair costs <span class="math inline">\(2n^2+\bigO(n)\)</span>; this is the single per-right-hand-side figure, abbreviated <span class="math inline">\(2n^2\)</span>, that recurs below. Thus the <span class="math inline">\(\tfrac23 n^3\)</span> factorization is done once, and every new right-hand side costs only <span class="math inline">\(2n^2\)</span>, the shallow slope of <a href="#fig-4-factor-reuse" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>.</p>
+\]</span> Each triangular solve costs <span class="math inline">\(n^2+\bigO(n)\)</span> by the count in <a href="#thm-4-ge-cost" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>, giving <span class="math inline">\(2n^2+\bigO(n)\)</span> per right-hand side.</p>
 <section id="permutation-matrices-and-palu" class="level3">
 <h3 class="anchored" data-anchor-id="permutation-matrices-and-palu">Permutation matrices and <span class="math inline">\(PA=LU\)</span></h3>
 <p>Plain <span class="math inline">\(LU\)</span> fails exactly when elimination needs a row swap. Row swaps are themselves matrix multiplications: the <strong>permutation matrix</strong> <span class="math inline">\(P_{k,s}\)</span>, obtained by exchanging rows <span class="math inline">\(k\)</span> and <span class="math inline">\(s\)</span> of <span class="math inline">\(I_n\)</span>, has the property that <span class="math inline">\(P_{k,s}A\)</span> is <span class="math inline">\(A\)</span> with rows <span class="math inline">\(k\)</span> and <span class="math inline">\(s\)</span> interchanged. A product of permutation matrices is again a permutation matrix. If we collect all the swaps GEPP performs into one permutation <span class="math inline">\(P\)</span>, we can apply them to <span class="math inline">\(A\)</span> up front and then eliminate with no further swaps, which says the pivoted elimination is an ordinary <span class="math inline">\(LU\)</span> factorization of the row-reordered matrix <span class="math inline">\(PA\)</span>.</p>
@@ -529,7 +527,6 @@ U=\begin{pmatrix}1&amp;1&amp;-1&amp;2\\0&amp;1&amp;1&amp;0\\0&amp;0&amp;-1&amp;1
 <li>Permute the right-hand side to <span class="math inline">\(Pb\)</span>.</li>
 <li>Forward-substitute <span class="math inline">\(Ly=Pb\)</span>, then back-substitute <span class="math inline">\(Ux=y\)</span> (<span class="math inline">\(2n^2\)</span> operations total).</li>
 </ol>
-<p>The factorization dominates; solving additional right-hand sides reuses <span class="math inline">\(P,L,U\)</span> at <span class="math inline">\(\bigO(n^2)\)</span> each. This is exactly how one computes <span class="math inline">\(A^{-1}\)</span> when it is truly needed: factor once, then solve <span class="math inline">\(Ax_j=e_j\)</span> for <span class="math inline">\(j=1,\dots,n\)</span>.</p>
 </div>
 </div>
 </section>
@@ -581,7 +578,6 @@ A=\begin{pmatrix}1&amp;0\\ \ell_1&amp;I\end{pmatrix}
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>Symmetry of <span class="math inline">\(\hat A\)</span> is clear. For nonzero <span class="math inline">\(\hat x\in\R^{n-1}\)</span> set <span class="math inline">\(x=(-\ell_1^\top\hat x,\ \hat x^\top)^\top\ne0\)</span>; multiplying out the factored form gives <span class="math inline">\(x^\top Ax=\hat x^\top\hat A\hat x\)</span>, and the left side is <span class="math inline">\(&gt;0\)</span> because <span class="math inline">\(A\)</span> is SPD. Hence <span class="math inline">\(\hat x^\top\hat A\hat x&gt;0\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>Iterating the lemma factors <span class="math inline">\(A\)</span> symmetrically, producing the Cholesky family.</p>
 <div id="thm-4-cholesky" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 4.5 (Cholesky / <span class="math inline">\(LDL^\top\)</span> factorization)</strong></span> Every SPD matrix <span class="math inline">\(A\)</span> has a factorization <span class="math display">\[
 A=LDL^\top,
@@ -608,7 +604,7 @@ D=\diag(4,4,1),
 </section>
 <section id="tridiagonal-systems" class="level2" data-number="4.7">
 <h2 data-number="4.7" class="anchored" data-anchor-id="tridiagonal-systems"><span class="header-section-number">4.7</span> Tridiagonal systems</h2>
-<p>The spline system of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> is the archetype of a sparse structure worth exploiting: a <strong>tridiagonal</strong> matrix, one whose nonzeros sit only on the main diagonal and the two adjacent diagonals.</p>
+<p>The spline system of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> is tridiagonal.</p>
 <div id="def-4-tridiag" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 4.5 (Tridiagonal matrix)</strong></span> <span class="math inline">\(A\in\R^{n\times n}\)</span> is <strong>tridiagonal</strong> if <span class="math inline">\(a_{ij}=0\)</span> whenever <span class="math inline">\(\abs{i-j}&gt;1\)</span>.</p>
 </div>
@@ -625,20 +621,7 @@ h_1&amp;2(h_1+h_2)&amp;h_2&amp;\\
 \end{pmatrix}
 \]</span> is not only tridiagonal but also SDD <strong>and</strong> SPD, so by <a href="#thm-4-sdd-nopivot" class="quarto-xref">Theorem&nbsp;<span>4.4</span></a> it needs no pivoting at all: the bare <span class="math inline">\(3n\)</span> recurrence is safe, and the spline coefficients follow in linear time.</p>
 <p>If pivoting <em>is</em> required (a general nonsingular tridiagonal matrix with no special structure), a partial-pivot step compares <span class="math inline">\(\abs{a_{11}}\)</span> with <span class="math inline">\(\abs{a_{21}}\)</span> and swaps the two rows when the subdiagonal entry is larger. A swap pulls the entry <span class="math inline">\(a_{23}\)</span> up into the pivot row, so <span class="math inline">\(U\)</span> can pick up a <em>second</em> superdiagonal (<span class="math inline">\(u_{i,i+2}\ne0\)</span>): its bandwidth grows from <span class="math inline">\(2\)</span> to <span class="math inline">\(3\)</span>. The factor <span class="math inline">\(L\)</span> still has at most one nonzero below the diagonal in each column. The total cost stays linear, at most <span class="math inline">\(4n\)</span> operations and <span class="math inline">\(n\)</span> comparisons, so even with pivoting a tridiagonal solve is <span class="math inline">\(\bigO(n)\)</span>.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Exploit structure before you compute
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The progression <span class="math inline">\(\tfrac23 n^3\to\tfrac13 n^3\to 3n\)</span> across general <span class="math inline">\(LU\)</span>, Cholesky, and tridiagonal elimination is the recurring lesson of direct methods: identifying that a matrix is SPD, SDD, or banded, before touching the arithmetic, can cut the cost by a constant factor or, for banded matrices, by a whole power of <span class="math inline">\(n\)</span>.</p>
-</div>
-</div>
-<p><a href="#tbl-4-structure" class="quarto-xref">Table&nbsp;<span>4.1</span></a> lists what each class factors into, whether pivoting is needed, and the leading factorization cost.</p>
+<p><span id="exploit-structure-before-you-compute"></span></p>
 <div id="tbl-4-structure" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-structure-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -699,7 +682,7 @@ Table&nbsp;4.1: Factorization, pivoting need, and cost for the matrix classes of
 </section>
 <section id="conditioning-of-a-linear-system" class="level2" data-number="4.8">
 <h2 data-number="4.8" class="anchored" data-anchor-id="conditioning-of-a-linear-system"><span class="header-section-number">4.8</span> Conditioning of a linear system</h2>
-<p>Pivoting controls the <em>algorithm</em>; it says nothing about whether the <em>problem</em> itself is sensitive to perturbations. The numerical experiments motivating pivoting, a computed solution that is wildly wrong when the pivot is tiny, hint that some matrices amplify input error no matter how carefully we eliminate. The quantity that measures this is the condition number. (The 128A notes demonstrate the effect experimentally; we state the standard definition and bound, a classical result, and use it to interpret the experiments.)</p>
+<p>The condition number measures the system’s sensitivity to input perturbations.</p>
 <div id="def-4-cond" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 4.6 (Condition number)</strong></span> For a nonsingular <span class="math inline">\(A\)</span> and an induced matrix norm <span class="math inline">\(\norm{\cdot}\)</span>, the <strong>condition number</strong> is <span class="math display">\[
 \cond(A)\defeq\norm{A}\,\norm{A^{-1}}\ \ge 1,
@@ -716,14 +699,13 @@ Figure&nbsp;4.3: Two <span class="math inline">\(2\times2\)</span> systems, each
 </figcaption>
 </figure>
 </div>
-<p>The condition number bounds how much a relative perturbation of the data can change the solution.</p>
 <div id="thm-4-cond-bound" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 4.6 (Perturbation bound)</strong></span> Let <span class="math inline">\(A\)</span> be nonsingular, <span class="math inline">\(Ax=b\)</span> with <span class="math inline">\(b\ne0\)</span>, and let <span class="math inline">\(A(x+\delta x)=b+\delta b\)</span>. Then <span class="math display">\[
 \frac{\norm{\delta x}}{\norm{x}}\le\cond(A)\,\frac{\norm{\delta b}}{\norm{b}}.
 \]</span></p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>This is the standard first-order bound. From <span class="math inline">\(A\,\delta x=\delta b\)</span> we get <span class="math inline">\(\norm{\delta x}\le\norm{A^{-1}}\norm{\delta b}\)</span>, and from <span class="math inline">\(b=Ax\)</span> we get <span class="math inline">\(\norm{b}\le\norm{A}\norm{x}\)</span>, i.e.&nbsp;<span class="math inline">\(1/\norm{x}\le\norm{A}/\norm{b}\)</span>. Multiplying the two inequalities gives <span class="math inline">\(\norm{\delta x}/\norm{x}\le\norm{A}\norm{A^{-1}}\norm{\delta b}/\norm{b}\)</span>. <span class="math inline">\(\square\)</span></p>
+<p><span class="proof-title"><em>Proof</em>. </span>From <span class="math inline">\(A\,\delta x=\delta b\)</span> we get <span class="math inline">\(\norm{\delta x}\le\norm{A^{-1}}\norm{\delta b}\)</span>, and from <span class="math inline">\(b=Ax\)</span> we get <span class="math inline">\(\norm{b}\le\norm{A}\norm{x}\)</span>, i.e.&nbsp;<span class="math inline">\(1/\norm{x}\le\norm{A}/\norm{b}\)</span>. Multiplying the two inequalities gives <span class="math inline">\(\norm{\delta x}/\norm{x}\le\norm{A}\norm{A^{-1}}\norm{\delta b}/\norm{b}\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
 <p>For example, take <span class="math display">\[
 A=\begin{pmatrix}1&amp;1\\ 1&amp;1.0001\end{pmatrix},\qquad b=\begin{pmatrix}2\\ 2.0001\end{pmatrix},
@@ -750,18 +732,8 @@ Figure&nbsp;4.4: The small-pivot family <span class="math inline">\(A=[[\varepsi
 </figcaption>
 </figure>
 </div>
-<p>Pivoting keeps a stable algorithm from making things <em>worse</em>, but no direct method can recover accuracy that the conditioning of the problem has already destroyed; the condition number resurfaces in <a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a> as the quantity governing how fast iterative solvers converge.</p>
-</section>
-<section id="chapter-summary" class="level2" data-number="4.9">
-<h2 data-number="4.9" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">4.9</span> Chapter summary</h2>
-<ul>
-<li><strong>Gaussian elimination</strong> triangularizes <span class="math inline">\(A\)</span> in <span class="math inline">\(\tfrac23 n^3\)</span> operations (<a href="#thm-4-ge-cost" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>) and back-substitutes in <span class="math inline">\(\bigO(n^2)\)</span>; a zero or small pivot forces a row swap.</li>
-<li><strong>Partial pivoting</strong> (GEPP) swaps in the largest column entry, keeping all multipliers <span class="math inline">\(\abs{\ell_{js}}\le1\)</span>; it is stable in practice but not in the worst case (the Wilkinson matrix, <a href="#fig-4-wilkinson" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>). <strong>Complete pivoting</strong> is stabler but too costly.</li>
-<li>Elimination <em>is</em> a factorization: <span class="math inline">\(A=LU\)</span> (<a href="#def-4-lu" class="quarto-xref">Definition&nbsp;<span>4.1</span></a>) without swaps, and with swaps <span class="math inline">\(PA=LU\)</span> (<a href="#thm-4-palu" class="quarto-xref">Theorem&nbsp;<span>4.3</span></a>) via permutation matrices (<a href="#def-4-permutation" class="quarto-xref">Definition&nbsp;<span>4.2</span></a>). Factor once at <span class="math inline">\(\tfrac23 n^3\)</span>, then solve each right-hand side by two triangular solves at <span class="math inline">\(2n^2\)</span>; this is also how <span class="math inline">\(A^{-1}\)</span> and <span class="math inline">\(\det(A)=(-1)^{\#\text{swaps}}\prod u_{jj}\)</span> are computed.</li>
-<li><strong>SDD</strong> matrices (<a href="#def-4-sdd" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>) need no pivoting: elimination preserves diagonal dominance (<a href="#thm-4-sdd-nopivot" class="quarto-xref">Theorem&nbsp;<span>4.4</span></a>). <strong>SPD</strong> matrices (<a href="#def-4-spd" class="quarto-xref">Definition&nbsp;<span>4.4</span></a>) have a <strong>Cholesky / <span class="math inline">\(LDL^\top\)</span></strong> factorization (<a href="#thm-4-cholesky" class="quarto-xref">Theorem&nbsp;<span>4.5</span></a>) computed at <span class="math inline">\(\tfrac13 n^3\)</span>, half the general cost.</li>
-<li><strong>Tridiagonal</strong> systems (<a href="#def-4-tridiag" class="quarto-xref">Definition&nbsp;<span>4.5</span></a>) factor in <span class="math inline">\(\bigO(n)\)</span> (<span class="math inline">\(3n\)</span> operations without pivoting, <span class="math inline">\(4n\)</span> with), which is what makes the cubic-spline system of <a href="01-interpolation.html#def-1-spline" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> a linear-time solve.</li>
-<li>The <strong>condition number</strong> <span class="math inline">\(\cond(A)=\norm{A}\norm{A^{-1}}\)</span> (<a href="#def-4-cond" class="quarto-xref">Definition&nbsp;<span>4.6</span></a>) measures the problem’s sensitivity: relative error is amplified by up to <span class="math inline">\(\cond(A)\)</span> (<a href="#thm-4-cond-bound" class="quarto-xref">Theorem&nbsp;<span>4.6</span></a>), a limit no direct solver can beat.</li>
-</ul>
+<p>Conditioning also affects the convergence of iterative solvers (<a href="05-iterative-linear-systems.html" class="quarto-xref"><span>Chapter 5</span></a>).</p>
+<p><span id="chapter-summary"></span></p>
 
 
 </section>

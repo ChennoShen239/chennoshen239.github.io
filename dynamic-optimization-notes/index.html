@@ -253,7 +253,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-arc-of-the-subject" id="toc-the-arc-of-the-subject" class="nav-link" data-scroll-target="#the-arc-of-the-subject">Methods</a></li>
   <li><a href="#how-the-notes-are-organized" id="toc-how-the-notes-are-organized" class="nav-link" data-scroll-target="#how-the-notes-are-organized">How the notes are organized</a></li>
-  <li><a href="#a-word-on-notation" id="toc-a-word-on-notation" class="nav-link" data-scroll-target="#a-word-on-notation">A word on notation</a></li>
+  <li><a href="#a-word-on-notation" id="toc-a-word-on-notation" class="nav-link" data-scroll-target="#a-word-on-notation">Notation</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -286,7 +286,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 2026</p>
+      <p class="date">November 2026</p>
     </div>
   </div>
   
@@ -300,8 +300,7 @@ window.Quarto = {
 
 <section id="preface" class="level1 unnumbered">
 <h1 class="unnumbered">Preface</h1>
-<p>I prepared these notes for my own reference. They follow Zhang Bo’s (张博) graduate course on dynamic optimization: choosing an entire path. The structure, examples, and economic motivation come from the original Chinese courseware.</p>
-<p>Each theorem includes its hypotheses and proof, and sign claims are justified. Value and asset equations are typically derived from a discrete period-<span class="math inline">\(\Delta\)</span> problem by taking the <span class="math inline">\(\Delta\to 0\)</span> limit.</p>
+<p>I prepared these notes for my own reference. They follow Zhang Bo’s (张博) graduate course on dynamic optimization. The structure, examples, and economic motivation come from the original Chinese courseware.</p>
 <section id="the-arc-of-the-subject" class="level2">
 <h2 class="anchored" data-anchor-id="the-arc-of-the-subject">Methods</h2>
 <p>The three methods below maximize an objective over a path subject to a law of motion:</p>
@@ -336,20 +335,19 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>The costate <span class="math inline">\(\lambda\)</span> of optimal control is the gradient <span class="math inline">\(V_x\)</span> of the value function, and the maximum principle and the HJB equation imply one another.</p>
+<p>For a smooth value function, the costate satisfies <span class="math inline">\(\lambda=V_x\)</span> along the optimal path.</p>
 </section>
 <section id="how-the-notes-are-organized" class="level2">
 <h2 class="anchored" data-anchor-id="how-the-notes-are-organized">How the notes are organized</h2>
-
 <ul>
 <li><strong>Foundations.</strong> The <a href="./00-introduction.html">Introduction</a> frames the optimization problem and the three methods. <a href="./01-static-optimization.html">Static Optimization</a> develops convexity, the KKT conditions, the envelope theorem, and duality. <a href="./02-odes.html">ODEs</a> covers solution methods, with an emphasis on the qualitative theory: stability, phase diagrams, and bifurcations.</li>
 <li><strong>Continuous-time dynamic optimization.</strong> The <a href="./03-calculus-of-variations.html">Calculus of Variations</a> and <a href="./04-optimal-control.html">Optimal Control</a> handle continuous-time paths, with the Ramsey growth model as the running economic example.</li>
 <li><strong>Dynamic programming.</strong> <a href="./05-dynamic-programming.html">Dynamic Programming</a> treats discrete and continuous time, deterministic and stochastic, up to the Itô calculus and the Merton portfolio problem.</li>
 </ul>
-<p>Each chapter ends with the course’s problem set, translated in full, with worked solutions to the most instructive problems. Supplementary courseware (LICQ, the brachistochrone sufficiency proof, MRAP, the verification theorems, random-horizon DP) is folded into the relevant chapter.</p>
+<p>Each chapter includes the course’s problem set and selected solutions. Supplementary courseware (LICQ, the brachistochrone sufficiency proof, MRAP, the verification theorems, random-horizon DP) is folded into the relevant chapter.</p>
 </section>
 <section id="a-word-on-notation" class="level2">
-<h2 class="anchored" data-anchor-id="a-word-on-notation">A word on notation</h2>
+<h2 class="anchored" data-anchor-id="a-word-on-notation">Notation</h2>
 <p>The notes use standard field notation, which occasionally departs from the courseware. In particular, the continuous-time discount <em>rate</em> <span class="math inline">\(\rho\)</span> is kept distinct from the discrete-time discount <em>factor</em> <span class="math inline">\(\beta=1/(1+\rho)\)</span>, which the course writes with a single symbol. The <a href="./notation.html">Notation</a> chapter is the master table and flags every such deviation.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">

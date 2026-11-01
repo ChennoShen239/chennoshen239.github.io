@@ -222,7 +222,6 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-uniformquadratic-example" id="toc-the-uniformquadratic-example" class="nav-link" data-scroll-target="#the-uniformquadratic-example">The uniform–quadratic example</a></li>
   </ul></li>
-  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">5.7</span> Chapter summary</a></li>
   </ul>
 </nav>
     </div>
@@ -262,7 +261,7 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>This chapter brings together the two threads of the previous two chapters: the <em>sequential</em> structure of <a href="03-dynamic-complete.html" class="quarto-xref"><span>Chapter 3</span></a> and the <em>private information</em> of <a href="04-static-incomplete.html" class="quarto-xref"><span>Chapter 4</span></a>. When players move in turn but some of them do not know others’ types, the difficulty is that subgame-perfect equilibrium often has nothing to say: too few proper subgames exist for backward induction to bite. The remedy is <strong>perfect Bayesian equilibrium</strong>, which equips each player with a <em>belief</em> about where they are in the tree and demands that strategies be optimal given those beliefs. We develop the concept on a chain-store example, apply it to <strong>signaling games</strong> (Spence’s model of education as a costly signal), sharpen it with the Cho–Kreps <strong>intuitive criterion</strong>, and finally study <strong>cheap talk</strong>, where the signal is costless and the question becomes how much information can be credibly transmitted at all.</p>
+<p>With private information, an information set may span several nodes and prevent a proper subgame from starting there. <strong>Perfect Bayesian equilibrium</strong> requires optimal play at each information set, using beliefs about which node has been reached.</p>
 <section id="a-motivating-example" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="a-motivating-example"><span class="header-section-number">5.1</span> A motivating example</h2>
 <section id="the-chain-store-game-with-complete-information" class="level3">
@@ -278,11 +277,11 @@ Figure&nbsp;5.1: The chain-store game with complete information. The entrant (pl
 </figcaption>
 </figure>
 </div>
-<p>This game has <strong>two</strong> pure-strategy Nash equilibria, <span class="math inline">\((S,F)\)</span> and <span class="math inline">\((E,A)\)</span>, but only <span class="math inline">\((E,A)\)</span> is subgame perfect (<a href="03-dynamic-complete.html#def-3-spe" class="quarto-xref">Definition&nbsp;<span>3.11</span></a>). The profile <span class="math inline">\((S,F)\)</span> rests on a <strong>non-credible threat</strong>: the incumbent promises to fight, which keeps the entrant out, but if entry actually occurred the incumbent would prefer to accommodate (<span class="math inline">\(1 &gt; -1\)</span>). Subgame perfection requires sequential rationality both <em>on</em> and <em>off</em> the equilibrium path, and so eliminates <span class="math inline">\((S,F)\)</span>; Nash equilibrium does not.</p>
+<p>This game has <strong>two</strong> pure-strategy Nash equilibria, <span class="math inline">\((S,F)\)</span> and <span class="math inline">\((E,A)\)</span>, but only <span class="math inline">\((E,A)\)</span> is subgame perfect (<a href="03-dynamic-complete.html#def-3-spe" class="quarto-xref">Definition&nbsp;<span>3.11</span></a>). The profile <span class="math inline">\((S,F)\)</span> rests on a <strong>non-credible threat</strong>: the incumbent promises to fight, which keeps the entrant out, but if entry actually occurred the incumbent would prefer to accommodate (<span class="math inline">\(1 &gt; -1\)</span>).</p>
 </section>
 <section id="the-chain-store-game-with-incomplete-information" class="level3">
 <h3 class="anchored" data-anchor-id="the-chain-store-game-with-incomplete-information">The chain-store game with incomplete information</h3>
-<p>Now suppose the entrant has private information about its own strength. Nature first draws the entrant’s type: <strong>competent</strong> (<span class="math inline">\(C\)</span>) with probability <span class="math inline">\(p\)</span>, or <strong>weak</strong> (<span class="math inline">\(W\)</span>) with probability <span class="math inline">\(1-p\)</span>. The competent entrant’s payoffs are as before; the weak entrant’s are worse: fighting it yields the incumbent <span class="math inline">\(0\)</span> rather than <span class="math inline">\(-1\)</span>, and the weak entrant earns <span class="math inline">\(-2\)</span> if fought and <span class="math inline">\(-1\)</span> if accommodated. Crucially, <strong>only the entrant knows its own type</strong>: the incumbent, who moves after observing entry, cannot tell a competent entrant from a weak one. The extensive form is <a href="#fig-5-chainstore-incomplete" class="quarto-xref">Figure&nbsp;<span>5.2</span></a>.</p>
+<p>Now suppose the entrant has private information about its own strength. Nature first draws the entrant’s type: <strong>competent</strong> (<span class="math inline">\(C\)</span>) with probability <span class="math inline">\(p\)</span>, or <strong>weak</strong> (<span class="math inline">\(W\)</span>) with probability <span class="math inline">\(1-p\)</span>. The competent entrant’s payoffs are as before; the weak entrant’s are worse: fighting it yields the incumbent <span class="math inline">\(0\)</span> rather than <span class="math inline">\(-1\)</span>, and the weak entrant earns <span class="math inline">\(-2\)</span> if fought and <span class="math inline">\(-1\)</span> if accommodated. Only the entrant knows its own type: the incumbent, who moves after observing entry, cannot tell a competent entrant from a weak one. The extensive form is <a href="#fig-5-chainstore-incomplete" class="quarto-xref">Figure&nbsp;<span>5.2</span></a>.</p>
 <div id="fig-5-chainstore-incomplete" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-5-chainstore-incomplete-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -399,7 +398,7 @@ Important
 </section>
 <section id="perfect-bayesian-equilibrium" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="perfect-bayesian-equilibrium"><span class="header-section-number">5.2</span> Perfect Bayesian equilibrium</h2>
-<p>Attach to each information set a belief, a probability distribution over its nodes, and require each player to act optimally given that belief. We begin by distinguishing the information sets that the play actually reaches.</p>
+<p>A belief is a probability distribution over the nodes in an information set.</p>
 <div id="def-5-onpath" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 5.1 (On and off the equilibrium path)</strong></span> Let <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> be a Bayesian Nash equilibrium profile of strategies in a game of incomplete information. An information set is <strong>on the equilibrium path</strong> if, given <span class="math inline">\(\sigma^*\)</span> and the distribution of types, it is reached with positive probability; it is <strong>off the equilibrium path</strong> if, given <span class="math inline">\(\sigma^*\)</span> and the distribution of types, it is reached with probability zero.</p>
 </div>
@@ -469,7 +468,7 @@ Important
 \E\!\big[v_i(\sigma_i, \sigma_{-i}, \theta) \given h, \mu\big] \ge
 \E\!\big[v_i(s_i, \sigma_{-i}, \theta) \given h, \mu\big] \qquad
 \text{for all } s_i .
-\tag{5.2}\]</span></span> In words: conditional on <span class="math inline">\(h\)</span> being reached, playing <span class="math inline">\(\sigma_i\)</span> is at least as good as any alternative given <span class="math inline">\(\sigma_{-i}\)</span> and <span class="math inline">\(\mu\)</span>.</p>
+\tag{5.2}\]</span></span></p>
 </div>
 </div>
 <p>To see Requirement 4 in isolation, consider <a href="#fig-5-seqrat" class="quarto-xref">Figure&nbsp;<span>5.3</span></a>, where a single player moves at an information set with two nodes (beliefs <span class="math inline">\(\mu\)</span> and <span class="math inline">\(1-\mu\)</span>) and three actions <span class="math inline">\(a, b, c\)</span>. The payoffs are <span class="math inline">\((-1,0,2)\)</span> at the left node and <span class="math inline">\((2,0,-1)\)</span> at the right. Whatever the belief, action <span class="math inline">\(b\)</span> yields <span class="math inline">\(0\)</span>, while <span class="math inline">\(a\)</span> yields <span class="math inline">\(-\mu + 2(1-\mu) = 2 - 3\mu\)</span> and <span class="math inline">\(c\)</span> yields <span class="math inline">\(2\mu - (1-\mu) = 3\mu -
@@ -487,7 +486,7 @@ Figure&nbsp;5.3: Sequential rationality at a single information set; payoffs sho
 <div id="def-5-pbe" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 5.3 (Perfect Bayesian equilibrium)</strong></span> A Bayesian Nash equilibrium profile <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> together with a system of beliefs <span class="math inline">\(\mu\)</span> constitutes a <strong>perfect Bayesian equilibrium (PBE)</strong> of an <span class="math inline">\(n\)</span>-player game if they satisfy Requirements 1–4.</p>
 </div>
-<p>A PBE thus packages <em>rationality</em> (best responses at every information set), <em>correct beliefs on the path</em> (Bayes’ rule), and <em>unrestricted but fixed beliefs off the path</em>. The freedom in off-path beliefs is the source of multiplicity we return to when discussing refinements. In particular, when the candidate equilibrium reaches every information set, Bayes’ rule pins down the beliefs uniquely.</p>
+<p>Off-path beliefs can support different continuation choices and hence multiple equilibria. If every information set is reached, Bayes’ rule determines all beliefs.</p>
 <div id="prp-5-unique-belief" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 5.1 (Uniqueness of consistent beliefs on the path)</strong></span> If a profile <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> is a Bayesian Nash equilibrium of a Bayesian game <span class="math inline">\(\Gamma\)</span>, and if <span class="math inline">\(\sigma^*\)</span> induces <em>all</em> information sets to be reached with positive probability, then <span class="math inline">\(\sigma^*\)</span>, together with the belief system <span class="math inline">\(\mu^*\)</span> uniquely derived from <span class="math inline">\(\sigma^*\)</span> and the distribution of types, constitutes a perfect Bayesian equilibrium of <span class="math inline">\(\Gamma\)</span>.</p>
 </div>
@@ -506,7 +505,7 @@ Figure&nbsp;5.3: Sequential rationality at a single information set; payoffs sho
 <li><strong>conspicuous consumption</strong> signals wealth;</li>
 <li><strong>education</strong> signals ability.</li>
 </ul>
-<p>The recurring logic, due to Michael Spence (Nobel Prize, 2001), is that a signal is credible precisely when it is <strong>differentially costly</strong> across types: the “good” type can afford the signal that the “bad” type would find too expensive to mimic.</p>
+<p>In Spence’s education model, signaling costs differ by type. A separating equilibrium requires the high type to prefer the signal and the low type to prefer not to imitate it.</p>
 </section>
 <section id="education-signaling" class="level2" data-number="5.4">
 <h2 data-number="5.4" class="anchored" data-anchor-id="education-signaling"><span class="header-section-number">5.4</span> Education signaling</h2>
@@ -544,7 +543,7 @@ Table&nbsp;5.3: Employer’s net profit by skill and assignment.
 </div>
 </figure>
 </div>
-<p>The high-skilled worker is always more productive, is better at managing, and the low-skilled worker is comparatively better at blue-collar work, but <strong>owning an MBA changes nothing about productivity</strong>. Player 1’s payoff is the wage he obtains minus any education cost; player 2’s payoff is the net profit. The full extensive form, with terminal payoff vectors <span class="math inline">\((\text{player 1},\ \text{player
+<p>Player 1’s payoff is the wage minus education cost; player 2’s payoff is net profit. The full extensive form, with terminal payoff vectors <span class="math inline">\((\text{player 1},\ \text{player
 2})\)</span>, is <a href="#fig-5-education" class="quarto-xref">Figure&nbsp;<span>5.4</span></a>.</p>
 <div id="fig-5-education" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -571,10 +570,10 @@ B \text{ is optimal after } U \iff \mu_U \le \tfrac38 .
 (UU,\ BB) \text{ with beliefs } (\mu_U = \tfrac14,\ \mu_D = 0)
 \]</span> is a perfect Bayesian equilibrium. This is a <strong>pooling equilibrium</strong>: both types choose the same action, revealing nothing.</p>
 <p><strong><span class="math inline">\(DD\)</span> gives no PBE.</strong> If both types choose <span class="math inline">\(D\)</span>, then <span class="math inline">\(D\)</span> is on the path and consistency forces <span class="math inline">\(\mu_D = p = \tfrac14\)</span>. By the same arithmetic as <a href="#eq-5-employer-br" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> (with <span class="math inline">\(D\)</span> in place of <span class="math inline">\(U\)</span>), player 2 optimally plays <span class="math inline">\(B\)</span> after <span class="math inline">\(D\)</span>. But then the <span class="math inline">\(L\)</span> type, who pays the high cost <span class="math inline">\(c_L = 5\)</span> for the degree only to remain a blue-collar worker, strictly prefers to deviate to <span class="math inline">\(U\)</span> regardless of what player 2 does after <span class="math inline">\(U\)</span>. So <span class="math inline">\(DD\)</span> supports no PBE.</p>
-<p><strong>No mixed-strategy PBE either.</strong> In any PBE the <span class="math inline">\(L\)</span> type must play <span class="math inline">\(U\)</span>: were the <span class="math inline">\(L\)</span> type ever to incur the cost of <span class="math inline">\(D\)</span>, the foregoing arguments show he would rather not. Suppose then the <span class="math inline">\(H\)</span> type mixes, playing <span class="math inline">\(U\)</span> with probability <span class="math inline">\(q \in
+<p><strong>The high type cannot mix at <span class="math inline">\(p=\tfrac14\)</span>.</strong> In any PBE the <span class="math inline">\(L\)</span> type must play <span class="math inline">\(U\)</span>: were the <span class="math inline">\(L\)</span> type ever to incur the cost of <span class="math inline">\(D\)</span>, the foregoing arguments show he would rather not. Suppose then the <span class="math inline">\(H\)</span> type mixes, playing <span class="math inline">\(U\)</span> with probability <span class="math inline">\(q \in
 (0,1)\)</span>. Consistency gives <span class="math display">\[
 \mu_U = \frac{pq}{pq + (1-p)\cdot 1} &lt; p = \tfrac14 ,
-\]</span> which by <a href="#eq-5-employer-br" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> makes <span class="math inline">\(B\)</span> strictly optimal after <span class="math inline">\(U\)</span>, but then the <span class="math inline">\(H\)</span> type is <em>not</em> indifferent between <span class="math inline">\(U\)</span> and <span class="math inline">\(D\)</span>, contradicting that he mixes. So there is no other PBE, and in particular no mixed-strategy PBE.</p>
+\]</span> which by <a href="#eq-5-employer-br" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> makes <span class="math inline">\(B\)</span> strictly optimal after <span class="math inline">\(U\)</span>, but then the <span class="math inline">\(H\)</span> type is <em>not</em> indifferent between <span class="math inline">\(U\)</span> and <span class="math inline">\(D\)</span>, contradicting that he mixes. Thus the high type chooses a pure education action in every PBE at this prior.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -585,7 +584,7 @@ B \text{ is optimal after } U \iff \mu_U \le \tfrac38 .
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In the separating equilibrium <span class="math inline">\((DU, BM)\)</span>, the degree credibly signals high ability even though education adds nothing to productivity. The low type would also prefer the manager’s wage, <span class="math inline">\(w_M = 10 &gt; 6 = w_B\)</span>, but imitation is too costly: <span class="math inline">\(c_L = 5 &gt; 2 = c_H\)</span>. This cost difference makes the signal informative.</p>
+<p>The manager’s wage premium lies between the two education costs. The high type gains from obtaining the degree; the low type loses by imitating. This is the incentive condition that makes the separating signal credible.</p>
 </div>
 </div>
 </section>
@@ -600,8 +599,7 @@ B \text{ is optimal after } U \iff \mu_U \le \tfrac38 .
 </section>
 <section id="a-finite-signaling-game-a-continuum-of-equilibria" class="level3">
 <h3 class="anchored" data-anchor-id="a-finite-signaling-game-a-continuum-of-equilibria">A finite signaling game: a continuum of equilibria</h3>
-<p>Signaling games need not have the clean separating/pooling dichotomy of the education model; mixed equilibria can form a continuum. Consider the abstract game of <a href="#fig-5-finite-signaling" class="quarto-xref">Figure&nbsp;<span>5.5</span></a>. Nature draws a sender type <span class="math inline">\(t_1\)</span> or <span class="math inline">\(t_2\)</span>, each with probability <span class="math inline">\(\tfrac12\)</span>; the sender sends message <span class="math inline">\(b\)</span> or <span class="math inline">\(q\)</span>; the receiver, observing only the message, responds with <span class="math inline">\(f\)</span> or <span class="math inline">\(r\)</span>. Payoffs <span class="math inline">\((\text{sender},
-\text{receiver})\)</span> are</p>
+<p>In the game of <a href="#fig-5-finite-signaling" class="quarto-xref">Figure&nbsp;<span>5.5</span></a>, Nature draws a sender type <span class="math inline">\(t_1\)</span> or <span class="math inline">\(t_2\)</span>, each with probability <span class="math inline">\(\tfrac12\)</span>. The sender sends <span class="math inline">\(b\)</span> or <span class="math inline">\(q\)</span>; the receiver sees only the message and responds with <span class="math inline">\(f\)</span> or <span class="math inline">\(r\)</span>. Payoffs are (sender, receiver):</p>
 <div id="tbl-5-finite" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-5-finite-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -662,7 +660,7 @@ Figure&nbsp;5.5: A finite signaling game. The sender’s type (<span class="math
 \]</span> and then the posterior after <span class="math inline">\(q\)</span> is also <span class="math inline">\(\mu_q = \tfrac12\)</span>, which makes playing <span class="math inline">\(r\)</span> (<span class="math inline">\(\tau(q)=0\)</span>) a best response. Every common value <span class="math inline">\(\sigma(t_1) = \sigma(t_2)
 = \sigma \in (0,1)\)</span> therefore supports a perfect Bayesian equilibrium: <span class="math display">\[
 \sigma(t_1) = \sigma(t_2) = \sigma \in (0,1), \quad \tau(b) = \tfrac12, \quad \tau(q) = 0, \quad \mu_b = \mu_q = \tfrac12 .
-\]</span> The equilibria form a continuum indexed by <span class="math inline">\(\sigma\)</span>, so PBE need not give a unique prediction.</p>
+\]</span></p>
 </section>
 </section>
 <section id="refinement-the-intuitive-criterion" class="level2" data-number="5.5">
@@ -691,7 +689,7 @@ U(H) = 6 &lt; 8 = \min_{a_2 \in BR_2(\Theta \sm D(D),\, D)} v_1(D, a_2, H) .
 </section>
 <section id="cheap-talk" class="level2" data-number="5.6">
 <h2 data-number="5.6" class="anchored" data-anchor-id="cheap-talk"><span class="header-section-number">5.6</span> Cheap talk</h2>
-<p>In a <strong>cheap-talk</strong> game, due to Crawford and Sobel, the sender’s message has <strong>no direct effect on payoffs</strong>; it is costless and payoff-irrelevant. This is the polar opposite of signaling, where the signal is costly. The question becomes whether <em>any</em> information can be credibly transmitted when talk is free.</p>
+<p>In a <strong>cheap-talk</strong> game (Crawford and Sobel), the message has no direct effect on payoffs. It can affect the receiver’s action through the information it conveys.</p>
 <p>The structure is as follows. Nature draws a type <span class="math inline">\(\theta \in \Theta\)</span> from a known distribution <span class="math inline">\(p\)</span>. The <strong>sender</strong> (player 1) learns <span class="math inline">\(\theta\)</span> and sends a message <span class="math inline">\(a_1 \in A_1\)</span>; the <strong>receiver</strong> (player 2) observes <span class="math inline">\(a_1\)</span> and chooses an action <span class="math inline">\(a_2 \in A_2\)</span>. Payoffs <span class="math inline">\(v_1(a_2, \theta)\)</span> and <span class="math inline">\(v_2(a_2, \theta)\)</span> depend on the receiver’s action and the type, <em>not</em> on the message. Strategies are <span class="math inline">\(\sigma_1: \Theta \to \Delta(A_1)\)</span> for the sender and <span class="math inline">\(\sigma_2: A_1 \to
 \Delta(A_2)\)</span> for the receiver, and player 2 holds beliefs <span class="math inline">\(\mu: A_1 \to
 \Delta(\Theta)\)</span>, with <span class="math inline">\(\mu(\cdot \mid a_1)\)</span> the posterior over types after message <span class="math inline">\(a_1\)</span>. A PBE is a pair <span class="math inline">\((\sigma_1^*, \sigma_2^*)\)</span> and beliefs <span class="math inline">\(\mu\)</span> satisfying:</p>
@@ -816,22 +814,10 @@ s_2(a_1'') = \begin{cases} \dfrac{\theta^*}{2}, &amp; a_1'' \ne a_1',\\[6pt]
 \dfrac{1+\theta^*}{2}, &amp; a_1'' = a_1', \end{cases}
 \]</span> together with beliefs <span class="math inline">\(\mu(\cdot \mid a_1'')\)</span> uniform on <span class="math inline">\([0, \theta^*]\)</span> when <span class="math inline">\(a_1'' \ne a_1'\)</span> and uniform on <span class="math inline">\([\theta^*, 1]\)</span> when <span class="math inline">\(a_1'' = a_1'\)</span>, satisfy all three PBE conditions. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>The results describe three levels of information transmission. With <em>any</em> bias <span class="math inline">\(b &gt; 0\)</span>, information can <strong>never</strong> be fully transmitted (Claim 5.1). A completely uninformative <strong>babbling</strong> equilibrium always exists (Claim 5.2). But when the bias is small enough (<span class="math inline">\(b &lt; \tfrac14\)</span>) <em>partial</em> communication is possible through a two-message, interval-partition equilibrium (Claims 5.3–5.4). Whether still finer communication is feasible (three-, four-, …, <span class="math inline">\(M\)</span>-message equilibria) is the natural next question.</p>
-</section>
-</section>
-<section id="chapter-summary" class="level2" data-number="5.7">
-<h2 data-number="5.7" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">5.7</span> Chapter summary</h2>
-<ul>
-<li>In the chain-store example there are no proper subgames, so Nash <span class="math inline">\(=\)</span> SPE. Perfect Bayesian equilibrium also requires optimality at information sets that cannot start a subgame.</li>
-<li>A perfect Bayesian equilibrium (<a href="#def-5-pbe" class="quarto-xref">Definition&nbsp;<span>5.3</span></a>) augments a Bayesian Nash equilibrium with a system of beliefs <span class="math inline">\(\mu\)</span> (<a href="#def-5-beliefs" class="quarto-xref">Definition&nbsp;<span>5.2</span></a>) and imposes four requirements: beliefs exist; on-path beliefs obey Bayes’ rule (<span class="math inline">\(\mu(x) = \Prob^{\sigma^*}(x)/\Prob^{\sigma^*}(h)\)</span>); off-path beliefs are unrestricted; and strategies are sequentially rational given beliefs.</li>
-<li>When a BNE reaches <em>every</em> information set, the consistent belief system is unique and the BNE is automatically a PBE (<a href="#prp-5-unique-belief" class="quarto-xref">Proposition&nbsp;<span>5.1</span></a>).</li>
-<li>In signaling games, an informed sender’s costly action can credibly convey its type. In Spence’s education model, the degree is completely unproductive yet signals high ability in the separating equilibrium <span class="math inline">\((DU,
-BM)\)</span>, because imitation is too costly for the low type (<span class="math inline">\(c_L = 5 &gt; c_H = 2\)</span>); there is also a pooling equilibrium <span class="math inline">\((UU, BB)\)</span> revealing nothing, and (at <span class="math inline">\(p = \tfrac12\)</span>) a mixed equilibrium with the high type educating with probability <span class="math inline">\(\tfrac25\)</span>.</li>
-<li>The intuitive criterion (<a href="#def-5-intuitive" class="quarto-xref">Definition&nbsp;<span>5.4</span></a>) refines PBE by deleting off-path beliefs on types <span class="math inline">\(D(a_1)\)</span> that would never deviate; the pooling equilibrium fails it because <span class="math inline">\(U(H) = 6 &lt; 8\)</span>, while the separating equilibrium survives.</li>
-<li>In cheap talk, the message is costless and payoff-irrelevant: full revelation is impossible for any bias (Claim 5.1), babbling always exists (Claim 5.2), and a partially informative two-message equilibrium with cutoff <span class="math inline">\(\theta^* = \tfrac12 - 2b\)</span> exists exactly when <span class="math inline">\(b &lt; \tfrac14\)</span> (Claims 5.3–5.4).</li>
-</ul>
+<p><span id="chapter-summary"></span></p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

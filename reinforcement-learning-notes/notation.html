@@ -249,13 +249,13 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>The notation follows the lectures: Chapter 1 uses dynamic-programming conventions, and Chapters 2 to 4 use RL conventions. The change occurs at the start of Chapter 2.</p>
+<p>The notation follows the lectures.</p>
 <section id="the-one-deliberate-switch" class="level2">
 <h2 class="anchored" data-anchor-id="the-one-deliberate-switch">The one deliberate switch</h2>
 <div id="tbl-n-switch" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-n-switch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: The notation changes at the Chapter 1 / Chapter 2 boundary and nowhere else.
+Table&nbsp;1: Dynamic-programming and RL conventions.
 </figcaption>
 <div aria-describedby="tbl-n-switch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -395,7 +395,6 @@ Table&nbsp;1: The notation changes at the Chapter 1 / Chapter 2 boundary and now
 <li><strong>Under which policy</strong>: a given <span class="math inline">\(\pi\)</span> (subscript <span class="math inline">\(\pi\)</span>, an <em>evaluation</em> object) or the best one (superscript <span class="math inline">\(*\)</span>, an <em>optimality</em> object).</li>
 <li><strong>Estimate or truth</strong>: no decoration is the true value; a time subscript <span class="math inline">\(v_{t},q_{t}\)</span> is the running estimate; a hat <span class="math inline">\(\hat{v},\hat{q}\)</span> is a parameterized approximation.</li>
 </ul>
-<p>So <span class="math inline">\(q_{t}(s,a)\)</span> is the time-<span class="math inline">\(t\)</span> estimate of the action value, <span class="math inline">\(q_{\pi}\)</span> is what Sarsa converges to, <span class="math inline">\(q^{*}\)</span> is what Q-learning converges to, and <span class="math inline">\(\hat{q}(s,a,w)\)</span> is a function of parameters standing in for a table.</p>
 </div>
 </div>
 </section>
@@ -454,7 +453,6 @@ Table&nbsp;1: The notation changes at the Chapter 1 / Chapter 2 boundary and now
 </section>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
-<p>The value and the policy use separate parameter vectors.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -511,13 +509,13 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Parameters <span class="math inline">\(w\)</span> and <span class="math inline">\(\theta\)</span> distinguish the last two chapters: Chapter 3 parameterizes a value and obtains the policy by <span class="math inline">\(\argmax\)</span>. Chapter 4 parameterizes the policy directly. Actor-critic uses both: <span class="math inline">\(\theta\)</span> for the actor, <span class="math inline">\(w\)</span> for the critic.</p>
+<p>Actor-critic uses both parameter vectors: <span class="math inline">\(\theta\)</span> for the actor, <span class="math inline">\(w\)</span> for the critic.</p>
 </div>
 </div>
 </section>
 <section id="macros-used-in-the-source" class="level2">
 <h2 class="anchored" data-anchor-id="macros-used-in-the-source">Macros used in the source</h2>
-<p>For anyone reading the <code>.qmd</code> source rather than the rendered page: <span class="math inline">\(\E\)</span> is <code>\E</code>, the conditional bar <span class="math inline">\(\given\)</span> is <code>\given</code>, <span class="math inline">\(\argmax\)</span> is <code>\argmax</code>, <span class="math inline">\(\defeq\)</span> is <code>\defeq</code>, <span class="math inline">\(\eps\)</span> is <code>\eps</code>, and <span class="math inline">\(\R\)</span> is <code>\R</code>. They are defined in <code>_macros.qmd</code>, which every chapter includes.</p>
+<p>In the <code>.qmd</code> source, <span class="math inline">\(\E\)</span> is <code>\E</code>, the conditional bar <span class="math inline">\(\given\)</span> is <code>\given</code>, <span class="math inline">\(\argmax\)</span> is <code>\argmax</code>, <span class="math inline">\(\defeq\)</span> is <code>\defeq</code>, <span class="math inline">\(\eps\)</span> is <code>\eps</code>, and <span class="math inline">\(\R\)</span> is <code>\R</code>. They are defined in <code>_macros.qmd</code>, which every chapter includes.</p>
 
 
 </section>

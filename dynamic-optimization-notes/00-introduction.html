@@ -318,13 +318,11 @@ window.Quarto = {
 
 
 <p><strong>Optimization</strong> studies how an agent who can rank the available actions chooses a best one. Dynamic optimization extends this choice over time: today’s action affects tomorrow’s options, and the objective ranks entire paths.</p>
-<p><a href="#sec-intro-origin" class="quarto-xref"><span>The origin of optimization problems</span></a> develops an optimization problem from rationality, an order on the choices, and a numerical objective representing that order. <a href="#sec-intro-classification" class="quarto-xref"><span>Classification of optimization problems</span></a> and <a href="#sec-intro-statement" class="quarto-xref"><span>Mathematical statement</span></a> classify the problems and introduce the calculus of variations, optimal control, and dynamic programming. <a href="#sec-intro-examples" class="quarto-xref"><span>A few examples</span></a> formulates the knapsack, consumer-choice, resource-extraction, cake-eating, and brachistochrone problems. Their solutions follow in the method chapters, beginning with <a href="./01-static-optimization.html">Static Optimization</a>.</p>
 <section id="sec-intro-origin" class="level2">
 <h2 class="anchored" data-anchor-id="sec-intro-origin">The origin of optimization problems</h2>
 <section id="rationality" class="level3">
 <h3 class="anchored" data-anchor-id="rationality">Rationality</h3>
 <p>What determines a person’s behaviour? The factors split into the <em>external</em> (coercion, example, the pull of the crowd) and the <em>internal</em> (instinct, habit, experience, character, belief, knowledge, taste). Economics uses the internal factor <strong>rationality</strong> to formulate optimization problems. We adopt a deliberately narrow working definition: rationality is the capacity for <em>logical inference and precise computation</em>; it is a mode of thought that prizes rigorous deduction over intuition, hearsay, or the worship of forces one does not understand. In this sense rationality is, as von Mises argued at length in <em>Human Action</em> <span class="citation" data-cites="vonmises1949">(<a href="references.html#ref-vonmises1949" role="doc-biblioref">Mises 1949</a>)</span>, the defining feature of deliberate human conduct, and one of the twin pillars of modern science (the other being the discipline of experiment).</p>
-<p>It helps to distinguish two grades of rationality.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -335,7 +333,6 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>Two words in that definition deserve scrutiny: <em>advantageous</em> and <em>most</em>.</p>
 <ul>
 <li><p>The “advantage” (the <em>gain</em>, the <em>good</em>) need not be selfish. Under a given moral framework, every action has a well-defined worth, and that worth may incorporate altruism, concern for others’ welfare, without ceasing to be a sharp, quantifiable standard. A purely self-regarding agent is the special case in which “advantage” means private benefit alone. So long as the worth of each action is unambiguous, the rational-agent method applies, even to the analysis of moral behaviour. In physics and engineering the objective carries no ethical content: physical laws can be expressed as extremum principles.</p></li>
 <li><p>The word “most” presupposes an <strong>order</strong> on the feasible actions under which a top element can be defined. The rest of this section specifies that order.</p></li>
@@ -351,11 +348,10 @@ window.Quarto = {
 <li><strong>Optimize</strong>: find a <span class="math inline">\(\preceq\)</span>-greatest element of <span class="math inline">\(X\)</span>.</li>
 <li><strong>Execute</strong> it.</li>
 </ol>
-<p>The later steps require a well-defined question, and its formulation affects the resulting problem. To <strong>model</strong> a real situation is precisely to turn a vague “matter” into a definite “problem”, i.e.&nbsp;to perform steps 1–3 explicitly. This book concentrates almost entirely on <strong>step 4</strong>: given the problem, find the optimum, and chiefly the <em>exact</em> (analytic) optimum, or, where no closed form exists, the <em>qualitative</em> properties of the optimum (existence, uniqueness, monotonicity, asymptotic behaviour). We do not pursue numerical algorithms for approximate solutions.</p>
+<p><strong>Modelling</strong> comprises steps 1–3. These notes focus on step 4: analytic solutions and, where no closed form exists, existence, uniqueness, monotonicity, and asymptotic behaviour.</p>
 </section>
 <section id="an-order-on-the-choice-set" class="level3">
 <h3 class="anchored" data-anchor-id="an-order-on-the-choice-set">An order on the choice set</h3>
-<p>Step 3 requires an order on the choice set.</p>
 <div id="def-preorder" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 1 (Preorder (the course’s “order”))</strong></span> A binary relation <span class="math inline">\(\preceq\)</span> on a set <span class="math inline">\(X\)</span> is a <strong>preorder</strong> (the course simply calls it an <em>order</em>) if it is</p>
 <ul>
@@ -370,7 +366,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p><strong>On the symbol <span class="math inline">\(\preceq\)</span> versus <span class="math inline">\(\le\)</span>.</strong> The course writes the abstract order with the ordinary inequality sign <span class="math inline">\(\le\)</span> on the choice set <span class="math inline">\(\aleph\)</span>. To avoid collision with the numerical <span class="math inline">\(\le\)</span> on <span class="math inline">\(\mathbb{R}\)</span>, which appears the moment we introduce a real-valued objective, we write the <em>abstract</em> order as <span class="math inline">\(\preceq\)</span> and reserve <span class="math inline">\(\le\)</span> for numbers. The choice set itself we write <span class="math inline">\(X\)</span>, not <span class="math inline">\(\aleph\)</span> (see <a href="./notation.html">notation</a>).</p>
+<p>We write the abstract order as <span class="math inline">\(\preceq\)</span> and the choice set as <span class="math inline">\(X\)</span>; the course uses <span class="math inline">\(\le\)</span> and <span class="math inline">\(\aleph\)</span>. We reserve <span class="math inline">\(\le\)</span> for numerical comparisons (see <a href="./notation.html">notation</a>).</p>
 </div>
 </div>
 </div>
@@ -394,7 +390,6 @@ x^i\le y^i\ \text{ for every } i=1,\dots,n .
 </section>
 <section id="preferences-a-complete-order" class="level3">
 <h3 class="anchored" data-anchor-id="preferences-a-complete-order">Preferences: a complete order</h3>
-<p>Adjoin to a preorder one more axiom and the incomparable pairs disappear.</p>
 <div id="def-preference" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 3 (Complete order (preference))</strong></span> A preorder <span class="math inline">\(\preceq\)</span> on <span class="math inline">\(X\)</span> is a <strong>complete order</strong> (a <strong>total</strong> order, an economic <strong>preference</strong>) if it is</p>
 <ul>
@@ -406,7 +401,7 @@ x^i\le y^i\ \text{ for every } i=1,\dots,n .
 </section>
 <section id="from-the-order-to-a-numerical-objective" class="level3">
 <h3 class="anchored" data-anchor-id="from-the-order-to-a-numerical-objective">From the order to a numerical objective</h3>
-<p>How does one <em>install</em> a complete order on <span class="math inline">\(X\)</span> in practice? Almost always by <strong>evaluating</strong> the options, assigning each a value and inheriting the order of the values. Formally, one chooses a <strong>value set</strong> <span class="math inline">\(Y\)</span> that already carries a natural order <span class="math inline">\(\le_Y\)</span>, and a map</p>
+<p>Choose an ordered <strong>value set</strong> <span class="math inline">\((Y,\le_Y)\)</span> and a map</p>
 <p><span id="eq-Fmap"><span class="math display">\[
 f : X \longrightarrow Y ,
 \tag{2}\]</span></span></p>
@@ -420,7 +415,7 @@ x_1 \preceq x_2 \quad\Longleftrightarrow\quad f(x_1)\le_Y f(x_2).
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p>Equation <a href="#eq-induced-order" class="quarto-xref">Equation&nbsp;<span>3</span></a> compares actions through their values in the ordered set <span class="math inline">\(Y\)</span>. The modelling task is to choose an <span class="math inline">\(f\)</span> that reproduces the agent’s ranking.</p>
+<p>The modelling task is to choose an <span class="math inline">\(f\)</span> that reproduces the agent’s ranking.</p>
 </div>
 </div>
 </div>
@@ -433,14 +428,13 @@ x_1 \preceq x_2 \quad\Longleftrightarrow\quad f(x_1)\le_Y f(x_2).
 <li></li>
 </ol></li>
 </ul>
-<p>We will see in <a href="#sec-intro-statement" class="quarto-xref"><span>Mathematical statement</span></a> that maximizing <span class="math inline">\(f\)</span> is the standard <em>form</em> of every optimization problem in this book; the construction just given is <em>why</em> that form captures rational choice.</p>
 </section>
 </section>
 <section id="sec-intro-classification" class="level2">
 <h2 class="anchored" data-anchor-id="sec-intro-classification">Classification of optimization problems</h2>
 <p>Four distinctions classify the problem <span class="math inline">\(\max_{x\in X}f(x)\)</span> and determine the methods used below.</p>
-<p><strong>(i) Static versus dynamic.</strong> If an action is taken once and its consequences for the <em>future</em> may be ignored, the problem is <strong>static</strong>: one chooses a single point <span class="math inline">\(x\in X\)</span> and is done. If instead the action’s effect on the future cannot be neglected, or, more sharply, if one must choose a <em>whole sequence or path</em> of actions whose cumulative effect is what matters, the problem is <strong>dynamic</strong>: the unknown is itself a sequence <span class="math inline">\((x_0,x_1,\dots)\)</span> or a function of time <span class="math inline">\(x(\cdot)\)</span>. The distinction depends on whether present actions affect future outcomes.</p>
-<p><strong>(ii) Discrete versus continuous time.</strong> A dynamic problem is <strong>discrete-time</strong> when decisions are made at a sequence of isolated instants <span class="math inline">\(t=0,1,2,\dots\)</span> (the unknown is a sequence), and <strong>continuous-time</strong> when decisions are made throughout an interval <span class="math inline">\([0,T]\)</span>, possibly with <span class="math inline">\(T=\infty\)</span> (the unknown is a path <span class="math inline">\(x:[0,T]\to\mathbb{R}^n\)</span>). The two are not cosmetic variants: the discrete problem is governed by <em>difference</em> equations and recursions, the continuous one by <em>differential</em> equations, and their natural tools differ accordingly.</p>
+<p><strong>(i) Static versus dynamic.</strong> A <strong>static</strong> problem chooses a point <span class="math inline">\(x\in X\)</span> when future consequences can be ignored. A <strong>dynamic</strong> problem chooses a sequence <span class="math inline">\((x_0,x_1,\dots)\)</span> or path <span class="math inline">\(x(\cdot)\)</span> when present actions affect future outcomes.</p>
+<p><strong>(ii) Discrete versus continuous time.</strong> A dynamic problem is <strong>discrete-time</strong> when decisions are made at a sequence of isolated instants <span class="math inline">\(t=0,1,2,\dots\)</span> (the unknown is a sequence), and <strong>continuous-time</strong> when decisions are made throughout an interval <span class="math inline">\([0,T]\)</span>, possibly with <span class="math inline">\(T=\infty\)</span> (the unknown is a path <span class="math inline">\(x:[0,T]\to\mathbb{R}^n\)</span>). Discrete-time problems use difference equations and recursions; continuous-time problems use differential equations.</p>
 <p><strong>(iii) Deterministic versus stochastic.</strong> When the agent’s environment is known with certainty, the problem is <strong>deterministic</strong>. When the law of motion or payoff is random, the problem is <strong>stochastic</strong>. The objective is an <em>expected</em> value, and the methods use conditional expectations and Itô calculus.</p>
 <p><strong>(iv) By the type of decision variable.</strong> When the decision variable ranges over a <em>discrete</em> set the problem is <strong>combinatorial</strong>, a family that includes <strong>integer programming</strong> and <strong>0–1 programming</strong> (binary choices). When the decision variable ranges over a <em>continuum</em> the problem is the smooth optimization of calculus, and carries no special name.</p>
 <div class="callout callout-style-simple callout-note">
@@ -449,7 +443,7 @@ x_1 \preceq x_2 \quad\Longleftrightarrow\quad f(x_1)\le_Y f(x_2).
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p>The course develops <em>continuous-variable</em> dynamic optimization, mostly <em>deterministic</em>. The calculus of variations and optimal control are treated in <strong>continuous time only</strong>; dynamic programming is treated in <strong>both discrete and continuous time</strong>, and is where the stochastic case enters. Static optimization is included as a <em>foundation and a foil</em> (<a href="#sec-intro-statement" class="quarto-xref"><span>Mathematical statement</span></a>), and the qualitative theory of ordinary differential equations as the <em>prerequisite</em> for everything continuous-time. Combinatorial problems such as the knapsack (<a href="05-dynamic-programming.html#exm-knapsack" class="quarto-xref">Example&nbsp;<span>6.4</span></a>) appear only to motivate; we do not develop their algorithmics.</p>
+<p>The course develops <em>continuous-variable</em> dynamic optimization, mostly <em>deterministic</em>. The calculus of variations and optimal control are treated in <strong>continuous time only</strong>; dynamic programming is treated in <strong>both discrete and continuous time</strong>, and is where the stochastic case enters. Static optimality conditions (<a href="#sec-intro-statement" class="quarto-xref"><span>Mathematical statement</span></a>) and ODE theory support the continuous-time methods. Combinatorial problems such as the knapsack (<a href="05-dynamic-programming.html#exm-knapsack" class="quarto-xref">Example&nbsp;<span>6.4</span></a>) appear only to motivate; we do not develop their algorithmics.</p>
 </div>
 </div>
 </div>
@@ -470,7 +464,6 @@ x_1 \preceq x_2 \quad\Longleftrightarrow\quad f(x_1)\le_Y f(x_2).
 <li><span class="math inline">\(x\)</span> is the <strong>decision variable</strong> (optimization variable);</li>
 <li><span class="math inline">\(f\)</span> is the <strong>objective</strong>, and <span class="math inline">\(\max\)</span> means the greatest value of <span class="math inline">\(f\)</span> under the order on its codomain.</li>
 </ul>
-<p>When the codomain of <span class="math inline">\(f\)</span> is <span class="math inline">\(Y=\mathbb{R}\)</span> the problem is <strong>single-objective</strong>; the order is the complete order of the real line and a maximum is a genuine maximum. When <span class="math inline">\(Y=\mathbb{R}^n\)</span> with <span class="math inline">\(n&gt;1\)</span> the problem is <strong>multi-objective</strong>, the order is Pareto, and “max” means a Pareto optimum. <em>This book treats only the single-objective case, <span class="math inline">\(Y=\mathbb{R}\)</span>.</em></p>
 <div class="callout callout-style-simple callout-tip">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -481,19 +474,19 @@ x_1 \preceq x_2 \quad\Longleftrightarrow\quad f(x_1)\le_Y f(x_2).
 \max_{x}\ \theta x-x^2 \quad\text{s.t.}\quad x\in[0,\theta]
 \qquad\text{versus}\qquad
 \max_{(x,\theta)}\ \theta x-x^2 \quad\text{s.t.}\quad x\in[0,\theta],\ \theta\in[0,1].
-\]</span> In the first, <span class="math inline">\(\theta\)</span> is a fixed parameter and the optimizer chooses only <span class="math inline">\(x\)</span> (obtaining a value <span class="math inline">\(V(\theta)\)</span> that depends on <span class="math inline">\(\theta\)</span>); in the second, <span class="math inline">\(\theta\)</span> is <em>also</em> chosen. The two are different problems. They are related, however, by the <strong>nested-maximization identity</strong> <span id="eq-nested-max"><span class="math display">\[
+\]</span> In the first, <span class="math inline">\(\theta\)</span> is a fixed parameter and the optimizer chooses only <span class="math inline">\(x\)</span> (obtaining a value <span class="math inline">\(V(\theta)\)</span> that depends on <span class="math inline">\(\theta\)</span>); in the second, <span class="math inline">\(\theta\)</span> is <em>also</em> chosen. The <strong>nested-maximization identity</strong> relates them: <span id="eq-nested-max"><span class="math display">\[
 \max_{(x,\theta)}f(x,\theta)
 =\max_{\theta}\Bigl(\max_{x}f(x,\theta)\Bigr)
 =\max_{x}\Bigl(\max_{\theta}f(x,\theta)\Bigr),
-\tag{5}\]</span></span> which says a joint maximum may be found by optimizing the variables in either order, one block at a time. This iterated-optimization identity is, in embryo, the principle behind dynamic programming.</p>
+\tag{5}\]</span></span> The nested maximization underlies dynamic programming.</p>
 </div>
 </div>
 </div>
-<p>In the <strong>static</strong> problems of <a href="./01-static-optimization.html">Chapter 1</a> the feasible set is a subset of Euclidean space carved out by constraints, <span class="math inline">\(X=\{x\in\mathbb{R}^n: g(x)\ge 0,\ h(x)=0\}\)</span>, and <span class="math inline">\(f:X\to\mathbb{R}\)</span> is an ordinary function. In the <strong>dynamic</strong> problems the feasible set is a subset of a <em>function space</em>, paths <span class="math inline">\(x(\cdot)\)</span> in <span class="math inline">\(C^1[0,T]\)</span> in continuous time, sequences <span class="math inline">\((x_t)\)</span> in discrete time, and the objective is a <strong>functional</strong>: an integral <span class="math inline">\(\int_0^T(\cdots)\,\mathrm{d}t\)</span> in continuous time or a sum <span class="math inline">\(\sum_t(\cdots)\)</span> in discrete time. The decision variable is then an entire function or sequence, which is exactly what makes dynamic optimization harder than static: the decision variable is a curve.</p>
+<p>In the <strong>static</strong> problems of <a href="./01-static-optimization.html">Chapter 1</a> the feasible set is a subset of Euclidean space carved out by constraints, <span class="math inline">\(X=\{x\in\mathbb{R}^n: g(x)\ge 0,\ h(x)=0\}\)</span>, and <span class="math inline">\(f:X\to\mathbb{R}\)</span> is an ordinary function. In the <strong>dynamic</strong> problems the feasible set is a subset of a <em>function space</em>, paths <span class="math inline">\(x(\cdot)\)</span> in <span class="math inline">\(C^1[0,T]\)</span> in continuous time, sequences <span class="math inline">\((x_t)\)</span> in discrete time, and the objective is a <strong>functional</strong>: an integral <span class="math inline">\(\int_0^T(\cdots)\,\mathrm{d}t\)</span> in continuous time or a sum <span class="math inline">\(\sum_t(\cdots)\)</span> in discrete time.</p>
 </section>
 <section id="the-three-canonical-dynamic-problems" class="level3">
 <h3 class="anchored" data-anchor-id="the-three-canonical-dynamic-problems">The three canonical dynamic problems</h3>
-<p>The continuous-time dynamic-optimization problems that economics needs are solved by three methods, each with its own standard problem and its own central tool. The chapters below develop these methods.</p>
+<p>The three methods use the following standard problems.</p>
 <div id="tbl-three-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-three-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -534,11 +527,10 @@ Table&nbsp;1: The three methods of dynamic optimization, their standard problems
 </div>
 </figure>
 </div>
-<p>The methods differ in the choice variable and the representation of dynamics.</p>
 <p><strong>Calculus of variations.</strong> The unknown is the path <span class="math inline">\(x(\cdot)\)</span> itself; its rate of change <span class="math inline">\(\dot x\)</span> enters the integrand <span class="math inline">\(F(t,x,\dot x)\)</span> directly. With <span class="math inline">\(F\)</span> twice differentiable, <span class="math inline">\(T\)</span> a positive number or <span class="math inline">\(\infty\)</span>, and <span class="math inline">\(x_0\)</span> a constant, the necessary condition for optimality is the <strong>Euler equation</strong> <span id="eq-intro-euler"><span class="math display">\[
 F_x = \frac{\mathrm{d}}{\mathrm{d}t}F_{\dot x},
 \tag{6}\]</span></span> a (generally second-order) differential equation for the optimal path. This is the subject of <a href="./03-calculus-of-variations.html">Chapter 3</a>.</p>
-<p><strong>Optimal control.</strong> Here one separates the <strong>state</strong> <span class="math inline">\(x\)</span> (what the system <em>is</em>) from the <strong>control</strong> <span class="math inline">\(u\)</span> (the lever the agent <em>pulls</em>), linked by a <strong>state equation</strong> (law of motion) <span class="math inline">\(\dot x=g(t,x,u)\)</span>; the agent chooses <span class="math inline">\(u(\cdot)\)</span> and the state responds. The running payoff is <span class="math inline">\(f(t,x,u)\)</span>. The necessary condition is <strong>Pontryagin’s maximum principle</strong> <span class="citation" data-cites="pontryagin1962">(<a href="references.html#ref-pontryagin1962" role="doc-biblioref">Pontryagin et al. 1962</a>)</span>, organized around the <strong>Hamiltonian</strong> <span id="eq-intro-hamiltonian"><span class="math display">\[
+<p><strong>Optimal control.</strong> The <strong>state</strong> <span class="math inline">\(x\)</span> and <strong>control</strong> <span class="math inline">\(u\)</span> are linked by a <strong>state equation</strong> (law of motion) <span class="math inline">\(\dot x=g(t,x,u)\)</span>; the agent chooses <span class="math inline">\(u(\cdot)\)</span> and the state responds. The running payoff is <span class="math inline">\(f(t,x,u)\)</span>. The necessary condition is <strong>Pontryagin’s maximum principle</strong> <span class="citation" data-cites="pontryagin1962">(<a href="references.html#ref-pontryagin1962" role="doc-biblioref">Pontryagin et al. 1962</a>)</span>, organized around the <strong>Hamiltonian</strong> <span id="eq-intro-hamiltonian"><span class="math display">\[
 H(t,x,u,\lambda)=f(t,x,u)+\lambda\,g(t,x,u),
 \tag{7}\]</span></span> in which the multiplier <span class="math inline">\(\lambda\)</span> on the state equation, the <strong>costate</strong>, is the <em>shadow price</em> of the state. The maximum principle says the optimal control maximizes <span class="math inline">\(H\)</span> pointwise while the costate obeys its own differential equation <span class="math inline">\(\dot\lambda=-H_x\)</span>. This is <a href="./04-optimal-control.html">Chapter 4</a>. The calculus of variations is the special case <span class="math inline">\(g(t,x,u)=u\)</span>, <span class="math inline">\(\dot x=u\)</span>, i.e.&nbsp;the control <em>is</em> the velocity, so optimal control strictly generalizes it.</p>
 <p><strong>Dynamic programming.</strong> Written here in <strong>discrete time</strong>, the agent maximizes a discounted sum of per-period payoffs <span class="math inline">\(\pi(t,x_t,u_t)\)</span> subject to a transition <span class="math inline">\(x_{t+1}=f(t,x_t,u_t)\)</span>, with the <strong>discount factor</strong> <span class="math inline">\(\beta=\tfrac{1}{1+\rho}\in(0,1)\)</span>. The central tool is the <strong>Bellman equation</strong> <span class="citation" data-cites="bellman1957">(<a href="references.html#ref-bellman1957" role="doc-biblioref">Bellman 1957</a>)</span>, the recursion <span id="eq-intro-bellman"><span class="math display">\[
@@ -566,16 +558,15 @@ V_t(x)=\max_{u}\bigl\{\pi(t,x,u)+\beta\,V_{t+1}\bigl(f(t,x,u)\bigr)\bigr\},
 <div class="callout-body-container">
 <p><strong>Costate <span class="math inline">\(=\)</span> gradient of the value function.</strong> Pontryagin’s costate <span class="math inline">\(\lambda(t)\)</span> equals the gradient of Bellman’s value function evaluated along the optimal path, <span id="eq-intro-bridge"><span class="math display">\[
 \lambda(t)=V_x\bigl(t,x^\ast(t)\bigr).
-\tag{9}\]</span></span> Both quantities are <em>the same shadow price</em> of the state: the marginal value, at the optimum, of an extra unit of the state variable. Read this way, the maximum principle’s costate equation <span class="math inline">\(\dot\lambda=-H_x\)</span> and the HJB equation are two encodings of the same economics, and the Hamiltonian <a href="#eq-intro-hamiltonian" class="quarto-xref">Equation&nbsp;<span>7</span></a> is the HJB equation’s maximand. The later chapters derive <a href="#eq-intro-bridge" class="quarto-xref">Equation&nbsp;<span>9</span></a> after developing both methods.</p>
+\tag{9}\]</span></span> Both measure the marginal value of the state along the optimal path. The Hamiltonian <a href="#eq-intro-hamiltonian" class="quarto-xref">Equation&nbsp;<span>7</span></a> is the HJB maximand; <a href="./05-dynamic-programming.html">Chapter 5</a> derives <a href="#eq-intro-bridge" class="quarto-xref">Equation&nbsp;<span>9</span></a>.</p>
 </div>
 </div>
 </div>
-<p>A second bridge runs to the <em>static</em> theory of <a href="./01-static-optimization.html">Chapter 1</a>. The Hamiltonian and the Bellman maximand are each maximized by a <strong>first-order (KKT-type) condition</strong> in the control, so at every instant a dynamic problem hides a static one. The costate and the value-function gradient are the dynamic descendants of the static Lagrange multiplier and envelope derivative. Static optimization supplies these optimality conditions, and the qualitative theory of ODEs provides the tools for studying the resulting continuous-time systems.</p>
+<p>The Hamiltonian and Bellman maximand use the static optimality conditions of <a href="./01-static-optimization.html">Chapter 1</a>. ODE theory then describes the resulting continuous-time systems.</p>
 </section>
 </section>
 <section id="sec-intro-examples" class="level2">
 <h2 class="anchored" data-anchor-id="sec-intro-examples">A few examples</h2>
-<p>The following examples specify the decision variables, feasible sets, and objectives in <a href="#eq-standard-form" class="quarto-xref">Equation&nbsp;<span>4</span></a>. Each links to the chapter that develops its solution method.</p>
 <section id="static-and-combinatorial-examples" class="level3">
 <h3 class="anchored" data-anchor-id="static-and-combinatorial-examples">Static and combinatorial examples</h3>
 <div id="exm-knapsack" class="theorem example">
@@ -583,7 +574,7 @@ V_t(x)=\max_{u}\bigl\{\pi(t,x,u)+\beta\,V_{t+1}\bigl(f(t,x,u)\bigr)\bigr\},
 \max_{(x_1,\dots,x_n)}\ \sum_{i=1}^{n} v_i\,x_i
 \qquad\text{s.t.}\qquad
 \sum_{i=1}^{n}\omega_i\,x_i\le W,\quad x_i\in\{0,1\}\ \ (i=1,\dots,n).
-\]</span> This is a <strong>0–1 (binary) program</strong>: the decision variable is a vector of bits, the feasible set is combinatorial, and the methods of smooth calculus do not apply directly. We list it to mark the boundary of this book’s scope (continuous variables); its natural home is integer programming and, when stages are introduced, the <em>discrete</em> dynamic programming of <a href="./05-dynamic-programming.html">Chapter 5</a>.</p>
+\]</span> This <strong>0–1 (binary) program</strong> is solved by discrete dynamic programming in <a href="./05-dynamic-programming.html">Chapter 5</a>.</p>
 </div>
 <div id="exm-consumer" class="theorem example">
 <p><span class="theorem-title"><strong>Example 3 (The consumer’s problem (static, continuous))</strong></span> An agent with budget <span class="math inline">\(C&gt;0\)</span> buys quantities <span class="math inline">\(x_1,\dots,x_n\)</span> of <span class="math inline">\(n\)</span> goods at prices <span class="math inline">\(p_1,\dots,p_n&gt;0\)</span> to maximize utility <span class="math inline">\(U(x_1,\dots,x_n)\)</span>: <span class="math display">\[
@@ -614,8 +605,7 @@ p_1 x_1+\cdots+p_n x_n\le C,\quad x_1\ge 0,\dots,x_n\ge 0 .
 \max_{(c_t)_{t\ge 0}}\ \sum_{t=0}^{\infty}\beta^{t}\,u(c_t)
 \qquad\text{s.t.}\qquad
 x_{t+1}=x_t-c_t,\quad 0\le c_t\le x_t,\quad x_0=1 .
-\]</span> This is the canonical <strong>dynamic-programming</strong> problem: state <span class="math inline">\(x_t\)</span> (cake remaining), control <span class="math inline">\(c_t\)</span> (amount eaten), transition <span class="math inline">\(x_{t+1}=x_t-c_t\)</span>, discounted-sum objective. It is the simplest non-trivial test of the Bellman equation <a href="#eq-intro-bellman" class="quarto-xref">Equation&nbsp;<span>8</span></a> and is solved in <a href="./05-dynamic-programming.html">Chapter 5</a>.</p>
-<p>The course originally writes the discount factor as <span class="math inline">\(\rho\in(0,1)\)</span>; per the discount-trap convention we write it <span class="math inline">\(\beta\)</span>, reserving <span class="math inline">\(\rho\)</span> for the continuous-time <em>rate</em>.</p>
+\]</span> <a href="./05-dynamic-programming.html">Chapter 5</a> solves this problem using the Bellman equation <a href="#eq-intro-bellman" class="quarto-xref">Equation&nbsp;<span>8</span></a>.</p>
 </div>
 </section>
 <section id="the-brachistochrone-where-the-subject-began" class="level3">
@@ -634,22 +624,21 @@ T[y]=\int_0^p \frac{\sqrt{1+y'^2}}{\sqrt{2gy}}\,\mathrm{d}x .
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p><strong>A historical aside.</strong> The cycloid is also the <strong>tautochrone</strong> (isochrone), the curve along which a bead reaches the lowest point in a time <em>independent of its starting height</em>. That a single curve solves both problems was shown by Abel, who reduced the tautochrone to an integral equation and cracked it with the Laplace transform and the convolution theorem. The brachistochrone connects these methods from mechanics, optics, and analysis.</p>
+<p><strong>A historical aside.</strong> The cycloid is also the <strong>tautochrone</strong> (isochrone), the curve along which a bead reaches the lowest point in a time <em>independent of its starting height</em>. That a single curve solves both problems was shown by Abel, who reduced the tautochrone to an integral equation and cracked it with the Laplace transform and the convolution theorem.</p>
 </div>
 </div>
 </div>
-<p>Static optimization chooses a number or vector; dynamic optimization chooses a function or path. The continuous-time methods below characterize optimality through the Euler equation, costate equation, or HJB equation. After static optimization, <a href="./02-odes.html">Chapter 2</a> develops the qualitative theory of ODEs needed to study these systems.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-bellman1957" class="csl-entry" role="listitem">
-Bellman, Richard. 1957. <em>Dynamic Programming</em>. Princeton, NJ: Princeton University Press.
+Bellman, Richard. 1957. <em>Dynamic Programming</em>. Princeton University Press.
 </div>
 <div id="ref-vonmises1949" class="csl-entry" role="listitem">
-Mises, Ludwig von. 1949. <em>Human Action: A Treatise on Economics</em>. New Haven, CT: Yale University Press.
+Mises, Ludwig von. 1949. <em>Human Action: A Treatise on Economics</em>. Yale University Press.
 </div>
 <div id="ref-pontryagin1962" class="csl-entry" role="listitem">
-Pontryagin, L. S., V. G. Boltyanskii, R. V. Gamkrelidze, and E. F. Mishchenko. 1962. <em>The Mathematical Theory of Optimal Processes</em>. New York: Interscience Publishers.
+Pontryagin, L. S., V. G. Boltyanskii, R. V. Gamkrelidze, and E. F. Mishchenko. 1962. <em>The Mathematical Theory of Optimal Processes</em>. Interscience Publishers.
 </div>
 </div>
 </section>

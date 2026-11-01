@@ -223,7 +223,6 @@ window.Quarto = {
   <li><a href="#sec-4-revenue" id="toc-sec-4-revenue" class="nav-link" data-scroll-target="#sec-4-revenue">Revenue equivalence</a></li>
   <li><a href="#sec-4-winners-curse" id="toc-sec-4-winners-curse" class="nav-link" data-scroll-target="#sec-4-winners-curse">Common-value auctions and the winner’s curse</a></li>
   </ul></li>
-  <li><a href="#sec-4-summary" id="toc-sec-4-summary" class="nav-link" data-scroll-target="#sec-4-summary"><span class="header-section-number">4.6</span> Chapter summary</a></li>
   </ul>
 </nav>
     </div>
@@ -263,7 +262,7 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>So far players have known everything about the game they are playing. But in many strategic situations a player is uncertain about something fundamental: a rival’s costs, a buyer’s valuation, an opponent’s preferences. This chapter develops the model of <strong>incomplete information</strong>, in which each player has a privately known <strong>type</strong>. The central device, due to John Harsanyi, is to let a fictitious player “Nature” draw the types at the start of the game, converting incomplete information into an extensive-form game of <em>imperfect</em> information that we can analyse with the tools of <a href="03-dynamic-complete.html" class="quarto-xref"><span>Chapter 3</span></a>. The resulting equilibrium concept is the <strong>Bayesian Nash equilibrium</strong>, and we put it to work on Cournot competition, public-good provision, the market for lemons, jury voting, the purification of mixed strategies, and the theory of auctions.</p>
+<p>In a game of <strong>incomplete information</strong>, a player may privately know a cost, valuation, or preference. Harsanyi represents this information as a <strong>type</strong> drawn by Nature before players choose their actions.</p>
 <section id="sec-4-chicken" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="sec-4-chicken"><span class="header-section-number">4.1</span> A motivating example</h2>
 <p>Two teenagers drive toward each other; each can <strong>swerve</strong> (be “chicken”) or <strong>continue</strong> straight. In the complete-information <strong>game of Chicken</strong>, player 1 chooses a row <span class="math inline">\(C\)</span> (swerve) or <span class="math inline">\(D\)</span> (drive on) and player 2 a column <span class="math inline">\(c\)</span> or <span class="math inline">\(d\)</span>:</p>
@@ -371,12 +370,11 @@ Table&nbsp;4.2: Chicken with private punishment, <span class="math inline">\(R=8
 </div>
 </figure>
 </div>
-<p>Checking best responses cell by cell, the game has a <strong>unique pure-strategy Nash equilibrium, <span class="math inline">\((DC, dc)\)</span></strong>. Reading off the convention: a teenager with <em>harsh</em> parents (<span class="math inline">\(k_i = H\)</span>) swerves, while a teenager with <em>lenient</em> parents (<span class="math inline">\(k_i = L\)</span>) drives on. The threat of severe punishment makes the harsh-parented type back down, as obtained by transforming the incomplete-information game into an extensive form.</p>
+<p>Checking best responses cell by cell, the game has a <strong>unique pure-strategy Nash equilibrium, <span class="math inline">\((DC, dc)\)</span></strong>. Reading off the convention: a teenager with <em>harsh</em> parents (<span class="math inline">\(k_i = H\)</span>) swerves, while a teenager with <em>lenient</em> parents (<span class="math inline">\(k_i = L\)</span>) drives on.</p>
 </section>
 <section id="sec-4-bayesian" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="sec-4-bayesian"><span class="header-section-number">4.2</span> Bayesian games</h2>
-<p>The general Bayesian-game model uses types and a prior. Each player <span class="math inline">\(i\)</span> has a <strong>type</strong> <span class="math inline">\(\theta_i\)</span> summarising his privately known characteristics, drawn from a <strong>type space</strong> <span class="math inline">\(\Theta_i\)</span>. Write <span class="math inline">\(\Theta = \Theta_1 \times \cdots \times \Theta_n\)</span> for the set of type profiles and <span class="math inline">\(A = A_1 \times \cdots \times A_n\)</span> for the set of action profiles. Payoffs may depend on the whole type profile, <span class="math inline">\(v_i : A \times \Theta \to
-\R\)</span>. The distribution of types is governed by a <strong>common prior</strong>: a single probability distribution over <span class="math inline">\(\Theta\)</span> that is common knowledge.</p>
+<p>Write <span class="math inline">\(\Theta = \Theta_1 \times \cdots \times \Theta_n\)</span> for the type profiles and <span class="math inline">\(A = A_1 \times \cdots \times A_n\)</span> for the action profiles. The common prior is common knowledge.</p>
 <div id="def-4-bayesian-game" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 4.1 (Bayesian game)</strong></span> The normal-form representation of an <span class="math inline">\(n\)</span>-player <strong>Bayesian game</strong> (or <strong>static game of incomplete information</strong>) is the tuple <span class="math display">\[
 \big(N,\ \{A_i\}_{i=1}^n,\ \{\Theta_i\}_{i=1}^n,\ \{v_i\}_{i=1}^n,\ \Prob\big),
@@ -431,7 +429,6 @@ Table&nbsp;4.3: A correlated prior over <span class="math inline">\((\theta_1,\t
 </div>
 <p>the posteriors become <span class="math inline">\(\phi_i(L\given L) = \tfrac23\)</span>, <span class="math inline">\(\phi_i(H\given L) =
 \tfrac13\)</span>, <span class="math inline">\(\phi_i(L\given H) = \tfrac13\)</span>, <span class="math inline">\(\phi_i(H\given H) = \tfrac23\)</span>: different types hold different beliefs, and every type thinks the opponent is more likely to be the <em>same</em> type as himself.</p>
-<p>A strategy must specify what to do as a function of one’s type.</p>
 <div id="def-4-strategy" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 4.2 (Strategies in a Bayesian game)</strong></span> In a Bayesian game <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>:</p>
 <ul>
@@ -444,7 +441,6 @@ Table&nbsp;4.3: A correlated prior over <span class="math inline">\((\theta_1,\t
 \phi_i(\theta_{-i} \given \theta_i)\,
 v_i\big(a_i, s_{-i}(\theta_{-i});\ \theta_i, \theta_{-i}\big).
 \]</span></p>
-<p>The equilibrium concept now requires that <em>every type</em> of every player be playing a best response in this conditional sense.</p>
 <div id="def-4-bne" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 4.3 (Bayesian Nash equilibrium)</strong></span> In the Bayesian game <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>, a strategy profile <span class="math inline">\(s^* = (s_1^*, \dots, s_n^*)\)</span> is a <strong>(pure-strategy) Bayesian Nash equilibrium (BNE)</strong> if for every player <span class="math inline">\(i\)</span> and every type <span class="math inline">\(\theta_i \in \Theta_i\)</span>, <span id="eq-4-bne"><span class="math display">\[
 \sum_{\theta_{-i}} \phi_i(\theta_{-i} \given \theta_i)\,
@@ -455,7 +451,6 @@ v_i\big(a_i, s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big)
 \quad \text{for all } a_i \in A_i.
 \tag{4.1}\]</span></span> A mixed-strategy BNE is defined analogously.</p>
 </div>
-<p>The condition says that no type of any player wants to deviate. The next result confirms that this is exactly the Nash equilibrium of the Harsanyi extensive form, so the two views agree.</p>
 <div id="thm-4-bne-ne" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 4.1 (BNE equals NE of the extensive form)</strong></span> In any Bayesian game, a strategy profile is a Bayesian Nash equilibrium if and only if it is a Nash equilibrium of the equivalent extensive-form game with Nature (<a href="03-dynamic-complete.html#def-3-extensive" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>).</p>
 </div>
@@ -518,7 +513,7 @@ v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big).
 \phi_1 = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{pmatrix},
 \qquad
 \phi_2 = \begin{pmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{pmatrix},
-\]</span> where the rows of <span class="math inline">\(\phi_1\)</span> are player 1’s own type <span class="math inline">\(\theta_1 \in \{H, L\}\)</span> and the columns are <span class="math inline">\(\theta_2 \in \{H, L\}\)</span> (and symmetrically for <span class="math inline">\(\phi_2\)</span>). Suppose a common prior <span class="math inline">\(\Prob\)</span> generated these. From <span class="math inline">\(\phi_1\)</span>, type <span class="math inline">\(H\)</span> of player 1 is <em>sure</em> the opponent is <span class="math inline">\(H\)</span>, so <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) = 0\)</span>. But from <span class="math inline">\(\phi_2\)</span>, type <span class="math inline">\(H\)</span> of player 2 is sure player 1 is <span class="math inline">\(L\)</span>, which forces <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) &gt; 0\)</span>. Contradiction: no common prior exists.</p>
+\]</span> where the rows of <span class="math inline">\(\phi_1\)</span> are player 1’s own type <span class="math inline">\(\theta_1 \in \{H, L\}\)</span> and the columns are <span class="math inline">\(\theta_2 \in \{H, L\}\)</span> (and symmetrically for <span class="math inline">\(\phi_2\)</span>). Suppose a common prior <span class="math inline">\(\Prob\)</span> generated these. From <span class="math inline">\(\phi_1\)</span>, type <span class="math inline">\(H\)</span> of player 1 is <em>sure</em> the opponent is <span class="math inline">\(H\)</span>, so <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) = 0\)</span>. But from <span class="math inline">\(\phi_2\)</span>, type <span class="math inline">\(L\)</span> of player 2 is sure player 1 is <span class="math inline">\(H\)</span>, which forces <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) &gt; 0\)</span>. Contradiction: no common prior exists.</p>
 </div>
 </div>
 </section>
@@ -545,8 +540,7 @@ q_h^* = \frac{a - 2c_h + c_2}{3} + \frac{1 - \theta}{6}(c_h - c_\ell),
 q_\ell^* = \frac{a - 2c_\ell + c_2}{3} - \frac{\theta}{6}(c_h - c_\ell),
 \]</span> <span class="math display">\[
 q_2^* = \frac{a - 2c_2 + \theta c_h + (1-\theta) c_\ell}{3}.
-\]</span> The benchmark complete-information Cournot outputs are recovered by setting <span class="math inline">\(c_h = c_\ell\)</span>. The new feature is the correction term <span class="math inline">\(\pm\frac{1}{6}(c_h -
-c_\ell)\)</span> in firm 1’s outputs: relative to a firm that knew its own cost and faced a rival who knew it too, the high-cost type produces a little <em>more</em> and the low-cost type a little <em>less</em>, because firm 2 hedges against firm 1’s uncertain cost and firm 1 responds to that hedging.</p>
+\]</span> Setting <span class="math inline">\(c_h = c_\ell\)</span> recovers complete-information Cournot outputs. When costs differ, firm 2 responds to their expected value. Relative to the corresponding complete-information outcome, this makes the high-cost type produce more and the low-cost type less, as the correction terms above show.</p>
 </section>
 <section id="sec-4-studygroups" class="level3">
 <h3 class="anchored" data-anchor-id="sec-4-studygroups">Study groups</h3>
@@ -578,7 +572,7 @@ p^{\sigma_2} = 1 - \min\!\Big\{1,\ \sqrt{c/(1 - p^{\sigma_1})}\Big\}.
 1, &amp; \theta_i &gt; c^{1/3},\\
 0, &amp; \theta_i &lt; c^{1/3}.
 \end{cases}
-\]</span> (“Essentially” because the borderline type <span class="math inline">\(\theta_i = c^{1/3}\)</span> may play any <span class="math inline">\(\sigma_i(\theta_i) \in [0,1]\)</span> without affecting anything, the event having probability zero.) Only sufficiently high types contribute; the cutoff reflects free-riding in public-good provision.</p>
+\]</span> (“Essentially” because the borderline type <span class="math inline">\(\theta_i = c^{1/3}\)</span> may play any <span class="math inline">\(\sigma_i(\theta_i) \in [0,1]\)</span> without affecting anything, the event having probability zero.)</p>
 </section>
 </section>
 <section id="sec-4-applications" class="level2" data-number="4.4">
@@ -606,7 +600,7 @@ s_1^\theta(p) =
 a, &amp; p \ge v_1(\theta),\\
 r, &amp; p &lt; v_1(\theta).
 \end{cases}
-\]</span> Only the lowest-quality cars remain on the market and trade; the fair and good cars, which it would be efficient to sell, do not. This is <strong>adverse selection</strong>: asymmetric information drives high-quality sellers out and selects sellers adverse to the buyer, producing an inefficient outcome even though complete-information trade is fully efficient. The phenomenon was identified by George Akerlof (Nobel Prize, 2001) in his “market for lemons.”</p>
+\]</span> This is <strong>adverse selection</strong>: the buyer’s price attracts low-quality sellers, while the fair and good cars remain unsold despite gains from trade in every state. Akerlof’s market-for-lemons model studies this loss of trade.</p>
 </section>
 <section id="sec-4-jury" class="level3">
 <h3 class="anchored" data-anchor-id="sec-4-jury">Committee and jury voting</h3>
@@ -771,14 +765,13 @@ Table&nbsp;4.7: Posterior of <span class="math inline">\((\text{state},\theta_2)
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The resolution is the logic of <strong>pivotal voting</strong>. Under unanimity, juror 1’s vote matters only when juror 2 votes to convict (<span class="math inline">\(\theta_2 = \theta_G\)</span>); if juror 2 acquits, the verdict is acquittal whatever juror 1 does. A rational juror therefore conditions not just on his own signal but on the <em>event that he is pivotal</em>. Even though it may be that <span class="math inline">\(\Prob(G \given \theta_1 = \theta_I) &lt; \Prob(I \given
-\theta_1 = \theta_I)\)</span> when <span class="math inline">\(p &gt; q\)</span>, conditioning on being pivotal always tilts toward guilt: <span class="math display">\[
+<p>Under unanimity, juror 1’s vote changes the verdict only when juror 2 votes to convict. If juror 2 follows her signal, this reveals <span class="math inline">\(\theta_2=\theta_G\)</span>. The relevant comparison therefore conditions on both signals: <span class="math display">\[
 \frac{\Prob(G, \theta_2 = \theta_G \given \theta_1 = \theta_I)}
 {\Prob(I, \theta_2 = \theta_G \given \theta_1 = \theta_I)}
 = \frac{\Prob(G, \theta_1 = \theta_I, \theta_2 = \theta_G)}
 {\Prob(I, \theta_1 = \theta_I, \theta_2 = \theta_G)}
 = \frac{q(1-p)p}{(1-q)p(1-p)} = \frac{q}{1-q} &gt; 1.
-\]</span> Being pivotal means juror 2 saw a guilty signal, which is bad news for the defendant, so even a juror with an innocent signal may rationally vote to convict.</p>
+\]</span></p>
 </div>
 </div>
 </section>
@@ -908,7 +901,7 @@ p^{\sigma_2} =
 <li>the <strong>first-price sealed-bid</strong> auction, in which the highest bidder wins and pays her own bid;</li>
 <li>the <strong>second-price sealed-bid</strong> (or <strong>Vickrey</strong>) auction, in which the highest bidder wins but pays the <em>second</em>-highest bid.</li>
 </ul>
-<p>William Vickrey was the first to analyse auctions with formal game theory (Nobel Prize, 1996). We work in the <strong>independent private values (IPV)</strong> environment: there are <span class="math inline">\(n\)</span> bidders, bidder <span class="math inline">\(i\)</span> has a privately known valuation <span class="math inline">\(\theta_i\)</span> drawn from <span class="math inline">\([\underline\theta_i, \overline\theta_i]\)</span> with cdf <span class="math inline">\(F_i\)</span> and density <span class="math inline">\(f_i\)</span>, and valuations are independent across bidders. (“Private value” because <span class="math inline">\(i\)</span>’s own type fully determines his willingness to pay; “independent” because types are drawn independently.) The final subsection treats a common-value variant.</p>
+<p>There are <span class="math inline">\(n\)</span> bidders in the <strong>independent private values (IPV)</strong> environment. Bidder <span class="math inline">\(i\)</span>’s privately known valuation <span class="math inline">\(\theta_i\)</span> is drawn from <span class="math inline">\([\underline\theta_i, \overline\theta_i]\)</span> with cdf <span class="math inline">\(F_i\)</span> and density <span class="math inline">\(f_i\)</span>. Valuations are independent across bidders, and each bidder’s own valuation determines her willingness to pay.</p>
 <section id="sec-4-second-price" class="level3">
 <h3 class="anchored" data-anchor-id="sec-4-second-price">Second-price and English auctions</h3>
 <p>In the <strong>second-price</strong> auction the highest bidder wins and pays the highest of the <em>other</em> bids, so bidder <span class="math inline">\(i\)</span>’s payoff is <span class="math display">\[
@@ -1067,26 +1060,11 @@ s_1(t) = s_2(t) = t.
 t_1 + \E(t_2 \given t_2 &lt; t_1)
 = t_1 + \frac{\int_0^{t_1} t_2\,\mathrm dt_2}{\Prob(t_2 &lt; t_1)}
 = t_1 + \frac{t_1}{2} &lt; t_1 + \tfrac12.
-\]</span> Winning is “bad news”; it reveals that one was the more optimistic bidder and thus probably overestimated the object. This is the <strong>winner’s curse</strong>, a hallmark of common-value auctions, and a rational bidder must shade his bid to account for it. (Paul Milgrom and Robert Wilson received the Nobel Prize in 2020 for improvements to auction theory and the design of new auction formats.)</p>
-</section>
-</section>
-<section id="sec-4-summary" class="level2" data-number="4.6">
-<h2 data-number="4.6" class="anchored" data-anchor-id="sec-4-summary"><span class="header-section-number">4.6</span> Chapter summary</h2>
-<ul>
-<li>A Bayesian game <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>
-<ol class="example" type="1">
-<li>models incomplete information through privately known types; Harsanyi’s device of a chance move by Nature turns it into an extensive-form game of imperfect information.</li>
-</ol></li>
-<li>Each player updates to a posterior belief <span class="math inline">\(\phi_i(\cdot \given \theta_i)\)</span> by Bayes’ rule; with independent types posteriors equal marginals, with correlated types they need not.</li>
-<li>A Bayesian Nash equilibrium (<a href="#def-4-bne" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>) requires <em>every type</em> of every player to best-respond; a profile is a BNE if and only if it is a Nash equilibrium of the equivalent extensive form (<a href="#thm-4-bne-ne" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>). Since only posteriors matter, one can even drop the common prior, allowing no-common-prior belief systems.</li>
-<li>Worked examples: Cournot with private cost (closed-form <span class="math inline">\(q_h^*, q_\ell^*,
-q_2^*\)</span>) and study groups (continuum of types, cutoff strategy, unique cutoff <span class="math inline">\(c^{1/3}\)</span>).</li>
-<li>Applications: adverse selection in the lemons market (only the poorest cars trade, Akerlof’s inefficiency), jury voting under unanimity (voting one’s signal is not a BNE; condition on being pivotal), and purification (a mixed equilibrium of Matching Pennies is the <span class="math inline">\(\eps \to 0\)</span> limit of pure BNE of perturbed games).</li>
-<li>Auctions: in the second-price and English formats bidding your value is weakly dominant, a BNE, and efficient; in the first-price and Dutch formats bidders shade to <span class="math inline">\(s(\theta) = \theta - \int_{\underline\theta}^{\theta} F^{n-1}/F^{n-1}(\theta)\)</span>, which is <span class="math inline">\(\frac{n-1}{n}\theta\)</span> in the uniform case. All four standard formats raise the same expected revenue (<span class="math inline">\(\frac{n-1}{n+1}\)</span> for uniform <span class="math inline">\([0,1]\)</span>), as stated by the Revenue Equivalence Theorem. In common-value auctions, winning is bad news: the winner’s curse forces additional shading.</li>
-</ul>
-<p>The next chapter combines sequential moves with incomplete information, refining Bayesian Nash equilibrium into perfect Bayesian equilibrium for dynamic games.</p>
+\]</span> Winning selects opponents with lower signals. Using the unconditional value estimate would therefore overstate the expected value conditional on winning. This selection is the <strong>winner’s curse</strong>.</p>
+<p><span id="sec-4-summary"></span></p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

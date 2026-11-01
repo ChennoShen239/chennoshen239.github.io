@@ -306,7 +306,7 @@ window.Quarto = {
 </div>
 <section id="the-basic-idea-of-rl" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="the-basic-idea-of-rl"><span class="header-section-number">1.1</span> The basic idea of RL</h2>
-<p>For a random variable <span class="math inline">\(x\)</span>, how can we compute <span class="math inline">\(\E[x]\)</span>? There are two approaches.</p>
+<p>For a random variable <span class="math inline">\(x\)</span>, compute <span class="math inline">\(\E[x]\)</span> by integration or sampling:</p>
 <ol type="1">
 <li><strong>Exact.</strong> If we know the distribution <span class="math inline">\(p(x)\)</span>, integrate: <span class="math display">\[
 \E[x]=\int x\,p(x)\,dx .
@@ -315,7 +315,7 @@ window.Quarto = {
 \E[x]\approx \bar{x}=\frac{1}{N}\sum_{i=1}^{N}x_{i} .
 \]</span></li>
 </ol>
-<p>The Monte-Carlo mean can be built up <em>incrementally</em>. Writing <span class="math inline">\(\bar{x}_{k}=\tfrac{1}{k}\sum_{i=1}^{k}x_{i}\)</span> for the running mean of the first <span class="math inline">\(k\)</span> samples, a one-line rearrangement gives the recursion</p>
+<p>The Monte-Carlo mean can be built up <em>incrementally</em>. Writing <span class="math inline">\(\bar{x}_{k}=\tfrac{1}{k}\sum_{i=1}^{k}x_{i}\)</span> for the running mean of the first <span class="math inline">\(k\)</span> samples, the recursion is</p>
 <p><span id="eq-running-mean"><span class="math display">\[
 \bar{x}_{k}=\bar{x}_{k-1}+\frac{1}{k}\,(x_{k}-\bar{x}_{k-1}).
 \tag{1.1}\]</span></span></p>
@@ -329,7 +329,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Read <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> as <strong>old estimate <span class="math inline">\(+\)</span> step <span class="math inline">\(\times\)</span> (new sample <span class="math inline">\(-\)</span> old estimate)</strong>. The step size <span class="math inline">\(\tfrac{1}{k}\)</span> is the <em>learning rate</em>. A constant <span class="math inline">\(\alpha\)</span> gives more weight to recent samples.</p>
+<p>The step size <span class="math inline">\(\tfrac{1}{k}\)</span> is the <em>learning rate</em>. A constant <span class="math inline">\(\alpha\)</span> gives more weight to recent samples.</p>
 </div>
 </div>
 <section id="computing-a-value-function" class="level3">
@@ -339,7 +339,7 @@ Tip
 v(s_{0})=\E\!\left[\sum_{t=0}^{\infty}\beta^{t}r(s_{t})\right],
 \]</span> where the state <span class="math inline">\(s_{t}\)</span> follows an exogenous Markov process and <span class="math inline">\(\beta\in(0,1)\)</span> is the discount factor.</p>
 </div>
-<p>As before, there are two ways to obtain <span class="math inline">\(v\)</span>.</p>
+<p>For <span class="math inline">\(v\)</span>, the corresponding methods are:</p>
 <ol type="1">
 <li><strong>Dynamic programming.</strong> If we know the transition density <span class="math inline">\(p(s'\given s)\)</span>, then <span class="math inline">\(v\)</span> solves the fixed point <span id="eq-mrp-dp"><span class="math display">\[
 v(s)=r(s)+\beta\int v(s')\,p(s'\given s)\,ds' .
@@ -368,7 +368,7 @@ v(s_{0})\approx \hat{v}(s_{0})=\frac{1}{N}\sum_{i=1}^{N}\sum_{t=0}^{T}\beta^{t}r
 <p>Start from the dynamic-programming fixed point <a href="#eq-mrp-dp" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> and read it as an expectation: <span class="math display">\[
 v(s)=r(s)+\beta\int v(s')\,p(s'\given s)\,ds'
      =\E_{s'\sim p(\cdot\given s)}\big[\,\underbrace{r(s)+\beta v(s')}_{Y\,\defeq\,r(s)+\beta v(s')}\,\big].
-\]</span> So computing <span class="math inline">\(v(s)\)</span> <em>is</em> computing <span class="math inline">\(\E[Y]\)</span>, and we already know how to estimate an expectation incrementally via <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a>, with the learning rate relaxed to a constant <span class="math inline">\(\alpha\)</span>.</p>
+\]</span> Apply <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> to <span class="math inline">\(\E[Y]\)</span>, using a constant learning rate <span class="math inline">\(\alpha\)</span>.</p>
 <p>At trajectory <span class="math inline">\(k\)</span> the realized value of <span class="math inline">\(Y\)</span> is <span class="math inline">\(r(s^{k})+\beta v(s'^{k})\)</span>. The true <span class="math inline">\(v(s'^{k})\)</span> is unknown. We <strong>bootstrap</strong> by substituting the current estimate <span class="math inline">\(\hat{v}^{k}\)</span> in its place: <span class="math display">\[
 x_{k}=r(s^{k})+\beta\,\hat{v}^{k}(s'^{k}).
 \]</span> If <span class="math inline">\(\hat{v}^{k}\to v\)</span> then <span class="math inline">\(x_{k}\to Y\)</span>, so the target is asymptotically unbiased. Feeding <span class="math inline">\(x_{k}\)</span> into the incremental rule <span class="math inline">\(\bar{x}_{k}=\bar{x}_{k-1}+\alpha(x_{k}-\bar{x}_{k-1})\)</span>, with <span class="math inline">\(\bar{x}_{k}=\hat{v}'^{k}(s^{k})\)</span> the <em>updated</em> estimate and <span class="math inline">\(\bar{x}_{k-1}=\hat{v}^{k}(s^{k})\)</span> the <em>old</em> one (a prime marks the post-update value), gives <span class="math display">\[
@@ -391,7 +391,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The last line says the new estimate is a <strong>convex combination</strong> of the old estimate and the bootstrapped target, with weights <span class="math inline">\((1-\alpha,\,\alpha)\)</span>. The bracketed quantity <span class="math inline">\(r+\beta\hat{v}(s')-\hat{v}(s)\)</span> is the <strong>temporal-difference error</strong>: the gap between the one-step-ahead target and the current guess.</p>
+<p>The bracketed quantity <span class="math inline">\(r+\beta\hat{v}(s')-\hat{v}(s)\)</span> is the <strong>temporal-difference error</strong>, the gap between the one-step target and the current estimate.</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled" title="Why a constant step size?">
@@ -404,9 +404,8 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The average in <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> uses a <em>shrinking</em> step <span class="math inline">\(\tfrac{1}{k}\)</span> because it estimates the mean of a <strong>fixed</strong> distribution: every sample deserves equal weight, and the estimate converges (its variance falls like <span class="math inline">\(1/k\)</span>).</p>
-<p>The TD target <span class="math inline">\(r+\beta\,\hat{v}(s')\)</span> is different: it is <strong>non-stationary</strong>. It moves as <span class="math inline">\(\hat{v}\)</span> is updated (that is exactly what bootstrapping does), and as the policy changes. A decaying step gives progressively less weight to new observations and can track a moving target slowly.</p>
-<p>A <strong>constant</strong> <span class="math inline">\(\alpha\)</span> instead keeps a fixed weight on recent samples (an exponentially recency-weighted average, <span class="math inline">\(\hat{v}\leftarrow(1-\alpha)\hat{v}+\alpha\cdot(\text{target})\)</span>), so the estimate keeps chasing the target. The price: it no longer converges to a point but fluctuates around the truth, with a stationary standard deviation <span class="math inline">\(\propto\sqrt{\alpha}\)</span> (it violates the Robbins-Monro conditions <span class="math inline">\(\sum_{t}\alpha_{t}=\infty,\ \sum_{t}\alpha_{t}^{2}&lt;\infty\)</span>). Genuine convergence needs <span class="math inline">\(\alpha\)</span> to decay over time. So a constant step trades <strong>asymptotic precision</strong> for the ability to <strong>track</strong>.</p>
+<p>The step <span class="math inline">\(\tfrac{1}{k}\)</span> in <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> weights samples equally; for a fixed distribution, its variance falls like <span class="math inline">\(1/k\)</span>. The TD target <span class="math inline">\(r+\beta\,\hat{v}(s')\)</span> moves as <span class="math inline">\(\hat{v}\)</span> and the policy change, so shrinking steps can track it slowly.</p>
+<p>A constant <span class="math inline">\(\alpha\)</span> gives an exponentially weighted average, <span class="math inline">\(\hat{v}\leftarrow(1-\alpha)\hat{v}+\alpha\cdot(\text{target})\)</span>. It retains sensitivity to new samples but leaves stationary fluctuations of standard deviation <span class="math inline">\(\propto\sqrt{\alpha}\)</span>. It violates the Robbins-Monro conditions <span class="math inline">\(\sum_{t}\alpha_{t}=\infty,\ \sum_{t}\alpha_{t}^{2}&lt;\infty\)</span>; convergence requires a decaying step.</p>
 </div>
 </div>
 <p>The trajectory average and the TD(0) update estimate the same <span class="math inline">\(v\)</span> with different bias, variance and timing:</p>
@@ -455,7 +454,7 @@ Table&nbsp;1.1: Monte Carlo vs.&nbsp;TD(0) as estimators of the value function.
 </div>
 </figure>
 </div>
-<p>TD has lower variance and finite-estimate bias, and updates at each transition. The two are endpoints of a spectrum: <span class="math inline">\(n\)</span>-step returns and TD(<span class="math inline">\(\lambda\)</span>) interpolate between them.</p>
+<p>The two are endpoints of a spectrum: <span class="math inline">\(n\)</span>-step returns and TD(<span class="math inline">\(\lambda\)</span>) interpolate between them.</p>
 <!-- Deliberately NOT an executable cell: `fig_mc_vs_td()` in figures/01_figures.py takes
      ~110 s (16 episode budgets x 60 replications x two estimators), far too slow to run at
      render time. It stays pre-generated; regenerate with `python3 figures/01_figures.py`. -->
@@ -465,7 +464,7 @@ Table&nbsp;1.1: Monte Carlo vs.&nbsp;TD(0) as estimators of the value function.
 <img src="figures/01-mc-vs-td.svg" class="img-fluid figure-img" style="width:82.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-mc-vs-td-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1.1: The trade in <a href="#tbl-mc-td" class="quarto-xref">Table&nbsp;<span>1.1</span></a>, measured. Both estimators are shown the <em>same</em> episodes from a five-state discounted Markov reward process, and scored by the error of <span class="math inline">\(\hat{v}\)</span> across all states. TD(0) falls faster at small budgets, because one random step carries far less variance than a whole trajectory. But a <strong>constant</strong> step size never settles: TD flattens onto a noise floor whose height is set by <span class="math inline">\(\alpha\)</span>, while Monte Carlo, which keeps averaging, eventually crosses below it. Their relative accuracy depends on the sample budget.
+Figure&nbsp;1.1: Both estimators use the same episodes from a five-state discounted Markov reward process; error is measured across all states. TD(0) has lower error at small budgets, then reaches a noise floor set by <span class="math inline">\(\alpha\)</span>. Monte Carlo eventually crosses below it.
 </figcaption>
 </figure>
 </div>
@@ -474,7 +473,7 @@ Figure&nbsp;1.1: The trade in <a href="#tbl-mc-td" class="quarto-xref">Table&nbs
 <h3 class="anchored" data-anchor-id="reinforcement-learning-and-deep-learning">Reinforcement learning and deep learning</h3>
 <p>Often we approximate the value function by a parametric family <span class="math display">\[
 \hat{V}(s,w),
-\]</span> where <span class="math inline">\(w\)</span> is a parameter vector, for instance the weights of a neural network. RL with a neural-network approximator is what people call <strong>deep reinforcement learning</strong>.</p>
+\]</span> where <span class="math inline">\(w\)</span> is a parameter vector, for instance the weights of a neural network. Using a neural network gives <strong>deep reinforcement learning</strong>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -485,7 +484,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>RL and deep learning are <strong>orthogonal</strong>. RL is about <em>how to estimate</em> values and policies from sampled experience; the network is merely one choice of function approximator. Either can be swapped out without the other.</p>
+<p>RL estimates values and policies from sampled experience. A neural network is one choice of function approximator.</p>
 </div>
 </div>
 </section>
@@ -512,7 +511,7 @@ p(s'\given s,a)=
 \end{cases}
 \]</span></p>
 </div>
-<p>Back to the general problem, the value function satisfies the <strong>Bellman equation</strong> <span id="eq-bellman"><span class="math display">\[
+<p>The value function satisfies the <strong>Bellman equation</strong> <span id="eq-bellman"><span class="math display">\[
 v(s)=\max_{a\in\mathcal{A}}\Big\{\,r(s,a)+\beta\sum_{s'\in\mathcal{S}}v(s')\,p(s'\given s,a)\,\Big\}.
 \tag{1.4}\]</span></span></p>
 <p>Naming the bracketed quantity gives the <strong>action-value</strong> (or <strong>Q</strong>) function: <span class="math display">\[
@@ -527,7 +526,6 @@ q(s,a) &amp;=r(s,a)+\E_{\pi^{*}}\!\left[\sum_{\tau=1}^{\infty}\beta^{\tau}r(s_{t
 \]</span></p>
 </div>
 <p><a href="#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> defines the <strong>optimal</strong> action-value <span class="math inline">\(q^{*}\)</span>: it assumes the optimal policy <span class="math inline">\(\pi^{*}\)</span> is followed after the first action. Swapping <span class="math inline">\(\pi^{*}\)</span> for an arbitrary policy <span class="math inline">\(\pi\)</span> gives the <strong>policy-specific</strong> <span class="math inline">\(q_{\pi}\)</span>; the version under the current policy, <span class="math inline">\(q_{\pi_{k}}\)</span>, is what Howard policy iteration iterates on below.</p>
-<p>The two expressions for <span class="math inline">\(q\)</span> agree: the “one step now, optimal continuation later” form follows from the discounted-sum form.</p>
 <div class="block-proof callout callout-style-default callout-note callout-titled" title="Derivation: the two forms of q(s,a) coincide">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -592,7 +590,7 @@ v(s_{i})=\max_{a\in\mathcal{A}}\Big\{\,r_{a}(s_{i})+\beta\sum_{s_{j}\in\mathcal{
 \pi_{k+1}=\argmax_{\pi}\big\{\,\mathbf{r}_{\pi}+\beta\,\mathbf{P}_{\pi}\mathbf{v}_{\pi_{k}}\,\big\}.
 \]</span></li>
 </ol>
-<p>HPI often converges in far fewer iterations than VFI: each evaluation step solves for a policy’s value <em>exactly</em>, so every improvement acts on the <em>true</em> value of the current policy, a Newton-like step in policy space. With finitely many policies and a strict improvement each round, it reaches the optimum in finitely many iterations, as <a href="#fig-1-vfi-vs-hpi" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> shows.</p>
+<p>HPI evaluates each policy exactly and often requires fewer iterations than VFI. With finitely many policies and strict improvement each round, it terminates in finitely many iterations (<a href="#fig-1-vfi-vs-hpi" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>).</p>
 <div id="cell-fig-1-vfi-vs-hpi" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Value function iteration and Howard policy iteration, and their error paths</summary>
@@ -678,7 +676,16 @@ v(s_{i})=\max_{a\in\mathcal{A}}\Big\{\,r_{a}(s_{i})+\beta\sum_{s_{j}\in\mathcal{
 <img src="01-notes_files/figure-html/fig-1-vfi-vs-hpi-output-1.png" width="577" height="401" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-vfi-vs-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1.2: The two algorithms on the neoclassical growth model of <a href="#exm-ncgm" class="quarto-xref">Example&nbsp;<span>1.1</span></a>, capital discretised onto a 250-point grid with <span class="math inline">\(\beta=0.96\)</span>. VFI is a contraction of modulus <span class="math inline">\(\beta\)</span>, so its error falls by a constant factor every sweep: a straight line on a log scale, which never actually terminates. HPI does terminate. The policy stops changing at iteration 19, and one iteration earlier the error drops off a cliff to machine precision, because an evaluation step that is <em>exact</em> returns the true value of a policy that has stopped improving. Matching that accuracy by VFI takes on the order of <span class="math inline">\(\log(10^{-15})/\log\beta\approx850\)</span> sweeps.
+Figure 1.2: The two algorithms on the neoclassical growth model of <span
+class="citation" data-cites="exm-ncgm"><a class="quarto-xref" href="#exm-ncgm">Example <span>1.1</span></a></span>, with capital
+discretised onto a 250-point grid and <span
+class="math inline">\(\beta=0.96\)</span>. VFI has contraction modulus
+<span class="math inline">\(\beta\)</span>; its log error path is nearly
+linear. HPI reaches machine precision at iteration 18, and the policy
+stops changing at iteration 19. Matching that accuracy by VFI takes on
+the order of <span
+class="math inline">\(\log(10^{-15})/\log\beta\approx850\)</span>
+sweeps.
 </figcaption>
 </figure>
 </div>
