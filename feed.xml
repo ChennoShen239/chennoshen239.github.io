@@ -5,17 +5,8 @@
     <link>https://chennoshen239.github.io/</link>
     <description>New posts, notes, and working papers by Chen Gao.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Nov 2026 20:51:32 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Nov 2026 22:50:35 +0000</lastBuildDate>
     <atom:link href="https://chennoshen239.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-
-    <item>
-      <title>Where I run my research code</title>
-      <link>https://chennoshen239.github.io/aws-compute-notes/</link>
-      <guid isPermaLink="false">tag:chennoshen239.github.io,2026-08-02:research-computing-on-aws</guid>
-      <pubDate>Sun, 02 Aug 2026 14:29:45 +0800</pubDate>
-      <category>Post</category>
-      <description>Choosing between Colab, larger RunPod CPU machines and AWS batch jobs, with a short example of saving and resuming independent tasks.</description>
-    </item>
 
     <item>
       <title>Reinforcement Learning</title>
