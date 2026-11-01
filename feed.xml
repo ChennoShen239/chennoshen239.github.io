@@ -5,16 +5,16 @@
     <link>https://chennoshen239.github.io/</link>
     <description>New posts, notes, and working papers by Chen Gao.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 02 Aug 2026 19:43:16 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 01 Nov 2026 20:22:30 +0000</lastBuildDate>
     <atom:link href="https://chennoshen239.github.io/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
-      <title>Research Computing on AWS</title>
+      <title>Where I run my research code</title>
       <link>https://chennoshen239.github.io/aws-compute-notes/</link>
       <guid isPermaLink="false">tag:chennoshen239.github.io,2026-08-02:research-computing-on-aws</guid>
       <pubDate>Sun, 02 Aug 2026 14:29:45 +0800</pubDate>
       <category>Post</category>
-      <description>A short field note on ParallelCluster and Slurm: the setup, the traps, and the cost.</description>
+      <description>My current choices for research computing: Colab first, AWS for larger batches, and RunPod as a backup.</description>
     </item>
 
     <item>
