@@ -89,7 +89,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#colab" id="toc-colab" class="nav-link active" data-scroll-target="#colab">Using Colab from the terminal</a></li>
   <li><a href="#a-closing-checklist" id="toc-a-closing-checklist" class="nav-link" data-scroll-target="#a-closing-checklist">Recovering an interrupted run</a></li>
   <li><a href="#why-the-cloud" id="toc-why-the-cloud" class="nav-link" data-scroll-target="#why-the-cloud">AWS for a batch of independent tasks</a></li>
-  <li><a href="#what-transfers" id="toc-what-transfers" class="nav-link" data-scroll-target="#what-transfers">RunPod when Colab cannot allocate a machine</a></li>
+  <li><a href="#what-transfers" id="toc-what-transfers" class="nav-link" data-scroll-target="#what-transfers">RunPod for a larger CPU machine</a></li>
   </ul>
 </nav>
 </div>
@@ -137,15 +137,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="colab" class="level2">
 <h2 class="anchored" data-anchor-id="colab">Using Colab from the terminal</h2>
 <p>Most of my Colab work starts from a local coding agent. Through the <a href="https://github.com/googlecolab/google-colab-cli">official Colab CLI</a>, it can request a hosted runtime, execute an existing Python script or notebook, and download the outputs. This saves me from turning a project full of scripts into a browser notebook. I keep editing the local working copy; small checks and plots still run on my laptop.</p>
-<p>The remote machine needs the project’s inputs and dependencies. I upload the required files and install fixed package versions each time I start a fresh runtime. Having that setup written down also makes it possible to move the same code to another machine when Colab cannot allocate one.</p>
-<p>Some of my runs did most of their work through CPU multiprocessing even on a runtime with a GPU attached. Choosing a GPU runtime does not make existing CPU code use the GPU. For CPU batches, I can run independent tasks as separate processes on one machine, sharing its CPU capacity and system memory. To spread that batch across more machines, I need additional runtime allocations.</p>
-<p>I have had requests for my preferred GPU refused, and I have been unable to start an additional runtime while others were running. There were still compute units left. Google’s <a href="https://research.google.com/colaboratory/faq.html#resource-limits">resource limits</a> vary, including on paid plans. A spare balance therefore does not tell me whether I can get a particular GPU or run the whole batch concurrently.</p>
+<p>I upload the required files and install fixed package versions each time I start a fresh runtime. Having that setup written down also makes it possible to move the same code to another machine when Colab cannot allocate one.</p>
+<p>Some of my runs did most of their work through CPU multiprocessing even on a runtime with a GPU attached. Colab also offers <a href="https://github.com/googlecolab/google-colab-cli/blob/main/docs/01_session_management.md">CPU runtimes and a high-memory option</a>. I can request those options, though the exact vCPU allocation is chosen by the service.</p>
+<p>I have had requests for my preferred GPU refused, and I have been unable to start an additional runtime while others were running. There were still compute units left. Google’s <a href="https://research.google.com/colaboratory/faq.html#resource-limits">resource limits</a> vary, including on paid plans.</p>
 </section>
 <section id="a-closing-checklist" class="level2">
 <h2 class="anchored" data-anchor-id="a-closing-checklist">Recovering an interrupted run</h2>
 <p>In earlier Colab runs, I saved outputs only after a long stage had finished. When that stage was interrupted, its unfinished work had to be repeated. I changed the code to save each completed piece, so a replacement run could reuse those pieces and work through what remained.</p>
-<p>Saving a notebook preserves its cells and saved outputs, but it does not preserve every file written to the virtual machine. I download intermediate files to the local project during a run and check that the downloads are complete. Before reusing them, I check that they belong to the same code, dependency versions and inputs. Otherwise, a resumed run can silently combine outputs from different versions of the calculation.</p>
-<p>A connection failure can look like a lost run too. I have seen the client report a failure while the remote task was still running. Now I check the backend session state before starting a replacement. Once the outputs are back and checked, I release the runtime and confirm that it has disappeared from the server’s session list.</p>
+<p>In this illustrative pseudocode, each independent task has its own result file and one writer. The run identifier covers the code version, dependencies, settings and inputs, so changing the calculation gives it a separate set of saved results.</p>
+<pre class="text"><code>run = fingerprint(code_version, dependencies, settings, inputs)
+restore_verified_results(run)
+
+for task in tasks:
+    if not valid_result(run, task):
+        tmp = write_temp(run, task, compute(task))
+        validate(tmp, run, task)
+        rename_same_filesystem(tmp, result_path(run, task))
+    copy_and_verify_off_runtime(result_path(run, task))</code></pre>
+<p><code>write_temp</code> writes and closes a temporary file in the result directory. Validation checks that it can be read, has the expected fields, and records the correct run and task identifiers. Renaming within the same filesystem then gives the completed file its final name atomically. An interruption during writing leaves a temporary file that the next run ignores.</p>
+<p>Saving a notebook retains its cells and saved outputs. To keep the separate result files after the runtime ends, the copy step sends them to storage outside the runtime, such as my local project, and compares checksums. It also runs for an existing valid result: a previous attempt may have finished computing but failed during the download. On a fresh runtime, I restore the verified copies first and run only the missing or invalid tasks. An unfinished task starts again from its beginning. Resuming inside a long iterative calculation would also require saving its internal state.</p>
+<p>I have also seen a client connection fail while the remote task kept running, so I check the backend session state before starting a replacement. Once the outputs are back and checked, I release the runtime and confirm that it has disappeared from the server’s session list.</p>
 </section>
 <section id="why-the-cloud" class="level2">
 <h2 class="anchored" data-anchor-id="why-the-cloud">AWS for a batch of independent tasks</h2>
@@ -169,9 +180,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><span id="the-traps">I once lost about two hours</span> to <span id="nat-routes">a stale network route</span>, <span id="failed-bootstrap-costs">with the instances billing during the delay</span>. The compute queue could scale to zero after the jobs finished, while the head node and shared storage kept billing until teardown. <span id="efs-storage">My managed EFS volume was deleted with the cluster</span>, so I retrieved the results first. If a university Slurm cluster has the software I need and a short enough queue, I would use it and adapt the account, partition and paths.</p>
 </section>
 <section id="what-transfers" class="level2">
-<h2 class="anchored" data-anchor-id="what-transfers">RunPod when Colab cannot allocate a machine</h2>
-<p>RunPod is now my backup for a GPU job I cannot get onto Colab. I choose from the available GPUs and images, then connect to the Pod over SSH. My <a href="https://github.com/ChennoShen239/runpod_scripts">existing scripts</a> copy the project to <code>/workspace</code>, build the environment, and run the entry file in <code>tmux</code>. I can disconnect and reconnect while the process keeps running on the Pod.</p>
-<p>Stopping and terminating the Pod have different consequences for the files. RunPod’s <a href="https://docs.runpod.io/pods/manage-pods">storage rules</a> distinguish the Pod’s volume disk, which survives stopping but is deleted at termination, from a separate network volume, which survives both. I retrieve the outputs before termination so I can inspect them locally and release the rented machine.</p>
+<h2 class="anchored" data-anchor-id="what-transfers">RunPod for a larger CPU machine</h2>
+<p>For CPU work that has outgrown the runtime Colab gives me, I would look at a larger CPU-only Pod before setting up a cluster. On November 1, 2026, its <a href="https://console.runpod.io/deploy">selection page</a> listed a general-purpose option with 32 vCPU and 128 GB RAM, and a memory-optimized option with 32 vCPU and 256 GB RAM. These are virtual CPU counts; their mapping to physical cores depends on the host.</p>
+<p>A larger CPU allocation is useful when the work splits into independent tasks or a numerical library can use several threads. A process pool keeps the independent tasks on one machine, with all workers reading the same local files.</p>
+<p>Suppose eight worker processes each use four compute threads on a 32 vCPU machine: 8 × 4 = 32 threads. If each worker instead starts 32 threads, the machine has 256 competing threads, which can make the batch slower. Memory can impose a tighter limit: if each of those eight workers needs 20 GB of its own, their combined 160 GB exceeds a 128 GB allocation. The parent process and runtime also need memory. I would first measure one worker’s peak memory and elapsed time, then choose the worker count and thread limit together.</p>
+<p>My <a href="https://github.com/ChennoShen239/runpod_scripts">existing scripts</a> copy the project to <code>/workspace</code>, build the environment, and run the entry file in <code>tmux</code>. They need an SSH server running in the template and a reachable SSH port. A CPU Pod’s local container disk is erased on stop; an attached <a href="https://www.runpod.io/blog/enhanced-cpu-pods-docker-network">network volume</a> persists independently of the Pod. I retrieve the outputs before releasing the machine.</p>
 <hr>
 <p><a href="https://chennoshen239.github.io/notes.html">← Notes &amp; code</a></p>
 </section>

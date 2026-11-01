@@ -5,7 +5,7 @@
     <link>https://chennoshen239.github.io/</link>
     <description>New posts, notes, and working papers by Chen Gao.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Nov 2026 20:22:30 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Nov 2026 20:51:32 +0000</lastBuildDate>
     <atom:link href="https://chennoshen239.github.io/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
@@ -14,7 +14,7 @@
       <guid isPermaLink="false">tag:chennoshen239.github.io,2026-08-02:research-computing-on-aws</guid>
       <pubDate>Sun, 02 Aug 2026 14:29:45 +0800</pubDate>
       <category>Post</category>
-      <description>My current choices for research computing: Colab first, AWS for larger batches, and RunPod as a backup.</description>
+      <description>Choosing between Colab, larger RunPod CPU machines and AWS batch jobs, with a short example of saving and resuming independent tasks.</description>
     </item>
 
     <item>
