@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+<meta name="description" content="Personal notes on dynamic optimization, based on Zhang Bo’s graduate course.">
 
 <title>1&nbsp; Static Optimization – Dynamic Optimization</title>
 <style>
@@ -63,7 +63,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-648ef3d9445146c9b2790911d1461dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-972fecedd11e416f878c9978b8c0d5ce.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -124,7 +124,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=efda436c61d7">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -342,7 +342,7 @@ window.Quarto = {
 </header>
 
 
-<p>Dynamic optimization is, at bottom, static optimization carried out over an infinite-dimensional choice space — a whole <em>path</em> rather than a single point. Every later chapter therefore leans on the finite-dimensional theory assembled here: the first-order conditions of the calculus of variations are an Euler equation <em>because</em> an interior optimum has zero gradient (<a href="#sec-uncon" class="quarto-xref"><span>Section 1.2</span></a>); the costate of optimal control is a <strong>Lagrange multiplier</strong> on the law of motion (<a href="#sec-con" class="quarto-xref"><span>Section 1.3</span></a>); the value function <span class="math inline">\(V\)</span> of dynamic programming inherits its smoothness and its envelope derivative from <strong>Berge’s maximum theorem</strong> (<a href="#sec-prelim" class="quarto-xref"><span>Section 1.1</span></a>) and the <strong>envelope theorem</strong> (<a href="#sec-envelope" class="quarto-xref"><span>Section 1.2.2</span></a>). This chapter develops that machinery from scratch and to research-grade rigor, deriving every result rather than asserting it.</p>
+<p>Dynamic optimization applies static optimization to an infinite-dimensional choice space of paths. The later chapters use the finite-dimensional theory developed here: the first-order conditions of the calculus of variations are an Euler equation <em>because</em> an interior optimum has zero gradient (<a href="#sec-uncon" class="quarto-xref"><span>Section 1.2</span></a>); the costate of optimal control is a <strong>Lagrange multiplier</strong> on the law of motion (<a href="#sec-con" class="quarto-xref"><span>Section 1.3</span></a>); the value function <span class="math inline">\(V\)</span> of dynamic programming inherits its smoothness and its envelope derivative from <strong>Berge’s maximum theorem</strong> (<a href="#sec-prelim" class="quarto-xref"><span>Section 1.1</span></a>) and the <strong>envelope theorem</strong> (<a href="#sec-envelope" class="quarto-xref"><span>Section 1.2.2</span></a>). This chapter develops these results from first principles.</p>
 <p>The general <strong>static optimization problem</strong> is</p>
 <p><span id="eq-static-problem"><span class="math display">\[
 \max_{x}\; f(x)\qquad\text{subject to}\qquad x\in X,

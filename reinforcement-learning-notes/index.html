@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Chen Gao (高琛)">
-<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+<meta name="description" content="Personal notes on Ben Moll’s four lectures on reinforcement learning.">
 
 <title>Reinforcement Learning</title>
 <style>
@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6e77e0fd038bd32286badfaa030b4a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-11adc450b4e5a03df677c42b89b3c1a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -104,7 +104,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=e42ca9fdf4f2">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -218,12 +218,12 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Reinforcement Learning</h1>
-<p class="subtitle lead">Lecture Notes: Math and Applications</p>
+<p class="subtitle lead">Mathematics and applications</p>
 </div>
 
 <div>
   <div class="description">
-    <p>Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.</p>
+    <p>Personal notes on Ben Moll’s four lectures on reinforcement learning.</p>
   </div>
 </div>
 
@@ -268,15 +268,13 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>This note is based on Ben’s latest lectures on RL, mainly focused on the math behind it w/ also some applications.</p>
+<p>I prepared these notes for my own reference from Ben Moll’s four lectures on reinforcement learning. They focus on the mathematics, with some applications.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-body-container">
-<p>Written in Obsidian with LaTeX Suite for the math, rendered as a Quarto book for the web version.</p>
-</div>
+<p>I wrote the notes in Obsidian with LaTeX Suite and use Quarto for the web version.</p>
 </div>
 </div>
 <div class="callout callout-style-simple callout-warning">
@@ -322,8 +320,8 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>Where the slides state a result and hand its proof off to the references, the proof is worked out and written up here rather than cited. Those arguments follow <strong>Shiyu Zhao’s</strong> <a href="https://github.com/MathFoundationRL/Book-Mathematical-Foundation-of-Reinforcement-Learning"><em>Mathematical Foundations of Reinforcement Learning</em></a>, which is also the book Ben Moll’s slides are themselves adapted from. Full details, and the rest of what the lectures cite, are in the <a href="./references.html">References</a> appendix. The <a href="./notation.html">Notation</a> appendix collects the symbols, including the one place where the book deliberately changes convention.</p>
-<p>Every algorithm is given twice: once as a statement, and once as the handful of lines of Python that produced this book’s figures, folded away under the algorithm it implements.</p>
+<p>The proofs omitted from the slides are worked out here using <strong>Shiyu Zhao’s</strong> <a href="https://github.com/MathFoundationRL/Book-Mathematical-Foundation-of-Reinforcement-Learning"><em>Mathematical Foundations of Reinforcement Learning</em></a>, which Ben Moll’s slides are adapted from. The <a href="./references.html">References</a> appendix gives full source details. The <a href="./notation.html">Notation</a> appendix collects the symbols and records the one change in convention.</p>
+<p>Algorithm statements are followed by the Python code used for the figures.</p>
 </section>
 <section id="license-attribution" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="license-attribution">License &amp; attribution</h2>

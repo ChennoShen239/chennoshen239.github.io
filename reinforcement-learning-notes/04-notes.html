@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+<meta name="description" content="Personal notes on Ben Moll’s four lectures on reinforcement learning.">
 
 <title>4&nbsp; Policy Gradient and Actor-Critic Methods – Reinforcement Learning</title>
 <style>
@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6e77e0fd038bd32286badfaa030b4a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-11adc450b4e5a03df677c42b89b3c1a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -139,7 +139,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=e42ca9fdf4f2">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -381,7 +381,7 @@ v_{\pi}(s)=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}r(s_{t},a_{t})\ \given\ s_
 <p><span id="eq-ascent"><span class="math display">\[
 \theta_{j+1}=\theta_{j}+\alpha\,\nabla_{\theta}J(\theta_{j}),
 \tag{4.2}\]</span></span></p>
-<p>ascent rather than descent because the problem is a maximization. In practice the true gradient is unavailable and <a href="#eq-ascent" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> is run in its stochastic form, which is <a href="02-notes.html#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> with the sign flipped: whenever the gradient can be written <span class="math inline">\(\nabla_{\theta}J(\theta)=\E[\text{something}(\theta)]\)</span>, a single sampled realization of that something is a legitimate step direction. That “whenever” is the entire technical content of this chapter.</p>
+<p>ascent rather than descent because the problem is a maximization. In practice the true gradient is unavailable and <a href="#eq-ascent" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> is run in its stochastic form, which is <a href="02-notes.html#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> with the sign flipped: whenever the gradient can be written <span class="math inline">\(\nabla_{\theta}J(\theta)=\E[\text{something}(\theta)]\)</span>, a single sampled realization of that something is a legitimate step direction.</p>
 <p>Two problems stand between here and there.</p>
 <section id="problem-1-v_pi-is-not-a-scalar" class="level3">
 <h3 class="anchored" data-anchor-id="problem-1-v_pi-is-not-a-scalar">Problem 1: <span class="math inline">\(v_{\pi}\)</span> is not a scalar</h3>
@@ -430,7 +430,7 @@ Important
 </div>
 <p>Read the hypotheses back in words. The policy is a deterministic function of the state, so the action space must be continuous for <span class="math inline">\(\nabla_{a}\)</span> to mean anything. The expectation is taken along trajectories generated <em>by the policy being differentiated</em>, so the theorem is a statement about on-policy data in the sense of <a href="03-notes.html#def-on-off-policy" class="quarto-xref">Definition&nbsp;<span>3.3</span></a>. And the model has vanished from the right-hand side entirely: the only unknowns are <span class="math inline">\(q_{\pi}\)</span> and its derivative in the action, both properties of the value function rather than of the environment. The result is due to Silver et al.&nbsp;(2014).</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof of the deterministic policy gradient theorem">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -439,7 +439,7 @@ Important
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p><strong>Step 1: differentiate the Bellman equation.</strong> This is <a href="#eq-chain-obstacle" class="quarto-xref">Equation&nbsp;<span>4.4</span></a>, restated: <span class="math display">\[
 \nabla_{\theta}v_{\pi}(s)=\Big(\nabla_{a}r(s,\pi)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\nabla_{a}p(s'\given s,\pi)\Big)\nabla_{\theta}\pi+\gamma\sum_{s'\in\mathcal{S}}\big(\nabla_{\theta}v_{\pi}(s')\big)p(s'\given s,\pi).
@@ -498,7 +498,7 @@ x(s)=\rho(s)+\gamma\sum_{s'\in\mathcal{S}}x(s')\,p_{\pi}(s'\given s),
 </div>
 <p>Compare the hypotheses with <a href="#thm-dpg" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>. Positivity of <span class="math inline">\(\pi\)</span> is new and is needed for <span class="math inline">\(\ln\pi\)</span> to be defined; differentiability in <span class="math inline">\(\theta\)</span> replaces differentiability in <span class="math inline">\(a\)</span>, so the action space may now be finite. Compare the conclusions: <span class="math inline">\(\nabla_{a}q_{\pi}\)</span> has become plain <span class="math inline">\(q_{\pi}\)</span>, and <span class="math inline">\(\nabla_{\theta}\pi\)</span> has become <span class="math inline">\(\nabla_{\theta}\ln\pi\)</span>. Both changes come from a single algebraic step in the proof.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof of the stochastic policy gradient theorem">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -507,7 +507,7 @@ x(s)=\rho(s)+\gamma\sum_{s'\in\mathcal{S}}x(s')\,p_{\pi}(s'\given s),
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p><strong>Step 1: differentiate the Bellman equation.</strong> For a fixed stochastic policy <span class="math inline">\(\pi\)</span>, <a href="02-notes.html#eq-bellman-stoch" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> without the maximization reads <span class="math display">\[
 v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s,\theta)\left(r(s,a)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\,p(s'\given s,a)\right).
@@ -687,7 +687,7 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 <h3 class="anchored" data-anchor-id="a-clarification-about-the-pseudocode">A clarification about the pseudocode</h3>
 <p>Standard presentations of REINFORCE, in Zhao, in Sutton and Barto, and in Murphy, write the update as a loop over <span class="math inline">\(t\)</span> inside each episode, which makes it look as though <span class="math inline">\(\theta\)</span> is being updated at every time step. It is not. <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> is one update per episode, and the inner loop is only an efficient way of accumulating its sum.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: the inner loop is an accumulator, not a sequence of updates">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -696,7 +696,7 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Write <span class="math inline">\(\theta_{j}^{t}\)</span> for the running value of the accumulator inside episode <span class="math inline">\(j\)</span>, initialized at <span class="math inline">\(\theta_{j}^{0}=\theta_{j}\)</span>. The inner loop performs <span class="math display">\[
 \theta_{j}^{t+1}=\theta_{j}^{t}+\alpha\gamma^{t}G_{t}\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j}),\qquad t=0,\dots,T.
@@ -731,7 +731,7 @@ d_{\pi,\mu}(s)\defeq(1-\gamma)\sum_{t=0}^{\infty}\gamma^{t}\,\Prob\big(s_{t}=s\ 
 </div>
 <p>Read <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> as: how often the policy is at <span class="math inline">\(s\)</span>, counting a visit at time <span class="math inline">\(t\)</span> as worth <span class="math inline">\(\gamma^{t}\)</span>, normalized so the weights sum to one. It answers “where does this policy spend its discounted time”, starting from <span class="math inline">\(\mu\)</span>. The factor <span class="math inline">\((1-\gamma)\)</span> is exactly the normalization that makes it a probability distribution, which is the first thing to verify.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof that $d_{\pi,\mu}$ is a probability distribution">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -740,7 +740,7 @@ d_{\pi,\mu}(s)\defeq(1-\gamma)\sum_{t=0}^{\infty}\gamma^{t}\,\Prob\big(s_{t}=s\ 
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div id="callout-14" class="callout-14-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Non-negativity is immediate: every term in <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> is a probability times a non-negative weight. It remains to show the entries sum to one, and the cleanest way is the matrix-vector notation of Chapter 1.</p>
 <p>Let <span class="math inline">\(\mathbf{P}_{\pi}\)</span> be the <span class="math inline">\(n\times n\)</span> policy-averaged transition matrix built from <a href="02-notes.html#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>, with <span class="math inline">\((\mathbf{P}_{\pi})_{ij}=p_{\pi}(s_{j}\given s_{i})\)</span>, and let <span class="math inline">\(\boldsymbol{\mu}\)</span> be the column vector of initial probabilities. If <span class="math inline">\(\boldsymbol{\mu}_{t}\)</span> denotes the distribution of <span class="math inline">\(s_{t}\)</span> as a column vector, then <span class="math display">\[
@@ -920,7 +920,7 @@ Figure&nbsp;4.1: The most abstract object in this chapter, drawn. Same six-state
 <section id="the-simple-expectation-form" class="level3">
 <h3 class="anchored" data-anchor-id="the-simple-expectation-form">The simple expectation form</h3>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: from the discounted sum to a single expectation">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -929,7 +929,7 @@ Figure&nbsp;4.1: The most abstract object in this chapter, drawn. Same six-state
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div id="callout-16" class="callout-16-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Start from the present-discounted-value form <a href="#eq-spg" class="quarto-xref">Equation&nbsp;<span>4.7</span></a> and exchange the sum and the expectation, which is legitimate by dominated convergence when rewards are bounded and <span class="math inline">\(\gamma&lt;1\)</span>: <span class="math display">\[
 \nabla_{\theta}J(\theta)=\sum_{t=0}^{\infty}\gamma^{t}\,\E\big[q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta)\big].

@@ -70,12 +70,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="index_files/libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="index_files/libs/bootstrap/bootstrap-0f94754cf0ff7830df8502da6662f91c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="index_files/libs/bootstrap/bootstrap-8e9867900b1c038eb766e729660b49bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <style>html{ scroll-behavior: smooth; }</style>
 
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=efda436c61d7">
 </head>
 
 <body class="quarto-light">
@@ -131,10 +131,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This summer I moved the heavy compute of <a href="https://chennoshen239.github.io/research.html">a forecasting paper of mine</a> onto AWS. This note records the setup that worked and the traps that cost time or money. It is not about the paper: everything below is about the computing pattern, which transfers to any project whose jobs look like “the same script, many times, with different arguments.” All timings and dollar figures come from the run logs, a benchmark record kept at the time, and the EC2 instance records.</p>
+<p>This summer I moved the heavy compute of <a href="https://chennoshen239.github.io/research.html">a forecasting paper of mine</a> onto AWS. This note records the setup that worked and the traps that cost time or money. The setup applies to projects whose jobs look like “the same script, many times, with different arguments.” All timings and dollar figures come from the run logs, a benchmark record kept at the time, and the EC2 instance records.</p>
 <section id="why-the-cloud" class="level2">
 <h2 class="anchored" data-anchor-id="why-the-cloud">Why the cloud</h2>
-<p>The workload was hyperparameter tuning for gradient-boosted trees, done separately for each forecast horizon from 1 to 24, where every candidate in the grid is refit over hundreds of rolling origins. The 24 horizons never talk to each other, so the job is embarrassingly parallel: what I needed was not a bigger computer but many ordinary ones, started together and thrown away after.</p>
+<p>The workload was hyperparameter tuning for gradient-boosted trees, done separately for each forecast horizon from 1 to 24, where every candidate in the grid is refit over hundreds of rolling origins. The 24 horizons never talk to each other, so the job is embarrassingly parallel: I needed many ordinary machines, started together and thrown away after.</p>
 <p>The routine tuning grid takes tens of minutes per horizon on eight vCPUs, about a day if run sequentially on a laptop; with nothing else to do, my MacBook could just about absorb that. The paper’s production configuration could not be treated the same way: a denser grid that, folding the EC2 instance records into vCPU terms, came to about 5,300 vCPU-hours (111 node-hours × 48 vCPU). Even granting my laptop’s eight logical cores the same per-core speed, running around the clock, that is nearly 28 days. And a laptop is never fully available anyway: memory aside, a multi-day full-load run turns the machine into a hand warmer, an argument with more appeal in winter.</p>
 </section>
 <section id="why-parallelcluster-slurm" class="level2">
@@ -147,7 +147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/fig_architecture.svg" class="img-fluid figure-img" alt="Architecture diagram: a laptop connects by rsync and ssh to a t3.large head node in the public subnet running Slurm, which shares an EFS volume holding code, virtualenv, and results with four c7i.12xlarge compute nodes of 48 vCPU each in a private subnet, whose only route out is a NAT gateway, drawn in red, used during node bootstrap for software mirrors and AWS APIs"></p>
-<figcaption>The disposable cluster: a head node schedules, four 48-vCPU compute nodes work, everything shares one EFS volume, and the private subnet reaches the world only through the NAT gateway. Remember the red box.</figcaption>
+<figcaption>The disposable cluster: a head node schedules, four 48-vCPU compute nodes work, everything shares one EFS volume, and the private subnet reaches the world only through the NAT gateway.</figcaption>
 </figure>
 </div>
 <p>The lines of the config that actually shape the experience (ParallelCluster 3.15, us-east-1):</p>
@@ -173,11 +173,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Do not starve the head node. My first attempt used a t3.small and the dependency install ran out of memory; t3.large ended the problem.</li>
 <li>Instance generations are not cosmetic: on my XGBoost tasks, the same batch ran about 20% slower on previous-generation c6i than on c7i at nearly the same hourly price, so the pool holds current-generation types only.</li>
 </ul>
-<p>One question worth answering before it is asked: the tasks are restartable, so why on-demand rather than the cheaper spot capacity? On the dense grid a single horizon runs about 20 hours and writes its output only at the end, so a reclaimed node loses the whole task, and I had no per-task checkpointing; for a first production run I also wanted a predictable finish time. And I had not set up the extra IAM piece spot requires (the service-linked role), which removed any temptation to improvise. If the grid were split into many shorter tasks, spot would be the better call.</p>
+<p>Spot capacity is cheaper, and the tasks can be restarted. I used on-demand capacity for the first production run. On the dense grid a single horizon runs about 20 hours and writes its output only at the end, so a reclaimed node loses the whole task, and I had no per-task checkpointing; I also wanted a predictable finish time. And I had not set up the extra IAM piece spot requires (the service-linked role), which removed any temptation to improvise. If the grid were split into many shorter tasks, spot would be the better call.</p>
 </section>
 <section id="one-full-run" class="level2">
 <h2 class="anchored" data-anchor-id="one-full-run">One full run</h2>
-<p>Compressed, a run has six beats:</p>
+<p>A run has six steps:</p>
 <ol type="1">
 <li>Bring up the NAT gateway (see the traps), then create the cluster. About ten minutes.</li>
 <li><code>rsync</code> the code and the few input files it needs to the shared volume. Never the virtualenv, never data the run will not touch.</li>
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=8      # reserves 8 vCPU per task</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/run_forecast.py <span class="at">--horizon</span> <span class="st">"</span><span class="va">${SLURM_ARRAY_TASK_ID}</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Each task requests 8 vCPU, so the full array needs 24 × 8 = 192 vCPU, exactly four 48-vCPU nodes at six tasks each. One easy misunderstanding: <code>--cpus-per-task=8</code> only reserves the vCPUs; the program will not use them by itself. The code has to read <code>SLURM_CPUS_PER_TASK</code> explicitly (my script passes it to XGBoost’s <code>nthread</code>).</p>
+<p>Each task requests 8 vCPU, so the full array needs 24 × 8 = 192 vCPU, exactly four 48-vCPU nodes at six tasks each. <code>--cpus-per-task=8</code> only reserves the vCPUs; the program will not use them by itself. The code has to read <code>SLURM_CPUS_PER_TASK</code> explicitly (my script passes it to XGBoost’s <code>nthread</code>).</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/fig_packing.svg" class="img-fluid figure-img" alt="Diagram of four nodes, each holding six 8-vCPU task chips labeled h1 through h24, plus a dashed fifth node marked idle: nothing left to schedule"></p>
@@ -239,7 +239,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>The compute subnet’s route table in the console as I write this: the default route still points at the deleted NAT, status Blackhole (IDs redacted).</figcaption>
 </figure>
 </div>
-<p><strong>The most dangerous default.</strong> In my configuration the shared EFS volume is part of the cluster and is deleted with it, the default <code>DeletionPolicy: Delete</code>. It can be set to <code>Retain</code> instead; I chose not to, preferring a clean site per run with the local copy as ground truth over a standing cloud volume that bills monthly and might hold the only copy of something. The price of that choice is discipline: retrieve first, tear down second, every time.</p>
+<p><strong>The most dangerous default.</strong> In my configuration the shared EFS volume is part of the cluster and is deleted with it, the default <code>DeletionPolicy: Delete</code>. It can be set to <code>Retain</code> instead; I chose not to, preferring a clean site per run with the local copy as ground truth over a standing cloud volume that bills monthly and might hold the only copy of something. I retrieve the results before every teardown.</p>
 <p><strong>Quotas.</strong> A fresh account’s on-demand vCPU quota is far below four 48-vCPU nodes. Check Service Quotas and request the raise days before the deadline run, not the night of. I asked for 1,024 vCPUs; the reviewers granted my freshly created account 500, which turned out to be plenty.</p>
 <p><strong>Failed bootstraps still bill.</strong> Instances bill from launch whether or not they ever join the queue. The July incident, priced from the instance records:</p>
 <table class="caption-top table">
@@ -339,13 +339,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Cost Explorer over the run’s dates (June 16–18, daily, grouped by service): US$236.96 of actual unblended cost, within a few percent of the ≈ $243 estimated from node-hours above. EC2 instances are the tall blue bars; every other service is a sliver.</figcaption>
 </figure>
 </div>
-<p>Reading the two tables together, the plainest conclusion is that AWS does not distinguish between a machine that is computing, one that is debugging, and one stuck in bootstrap: a running instance bills every minute at the same rate. On the routine grid a lapse costs a few dollars; with four compute nodes up, letting the same lapse sit for a few hours runs into tens of dollars.</p>
+<p>EC2 bills a running instance at the same rate whether it is computing, debugging, or stuck in bootstrap. On the routine grid a lapse costs a few dollars; with four compute nodes up, letting the same lapse sit for a few hours runs into tens of dollars.</p>
 </section>
 <section id="what-transfers" class="level2">
 <h2 class="anchored" data-anchor-id="what-transfers">What transfers</h2>
 <p>The shape that fits: tasks independent of one another, CPU-hungry but data-light, with no chatter between nodes. Batches split by horizon, by bootstrap draw, by simulation seed, by grid point, or by region all qualify. The misfits are just as clear: tasks that need to talk to each other constantly (that is MPI territory); data under compliance or residency constraints (settle the permissions before the architecture); and any case where the campus cluster’s queue is short and its software current, because free is the best price.</p>
-<p>The deep-learning side of my work takes the opposite route for the same reason. Training a neural network is one long job on one GPU, so there I rent a single pod on RunPod instead of building a cluster: no scheduler, no NAT, just a machine with an SSH port. The workflow still rhymes with the one above, and I keep it in a pair of small scripts (<a href="https://github.com/ChennoShen239/runpod_scripts">runpod_scripts</a>): <code>rsync</code> the project to the pod’s <code>/workspace</code>, build the environment once with <code>uv sync</code>, run the entry file inside <code>tmux</code> so the job survives a dropped connection, and mail the results back when it ends.</p>
-<p>Side by side, the two setups are the same discipline on opposite topologies:</p>
+<p>The deep-learning side of my work takes the opposite route for the same reason. Training a neural network is one long job on one GPU, so there I rent a single pod on RunPod instead of building a cluster: no scheduler, no NAT, just a machine with an SSH port. I keep the workflow in a pair of small scripts (<a href="https://github.com/ChennoShen239/runpod_scripts">runpod_scripts</a>): <code>rsync</code> the project to the pod’s <code>/workspace</code>, build the environment once with <code>uv sync</code>, run the entry file inside <code>tmux</code> so the job survives a dropped connection, and mail the results back when it ends.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -402,7 +401,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="a-closing-checklist" class="level2">
 <h2 class="anchored" data-anchor-id="a-closing-checklist">A closing checklist</h2>
-<p>Several rounds in, the discipline that actually saves money is not hunting for cheap instances; it is turning things off.</p>
+<p>By the time this note went up, I had spent a fair amount on these runs. Using this checklist had kept the wasted amount at about $2.7.</p>
 <p>Before a run:</p>
 <ol type="1">
 <li>NAT up? The default route must point at a live gateway.</li>
@@ -415,7 +414,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Cluster fully deleted? Wait for the delete to actually finish.</li>
 <li>NAT down, Elastic IP released?</li>
 </ol>
-<p>The checklist is boring, and it is what keeps correct compute surprisingly cheap: every wasted dollar above maps to one specific mistake, and the checklist’s whole job is to keep the waste frozen at the numbers you have just seen. By the time this note went up, the runs behind it had consumed a healthy pile of money; thanks to the checklist, the wasted slice has stayed where you saw it.</p>
 <hr>
 <p><a href="https://chennoshen239.github.io/notes.html">← Notes &amp; code</a></p>
 </section>

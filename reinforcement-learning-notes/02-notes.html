@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+<meta name="description" content="Personal notes on Ben Moll’s four lectures on reinforcement learning.">
 
 <title>2&nbsp; Monte Carlo Methods and Stochastic Approximation – Reinforcement Learning</title>
 <style>
@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6e77e0fd038bd32286badfaa030b4a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-11adc450b4e5a03df677c42b89b3c1a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -139,7 +139,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=e42ca9fdf4f2">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -700,7 +700,7 @@ w_{k+1}=\frac{1}{k}\sum_{i=1}^{k}x_{i},\qquad k=1,2,\dots
 \]</span></p>
 <p>so that <span class="math inline">\(w_{k}=\frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}\)</span>. Then the incremental form follows from algebra alone.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: the incremental mean">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -709,7 +709,7 @@ w_{k+1}=\frac{1}{k}\sum_{i=1}^{k}x_{i},\qquad k=1,2,\dots
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p><span class="math display">\[
 \begin{aligned}
@@ -901,7 +901,7 @@ Tip
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof of the Robbins-Monro theorem">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -910,7 +910,7 @@ Tip
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div id="callout-18" class="callout-18-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Let <span class="math inline">\(w^{*}\)</span> be the root, so <span class="math inline">\(g(w^{*})=0\)</span>, and write the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> with the noisy observation expanded: <span class="math display">\[
 w_{k+1}=w_{k}-\alpha_{k}\tilde{g}(w_{k},\eta_{k})=w_{k}-\alpha_{k}\big[g(w_{k})+\eta_{k}\big].
@@ -1089,7 +1089,7 @@ w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k}).
 \tag{2.13}\]</span></span></p>
 <p>It replaces the true gradient by a <em>single-sample</em> estimate of it, which is a wildly noisy substitute. That it works at all is <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: SGD is Robbins-Monro on the first-order condition">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1098,7 +1098,7 @@ w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k}).
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div id="callout-21" class="callout-21-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Minimizing <a href="#eq-sgd-objective" class="quarto-xref">Equation&nbsp;<span>2.12</span></a> means solving its first-order condition, which is a root-finding problem in the sense of the previous section: <span class="math display">\[
 g(w)\defeq\nabla_{w}J(w)=\E\big[\nabla_{w}f(w,X)\big]=0 ,

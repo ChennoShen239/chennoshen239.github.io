@@ -1,9 +1,18 @@
-/* Design tokens matching chennoshen239.github.io (plain CSS — referenced by theme.scss rules). */
+/* Homepage typography and colors. */
 :root{
-  --ink:#16181d; --text:#2a2f38; --muted:#4f5763;
+  --ink:#1a1a1a; --text:#1a1a1a; --muted:#5f6368;
   --red:#94070a; --red-2:#7a0608; --tint:rgba(148,7,10,.06);
   --line:rgba(22,24,29,.12); --line-2:rgba(22,24,29,.22);
-  --sans:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --sans:'Spectral',Georgia,'Times New Roman',serif;
   --body:'Spectral',Georgia,'Times New Roman',serif;
   --ease:cubic-bezier(.2,.6,.2,1);
+}
+
+#title-block-header .description{display:none}
+
+/* Keep wide equations within the reading column. */
+mjx-container[display="true"]{max-width:100%;overflow-x:auto;overflow-y:hidden}
+
+@media (max-width:760px){
+  .content table,.content .math.display{display:block;max-width:100%;overflow-x:auto}
 }

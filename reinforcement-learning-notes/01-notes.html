@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+<meta name="description" content="Personal notes on Ben Moll’s four lectures on reinforcement learning.">
 
 <title>1&nbsp; The Basic Idea of RL, and Its Link to Dynamic Programming – Reinforcement Learning</title>
 <style>
@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6e77e0fd038bd32286badfaa030b4a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-11adc450b4e5a03df677c42b89b3c1a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -139,7 +139,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=e42ca9fdf4f2">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -354,7 +354,7 @@ v(s_{0})\approx \hat{v}(s_{0})=\frac{1}{N}\sum_{i=1}^{N}\sum_{t=0}^{T}\beta^{t}r
 \tag{1.3}\]</span></span></p>
 <p>This is the <strong>TD(0)</strong> update. Where does it come from?</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: from the incremental mean to TD(0)">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -363,7 +363,7 @@ v(s_{0})\approx \hat{v}(s_{0})=\frac{1}{N}\sum_{i=1}^{N}\sum_{t=0}^{T}\beta^{t}r
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-3" class="callout-3-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Start from the dynamic-programming fixed point <a href="#eq-mrp-dp" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> and read it as an expectation: <span class="math display">\[
 v(s)=r(s)+\beta\int v(s')\,p(s'\given s)\,ds'
@@ -529,7 +529,7 @@ q(s,a) &amp;=r(s,a)+\E_{\pi^{*}}\!\left[\sum_{\tau=1}^{\infty}\beta^{\tau}r(s_{t
 <p>Strictly, <a href="#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> defines the <strong>optimal</strong> action-value <span class="math inline">\(q^{*}\)</span>: it assumes the optimal policy <span class="math inline">\(\pi^{*}\)</span> is followed after the first action. Swapping <span class="math inline">\(\pi^{*}\)</span> for an arbitrary policy <span class="math inline">\(\pi\)</span> gives the <strong>policy-specific</strong> <span class="math inline">\(q_{\pi}\)</span>; the version under the current policy, <span class="math inline">\(q_{\pi_{k}}\)</span>, is what Howard policy iteration iterates on below.</p>
 <p>The two expressions for <span class="math inline">\(q\)</span> agree: the “one step now, optimal continuation later” form follows from the discounted-sum form.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: the two forms of q(s,a) coincide">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -538,7 +538,7 @@ q(s,a) &amp;=r(s,a)+\E_{\pi^{*}}\!\left[\sum_{\tau=1}^{\infty}\beta^{\tau}r(s_{t
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Start from <span class="math display">\[
 q(s,a)=r(s,a)+\beta\sum_{s'\in\mathcal{S}}v(s')\,p(s'\given s,a),

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Chen Gao (高琛)">
-<meta name="description" content="Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.">
+<meta name="description" content="Personal notes on dynamic optimization, based on Zhang Bo’s graduate course.">
 
 <title>Dynamic Optimization</title>
 <style>
@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-648ef3d9445146c9b2790911d1461dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-972fecedd11e416f878c9978b8c0d5ce.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -104,7 +104,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=efda436c61d7">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -264,12 +264,12 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Dynamic Optimization</h1>
-<p class="subtitle lead">Variational Methods, Optimal Control, and Dynamic Programming — A Rigorous Reconstruction</p>
+<p class="subtitle lead">Variational methods, optimal control, and dynamic programming</p>
 </div>
 
 <div>
   <div class="description">
-    <p>Self-contained, fully-derived English lecture notes on dynamic optimization, reconstructed from Zhang Bo’s (张博) graduate course. From static optimization and the qualitative theory of ODEs, through the calculus of variations and Pontryagin’s optimal control, to Bellman/HJB dynamic programming — with economic applications (Ramsey, Solow, Merton) worked in full.</p>
+    <p>Personal notes on dynamic optimization, based on Zhang Bo’s graduate course.</p>
   </div>
 </div>
 
@@ -300,11 +300,11 @@ window.Quarto = {
 
 <section id="preface" class="level1 unnumbered">
 <h1 class="unnumbered">Preface</h1>
-<p>These are self-contained lecture notes on <strong>dynamic optimization</strong> — the mathematics of choosing an entire <em>path</em> rather than a single point. They reconstruct, in English and from first principles, a graduate course taught by <strong>Zhang Bo (张博)</strong>, whose original Chinese courseware supplies the structure, the examples, and the economic motivation.</p>
-<p>“Reconstruct” is meant literally. Every theorem is stated with its hypotheses and proved; every sign is argued, not asserted; every value or asset equation is <em>derived</em> — typically from a discrete period-<span class="math inline">\(\Delta\)</span> problem taken to the <span class="math inline">\(\Delta\to 0\)</span> limit — rather than written down as given. Where the course is terse, these notes are long; the goal is a reference you can read closed-book and reproduce.</p>
+<p>I prepared these notes for my own reference. They follow Zhang Bo’s (张博) graduate course on dynamic optimization: choosing an entire path. The structure, examples, and economic motivation come from the original Chinese courseware.</p>
+<p>The notes give hypotheses and proofs for each theorem, justify sign claims, and derive value and asset equations, typically from a discrete period-<span class="math inline">\(\Delta\)</span> problem by taking the <span class="math inline">\(\Delta\to 0\)</span> limit.</p>
 <section id="the-arc-of-the-subject" class="level2">
 <h2 class="anchored" data-anchor-id="the-arc-of-the-subject">The arc of the subject</h2>
-<p>Dynamic optimization is three methods for one problem — maximize an objective over a path subject to a law of motion — each with its own central tool:</p>
+<p>The three methods below maximize an objective over a path subject to a law of motion:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -336,13 +336,13 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>The three are not rivals but views of the same summit: the costate <span class="math inline">\(\lambda\)</span> of optimal control <em>is</em> the gradient <span class="math inline">\(V_x\)</span> of the value function, and the maximum principle and the HJB equation imply one another. A recurring aim of these notes is to make those bridges explicit.</p>
+<p>The costate <span class="math inline">\(\lambda\)</span> of optimal control is the gradient <span class="math inline">\(V_x\)</span> of the value function, and the maximum principle and the HJB equation imply one another.</p>
 </section>
 <section id="how-the-notes-are-organized" class="level2">
 <h2 class="anchored" data-anchor-id="how-the-notes-are-organized">How the notes are organized</h2>
-<p>The book is built bottom-up, so that the dynamic theory rests on solid static and dynamical foundations.</p>
+
 <ul>
-<li><strong>Foundations.</strong> The <a href="./00-introduction.html">Introduction</a> frames the optimization problem and the three methods. <a href="./01-static-optimization.html">Static Optimization</a> develops convexity, the KKT conditions, the envelope theorem, and duality. <a href="./02-odes.html">ODEs</a> covers solution methods and — more importantly for us — the <em>qualitative</em> theory: stability, phase diagrams, and bifurcations.</li>
+<li><strong>Foundations.</strong> The <a href="./00-introduction.html">Introduction</a> frames the optimization problem and the three methods. <a href="./01-static-optimization.html">Static Optimization</a> develops convexity, the KKT conditions, the envelope theorem, and duality. <a href="./02-odes.html">ODEs</a> covers solution methods, with an emphasis on the qualitative theory: stability, phase diagrams, and bifurcations.</li>
 <li><strong>Continuous-time dynamic optimization.</strong> The <a href="./03-calculus-of-variations.html">Calculus of Variations</a> and <a href="./04-optimal-control.html">Optimal Control</a> handle continuous-time paths, with the Ramsey growth model as the running economic example.</li>
 <li><strong>Dynamic programming.</strong> <a href="./05-dynamic-programming.html">Dynamic Programming</a> treats discrete and continuous time, deterministic and stochastic, up to the Itô calculus and the Merton portfolio problem.</li>
 </ul>
@@ -350,7 +350,7 @@ window.Quarto = {
 </section>
 <section id="a-word-on-notation" class="level2">
 <h2 class="anchored" data-anchor-id="a-word-on-notation">A word on notation</h2>
-<p>The notes use <strong>standard field notation</strong>, which occasionally departs from the courseware — most consequentially, the continuous-time discount <em>rate</em> <span class="math inline">\(\rho\)</span> is kept distinct from the discrete-time discount <em>factor</em> <span class="math inline">\(\beta=1/(1+\rho)\)</span>, which the course writes with a single symbol. The <a href="./notation.html">Notation</a> chapter is the master table and flags every such deviation. The reasoning behind the notation policy and the choice of Quarto for these notes is recorded in <code>docs/adr/</code>.</p>
+<p>The notes use standard field notation, which occasionally departs from the courseware. In particular, the continuous-time discount <em>rate</em> <span class="math inline">\(\rho\)</span> is kept distinct from the discrete-time discount <em>factor</em> <span class="math inline">\(\beta=1/(1+\rho)\)</span>, which the course writes with a single symbol. The <a href="./notation.html">Notation</a> chapter is the master table and flags every such deviation.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Chen Gao (高琛)">
-<meta name="description" content="Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.">
+<meta name="description" content="Personal notes on Berkeley’s Math 128A and Math 128B sequence, based on my class notes and M. Lindsey’s lecture notes.">
 
 <title>Numerical Analysis</title>
 <style>
@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-02481ebc706b4fb1273402d88e51fef5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-b8000fea8c0cdb7dc8fce3848fd6d512.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -104,7 +104,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=03b92a614e9d">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -246,7 +246,6 @@ window.Quarto = {
   <ul>
   <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a>
   <ul class="collapse">
-  <li><a href="#the-arc-of-the-subject" id="toc-the-arc-of-the-subject" class="nav-link" data-scroll-target="#the-arc-of-the-subject">The arc of the subject</a></li>
   <li><a href="#how-the-notes-are-organized" id="toc-how-the-notes-are-organized" class="nav-link" data-scroll-target="#how-the-notes-are-organized">How the notes are organized</a></li>
   <li><a href="#a-word-on-sources" id="toc-a-word-on-sources" class="nav-link" data-scroll-target="#a-word-on-sources">A word on sources</a></li>
   <li><a href="#license-attribution" id="toc-license-attribution" class="nav-link" data-scroll-target="#license-attribution">License &amp; attribution</a></li>
@@ -260,12 +259,12 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Numerical Analysis</h1>
-<p class="subtitle lead">Interpolation, Quadrature, ODEs, and Numerical Linear Algebra (Math 128A/128B)</p>
+<p class="subtitle lead">Math 128A and Math 128B</p>
 </div>
 
 <div>
   <div class="description">
-    <p>Self-contained lecture notes on numerical analysis, covering the two-semester Berkeley sequence Math 128A/128B. Part I (128A) develops polynomial interpolation, numerical differentiation and integration, initial-value ODE solvers, and direct methods for linear systems, reconstructed from the author’s course notes. Part II (128B) develops iterative linear solvers, approximation theory, eigenvalue problems, and nonlinear equations, reconstructed from M. Lindsey’s lecture notes.</p>
+    <p>Personal notes on Berkeley’s Math 128A and Math 128B sequence, based on my class notes and M. Lindsey’s lecture notes.</p>
   </div>
 </div>
 
@@ -296,59 +295,25 @@ window.Quarto = {
 
 <section id="preface" class="level1 unnumbered">
 <h1 class="unnumbered">Preface</h1>
-<p>These are self-contained lecture notes on <strong>numerical analysis</strong>, the art of computing approximate answers to continuous mathematical problems, and of bounding the error you commit by doing so. They cover the two-semester Berkeley sequence <strong>Math 128A</strong> and <strong>Math 128B</strong>, rebuilt in English from first principles as a single browsable book.</p>
-<p>The unifying question of the subject is always the same: <em>replace an object you cannot compute exactly (an integral, a derivative, the solution of a differential equation, the solution of a huge linear system, an eigenvector, a root) by one you can, and control the difference.</em> Every chapter is a variation on discretize, solve, and estimate the error.</p>
-<section id="the-arc-of-the-subject" class="level2">
-<h2 class="anchored" data-anchor-id="the-arc-of-the-subject">The arc of the subject</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Part</th>
-<th>Course</th>
-<th>Question</th>
-<th>Central tools</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>I</strong></td>
-<td>128A</td>
-<td>Approximate functions, derivatives, integrals, ODE trajectories; solve <span class="math inline">\(Ax=b\)</span> exactly</td>
-<td>interpolation, Newton–Cotes &amp; Gauss quadrature, Runge–Kutta &amp; multistep methods, LU/Cholesky</td>
-</tr>
-<tr class="even">
-<td><strong>II</strong></td>
-<td>128B</td>
-<td>Solve, approximate, and decompose at scale</td>
-<td>Jacobi/CG iteration, orthogonal-polynomial approximation, the power method &amp; SVD, Newton’s method</td>
-</tr>
-</tbody>
-</table>
-<p>Part I builds the classical toolkit on small, smooth problems: how to interpolate data, how to differentiate and integrate numerically, how to march an initial-value ODE forward in time, and how to solve a linear system by direct elimination. Part II turns to the large-scale and the iterative: solving <span class="math inline">\(Ax=b\)</span> by iteration when <span class="math inline">\(A\)</span> is too big to factor, approximating functions in the least-squares and Chebyshev senses, extracting eigenvalues and principal components, and solving nonlinear equations by fixed-point and Newton iteration.</p>
-</section>
+<p>I prepared these notes for my own reference. They cover Berkeley’s Math 128A and Math 128B sequence: computing approximate answers to continuous mathematical problems and bounding their errors.</p>
+<div id="the-arc-of-the-subject"></div>
 <section id="how-the-notes-are-organized" class="level2">
 <h2 class="anchored" data-anchor-id="how-the-notes-are-organized">How the notes are organized</h2>
 <ul>
-<li><strong>Part I: Interpolation, Quadrature &amp; ODEs (128A).</strong> <a href="./01-interpolation.html">Polynomial Interpolation</a> (Lagrange, Newton, Hermite, splines, Bézier); <a href="./02-differentiation-integration.html">Numerical Differentiation &amp; Integration</a> (finite differences, Richardson extrapolation, Newton–Cotes, Romberg, adaptive and Gauss quadrature); <a href="./03-ivp-odes.html">Initial-Value Problems for ODEs</a> (Euler, Taylor, Runge–Kutta, multistep, predictor–corrector, stiffness); <a href="./04-direct-linear-systems.html">Direct Methods for Linear Systems</a> (Gaussian elimination, pivoting, LU, SPD and Cholesky, tridiagonal solvers).</li>
-<li><strong>Part II: Numerical Linear Algebra &amp; Approximation (128B).</strong> <a href="./05-iterative-linear-systems.html">Iterative Methods for Linear Systems</a> (Jacobi, Gauss–Seidel, SOR, condition numbers, steepest descent, conjugate gradient, preconditioning); <a href="./06-approximation-theory.html">Approximation Theory</a> (least squares, orthogonal and Chebyshev polynomials, Padé, Fourier, the FFT); <a href="./07-eigenvalue-problems.html">Eigenvalue Problems</a> (power method, Markov chains and PageRank, PCA, subspace iteration, randomized SVD, spectral clustering); <a href="./08-nonlinear-equations.html">Nonlinear Equations &amp; Optimization</a> (fixed-point iteration, the Banach theorem, Newton’s method, orders of convergence).</li>
+<li><strong>Part I: Interpolation, Quadrature &amp; ODEs (128A).</strong> This part treats small, smooth approximation problems and direct methods that solve <span class="math inline">\(Ax=b\)</span> exactly. <a href="./01-interpolation.html">Polynomial Interpolation</a> (Lagrange, Newton, Hermite, splines, Bézier); <a href="./02-differentiation-integration.html">Numerical Differentiation &amp; Integration</a> (finite differences, Richardson extrapolation, Newton–Cotes, Romberg, adaptive and Gauss quadrature); <a href="./03-ivp-odes.html">Initial-Value Problems for ODEs</a> (Euler, Taylor, Runge–Kutta, multistep, predictor–corrector, stiffness); <a href="./04-direct-linear-systems.html">Direct Methods for Linear Systems</a> (Gaussian elimination, pivoting, LU, SPD and Cholesky, tridiagonal solvers).</li>
+<li><strong>Part II: Numerical Linear Algebra &amp; Approximation (128B).</strong> Iterative solvers handle <span class="math inline">\(Ax=b\)</span> when <span class="math inline">\(A\)</span> is too large to factor. <a href="./05-iterative-linear-systems.html">Iterative Methods for Linear Systems</a> (Jacobi, Gauss–Seidel, SOR, condition numbers, steepest descent, conjugate gradient, preconditioning); <a href="./06-approximation-theory.html">Approximation Theory</a> (least squares, orthogonal and Chebyshev polynomials, Padé, Fourier, the FFT); <a href="./07-eigenvalue-problems.html">Eigenvalue Problems</a> (power method, Markov chains and PageRank, PCA, subspace iteration, randomized SVD, spectral clustering); <a href="./08-nonlinear-equations.html">Nonlinear Equations &amp; Optimization</a> (fixed-point iteration, the Banach theorem, Newton’s method, orders of convergence).</li>
 </ul>
 </section>
 <section id="a-word-on-sources" class="level2">
 <h2 class="anchored" data-anchor-id="a-word-on-sources">A word on sources</h2>
-<p>The two parts rest on <strong>different sources</strong>, and the notes are honest about it. <strong>Part I (128A)</strong> is reconstructed from the author’s own course notes: there is no official instructor text for 128A, so the notes stand on their own derivations. <strong>Part II (128B)</strong> is reconstructed from <strong>M. Lindsey’s</strong> official <em>Math 128B</em> lecture notes, cited section by section, with the author’s personal notes folded in where they add something. The reasoning behind this asymmetry, and the notation policy, are recorded in <code>docs/adr/</code> and <a href="./notation.html"><code>notation.qmd</code></a>.</p>
+<p><strong>Part I (128A)</strong> is reconstructed from my own course notes. There is no official instructor text for 128A, so the derivations are developed from those notes. <strong>Part II (128B)</strong> follows <strong>M. Lindsey’s</strong> official <em>Math 128B</em> lecture notes, cited section by section, with material from my own notes added where it helps. The <a href="./notation.html">Notation</a> appendix records the notation conventions.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p>These notes are a study reconstruction, not official course materials; any errors introduced in the rebuilding are mine. Part I in particular is only as reliable as a diligent student’s notes.</p>
+<p>These notes are a study reconstruction, not official course materials; any errors introduced in the rebuilding are mine.</p>
 </div>
 </div>
 </div>

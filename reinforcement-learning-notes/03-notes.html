@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Self-contained lecture notes on reinforcement learning for economists, developed from Ben Moll’s four lectures. The organising idea is that reinforcement learning is Monte-Carlo dynamic programming: the same Bellman recursions, with expectations estimated from sampled experience rather than computed from a known model. Covers dynamic programming and the link to RL, Monte Carlo methods and stochastic approximation, temporal difference learning with Sarsa and Q-learning, and policy gradient and actor-critic methods, with the proofs the slides defer worked out in full.">
+<meta name="description" content="Personal notes on Ben Moll’s four lectures on reinforcement learning.">
 
 <title>3&nbsp; Temporal Difference Learning, Sarsa, and Q-learning – Reinforcement Learning</title>
 <style>
@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6e77e0fd038bd32286badfaa030b4a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-11adc450b4e5a03df677c42b89b3c1a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -139,7 +139,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css">
+<link rel="stylesheet" href="assets/custom.css?v=e42ca9fdf4f2">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -299,7 +299,7 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>Monte Carlo was the first model-free method. <strong>Temporal difference (TD) learning</strong> is the second, and it improves on Monte Carlo along the one axis Chapter 2 could not: it does not wait. Where MC Basic must run an episode to its end before it learns anything, TD updates after every single transition. This chapter builds that idea three times over, for state values, for action values under a fixed policy (<strong>Sarsa</strong>), and for optimal action values directly (<strong>Q-learning</strong>), and then removes the assumption that has been quietly holding since Chapter 1, that values can be stored in a table.</p>
+<p>Chapter 2 developed Monte Carlo methods for model-free learning. <strong>Temporal difference (TD) learning</strong> updates after each transition, while MC Basic waits until an episode ends. This chapter develops TD for state values, for action values under a fixed policy (<strong>Sarsa</strong>), and for optimal action values (<strong>Q-learning</strong>). It then relaxes the assumption, used since Chapter 1, that values can be stored in a table.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -315,7 +315,6 @@ window.Quarto = {
 </div>
 <section id="incremental-versus-episodic-learning" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="incremental-versus-episodic-learning"><span class="header-section-number">3.1</span> Incremental versus episodic learning</h2>
-<p>The distinction is worth naming precisely, because it is the whole difference between this chapter and the last.</p>
 <p>Chapter 2’s policy evaluation step was <a href="02-notes.html#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a>, the average return over <span class="math inline">\(N\)</span> episodes. Written as a running average in the manner of <a href="02-notes.html#eq-mean-incremental" class="quarto-xref">Equation&nbsp;<span>2.8</span></a>, the <span class="math inline">\(j\)</span>-th update is</p>
 <p><span id="eq-episodic-update"><span class="math display">\[
 q_{\pi_{k}}^{j+1}(s,a)=q_{\pi_{k}}^{j}(s,a)+\frac{1}{j}\left[\sum_{t=0}^{T}\gamma^{t}r(s_{t}^{j},a_{t}^{j})-q_{\pi_{k}}^{j}(s,a)\right].
@@ -384,7 +383,7 @@ v_{t+1}(s)=v_{t}(s)\qquad\text{for all } s\neq s_{t}.
 <h3 class="anchored" data-anchor-id="why-barv_t-deserves-the-name-target">Why <span class="math inline">\(\bar{v}_{t}\)</span> deserves the name “target”</h3>
 <p>Because the algorithm provably moves <span class="math inline">\(v(s_{t})\)</span> toward it.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: the update contracts the gap to the target">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -393,7 +392,7 @@ v_{t+1}(s)=v_{t}(s)\qquad\text{for all } s\neq s_{t}.
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Rewrite <a href="#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a> in terms of <span class="math inline">\(\bar{v}_{t}\)</span> and subtract <span class="math inline">\(\bar{v}_{t}\)</span> from both sides: <span class="math display">\[
 \begin{aligned}
@@ -447,7 +446,7 @@ Tip
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof of the convergence of TD learning">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -456,7 +455,7 @@ Tip
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Fix an arbitrary state <span class="math inline">\(s\in\mathcal{S}\)</span> and define the estimation error <span class="math display">\[
 \Delta_{t}(s)\defeq v_{t}(s)-v_{\pi}(s).
@@ -608,7 +607,7 @@ q_{\pi}(s,a)=\E\big[R+\gamma q_{\pi}(S',A')\ \given\ s,a\big],
 <p>which is the action-value form of the policy-evaluation Bellman equation for the fixed policy <span class="math inline">\(\pi\)</span>: <a href="02-notes.html#eq-bellman-pi" class="quarto-xref">Equation&nbsp;<span>2.2</span></a> with the maximization over <span class="math inline">\(\pi\)</span> removed.</p>
 <p>The claim deserves a proof, because <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> does not look like anything in Chapter 2. There is no sum over actions in it, and the policy <span class="math inline">\(\pi\)</span> appears nowhere. Both are hiding inside the expectation.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof that the Sarsa fixed point is the Bellman equation">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -617,7 +616,7 @@ q_{\pi}(s,a)=\E\big[R+\gamma q_{\pi}(S',A')\ \given\ s,a\big],
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Write <span class="math inline">\(p(r\given s,a)\)</span> for the distribution of the immediate reward and <span class="math inline">\(p(s'\given s,a)\)</span> for the transition, both conditional on the pair <span class="math inline">\((s,a)\)</span>. Expanding the right-hand side of <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> by the definition of expectation,</p>
 <p><span class="math display">\[
@@ -650,7 +649,7 @@ v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
 </div>
 <p>The hypotheses read exactly as in <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> with one word changed: the Robbins-Monro conditions must now hold <strong>pair by pair</strong> rather than state by state. The conclusion changes in the same mechanical way, from the whole vector of state values to the whole table of action values. So does the proof, and it is worth showing precisely how rather than asserting it.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof of the convergence of Sarsa">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -659,7 +658,7 @@ v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Nothing new is needed. Sarsa is the TD algorithm with its index set enlarged from states to state-action pairs, so the proof of <a href="#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> carries over under a dictionary. Here are the substitutions, in the order that proof uses them.</p>
 <p><strong>The index set.</strong> Replace <span class="math inline">\(\mathcal{S}\)</span> by <span class="math inline">\(\mathcal{S}\times\mathcal{A}\)</span> everywhere. It is still finite, which is all <a href="#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> ever asked of it, and the norm becomes <span class="math inline">\(\|x\|_{\infty}=\max_{(s,a)}|x(s,a)|\)</span>, a maximum over pairs.</p>
@@ -869,7 +868,7 @@ q(s,a)=\E\Big[R+\gamma\max_{a'\in\mathcal{A}}q(S',a')\ \given\ s,a\Big],
 <p>whose solution is <span class="math inline">\(q^{*}\)</span>. So Q-learning estimates the optimal action values directly, and needs no separate policy improvement step at all.</p>
 <p>Calling <a href="#eq-bellman-opt-q" class="quarto-xref">Equation&nbsp;<span>3.10</span></a> an optimality equation is a claim worth checking, because it does not look like one. Its only maximization sits inside the expectation, over the <em>next</em> action; nothing is maximized over policies, and the unknown carries no <span class="math inline">\(\pi\)</span> subscript at all.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof that the Q-learning fixed point is the Bellman optimality equation">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -878,7 +877,7 @@ q(s,a)=\E\Big[R+\gamma\max_{a'\in\mathcal{A}}q(S',a')\ \given\ s,a\Big],
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div id="callout-19" class="callout-19-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p><strong>Step 1: expand the expectation.</strong> Exactly as for Sarsa, write the right-hand side as sums against the conditional distributions of the reward and of the next state. What differs is that the next <em>action</em> is not random: the <span class="math inline">\(\max\)</span> has already chosen it, so only <span class="math inline">\(r\)</span> and <span class="math inline">\(s'\)</span> are integrated out and no policy is needed to average over <span class="math inline">\(a'\)</span>, <span class="math display">\[
 q(s,a)=\sum_{r}r\,p(r\given s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)\max_{a'\in\mathcal{A}}q(s',a').

@@ -4,17 +4,7 @@
     "href": "index.html",
     "title": "Numerical Analysis",
     "section": "",
-    "text": "Preface\nThese are self-contained lecture notes on numerical analysis, the art of computing approximate answers to continuous mathematical problems, and of bounding the error you commit by doing so. They cover the two-semester Berkeley sequence Math 128A and Math 128B, rebuilt in English from first principles as a single browsable book.\nThe unifying question of the subject is always the same: replace an object you cannot compute exactly (an integral, a derivative, the solution of a differential equation, the solution of a huge linear system, an eigenvector, a root) by one you can, and control the difference. Every chapter is a variation on discretize, solve, and estimate the error.",
-    "crumbs": [
-      "Preface"
-    ]
-  },
-  {
-    "objectID": "index.html#the-arc-of-the-subject",
-    "href": "index.html#the-arc-of-the-subject",
-    "title": "Numerical Analysis",
-    "section": "The arc of the subject",
-    "text": "The arc of the subject\n\n\n\n\n\n\n\n\n\nPart\nCourse\nQuestion\nCentral tools\n\n\n\n\nI\n128A\nApproximate functions, derivatives, integrals, ODE trajectories; solve \\(Ax=b\\) exactly\ninterpolation, Newton–Cotes & Gauss quadrature, Runge–Kutta & multistep methods, LU/Cholesky\n\n\nII\n128B\nSolve, approximate, and decompose at scale\nJacobi/CG iteration, orthogonal-polynomial approximation, the power method & SVD, Newton’s method\n\n\n\nPart I builds the classical toolkit on small, smooth problems: how to interpolate data, how to differentiate and integrate numerically, how to march an initial-value ODE forward in time, and how to solve a linear system by direct elimination. Part II turns to the large-scale and the iterative: solving \\(Ax=b\\) by iteration when \\(A\\) is too big to factor, approximating functions in the least-squares and Chebyshev senses, extracting eigenvalues and principal components, and solving nonlinear equations by fixed-point and Newton iteration.",
+    "text": "Preface\nI prepared these notes for my own reference. They cover Berkeley’s Math 128A and Math 128B sequence: computing approximate answers to continuous mathematical problems and bounding their errors.",
     "crumbs": [
       "Preface"
     ]
@@ -24,7 +14,7 @@
     "href": "index.html#how-the-notes-are-organized",
     "title": "Numerical Analysis",
     "section": "How the notes are organized",
-    "text": "How the notes are organized\n\nPart I: Interpolation, Quadrature & ODEs (128A). Polynomial Interpolation (Lagrange, Newton, Hermite, splines, Bézier); Numerical Differentiation & Integration (finite differences, Richardson extrapolation, Newton–Cotes, Romberg, adaptive and Gauss quadrature); Initial-Value Problems for ODEs (Euler, Taylor, Runge–Kutta, multistep, predictor–corrector, stiffness); Direct Methods for Linear Systems (Gaussian elimination, pivoting, LU, SPD and Cholesky, tridiagonal solvers).\nPart II: Numerical Linear Algebra & Approximation (128B). Iterative Methods for Linear Systems (Jacobi, Gauss–Seidel, SOR, condition numbers, steepest descent, conjugate gradient, preconditioning); Approximation Theory (least squares, orthogonal and Chebyshev polynomials, Padé, Fourier, the FFT); Eigenvalue Problems (power method, Markov chains and PageRank, PCA, subspace iteration, randomized SVD, spectral clustering); Nonlinear Equations & Optimization (fixed-point iteration, the Banach theorem, Newton’s method, orders of convergence).",
+    "text": "How the notes are organized\n\nPart I: Interpolation, Quadrature & ODEs (128A). This part treats small, smooth approximation problems and direct methods that solve \\(Ax=b\\) exactly. Polynomial Interpolation (Lagrange, Newton, Hermite, splines, Bézier); Numerical Differentiation & Integration (finite differences, Richardson extrapolation, Newton–Cotes, Romberg, adaptive and Gauss quadrature); Initial-Value Problems for ODEs (Euler, Taylor, Runge–Kutta, multistep, predictor–corrector, stiffness); Direct Methods for Linear Systems (Gaussian elimination, pivoting, LU, SPD and Cholesky, tridiagonal solvers).\nPart II: Numerical Linear Algebra & Approximation (128B). Iterative solvers handle \\(Ax=b\\) when \\(A\\) is too large to factor. Iterative Methods for Linear Systems (Jacobi, Gauss–Seidel, SOR, condition numbers, steepest descent, conjugate gradient, preconditioning); Approximation Theory (least squares, orthogonal and Chebyshev polynomials, Padé, Fourier, the FFT); Eigenvalue Problems (power method, Markov chains and PageRank, PCA, subspace iteration, randomized SVD, spectral clustering); Nonlinear Equations & Optimization (fixed-point iteration, the Banach theorem, Newton’s method, orders of convergence).",
     "crumbs": [
       "Preface"
     ]
@@ -34,7 +24,7 @@
     "href": "index.html#a-word-on-sources",
     "title": "Numerical Analysis",
     "section": "A word on sources",
-    "text": "A word on sources\nThe two parts rest on different sources, and the notes are honest about it. Part I (128A) is reconstructed from the author’s own course notes: there is no official instructor text for 128A, so the notes stand on their own derivations. Part II (128B) is reconstructed from M. Lindsey’s official Math 128B lecture notes, cited section by section, with the author’s personal notes folded in where they add something. The reasoning behind this asymmetry, and the notation policy, are recorded in docs/adr/ and notation.qmd.\n\n\n\n\n\n\nThese notes are a study reconstruction, not official course materials; any errors introduced in the rebuilding are mine. Part I in particular is only as reliable as a diligent student’s notes.",
+    "text": "A word on sources\nPart I (128A) is reconstructed from my own course notes. There is no official instructor text for 128A, so the derivations are developed from those notes. Part II (128B) follows M. Lindsey’s official Math 128B lecture notes, cited section by section, with material from my own notes added where it helps. The Notation appendix records the notation conventions.\n\n\n\n\n\n\nThese notes are a study reconstruction, not official course materials; any errors introduced in the rebuilding are mine.",
     "crumbs": [
       "Preface"
     ]
