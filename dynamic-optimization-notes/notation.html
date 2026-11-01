@@ -605,7 +605,7 @@ window.Quarto = {
 <td><span class="math inline">\(\sigma\)</span>, <span class="math inline">\(\phi\)</span></td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(\beta=\dfrac{1}{1+\rho}\in(0,1)\)</span></td>
+<td><span class="math inline">\(\beta\in(0,1)\)</span></td>
 <td>discrete discount <strong>factor</strong></td>
 <td><span class="math inline">\(\rho\)</span> (overloaded!)</td>
 </tr>
@@ -637,7 +637,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p><strong>Discount rate and factor.</strong> The course writes the discrete-time Bellman discount and the continuous-time discount with the <em>same</em> symbol <span class="math inline">\(\rho\)</span>, even though one is a factor in <span class="math inline">\((0,1)\)</span> and the other a rate in <span class="math inline">\((0,\infty)\)</span>. Throughout these notes: <strong><span class="math inline">\(\rho\)</span> is the continuous-time rate</strong> (<span class="math inline">\(e^{-\rho t}\)</span>, Ch. 3–4 and continuous DP) and <strong><span class="math inline">\(\beta=1/(1+\rho)\)</span> is the discrete-time factor</strong> (Ch. 5). Here <span class="math inline">\(\beta=1/(1+\rho)\)</span> is the per-period (simple) factor, whereas <span class="math inline">\(e^{-\rho}\)</span> is the continuous-compounding factor; the two agree only to first order, <span class="math inline">\(\beta=1-\rho+O(\rho^2)=e^{-\rho}+O(\rho^2)\)</span>, and the <span class="math inline">\(\rho\)</span> in each is a distinct object (a discrete per-period rate vs.&nbsp;a continuous-time rate).</p>
+<p><strong>Discount rate and factor.</strong> <span class="math inline">\(\rho\)</span> is the continuous-time rate in <span class="math inline">\(e^{-\rho t}\)</span>; <span class="math inline">\(\beta\)</span> is the discrete-time factor. Over a unit period, <span class="math inline">\(\beta=e^{-\rho}=1/(1+r_d)\)</span> with simple rate <span class="math inline">\(r_d=e^\rho-1\)</span>. The course uses <span class="math inline">\(\rho\)</span> for both the rate and the factor.</p>
 </div>
 </div>
 </div>

@@ -412,13 +412,13 @@ Important
 <section id="the-deterministic-policy-gradient-theorem" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="the-deterministic-policy-gradient-theorem"><span class="header-section-number">4.3</span> The deterministic policy gradient theorem</h2>
 <div id="thm-dpg" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 4.1 (Deterministic policy gradient theorem)</strong></span> Let <span class="math inline">\(\mathcal{S}\)</span> be finite, let <span class="math inline">\(\gamma\in(0,1)\)</span>, let the policy be deterministic, <span class="math inline">\(a=\pi(s,\theta)\)</span> and differentiable in <span class="math inline">\(\theta\)</span>, and let <span class="math inline">\(J(\theta)=\sum_{s}v_{\pi}(s)\mu(s)\)</span> as in <a href="#eq-objective" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>. Then</p>
+<p><span class="theorem-title"><strong>Theorem 4.1 (Deterministic policy gradient theorem)</strong></span> Let <span class="math inline">\(\mathcal S\)</span> be finite and <span class="math inline">\(\gamma\in(0,1)\)</span>. The deterministic policy <span class="math inline">\(a=\pi(s,\theta)\)</span> is continuously differentiable in <span class="math inline">\(\theta\)</span> and takes values in an open action domain. Suppose <span class="math inline">\(r(s,a)\)</span> and <span class="math inline">\(p(s'\mid s,a)\)</span> are continuously differentiable in <span class="math inline">\(a\)</span> on a neighborhood of these actions. With a fixed initial distribution <span class="math inline">\(\mu\)</span> and <span class="math inline">\(J\)</span> as in <a href="#eq-objective" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>,</p>
 <p><span id="eq-dpg"><span class="math display">\[
 \nabla_{\theta}J(\theta)=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}\,\nabla_{a}q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\pi(s_{t},\theta)\right],
 \tag{4.5}\]</span></span></p>
 <p>where the expectation is over trajectories with <span class="math inline">\(s_{0}\sim\mu\)</span>, <span class="math inline">\(a_{t}=\pi(s_{t},\theta)\)</span>, and <span class="math inline">\(s_{t+1}\sim p(\cdot\given s_{t},a_{t})\)</span>.</p>
 </div>
-<p>This form uses on-policy trajectories (<a href="03-notes.html#def-on-off-policy" class="quarto-xref">Definition&nbsp;<span>3.3</span></a>) and requires a continuous action space for <span class="math inline">\(\nabla_{a}\)</span>. The unknowns are <span class="math inline">\(q_{\pi}\)</span> and its action derivative. The result is due to Silver et al.&nbsp;(2014).</p>
+<p>This form uses on-policy trajectories (<a href="03-notes.html#def-on-off-policy" class="quarto-xref">Definition&nbsp;<span>3.3</span></a>) and requires a continuous action space for <span class="math inline">\(\nabla_{a}\)</span>. The unknowns are <span class="math inline">\(q_{\pi}\)</span> and its action derivative. The result is due to <a href="https://proceedings.mlr.press/v32/silver14.html">Silver et al.&nbsp;(2014)</a>; their supplement states regularity conditions for general state spaces.</p>
 <div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of the deterministic policy gradient theorem">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -431,7 +431,7 @@ Important
 </div>
 <div id="callout-5" class="callout-5-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
-<p><strong>Step 1: differentiate the Bellman equation.</strong> This is <a href="#eq-chain-obstacle" class="quarto-xref">Equation&nbsp;<span>4.4</span></a>, restated: <span class="math display">\[
+<p><strong>Step 1: differentiate the Bellman equation.</strong> The finite-state representation <span class="math inline">\(\mathbf v_\pi=(I-\gamma\mathbf P_\pi)^{-1}\mathbf r_\pi\)</span> is continuously differentiable under the stated assumptions. Differentiating gives <a href="#eq-chain-obstacle" class="quarto-xref">Equation&nbsp;<span>4.4</span></a>: <span class="math display">\[
 \nabla_{\theta}v_{\pi}(s)=\Big(\nabla_{a}r(s,\pi)+\gamma\sum_{s'\in\mathcal{S}}v_{\pi}(s')\nabla_{a}p(s'\given s,\pi)\Big)\nabla_{\theta}\pi+\gamma\sum_{s'\in\mathcal{S}}\big(\nabla_{\theta}v_{\pi}(s')\big)p(s'\given s,\pi).
 \]</span> The first group collects the effect of <span class="math inline">\(\theta\)</span> on <em>today’s</em> action; the second collects its effect on the continuation value, because <span class="math inline">\(v_{\pi}\)</span> at every future state also depends on <span class="math inline">\(\theta\)</span>.</p>
 <p><strong>Step 2: recognize the bracket as <span class="math inline">\(\nabla_{a}q_{\pi}\)</span>.</strong> The action value under <span class="math inline">\(\pi\)</span> is, by <a href="02-notes.html#eq-q-model" class="quarto-xref">Equation&nbsp;<span>2.5</span></a>, <span class="math display">\[
@@ -447,7 +447,7 @@ x(s)=\rho(s)+\gamma\sum_{s'\in\mathcal{S}}x(s')\,p_{\pi}(s'\given s),
 \]</span> This is <a href="01-notes.html#eq-mrp-dp" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> with reward <span class="math inline">\(\rho\)</span> and transition kernel <span class="math inline">\(p_{\pi}\)</span>, applied to each of the <span class="math inline">\(m\)</span> coordinates of <span class="math inline">\(x\)</span> and <span class="math inline">\(\rho\)</span>.</p>
 <p><strong>Step 4: solve it as a present discounted value.</strong> In matrix form, <span class="math inline">\(\mathbf{x}=\boldsymbol{\rho}+\gamma\mathbf{P}_{\pi}\mathbf{x}\)</span>. Since <span class="math inline">\(\mathbf{P}_{\pi}\)</span> is row-stochastic its spectral radius is <span class="math inline">\(1\)</span>, so for <span class="math inline">\(\gamma\in(0,1)\)</span> the matrix <span class="math inline">\(I-\gamma\mathbf{P}_{\pi}\)</span> is invertible and the solution is unique: <span class="math display">\[
 \mathbf{x}=(I-\gamma\mathbf{P}_{\pi})^{-1}\boldsymbol{\rho}=\sum_{t=0}^{\infty}\gamma^{t}\mathbf{P}_{\pi}^{t}\boldsymbol{\rho},
-\]</span> the Neumann series converging because <span class="math inline">\(\|\gamma\mathbf{P}_{\pi}\|&lt;1\)</span>. Row <span class="math inline">\(s\)</span> of <span class="math inline">\(\mathbf{P}_{\pi}^{t}\boldsymbol{\rho}\)</span> is <span class="math inline">\(\E[\rho(s_{t})\given s_{0}=s]\)</span>, so component-wise this says <span class="math display">\[
+\]</span> the Neumann series converging because <span class="math inline">\(\|\gamma\mathbf P_\pi\|_\infty=\gamma&lt;1\)</span> in the induced infinity norm. Row <span class="math inline">\(s\)</span> of <span class="math inline">\(\mathbf{P}_{\pi}^{t}\boldsymbol{\rho}\)</span> is <span class="math inline">\(\E[\rho(s_{t})\given s_{0}=s]\)</span>, so component-wise this says <span class="math display">\[
 \nabla_{\theta}v_{\pi}(s_{0})=\E_{0}\!\left[\sum_{t=0}^{\infty}\gamma^{t}\,\nabla_{a}q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\pi(s_{t},\theta)\right],
 \qquad a_{t}=\pi(s_{t},\theta),\ \ s_{t+1}\sim p(\cdot\given s_{t},a_{t}).
 \]</span></p>
@@ -574,9 +574,9 @@ Table&nbsp;4.1: The deterministic and stochastic policy gradient theorems requir
 <td>finite or continuous</td>
 </tr>
 <tr class="odd">
-<td><strong>Exploration</strong></td>
-<td>none: the policy is a point</td>
-<td>built in, if <span class="math inline">\(\pi&gt;0\)</span> as in <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a></td>
+<td><strong>Action sampling</strong></td>
+<td>one chosen action per state</td>
+<td>randomizes when <span class="math inline">\(\pi&gt;0\)</span>; repeated visitation needs further conditions</td>
 </tr>
 <tr class="even">
 <td><strong>Where the <span class="math inline">\(\theta\)</span>-derivative sits</strong></td>
@@ -599,10 +599,13 @@ Table&nbsp;4.1: The deterministic and stochastic policy gradient theorems requir
 \theta_{j+1}=\theta_{j}+\alpha\sum_{t=0}^{T}\gamma^{t}\,q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j}).
 \]</span></p>
 <p>The score <span class="math inline">\(\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j})\)</span> is computable from the chosen policy function. The unknown <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span> is estimated by Monte Carlo or TD, as in <a href="03-notes.html#tbl-td-mc" class="quarto-xref">Table&nbsp;<span>3.1</span></a>.</p>
-<p>The first choice is Monte Carlo. By <a href="02-notes.html#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a>, <span class="math inline">\(q_{\pi}(s,a)\)</span> is the expected discounted return from <span class="math inline">\((s,a)\)</span>, so the realized return along the sampled trajectory is an unbiased estimate of it:</p>
+<p>For Monte Carlo, use the return</p>
 <p><span class="math display">\[
 G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 \]</span></p>
+<p>If <span class="math inline">\(T\)</span> is the last decision in a complete terminating episode and later rewards are zero, <span class="math inline">\(\E[G_t\mid s_t,a_t]=q_\pi(s_t,a_t)\)</span>. At an artificial cutoff, the missing term is the continuation value: <span class="math display">\[
+q_\pi(s_t,a_t)=\E_\pi\!\left[G_t+\gamma^{T-t+1}v_\pi(s_{T+1})\mid s_t,a_t\right].
+\]</span> The full-episode algorithm below uses the first case. The numerical comparison caps episodes at 80 steps, so its truncated returns can carry bias.</p>
 <p>In <a href="#fig-4-reinforce-qac" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>, one action advances along six corridor states and the other goes back, stopping at the wall at <span class="math inline">\(s_{0}\)</span>. Exiting the far end pays 10 and ends the episode; other rewards have mean zero, and all carry <span class="math inline">\(N(0,3^{2})\)</span> noise. <code>step(s, a)</code> returns the next state, reward, and termination flag. <code>prob_back(theta, s)</code> evaluates <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> at <span class="math inline">\(s\)</span>.</p>
 <div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: REINFORCE (Monte-Carlo policy gradient)">
 <div class="callout-header d-flex align-content-center">
@@ -637,9 +640,8 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 <div class="callout-body-container callout-body">
 <p>Write a single term of <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> using <a href="#eq-log-trick" class="quarto-xref">Equation&nbsp;<span>4.8</span></a> in reverse: <span class="math display">\[
 \alpha\gamma^{t}G_{t}\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j})=\alpha\gamma^{t}\underbrace{\frac{G_{t}}{\pi(a_{t}\given s_{t},\theta_{j})}}_{\text{weight}}\nabla_{\theta}\pi(a_{t}\given s_{t},\theta_{j}),
-\]</span> which is a gradient-ascent step on the <em>probability</em> <span class="math inline">\(\pi(a_{t}\given s_{t},\theta)\)</span> itself, with the weight in front. The weight has two components.</p>
-<p>The weight is proportional to <span class="math inline">\(G_{t}\)</span>: actions that turned out well get their probability pushed up, actions that turned out badly get it pushed down, in proportion to how well. That is <strong>exploitation</strong>.</p>
-<p>The weight is inversely proportional to <span class="math inline">\(\pi(a_{t}\given s_{t},\theta_{j})\)</span>: among two actions with the same return, the one that was <em>unlikely</em> to have been tried gets the larger boost. That is <strong>exploration</strong>, and it falls out of the log rather than being imposed.</p>
+\]</span> For this term alone, a positive <span class="math inline">\(G_t\)</span> moves along the gradient of the sampled action’s probability; a negative <span class="math inline">\(G_t\)</span> reverses the direction. The size also depends on that gradient. With tabular softmax preferences, the score is <span class="math inline">\(e_{a_t}-\pi(\cdot\mid s_t)\)</span>, whose entries stay between <span class="math inline">\(-1\)</span> and <span class="math inline">\(1\)</span> even for a rare action.</p>
+<p>Softmax randomizes at each finite parameter value. Repeated exploration depends on the sequence of probabilities: an action sampled with probability <span class="math inline">\(2^{-t}\)</span> has a finite expected total number of visits, although its probability is always positive.</p>
 </div>
 </div>
 <section id="a-clarification-about-the-pseudocode" class="level3">
@@ -857,40 +859,7 @@ d_{\pi,\mu}(s)\defeq(1-\gamma)\sum_{t=0}^{\infty}\gamma^{t}\,\Prob\big(s_{t}=s\ 
 <img src="04-notes_files/figure-html/fig-4-visitation-output-1.png" width="912" height="369" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-visitation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 4.1: The six-state corridor of <span class="citation"
-data-cites="fig-4-reinforce-qac"><a class="quarto-xref" href="#fig-4-reinforce-qac">Figure <span>4.2</span></a></span>, with a
-fixed policy that advances with probability 0.75 at every state, the
-softmax <span class="citation"
-data-cites="eq-softmax"><a class="quarto-xref" href="#eq-softmax">Equation <span>4.10</span></a></span> at a preference gap of <span
-class="math inline">\(\ln3\)</span>. Stepping off the far end restarts
-at <span class="math inline">\(s_{0}\)</span>, making the chain
-continuing. The Neumann series in <span class="citation"
-data-cites="eq-dvisit"><a class="quarto-xref" href="#eq-dvisit">Equation <span>4.12</span></a></span> gives <span
-class="math inline">\(\mathbf{d}_{\pi,\mu}=(1-\gamma)(\mathbf{I}-\gamma\mathbf{P}_{\pi}^{\top})^{-1}\boldsymbol{\mu}\)</span>,
-used to compute every bar. <strong>Left:</strong> <span
-class="math inline">\(\mu\)</span> puts all mass on <span
-class="math inline">\(s_{0}\)</span>; the long-run distribution is
-nearly flat because the policy spends comparable time in all six states.
-The discounted distribution is a geometric average of the time-<span
-class="math inline">\(t\)</span> state distributions with weights <span
-class="math inline">\((1-\gamma)\gamma^{t}\)</span>. Early states
-receive more weight than in the long run and later states less; the
-crossover moves from between <span class="math inline">\(s_{1}\)</span>
-and <span class="math inline">\(s_{2}\)</span> at <span
-class="math inline">\(\gamma=0.5\)</span> to between <span
-class="math inline">\(s_{2}\)</span> and <span
-class="math inline">\(s_{3}\)</span> at <span
-class="math inline">\(\gamma=0.95\)</span>. <strong>Right:</strong> mean
-position under <span class="math inline">\(d_{\pi,\mu}\)</span> as <span
-class="math inline">\(\gamma\)</span> varies. At <span
-class="math inline">\(\gamma=0\)</span>, <span
-class="math inline">\(d_{\pi,\mu}=\mu\)</span>; the long-run value is
-reached as <span class="math inline">\(\gamma\to1\)</span>. At <span
-class="math inline">\(\gamma=0.95\)</span> the mean is 2.10, compared
-with 2.32 in the long run. The expectation in <span class="citation"
-data-cites="eq-spg-simple"><a class="quarto-xref" href="#eq-spg-simple">Equation <span>4.13</span></a></span> uses <span
-class="math inline">\(d_{\pi,\mu}\)</span>, which differs from the
-distribution of states sampled along an ongoing trajectory.
+Figure&nbsp;4.1: The six-state corridor of <a href="#fig-4-reinforce-qac" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>, with a fixed policy that advances with probability 0.75 at every state, the softmax <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> at a preference gap of <span class="math inline">\(\ln3\)</span>. Stepping off the far end restarts at <span class="math inline">\(s_{0}\)</span>, making the chain continuing. The Neumann series in <a href="#eq-dvisit" class="quarto-xref">Equation&nbsp;<span>4.12</span></a> gives <span class="math inline">\(\mathbf{d}_{\pi,\mu}=(1-\gamma)(\mathbf{I}-\gamma\mathbf{P}_{\pi}^{\top})^{-1}\boldsymbol{\mu}\)</span>, used to compute every bar. <strong>Left:</strong> <span class="math inline">\(\mu\)</span> puts all mass on <span class="math inline">\(s_{0}\)</span>; the long-run distribution is nearly flat because the policy spends comparable time in all six states. The discounted distribution is a geometric average of the time-<span class="math inline">\(t\)</span> state distributions with weights <span class="math inline">\((1-\gamma)\gamma^{t}\)</span>. Early states receive more weight than in the long run and later states less; the crossover moves from between <span class="math inline">\(s_{1}\)</span> and <span class="math inline">\(s_{2}\)</span> at <span class="math inline">\(\gamma=0.5\)</span> to between <span class="math inline">\(s_{2}\)</span> and <span class="math inline">\(s_{3}\)</span> at <span class="math inline">\(\gamma=0.95\)</span>. <strong>Right:</strong> mean position under <span class="math inline">\(d_{\pi,\mu}\)</span> as <span class="math inline">\(\gamma\)</span> varies. At <span class="math inline">\(\gamma=0\)</span>, <span class="math inline">\(d_{\pi,\mu}=\mu\)</span>; the long-run value is reached as <span class="math inline">\(\gamma\to1\)</span>. At <span class="math inline">\(\gamma=0.95\)</span> the mean is 2.10, compared with 2.32 in the long run. The expectation in <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> uses <span class="math inline">\(d_{\pi,\mu}\)</span>, which differs from the distribution of states sampled along an ongoing trajectory.
 </figcaption>
 </figure>
 </div>
@@ -965,7 +934,7 @@ Important
 </section>
 <section id="which-critic" class="level3">
 <h3 class="anchored" data-anchor-id="which-critic">Which critic</h3>
-<p>Take the stochastic gradient ascent step implied by <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a>: draw one pair <span class="math inline">\((s_{t},a_{t})\)</span>, absorb the constant into <span class="math inline">\(\alpha\)</span>, and step.</p>
+<p>To sample the gradient in <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a>, draw <span class="math inline">\(s_t\sim d_{\pi,\mu}\)</span> and <span class="math inline">\(a_t\sim\pi(\cdot\mid s_t)\)</span>, absorb <span class="math inline">\(1/(1-\gamma)\)</span> into <span class="math inline">\(\alpha\)</span>, and update</p>
 <p><span id="eq-ac-actor"><span class="math display">\[
 \theta_{t+1}=\theta_{t}+\alpha\,q_{\pi}(s_{t},a_{t})\,\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{t}).
 \tag{4.14}\]</span></span></p>
@@ -1001,7 +970,7 @@ w_{t+1}=w_{t}+\alpha_{w}\big[\,r_{t+1}+\gamma\hat{q}(s_{t+1},a_{t+1},w_{t})-\hat
 </div>
 </div>
 <p>The critic update <a href="#eq-qac-critic" class="quarto-xref">Equation&nbsp;<span>4.15</span></a> is Sarsa with function approximation (<a href="03-notes.html#eq-sarsa-fa" class="quarto-xref">Equation&nbsp;<span>3.14</span></a>). The actor replaces <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span> in <a href="#eq-ac-actor" class="quarto-xref">Equation&nbsp;<span>4.14</span></a> with <span class="math inline">\(\hat{q}(s_{t},a_{t},w_{t})\)</span>.</p>
-<p>Both update incrementally, without waiting for the other to converge.</p>
+<p>Both update incrementally. In the code below, states come from ordinary episodes rather than draws from <span class="math inline">\(d_{\pi,\mu}\)</span>. The actor step is therefore an approximation to the gradient of <span class="math inline">\(J\)</span>; the discount factor in the critic does not supply the missing state weights.</p>
 <div id="cell-fig-4-reinforce-qac" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Both algorithms on one corridor, scored by the exact objective</summary>
@@ -1042,135 +1011,95 @@ w_{t+1}=w_{t}+\alpha_{w}\big[\,r_{t+1}+\gamma\hat{q}(s_{t+1},a_{t+1},w_{t})-\hat
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_qac(grid):</span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""QAC @eq-qac-critic and @eq-qac-actor: one transition in, one update out.</span></span>
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">    Not literally the same actor as REINFORCE, in two ways. The estimate of q_pi is the</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">    critic's q_sa, read BEFORE the critic moves, because @eq-qac-actor asks for</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">    qhat(s_t, a_t, w_t); and the summand carries no gamma**t, because QAC implements</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">    @eq-spg-simple, whose discounting has already migrated into d_{pi,mu}. The critic is a</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">    table q(s,a) = w[s,a], which is @eq-sarsa-fa with indicator features: grad_w qhat is</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">    then the one-hot vector picking out (s,a), so the update touches that entry alone.</span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">    There is no traj list and no backward pass, because nothing has to be remembered until</span></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">    the end, and theta moves inside the transition loop rather than after it.</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    theta, w <span class="op">=</span> np.zeros((N_S, <span class="dv">2</span>)), np.zeros((N_S, <span class="dv">2</span>))  <span class="co"># actor table, critic table</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    curve <span class="op">=</span> np.full(<span class="bu">len</span>(grid), objective(theta))</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    k, steps <span class="op">=</span> <span class="dv">1</span>, <span class="dv">0</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> steps <span class="op">&lt;</span> BUDGET:</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>        p1 <span class="op">=</span> prob_back(theta, s)</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        a <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> RNG.random() <span class="op">&lt;</span> p1 <span class="cf">else</span> <span class="dv">0</span></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(T_MAX):</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>            s2, r, done <span class="op">=</span> step(s, a)  <span class="co"># 1. interact</span></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r</span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>                p1n <span class="op">=</span> prob_back(theta, s2)</span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>                a2 <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> RNG.random() <span class="op">&lt;</span> p1n <span class="cf">else</span> <span class="dv">0</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> w[s2, a2]  <span class="co"># bootstrap, not a realized return</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>            q_sa <span class="op">=</span> w[s, a]</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>            w[s, a] <span class="op">+=</span> ALPHA_W <span class="op">*</span> (target <span class="op">-</span> q_sa)  <span class="co"># 2. critic, @eq-qac-critic</span></span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>            <span class="co"># The score must be read at the CURRENT theta. Reusing the p1 cached when</span></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>            <span class="co"># this state was entered is stale whenever the actor already moved row s,</span></span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>            <span class="co"># which happens on every wall bump where s2 == s.</span></span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>            pp <span class="op">=</span> prob_back(theta, s)</span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>            theta[s, a] <span class="op">+=</span> ALPHA_THETA <span class="op">*</span> q_sa  <span class="co"># 3. actor, one per transition</span></span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>            theta[s, <span class="dv">0</span>] <span class="op">-=</span> ALPHA_THETA <span class="op">*</span> q_sa <span class="op">*</span> (<span class="fl">1.0</span> <span class="op">-</span> pp)</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>            theta[s, <span class="dv">1</span>] <span class="op">-=</span> ALPHA_THETA <span class="op">*</span> q_sa <span class="op">*</span> pp</span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>            steps <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>            k <span class="op">=</span> record(curve, k, grid, steps, theta)</span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done <span class="kw">or</span> steps <span class="op">&gt;=</span> BUDGET:</span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>            s, a, p1 <span class="op">=</span> s2, a2, p1n</span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> curve  <span class="co"># its update count is the step count, so there is nothing to report</span></span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">    The actor reads q_sa before the critic update. It uses ordinary episode states</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">    without gamma**t weights, so it approximates the gradient of J rather than</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">    sampling d_{pi,mu} exactly. The critic is the table q(s,a) = w[s,a].</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    theta, w <span class="op">=</span> np.zeros((N_S, <span class="dv">2</span>)), np.zeros((N_S, <span class="dv">2</span>))  <span class="co"># actor table, critic table</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    curve <span class="op">=</span> np.full(<span class="bu">len</span>(grid), objective(theta))</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    k, steps <span class="op">=</span> <span class="dv">1</span>, <span class="dv">0</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> steps <span class="op">&lt;</span> BUDGET:</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        p1 <span class="op">=</span> prob_back(theta, s)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        a <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> RNG.random() <span class="op">&lt;</span> p1 <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(T_MAX):</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>            s2, r, done <span class="op">=</span> step(s, a)  <span class="co"># 1. interact</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>                p1n <span class="op">=</span> prob_back(theta, s2)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>                a2 <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> RNG.random() <span class="op">&lt;</span> p1n <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> w[s2, a2]  <span class="co"># bootstrap, not a realized return</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>            q_sa <span class="op">=</span> w[s, a]</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>            w[s, a] <span class="op">+=</span> ALPHA_W <span class="op">*</span> (target <span class="op">-</span> q_sa)  <span class="co"># 2. critic, @eq-qac-critic</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>            <span class="co"># The score must be read at the CURRENT theta. Reusing the p1 cached when</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>            <span class="co"># this state was entered is stale whenever the actor already moved row s,</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>            <span class="co"># which happens on every wall bump where s2 == s.</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>            pp <span class="op">=</span> prob_back(theta, s)</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>            theta[s, a] <span class="op">+=</span> ALPHA_THETA <span class="op">*</span> q_sa  <span class="co"># 3. actor, one per transition</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>            theta[s, <span class="dv">0</span>] <span class="op">-=</span> ALPHA_THETA <span class="op">*</span> q_sa <span class="op">*</span> (<span class="fl">1.0</span> <span class="op">-</span> pp)</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>            theta[s, <span class="dv">1</span>] <span class="op">-=</span> ALPHA_THETA <span class="op">*</span> q_sa <span class="op">*</span> pp</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>            steps <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>            k <span class="op">=</span> record(curve, k, grid, steps, theta)</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done <span class="kw">or</span> steps <span class="op">&gt;=</span> BUDGET:</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>            s, a, p1 <span class="op">=</span> s2, a2, p1n</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> curve  <span class="co"># its update count is the step count, so there is nothing to report</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.linspace(<span class="dv">0</span>, BUDGET, <span class="dv">201</span>)</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>runs <span class="op">=</span> [run_reinforce(grid) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_RUNS)]</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>rein, n_up <span class="op">=</span> np.array([c <span class="cf">for</span> c, _ <span class="kw">in</span> runs]), np.mean([n <span class="cf">for</span> _, n <span class="kw">in</span> runs])</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>qac <span class="op">=</span> np.array([run_qac(grid) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_RUNS)])</span>
 <span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.linspace(<span class="dv">0</span>, BUDGET, <span class="dv">201</span>)</span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>runs <span class="op">=</span> [run_reinforce(grid) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_RUNS)]</span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>rein, n_up <span class="op">=</span> np.array([c <span class="cf">for</span> c, _ <span class="kw">in</span> runs]), np.mean([n <span class="cf">for</span> _, n <span class="kw">in</span> runs])</span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>qac <span class="op">=</span> np.array([run_qac(grid) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_RUNS)])</span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="co"># ponytail: one runnable check of the figure's central claim, on the simulated runs</span></span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="co"># themselves. Per environment step QAC's median must lead over the whole second half of the</span></span>
-<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="co"># budget, and REINFORCE's spread across runs must be the wider one: faster AND steadier out</span></span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="co"># of the same experience, which is what the two estimates of q_pi buy at a common step size.</span></span>
-<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>m_rein, m_qac <span class="op">=</span> np.median(rein, axis<span class="op">=</span><span class="dv">0</span>), np.median(qac, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>iqr <span class="op">=</span> {k: np.percentile(a, <span class="dv">75</span>, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">-</span> np.percentile(a, <span class="dv">25</span>, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>       <span class="cf">for</span> k, a <span class="kw">in</span> ((<span class="st">"rein"</span>, rein), (<span class="st">"qac"</span>, qac))}</span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>half <span class="op">=</span> <span class="bu">len</span>(m_qac) <span class="op">//</span> <span class="dv">2</span></span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.<span class="bu">all</span>(m_qac[half:] <span class="op">&gt;</span> m_rein[half:]), <span class="st">"QAC median does not lead throughout"</span></span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.<span class="bu">all</span>(iqr[<span class="st">"rein"</span>][[half, <span class="op">-</span><span class="dv">1</span>]] <span class="op">&gt;</span> iqr[<span class="st">"qac"</span>][[half, <span class="op">-</span><span class="dv">1</span>]]), <span class="st">"REINFORCE not the wider"</span></span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> new_ax(<span class="fl">6.8</span>, <span class="fl">4.6</span>)</span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>j_opt <span class="op">=</span> GAMMA <span class="op">**</span> (N_S <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> R_GOAL</span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>ax.plot([<span class="dv">0</span>, BUDGET], [j_opt, j_opt], color<span class="op">=</span>GREY, lw<span class="op">=</span><span class="fl">0.9</span>, ls<span class="op">=</span><span class="st">"--"</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> arr, colour <span class="kw">in</span> ((rein, COL[<span class="st">"sky"</span>]), (qac, COL[<span class="st">"vermilion"</span>])):</span>
-<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>    lo, med, hi <span class="op">=</span> np.percentile(arr, [<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">75</span>], axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>    ax.fill_between(grid, lo, hi, color<span class="op">=</span>colour, alpha<span class="op">=</span><span class="fl">0.22</span>, lw<span class="op">=</span><span class="dv">0</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>    ax.plot(grid, med, color<span class="op">=</span>colour, lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the plotted comparison for this seed and configuration.</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a><span class="co"># The algorithms differ in targets, update timing and time weights.</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>m_rein, m_qac <span class="op">=</span> np.median(rein, axis<span class="op">=</span><span class="dv">0</span>), np.median(qac, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>iqr <span class="op">=</span> {k: np.percentile(a, <span class="dv">75</span>, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">-</span> np.percentile(a, <span class="dv">25</span>, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>       <span class="cf">for</span> k, a <span class="kw">in</span> ((<span class="st">"rein"</span>, rein), (<span class="st">"qac"</span>, qac))}</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>half <span class="op">=</span> <span class="bu">len</span>(m_qac) <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.<span class="bu">all</span>(m_qac[half:] <span class="op">&gt;</span> m_rein[half:]), <span class="st">"QAC median does not lead throughout"</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.<span class="bu">all</span>(iqr[<span class="st">"rein"</span>][[half, <span class="op">-</span><span class="dv">1</span>]] <span class="op">&gt;</span> iqr[<span class="st">"qac"</span>][[half, <span class="op">-</span><span class="dv">1</span>]]), <span class="st">"REINFORCE not the wider"</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> new_ax(<span class="fl">6.8</span>, <span class="fl">4.6</span>)</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>j_opt <span class="op">=</span> GAMMA <span class="op">**</span> (N_S <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> R_GOAL</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>ax.plot([<span class="dv">0</span>, BUDGET], [j_opt, j_opt], color<span class="op">=</span>GREY, lw<span class="op">=</span><span class="fl">0.9</span>, ls<span class="op">=</span><span class="st">"--"</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> arr, colour <span class="kw">in</span> ((rein, COL[<span class="st">"sky"</span>]), (qac, COL[<span class="st">"vermilion"</span>])):</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    lo, med, hi <span class="op">=</span> np.percentile(arr, [<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">75</span>], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>    ax.fill_between(grid, lo, hi, color<span class="op">=</span>colour, alpha<span class="op">=</span><span class="fl">0.22</span>, lw<span class="op">=</span><span class="dv">0</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>    ax.plot(grid, med, color<span class="op">=</span>colour, lw<span class="op">=</span><span class="fl">2.0</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, BUDGET <span class="op">*</span> <span class="fl">1.02</span>)</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="fl">2.2</span>, <span class="fl">8.2</span>)  <span class="co"># headroom above the dashed rule carries its tag, not data</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>ax.set_xticks([<span class="dv">0</span>, <span class="dv">5000</span>, <span class="dv">10000</span>, <span class="dv">15000</span>, <span class="dv">20000</span>])</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([<span class="st">"0"</span>, <span class="st">"5k"</span>, <span class="st">"10k"</span>, <span class="st">"15k"</span>, <span class="st">"20k"</span>])</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"environment steps (transitions consumed)"</span>)</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="vs">r"</span><span class="dv">$</span><span class="vs">J</span><span class="kw">(</span><span class="ch">\t</span><span class="vs">heta</span><span class="kw">)</span><span class="vs">=v_{</span><span class="er">\</span><span class="vs">pi}</span><span class="kw">(</span><span class="vs">s_</span><span class="op">{0}</span><span class="kw">)</span><span class="dv">$</span><span class="vs">"</span>)</span>
 <span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, BUDGET <span class="op">*</span> <span class="fl">1.02</span>)</span>
-<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="fl">2.2</span>, <span class="fl">8.2</span>)  <span class="co"># headroom above the dashed rule carries its tag, not data</span></span>
-<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>ax.set_xticks([<span class="dv">0</span>, <span class="dv">5000</span>, <span class="dv">10000</span>, <span class="dv">15000</span>, <span class="dv">20000</span>])</span>
-<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([<span class="st">"0"</span>, <span class="st">"5k"</span>, <span class="st">"10k"</span>, <span class="st">"15k"</span>, <span class="st">"20k"</span>])</span>
-<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"environment steps (transitions consumed)"</span>)</span>
-<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="vs">r"</span><span class="dv">$</span><span class="vs">J</span><span class="kw">(</span><span class="ch">\t</span><span class="vs">heta</span><span class="kw">)</span><span class="vs">=v_{</span><span class="er">\</span><span class="vs">pi}</span><span class="kw">(</span><span class="vs">s_</span><span class="op">{0}</span><span class="kw">)</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Every label sits in space no curve or band enters: the reference tag above the dashed</span></span>
-<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a><span class="co"># rule, "QAC" in the empty wedge above its own steep rise, "REINFORCE" under its own curve,</span></span>
-<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a><span class="co"># and the two notes in the whole empty lower-right quadrant.</span></span>
-<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">300</span>, <span class="fl">7.94</span>, <span class="vs">r"</span><span class="dv">$</span><span class="vs">J</span><span class="dv">$</span><span class="vs"> at the optimal policy"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>)</span>
-<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">3000</span>, <span class="fl">6.95</span>, <span class="st">"QAC"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">10.5</span>)</span>
-<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">6300</span>, <span class="fl">5.25</span>, <span class="st">"REINFORCE"</span>, color<span class="op">=</span>COL[<span class="st">"sky"</span>], fontsize<span class="op">=</span><span class="fl">10.5</span>)</span>
-<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">11200</span>, <span class="fl">4.55</span>, <span class="ss">f"shaded: interquartile range across </span><span class="sc">{</span>N_RUNS<span class="sc">}</span><span class="ss"> runs"</span>,</span>
-<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
-<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">11200</span>, <span class="fl">3.85</span>,</span>
-<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>         <span class="st">"the same 20k transitions buy QAC 20,000</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>         <span class="ss">f"updates and REINFORCE </span><span class="sc">{</span>n_up<span class="sc">:,.0f}</span><span class="ss">, one per episode"</span>,</span>
-<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>INK, fontsize<span class="op">=</span><span class="fl">8.5</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
-<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="vs">r"Same actor, same step size: the estimate of </span><span class="dv">$</span><span class="vs">q_{</span><span class="er">\</span><span class="vs">pi}</span><span class="dv">$</span><span class="vs"> is the"</span></span>
-<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>             <span class="st">" whole difference"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a><span class="co"># Every label sits in space no curve or band enters: the reference tag above the dashed</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="co"># rule, "QAC" in the empty wedge above its own steep rise, "REINFORCE" under its own curve,</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a><span class="co"># and the two notes in the whole empty lower-right quadrant.</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">300</span>, <span class="fl">7.94</span>, <span class="vs">r"</span><span class="dv">$</span><span class="vs">J</span><span class="dv">$</span><span class="vs"> at the optimal policy"</span>, color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">3000</span>, <span class="fl">6.95</span>, <span class="st">"QAC"</span>, color<span class="op">=</span>COL[<span class="st">"vermilion"</span>], fontsize<span class="op">=</span><span class="fl">10.5</span>)</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">6300</span>, <span class="fl">5.25</span>, <span class="st">"REINFORCE"</span>, color<span class="op">=</span>COL[<span class="st">"sky"</span>], fontsize<span class="op">=</span><span class="fl">10.5</span>)</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">11200</span>, <span class="fl">4.55</span>, <span class="ss">f"shaded: interquartile range across </span><span class="sc">{</span>N_RUNS<span class="sc">}</span><span class="ss"> runs"</span>,</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>GREY, fontsize<span class="op">=</span><span class="fl">8.5</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>label_at(ax, <span class="dv">11200</span>, <span class="fl">3.85</span>,</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>         <span class="st">"the same 20k transitions buy QAC 20,000</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>         <span class="ss">f"updates and REINFORCE </span><span class="sc">{</span>n_up<span class="sc">:,.0f}</span><span class="ss">, one per episode"</span>,</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>         color<span class="op">=</span>INK, fontsize<span class="op">=</span><span class="fl">8.5</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"REINFORCE and QAC on the six-state corridor"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-4-reinforce-qac" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-4-reinforce-qac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="04-notes_files/figure-html/fig-4-reinforce-qac-output-1.png" width="562" height="416" class="figure-img">
+<img src="04-notes_files/figure-html/fig-4-reinforce-qac-output-1.png" width="562" height="414" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-reinforce-qac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 4.2: REINFORCE <span class="citation"
-data-cites="eq-reinforce"><a class="quarto-xref" href="#eq-reinforce">Equation <span>4.11</span></a></span> and QAC <span
-class="citation" data-cites="eq-qac-actor"><a class="quarto-xref" href="#eq-qac-actor">Equation <span>4.16</span></a></span> on the
-same six-state corridor, charged against <strong>environment
-steps</strong> rather than updates. Every episode starts at <span
-class="math inline">\(s_{0}\)</span>, one action advances along the
-corridor and one goes back, stepping off the far end pays <span
-class="math inline">\(10\)</span> and ends the episode, every other
-reward is zero in expectation, and every reward carries independent
-<span class="math inline">\(N(0,3^{2})\)</span> noise; <span
-class="math inline">\(\gamma=0.95\)</span> and episodes are capped at 80
-steps. The policy is the softmax <span class="citation"
-data-cites="eq-softmax"><a class="quarto-xref" href="#eq-softmax">Equation <span>4.10</span></a></span> on a table of preferences,
-the critic is a table trained by <span class="citation"
-data-cites="eq-sarsa-fa"><a class="quarto-xref" href="03-notes.html#eq-sarsa-fa">Equation <span>3.14</span></a></span> with <span
-class="math inline">\(\alpha_{w}=0.05\)</span>; and both algorithms use
-the <em>same</em> actor step size <span
-class="math inline">\(\alpha_{\theta}=0.003\)</span>. Lines are medians
-and bands interquartile ranges over 60 runs, with <span
-class="math inline">\(J(\theta)=v_{\pi}(s_{0})\)</span> solved for
-exactly at every point, so the width of a band is dispersion in the
-learned <span class="math inline">\(\theta\)</span> rather than
-measurement noise. QAC’s median improves little during its first
-thousand steps, and REINFORCE briefly leads. QAC then leads in the
-plotted medians. Timing: 20,000 transitions buy QAC 20,000 parameter
-updates and REINFORCE about 2,000, one per episode, and by 5,000 steps
-the median <span class="math inline">\(J\)</span> is <span
-class="math inline">\(6.9\)</span> against <span
-class="math inline">\(5.5\)</span>. Variance: <span
-class="math inline">\(G_{t}\)</span> sums every noisy reward left in the
-episode while the critic’s target carries one reward plus a bootstrap,
-so at 10,000 steps REINFORCE’s runs are spread roughly three times as
-wide.
+Figure&nbsp;4.2: REINFORCE <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> and QAC <a href="#eq-qac-actor" class="quarto-xref">Equation&nbsp;<span>4.16</span></a> on the same six-state corridor, charged against <strong>environment steps</strong> rather than updates. Every episode starts at <span class="math inline">\(s_{0}\)</span>, one action advances along the corridor and one goes back, stepping off the far end pays <span class="math inline">\(10\)</span> and ends the episode, every other reward is zero in expectation, and every reward carries independent <span class="math inline">\(N(0,3^{2})\)</span> noise; <span class="math inline">\(\gamma=0.95\)</span> and episodes are capped at 80 steps. The policy is the softmax <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> on a table of preferences, the critic is a table trained by <a href="03-notes.html#eq-sarsa-fa" class="quarto-xref">Equation&nbsp;<span>3.14</span></a> with <span class="math inline">\(\alpha_{w}=0.05\)</span>; and both algorithms use the <em>same</em> actor step size <span class="math inline">\(\alpha_{\theta}=0.003\)</span>. Lines are medians and bands interquartile ranges over 60 runs, with <span class="math inline">\(J(\theta)=v_{\pi}(s_{0})\)</span> solved for exactly at every point, so the width of a band is dispersion in the learned <span class="math inline">\(\theta\)</span> rather than measurement noise. QAC’s median improves little during its first thousand steps, and REINFORCE briefly leads. QAC then leads in the plotted medians. Timing: 20,000 transitions buy QAC 20,000 parameter updates and REINFORCE about 2,000, one per episode, and by 5,000 steps the median <span class="math inline">\(J\)</span> is <span class="math inline">\(6.9\)</span> against <span class="math inline">\(5.5\)</span>. At 10,000 steps, REINFORCE’s interquartile range is roughly three times QAC’s.
 </figcaption>
 </figure>
 </div>
@@ -1333,33 +1262,7 @@ wide.
 <img src="04-notes_files/figure-html/fig-4-policy-sharpens-output-1.png" width="889" height="360" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-policy-sharpens-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 4.3: QAC on the six-state corridor of <span class="citation"
-data-cites="fig-4-reinforce-qac"><a class="quarto-xref" href="#fig-4-reinforce-qac">Figure <span>4.2</span></a></span>, rerun to
-record the policy. Preferences start at <span
-class="math inline">\(\theta_{0}=0\)</span>, so <span class="citation"
-data-cites="eq-softmax"><a class="quarto-xref" href="#eq-softmax">Equation <span>4.10</span></a></span> assigns probability <span
-class="math inline">\(1/2\)</span> to each action. The only nonzero
-expected reward is the <span class="math inline">\(10\)</span> paid on
-leaving the far end, making advancing optimal at every state.
-<strong>Left:</strong> median probability of advancing at each state
-across 60 runs. The medians stay near <span
-class="math inline">\(1/2\)</span> for roughly the first thousand
-transitions, then rise. The actor step in <span class="citation"
-data-cites="eq-qac-actor"><a class="quarto-xref" href="#eq-qac-actor">Equation <span>4.16</span></a></span> multiplies the score of
-<span class="citation" data-cites="exm-softmax"><a class="quarto-xref" href="#exm-softmax">Example <span>4.1</span></a></span> by
-<span class="math inline">\(\hat{q}(s_{t},a_{t},w_{t})\)</span>; the
-critic starts at zero, though reward noise can move its estimates before
-the terminal reward is reached. <strong>Right:</strong> transitions
-until the probability of advancing first reaches <span
-class="math inline">\(0.75\)</span>, with interquartile ranges across
-runs. States nearer the goal reach this threshold sooner: <span
-class="citation" data-cites="eq-qac-critic"><a class="quarto-xref" href="#eq-qac-critic">Equation <span>4.15</span></a></span>
-propagates the expected terminal reward backward by bootstrapping, with
-a factor of <span class="math inline">\(\gamma\)</span> per state. <span
-class="math inline">\(s_{0}\)</span> needs about 5,700 transitions,
-compared with 2,500 for <span class="math inline">\(s_{5}\)</span>. By
-20,000 steps the three states nearest the goal are nearly tied and <span
-class="math inline">\(s_{0}\)</span> still lags.
+Figure&nbsp;4.3: QAC on the six-state corridor of <a href="#fig-4-reinforce-qac" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>, rerun to record the policy. Preferences start at <span class="math inline">\(\theta_{0}=0\)</span>, so <a href="#eq-softmax" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> assigns probability <span class="math inline">\(1/2\)</span> to each action. The only nonzero expected reward is the <span class="math inline">\(10\)</span> paid on leaving the far end, making advancing optimal at every state. <strong>Left:</strong> median probability of advancing at each state across 60 runs. The medians stay near <span class="math inline">\(1/2\)</span> for roughly the first thousand transitions, then rise. The actor step in <a href="#eq-qac-actor" class="quarto-xref">Equation&nbsp;<span>4.16</span></a> multiplies the score of <a href="#exm-softmax" class="quarto-xref">Example&nbsp;<span>4.1</span></a> by <span class="math inline">\(\hat{q}(s_{t},a_{t},w_{t})\)</span>; the critic starts at zero, though reward noise can move its estimates before the terminal reward is reached. <strong>Right:</strong> transitions until the probability of advancing first reaches <span class="math inline">\(0.75\)</span>, with interquartile ranges across runs. States nearer the goal reach this threshold sooner: <a href="#eq-qac-critic" class="quarto-xref">Equation&nbsp;<span>4.15</span></a> propagates the expected terminal reward backward by bootstrapping, with a factor of <span class="math inline">\(\gamma\)</span> per state. <span class="math inline">\(s_{0}\)</span> needs about 5,700 transitions, compared with 2,500 for <span class="math inline">\(s_{5}\)</span>. By 20,000 steps the three states nearest the goal are nearly tied and <span class="math inline">\(s_{0}\)</span> still lags.
 </figcaption>
 </figure>
 </div>
@@ -1368,7 +1271,7 @@ class="math inline">\(s_{0}\)</span> still lags.
 <div id="tbl-reinforce-ac" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-reinforce-ac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4.2: REINFORCE and Q actor-critic. REINFORCE uses explicit <span class="math inline">\(\gamma^{t}\)</span> weights; QAC uses the form <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> with discounting in <span class="math inline">\(d_{\pi,\mu}\)</span>.
+Table&nbsp;4.2: REINFORCE and Q actor-critic. REINFORCE uses explicit <span class="math inline">\(\gamma^t\)</span> weights. The unweighted QAC actor matches <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> only with states sampled from <span class="math inline">\(d_{\pi,\mu}\)</span>.
 </figcaption>
 <div aria-describedby="tbl-reinforce-ac-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1396,14 +1299,14 @@ Table&nbsp;4.2: REINFORCE and Q actor-critic. REINFORCE uses explicit <span clas
 <td>incremental: one update per transition</td>
 </tr>
 <tr class="odd">
-<td><strong>Bias</strong></td>
-<td>unbiased</td>
-<td>biased while <span class="math inline">\(\hat{q}\neq q_{\pi}\)</span></td>
+<td><strong>Value target</strong></td>
+<td>unbiased return for a complete terminating episode</td>
+<td>bootstrapped estimate, generally biased before evaluation converges</td>
 </tr>
 <tr class="even">
-<td><strong>Variance</strong></td>
-<td>high: <span class="math inline">\(G_{t}\)</span> sums many random rewards</td>
-<td>low: one reward plus a bootstrap</td>
+<td><strong>Sampling noise</strong></td>
+<td>the actor uses a return containing future reward and transition noise</td>
+<td>the actor uses the critic; each critic target adds one sampled reward and continuation</td>
 </tr>
 <tr class="odd">
 <td><strong>What is stored</strong></td>
@@ -1430,7 +1333,8 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Policy gradient methods are <strong>on-policy</strong> in the sense of <a href="03-notes.html#def-on-off-policy" class="quarto-xref">Definition&nbsp;<span>3.3</span></a>, and <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> says why. The expectation is taken over <span class="math inline">\(a\sim\pi(\cdot\given s,\theta)\)</span>, the policy currently being learned, so a sample drawn from any other policy estimates the wrong expectation. This is a stronger constraint than Sarsa’s: Sarsa was on-policy because its target happened to need <span class="math inline">\(a_{t+1}\)</span>, whereas here the sampling distribution is written into the theorem itself. Undoing it requires an importance-weighting correction, and that correction, kept from growing too large, is the idea behind PPO.</p>
+<p>The estimator in <a href="#eq-spg-simple" class="quarto-xref">Equation&nbsp;<span>4.13</span></a> is on-policy: it uses the current policy’s discounted state distribution and action probabilities. Off-policy policy-gradient methods must account for the change in sampling law.</p>
+<p><a href="https://arxiv.org/abs/1707.06347">PPO</a> collects a batch under <span class="math inline">\(\pi_{\mathrm{old}}\)</span> and takes several optimization steps on it. Its clipped surrogate uses the action ratio <span class="math inline">\(\pi_\theta(a\mid s)/\pi_{\mathrm{old}}(a\mid s)\)</span> times an estimated advantage, and removes the incentive for some large ratio changes. It remains a surrogate evaluated on the old batch; the ratio alone does not turn that batch into exact samples of the new policy’s state distribution.</p>
 </div>
 </div>
 <p><span id="closing-what-the-four-chapters-did"></span></p>

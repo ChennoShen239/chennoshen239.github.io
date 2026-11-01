@@ -334,7 +334,7 @@ window.Quarto = {
 \]</span> <span class="math inline">\(L\)</span> is the <strong>Lipschitz constant</strong>.</p>
 </div>
 <p>For example <span class="math inline">\(f(t,y)=t\abs{y}\)</span> on <span class="math inline">\(D=\{(t,y):0\le t\le T\}\)</span> satisfies the condition with <span class="math inline">\(L=T\)</span>, because <span class="math inline">\(\abs{t\abs{y_1}-t\abs{y_2}}\le t\,\abs{y_1-y_2}\le T\abs{y_1-y_2}\)</span>. By contrast <span class="math inline">\(f(t,y)=ty^2\)</span> satisfies <em>no</em> Lipschitz condition on that unbounded strip: since <span class="math inline">\(\abs{ty_1^2-ty_2^2}=t\abs{y_1+y_2}\,\abs{y_1-y_2}\)</span> and <span class="math inline">\(t\abs{y_1+y_2}\)</span> is unbounded, no single <span class="math inline">\(L\)</span> works, though restricting <span class="math inline">\(y\)</span> to a bounded band <span class="math inline">\(\abs{y}\le Y\)</span> restores it with <span class="math inline">\(L=2TY\)</span>.</p>
-<p>Verifying the inequality directly is awkward; on a <strong>convex</strong> domain a bound on the partial derivative is equivalent and far easier to check.</p>
+<p>When the partial derivative exists, bounding it on a convex domain is a convenient sufficient test. The example <span class="math inline">\(t\abs{y}\)</span> shows that Lipschitz continuity also allows a kink at <span class="math inline">\(y=0\)</span>.</p>
 <div id="def-3-convex" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 3.2 (Convex set)</strong></span> A set <span class="math inline">\(D\subset\R^2\)</span> is <strong>convex</strong> if for all <span class="math inline">\((t_1,y_1),(t_2,y_2)\in D\)</span> and all <span class="math inline">\(\lambda\in[0,1]\)</span>, <span class="math inline">\((1-\lambda)(t_1,y_1)+\lambda(t_2,y_2)\in D\)</span>: the whole segment joining any two of its points lies in <span class="math inline">\(D\)</span>.</p>
 </div>
@@ -667,6 +667,7 @@ w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
 <ol type="1">
 <li><strong>Predict</strong> (AB4): <span class="math inline">\(\displaystyle w_{j+1}^{\mathrm p}=w_j+\tfrac{h}{24}\bigl(55f_j-59f_{j-1}+37f_{j-2}-9f_{j-3}\bigr).\)</span></li>
 <li><strong>Correct</strong> (AM4 with the prediction): <span class="math inline">\(\displaystyle w_{j+1}=w_j+\tfrac{h}{24}\bigl(9f(t_{j+1},w_{j+1}^{\mathrm p})+19f_j-5f_{j-1}+f_{j-2}\bigr).\)</span></li>
+<li>Store <span class="math inline">\(f_{j+1}=f(t_{j+1},w_{j+1})\)</span> for the next step.</li>
 </ol>
 </div>
 </div>
@@ -683,7 +684,7 @@ w_{j+1}=w_j+\tfrac{h}{2}\bigl(f(t_j,w_j)+f(t_{j+1},w_{j+1})\bigr),
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Multistep methods are <strong>cheaper</strong>, one new <span class="math inline">\(f\)</span>-evaluation per step by reusing history, but every step-size change invalidates that history and forces a <strong>restart</strong> with a single-step method like RK4. Runge-Kutta changes <span class="math inline">\(h\)</span> freely but pays several evaluations per step. Adaptive codes therefore combine them: RK4 to start and restart, Adams4PC for subsequent steps.</p>
+<p>After startup, AB4 uses one new <span class="math inline">\(f\)</span>-evaluation per step. Adams4PC uses two: one at the prediction and one at the corrected point. The coefficients above assume equally spaced history. An implementation that keeps these coefficients must rebuild that history after changing <span class="math inline">\(h\)</span>; variable-step Adams methods instead recompute coefficients from the recent step sizes. Runge-Kutta needs no history adjustment, though RK4 uses four evaluations per step.</p>
 </div>
 </div>
 </section>
@@ -855,7 +856,7 @@ Table&nbsp;3.2: One-glance comparison of the chapter’s methods. “<span class
 <tr class="odd">
 <td style="text-align: left;">Adams4PC</td>
 <td style="text-align: center;"><span class="math inline">\(4\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2\)</span></td>
 <td style="text-align: center;">Explicit</td>
 <td style="text-align: center;">No (RK4 start)</td>
 <td style="text-align: left;">conditional</td>

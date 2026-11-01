@@ -387,6 +387,7 @@ Table&nbsp;4.2: Chicken with private punishment, <span class="math inline">\(R=8
 <li><span class="math inline">\(\Prob\)</span> is the <strong>common prior</strong>, a probability distribution over <span class="math inline">\(\Theta\)</span>.</li>
 </ol>
 </div>
+<p>For the finite-type definitions and equivalence theorem below, assume each <span class="math inline">\(\Theta_i\)</span> is finite and every type has positive marginal probability, <span class="math inline">\(\Prob(\theta_i)&gt;0\)</span>.</p>
 <p><strong>Beliefs from the prior.</strong> Once player <span class="math inline">\(i\)</span> learns his own type <span class="math inline">\(\theta_i\)</span>, he updates his beliefs about the others’ types <span class="math inline">\(\theta_{-i}\)</span> by <strong>Bayes’ rule</strong>. Recall that for a distribution <span class="math inline">\(\Prob\)</span> on a space <span class="math inline">\(X\)</span> and events <span class="math inline">\(A, B\)</span> with <span class="math inline">\(\Prob(A) &gt; 0\)</span>, <span class="math display">\[
 \Prob(B \given A) \defeq \frac{\Prob(B \cap A)}{\Prob(A)}.
 \]</span> Applying this to <span class="math inline">\(\Prob\)</span> over <span class="math inline">\(\Theta\)</span>, player <span class="math inline">\(i\)</span>’s <strong>posterior belief</strong> about <span class="math inline">\(\theta_{-i}\)</span> given own type <span class="math inline">\(\theta_i\)</span> is <span class="math display">\[
@@ -452,7 +453,7 @@ v_i\big(a_i, s_{-i}^*(\theta_{-i});\ \theta_i, \theta_{-i}\big)
 \tag{4.1}\]</span></span> A mixed-strategy BNE is defined analogously.</p>
 </div>
 <div id="thm-4-bne-ne" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 4.1 (BNE equals NE of the extensive form)</strong></span> In any Bayesian game, a strategy profile is a Bayesian Nash equilibrium if and only if it is a Nash equilibrium of the equivalent extensive-form game with Nature (<a href="03-dynamic-complete.html#def-3-extensive" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>).</p>
+<p><span class="theorem-title"><strong>Theorem 4.1 (BNE equals NE of the extensive form)</strong></span> In a Bayesian game with finite type spaces and <span class="math inline">\(\Prob(\theta_i)&gt;0\)</span> for every player’s type, a pure strategy profile is a Bayesian Nash equilibrium if and only if it is a Nash equilibrium of the corresponding extensive-form game with Nature (<a href="03-dynamic-complete.html#def-3-extensive" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>).</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span><em>(Only if: BNE <span class="math inline">\(\Rightarrow\)</span> NE.)</em> Let <span class="math inline">\(s^*\)</span> satisfy <a href="#eq-4-bne" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> and fix any player <span class="math inline">\(i\)</span> and any alternative strategy <span class="math inline">\(s_i\)</span> of the extensive form. Applying <a href="#eq-4-bne" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> with <span class="math inline">\(a_i = s_i(\theta_i)\)</span> gives, for each type <span class="math inline">\(\theta_i\)</span>, <span class="math display">\[
@@ -490,7 +491,7 @@ s_i(\theta_i) =
 \hat a_i, &amp; \theta_i = \hat\theta_i,\\
 s_i^*(\theta_i), &amp; \theta_i \ne \hat\theta_i,
 \end{cases}
-\]</span> which differs from <span class="math inline">\(s_i^*\)</span> only at <span class="math inline">\(\hat\theta_i\)</span>. Multiplying by priors and summing over types exactly as in the first part (the inequality is strict at <span class="math inline">\(\hat\theta_i\)</span> and an equality at every other type) yields <span class="math display">\[
+\]</span> which differs from <span class="math inline">\(s_i^*\)</span> only at <span class="math inline">\(\hat\theta_i\)</span>. Multiplying by priors and summing over types gives a strict inequality because <span class="math inline">\(\Prob(\hat\theta_i)&gt;0\)</span>; all other types’ payoffs are unchanged: <span class="math display">\[
 \sum_{\theta \in \Theta} \Prob(\theta)\,
 v_i\big(s_i(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big)
 \ &gt;\
@@ -498,6 +499,7 @@ v_i\big(s_i(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big)
 v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big).
 \]</span> So <span class="math inline">\(s_i^*\)</span> is not a best response to <span class="math inline">\(s_{-i}^*\)</span> in the extensive form, and <span class="math inline">\(s^*\)</span> is not a Nash equilibrium of it. <span class="math inline">\(\square\)</span></p>
 </div>
+<p>An ex ante best response leaves zero-probability types unrestricted. Their actions cannot affect the ex ante payoff, even if a separately specified posterior makes one action better for that type.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -901,7 +903,7 @@ p^{\sigma_2} =
 <li>the <strong>first-price sealed-bid</strong> auction, in which the highest bidder wins and pays her own bid;</li>
 <li>the <strong>second-price sealed-bid</strong> (or <strong>Vickrey</strong>) auction, in which the highest bidder wins but pays the <em>second</em>-highest bid.</li>
 </ul>
-<p>There are <span class="math inline">\(n\)</span> bidders in the <strong>independent private values (IPV)</strong> environment. Bidder <span class="math inline">\(i\)</span>’s privately known valuation <span class="math inline">\(\theta_i\)</span> is drawn from <span class="math inline">\([\underline\theta_i, \overline\theta_i]\)</span> with cdf <span class="math inline">\(F_i\)</span> and density <span class="math inline">\(f_i\)</span>. Valuations are independent across bidders, and each bidder’s own valuation determines her willingness to pay.</p>
+<p>There are <span class="math inline">\(n\ge2\)</span> risk-neutral bidders with quasilinear payoffs in the <strong>independent private values (IPV)</strong> environment. Bidder <span class="math inline">\(i\)</span>’s privately known valuation <span class="math inline">\(\theta_i\)</span> is drawn from <span class="math inline">\([\underline\theta_i, \overline\theta_i]\)</span> with cdf <span class="math inline">\(F_i\)</span> and density <span class="math inline">\(f_i\)</span>. Valuations are independent across bidders, and each bidder’s own valuation determines her willingness to pay. These examples use continuous types, so conditional expected payoffs are integrals; we verify best responses at every valuation directly. Bids are nonnegative, valuations are nonnegative, and there is no reserve price.</p>
 <section id="sec-4-second-price" class="level3">
 <h3 class="anchored" data-anchor-id="sec-4-second-price">Second-price and English auctions</h3>
 <p>In the <strong>second-price</strong> auction the highest bidder wins and pays the highest of the <em>other</em> bids, so bidder <span class="math inline">\(i\)</span>’s payoff is <span class="math display">\[
@@ -932,9 +934,8 @@ v_i(\theta_i, b_{-i}; \theta_i) &gt; v_i(b_i, b_{-i}; \theta_i).
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(m = \max_{j \ne i} b_j\)</span> be the highest competing bid.</p>
-<p><em>Case <span class="math inline">\(b_i &lt; \theta_i\)</span> (underbidding).</em> If <span class="math inline">\(m &lt; b_i\)</span> or <span class="math inline">\(m \ge \theta_i\)</span>, then bid <span class="math inline">\(b_i\)</span> and bid <span class="math inline">\(\theta_i\)</span> produce the same outcome (winning at price <span class="math inline">\(m\)</span> in the first sub-case, losing in the second), so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) = v_i(\theta_i,
-b_{-i}; \theta_i)\)</span>. But if <span class="math inline">\(b_i \le m &lt; \theta_i\)</span>, then bidding <span class="math inline">\(b_i\)</span> loses (or ties at a bad price) whereas bidding <span class="math inline">\(\theta_i\)</span> wins at price <span class="math inline">\(m &lt; \theta_i\)</span> for a strict gain, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
-<p><em>Case <span class="math inline">\(b_i &gt; \theta_i\)</span> (overbidding).</em> If <span class="math inline">\(m \le \theta_i\)</span> or <span class="math inline">\(m &gt; b_i\)</span>, the two bids again give the same outcome. But if <span class="math inline">\(\theta_i &lt; m \le b_i\)</span>, then bidding <span class="math inline">\(b_i\)</span> wins at price <span class="math inline">\(m &gt; \theta_i\)</span> (a negative payoff) whereas bidding <span class="math inline">\(\theta_i\)</span> loses and gets <span class="math inline">\(0\)</span>, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
+<p><em>Case <span class="math inline">\(b_i &lt; \theta_i\)</span> (underbidding).</em> If <span class="math inline">\(m &lt; b_i\)</span> or <span class="math inline">\(m \ge \theta_i\)</span>, then bid <span class="math inline">\(b_i\)</span> and bid <span class="math inline">\(\theta_i\)</span> give the same payoff: <span class="math inline">\(\theta_i-m\)</span> in the first sub-case and zero in the second, including a zero-surplus tie at <span class="math inline">\(m=\theta_i\)</span>. But if <span class="math inline">\(b_i\le m&lt;\theta_i\)</span>, bidding <span class="math inline">\(b_i\)</span> loses or shares the positive surplus in a tie, whereas bidding <span class="math inline">\(\theta_i\)</span> wins it outright. This gives a strict gain, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
+<p><em>Case <span class="math inline">\(b_i &gt; \theta_i\)</span> (overbidding).</em> If <span class="math inline">\(m \le \theta_i\)</span> or <span class="math inline">\(m &gt; b_i\)</span>, the two bids again give the same payoff. But if <span class="math inline">\(\theta_i&lt;m\le b_i\)</span>, bidding <span class="math inline">\(b_i\)</span> wins or ties at price <span class="math inline">\(m&gt;\theta_i\)</span>, giving negative expected payoff, whereas bidding <span class="math inline">\(\theta_i\)</span> loses and gets <span class="math inline">\(0\)</span>, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
 <p>In all cases <a href="#eq-4-2p-weak" class="quarto-xref">Equation&nbsp;<span>4.8</span></a> holds, and the strict sub-cases establish <a href="#eq-4-2p-strict" class="quarto-xref">Equation&nbsp;<span>4.9</span></a>. Hence bidding one’s valuation is a <strong>weakly dominant strategy</strong>. <span class="math inline">\(\square\)</span></p>
 </div>
 <p>Because <span class="math inline">\(s_i(\theta_i) = \theta_i\)</span> is a best response to <em>any</em> <span class="math inline">\(s_{-i}\)</span>, it is in particular a best response against equilibrium play: <span class="math display">\[
@@ -965,8 +966,7 @@ v_i(b_i, b_{-i}; \theta_i) =
 \prod_{k \ne i, j} F_k\big(s_k^{-1}(b_i)\big)\right]
 \bigg|_{b_i = s_i(\theta_i)} = 0.
 \]</span></p>
-<p><strong>Symmetric case.</strong> Suppose all bidders draw from the same <span class="math inline">\(F\)</span> with density <span class="math inline">\(f\)</span> on <span class="math inline">\([\underline\theta, \overline\theta]\)</span>, and look for a symmetric equilibrium <span class="math inline">\(s_1 =
-\cdots = s_n = s\)</span>, so that <span class="math inline">\(s_j^{-1}(s(\theta)) = \theta\)</span>. Dropping subscripts, the first-order condition simplifies to <span class="math display">\[
+<p><strong>Symmetric case.</strong> Suppose values are iid from a continuous cdf <span class="math inline">\(F\)</span> on <span class="math inline">\([\underline\theta,\overline\theta]\)</span>, with a continuous, strictly positive density on the interior and <span class="math inline">\(0\le\underline\theta&lt;\overline\theta&lt;\infty\)</span>. Look for a symmetric, strictly increasing differentiable strategy <span class="math inline">\(s\)</span>. Then <span class="math inline">\(s_j^{-1}(s(\theta))=\theta\)</span>, and the interior first-order condition is <span class="math display">\[
 -F^{n-1}(\theta) + (n-1)\big(\theta - s(\theta)\big)
 \frac{f(\theta) F^{n-2}(\theta)}{s'(\theta)} = 0,
 \]</span> which rearranges into the linear ODE <span class="math display">\[
@@ -977,10 +977,15 @@ s(\theta)\big]\)</span>, so integrating both sides and applying integration by p
 F^{n-1}(\theta) s(\theta)
 = \int_{\underline\theta}^{\theta} (n-1) x f(x) F^{n-2}(x)\,\mathrm dx + k
 = \theta F^{n-1}(\theta) - \int_{\underline\theta}^{\theta} F^{n-1}(x)\,\mathrm dx + k.
-\]</span> Since <span class="math inline">\(F(\underline\theta) = 0\)</span>, evaluating at <span class="math inline">\(\theta = \underline\theta\)</span> forces <span class="math inline">\(k = 0\)</span>, giving the <strong>symmetric first-price BNE</strong> <span id="eq-4-fpa-bid"><span class="math display">\[
+\]</span> For a bounded bid function, <span class="math inline">\(F^{n-1}(\theta)s(\theta)\to0\)</span> as <span class="math inline">\(\theta\downarrow\underline\theta\)</span>, so <span class="math inline">\(k=0\)</span>. The candidate is <span id="eq-4-fpa-bid"><span class="math display">\[
 \boxed{\ s(\theta) = \theta - \frac{\displaystyle\int_{\underline\theta}^{\theta}
 F^{n-1}(x)\,\mathrm dx}{F^{n-1}(\theta)}.\ }
-\tag{4.10}\]</span></span> This <span class="math inline">\(s\)</span> is strictly increasing and differentiable, so the conjecture is self-consistent; each bidder bids strictly below her valuation (the subtracted term is positive), and because <span class="math inline">\(s\)</span> is increasing the highest-value bidder still wins; the outcome is efficient.</p>
+\tag{4.10}\]</span></span> The formula applies for <span class="math inline">\(\theta&gt;\underline\theta\)</span> and extends continuously to <span class="math inline">\(s(\underline\theta)=\underline\theta\)</span>: its subtracted term lies between <span class="math inline">\(0\)</span> and <span class="math inline">\(\theta-\underline\theta\)</span>. In the interior, <span class="math inline">\(s(\theta)&lt;\theta\)</span> and the ODE gives <span class="math inline">\(s'(\theta)&gt;0\)</span>.</p>
+<p>To check all deviations, write a bid in the equilibrium range as <span class="math inline">\(s(z)\)</span> and let <span class="math inline">\(H(z)=F(z)^{n-1}\)</span>. Type <span class="math inline">\(\theta\)</span> then earns <span class="math display">\[
+U(z;\theta)=(\theta-s(z))H(z),\qquad
+\frac{\partial U(z;\theta)}{\partial z}
+=H'(z)(\theta-z).
+\]</span> The derivative is positive below <span class="math inline">\(\theta\)</span> and negative above it, so <span class="math inline">\(z=\theta\)</span> maximizes the payoff. A bid below <span class="math inline">\(s(\underline\theta)\)</span> wins with probability zero; a bid above <span class="math inline">\(s(\overline\theta)\)</span> pays more while still winning with probability one. Neither improves on <span class="math inline">\(s(\theta)\)</span>. Thus <a href="#eq-4-fpa-bid" class="quarto-xref">Equation&nbsp;<span>4.10</span></a> is a symmetric BNE, and its strict monotonicity allocates the object to the highest-value bidder.</p>
 <p><strong>Uniform special case.</strong> If <span class="math inline">\(F\)</span> is uniform on <span class="math inline">\([0,1]\)</span>, then <span class="math inline">\(F^{n-1}(x) =
 x^{n-1}\)</span> and <span class="math display">\[
 s(\theta) = \theta - \frac{\theta^n / n}{\theta^{n-1}} = \frac{n-1}{n}\,\theta.
@@ -1025,20 +1030,24 @@ f_n^{[1]}(x) = \frac{n^2}{n-1}\left(\frac{nx}{n-1}\right)^{n-1},
 \E\big(b_n^{[1]}\big) = \int_0^{\frac{n-1}{n}} x f_n^{[1]}(x)\,\mathrm dx
 = \frac{n-1}{n+1},
 \]</span> the same as the second-price auction, as implied by revenue equivalence.</p>
-<div class="block-result callout callout-style-simple callout-note callout-titled" title="Revenue Equivalence Theorem.">
+<div class="block-result callout callout-style-simple callout-note callout-titled" title="Revenue equivalence">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Revenue Equivalence Theorem.
+<span class="screen-reader-only">Note</span>Revenue equivalence
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In the IPV setting, any auction satisfying the following four conditions yields the seller the same expected revenue: (i) each bidder’s type is drawn from a “well-behaved” distribution; (ii) bidders are risk neutral; (iii) the bidder with the highest type always wins; (iv) the bidder with the lowest possible type has expected payoff zero. The result was first found by Vickrey and generalised by Roger Myerson (Nobel Prize, 2007, for mechanism design and the revelation principle).</p>
+<p>Suppose <span class="math inline">\(n\ge2\)</span> risk-neutral bidders have quasilinear payoffs and iid private values from the continuous distribution <span class="math inline">\(F\)</span> specified above. Compare auction equilibria that always allocate the object to the highest-value bidder and give the lowest type zero expected utility. They have the same expected payment for each type, hence the same expected seller revenue.</p>
+<p>Each type’s winning probability is <span class="math inline">\(F(\theta)^{n-1}\)</span>. The incentive-compatibility envelope condition and the lowest-type utility give <span class="math display">\[
+U(\theta)=\int_{\underline\theta}^{\theta}F(x)^{n-1}\,\mathrm dx,\qquad
+m(\theta)=\theta F(\theta)^{n-1}-U(\theta),
+\]</span> where <span class="math inline">\(m(\theta)\)</span> is the expected payment, including the zero payment when the bidder loses in the two auctions above.</p>
 </div>
 </div>
-<p>The first- and second-price auctions both satisfy (i)–(iv), which is why their expected revenues coincide at <span class="math inline">\(\frac{n-1}{n+1}\)</span>.</p>
+<p>For uniform <span class="math inline">\([0,1]\)</span> values, both equilibria satisfy these conditions, and the calculations above give revenue <span class="math inline">\(\frac{n-1}{n+1}\)</span>.</p>
 </section>
 <section id="sec-4-winners-curse" class="level3">
 <h3 class="anchored" data-anchor-id="sec-4-winners-curse">Common-value auctions and the winner’s curse</h3>

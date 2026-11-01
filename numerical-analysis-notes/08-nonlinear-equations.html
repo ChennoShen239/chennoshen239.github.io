@@ -413,40 +413,39 @@ Figure&nbsp;8.1: Fixed-point cobwebs for <span class="math inline">\(g(x)=x-\eps
 <h3 class="anchored" data-anchor-id="sec-8-banach">When does the iteration converge? The Banach theorem</h3>
 <p>Fix a vector norm <span class="math inline">\(\norm{\cdot}\)</span> on <span class="math inline">\(\R^n\)</span> and use the same notation for its induced operator norm on <span class="math inline">\(\R^{n\times n}\)</span>.</p>
 <div id="def-8-contraction" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 8.2 (Contraction map)</strong></span> A map <span class="math inline">\(g:\R^n\to\R^n\)</span> is a <strong>contraction</strong> with parameter <span class="math inline">\(k\in[0,1)\)</span> if <span id="eq-8-contraction"><span class="math display">\[
-\norm{g(x)-g(y)}\le k\,\norm{x-y}\qquad\text{for all }x,y\in\R^n .
+<p><span class="theorem-title"><strong>Definition 8.2 (Contraction map)</strong></span> A map <span class="math inline">\(g:\R^n\to\R^n\)</span> is a <strong>contraction</strong> with parameter <span class="math inline">\(r\in[0,1)\)</span> if <span id="eq-8-contraction"><span class="math display">\[
+\norm{g(x)-g(y)}\le r\,\norm{x-y}\qquad\text{for all }x,y\in\R^n .
 \tag{8.4}\]</span></span></p>
 </div>
 <p>A sequence <span class="math inline">\(\{x^{(k)}\}\)</span> is <strong>Cauchy</strong> if, for every <span class="math inline">\(\eps&gt;0\)</span>, there is <span class="math inline">\(K\)</span> such that <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\le\eps\)</span> whenever <span class="math inline">\(k,l\ge K\)</span>. Under any norm, <span class="math inline">\(\R^n\)</span> is complete: every Cauchy sequence converges.</p>
 <div id="thm-8-banach" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.1 (Banach fixed-point theorem)</strong></span> Suppose <span class="math inline">\(g:\R^n\to\R^n\)</span> is a contraction with parameter <span class="math inline">\(k\in[0,1)\)</span>. Let <span class="math inline">\(x^{(0)}\in\R^n\)</span> and set <span class="math inline">\(x^{(k+1)}=g(x^{(k)})\)</span> for <span class="math inline">\(k=0,1,2,\dots\)</span>. Then:</p>
+<p><span class="theorem-title"><strong>Theorem 8.1 (Banach fixed-point theorem)</strong></span> Suppose <span class="math inline">\(g:\R^n\to\R^n\)</span> is a contraction with parameter <span class="math inline">\(r\in[0,1)\)</span>. Let <span class="math inline">\(x^{(0)}\in\R^n\)</span> and set <span class="math inline">\(x^{(k+1)}=g(x^{(k)})\)</span> for <span class="math inline">\(k=0,1,2,\dots\)</span>. Then:</p>
 <ol type="1">
 <li>the sequence converges, <span class="math inline">\(x^{(k)}\to x^\star\)</span> for some <span class="math inline">\(x^\star\in\R^n\)</span>;</li>
 <li><span class="math inline">\(x^\star\)</span> is the <strong>unique</strong> fixed point of <span class="math inline">\(g\)</span> in <span class="math inline">\(\R^n\)</span>; and</li>
 <li>the error obeys <span id="eq-8-banach-error"><span class="math display">\[
-\norm{x^{(k)}-x^\star}\le\frac{k^{\,k}}{1-k}\,\norm{x^{(1)}-x^{(0)}}.
+\norm{x^{(k)}-x^\star}\le\frac{r^k}{1-r}\,\norm{x^{(1)}-x^{(0)}}.
 \tag{8.5}\]</span></span></li>
 </ol>
 </div>
-<p>In <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a>, the letter <span class="math inline">\(k\)</span> plays two roles at once: it is the contraction constant and, in the exponent and the superscript <span class="math inline">\(x^{(k)}\)</span>, the iteration count. After <span class="math inline">\(k\)</span> steps the error is at most <span class="math inline">\(\tfrac{1}{1-k}\)</span> times the <em>contraction constant raised to the number of steps</em>, times the length of the very first step.</p>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span><strong>Step 1: the iterates are Cauchy.</strong> For <span class="math inline">\(k\le l\)</span>, telescoping and the triangle inequality give <span class="math display">\[
 \norm{x^{(k)}-x^{(l)}}=\Bigl\|\textstyle\sum_{i=k}^{l-1}\bigl(x^{(i)}-x^{(i+1)}\bigr)\Bigr\|
 \le\sum_{i=k}^{l-1}\norm{x^{(i)}-x^{(i+1)}}.
-\]</span> Each summand shrinks geometrically. First, the <span class="math inline">\(j\)</span>-fold composite <span class="math inline">\(g^{j}\)</span> is itself a contraction with parameter <span class="math inline">\(k^{j}\)</span>: by induction, for <span class="math inline">\(j\ge1\)</span>, <span class="math display">\[
+\]</span> Each summand shrinks geometrically. First, the <span class="math inline">\(j\)</span>-fold composite <span class="math inline">\(g^{j}\)</span> is itself a contraction with parameter <span class="math inline">\(r^{j}\)</span>: by induction, for <span class="math inline">\(j\ge1\)</span>, <span class="math display">\[
 \norm{g^{j}(x)-g^{j}(y)}=\norm{g\bigl(g^{j-1}(x)\bigr)-g\bigl(g^{j-1}(y)\bigr)}
-\le k\,\norm{g^{j-1}(x)-g^{j-1}(y)}\le\cdots\le k^{j}\norm{x-y}.
+\le r\,\norm{g^{j-1}(x)-g^{j-1}(y)}\le\cdots\le r^{j}\norm{x-y}.
 \]</span> Since <span class="math inline">\(x^{(i)}=g^{i}(x^{(0)})\)</span> and <span class="math inline">\(x^{(i+1)}=g^{i}(x^{(1)})\)</span>, <span class="math display">\[
-\norm{x^{(i)}-x^{(i+1)}}=\norm{g^{i}(x^{(0)})-g^{i}(x^{(1)})}\le k^{i}\norm{x^{(0)}-x^{(1)}}.
+\norm{x^{(i)}-x^{(i+1)}}=\norm{g^{i}(x^{(0)})-g^{i}(x^{(1)})}\le r^{i}\norm{x^{(0)}-x^{(1)}}.
 \]</span> Summing the geometric series and extending it to infinity, <span class="math display">\[
-\norm{x^{(k)}-x^{(l)}}\le\Bigl(\sum_{i=k}^{l-1}k^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
-\le\Bigl(\sum_{i=k}^{\infty}k^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
-=\frac{k^{\,k}}{1-k}\,\norm{x^{(0)}-x^{(1)}}.
+\norm{x^{(k)}-x^{(l)}}\le\Bigl(\sum_{i=k}^{l-1}r^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
+\le\Bigl(\sum_{i=k}^{\infty}r^{i}\Bigr)\norm{x^{(0)}-x^{(1)}}
+=\frac{r^k}{1-r}\,\norm{x^{(0)}-x^{(1)}}.
 \tag{$\star$}
-\]</span> The right side is free of <span class="math inline">\(l\)</span> and, because <span class="math inline">\(k\in[0,1)\)</span>, tends to <span class="math inline">\(0\)</span> as <span class="math inline">\(k\to\infty\)</span>; the sequence is Cauchy.</p>
-<p><strong>Step 2: convergence, uniqueness, and the bound.</strong> Being Cauchy in the complete space <span class="math inline">\(\R^n\)</span>, the sequence has a limit <span class="math inline">\(x^\star=\lim_k x^{(k)}\)</span>. A contraction is continuous, so <a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a> makes <span class="math inline">\(x^\star\)</span> a fixed point. It is the only one: two fixed points <span class="math inline">\(x^\star,y^\star\)</span> would satisfy <span class="math inline">\(\norm{x^\star-y^\star}=\norm{g(x^\star)-g(y^\star)}\le k\norm{x^\star-y^\star}\)</span>, which forces <span class="math inline">\(\norm{x^\star-y^\star}=0\)</span> since <span class="math inline">\(k&lt;1\)</span>. Finally, hold <span class="math inline">\(k\)</span> fixed in <span class="math inline">\((\star)\)</span> and send <span class="math inline">\(l\to\infty\)</span>; continuity of the norm gives <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\to\norm{x^{(k)}-x^\star}\)</span>, which is <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a>. <span class="math inline">\(\square\)</span></p>
+\]</span> The right side is free of <span class="math inline">\(l\)</span> and, because <span class="math inline">\(r\in[0,1)\)</span>, tends to <span class="math inline">\(0\)</span> as <span class="math inline">\(k\to\infty\)</span>; the sequence is Cauchy.</p>
+<p><strong>Step 2: convergence, uniqueness, and the bound.</strong> Being Cauchy in the complete space <span class="math inline">\(\R^n\)</span>, the sequence has a limit <span class="math inline">\(x^\star=\lim_k x^{(k)}\)</span>. A contraction is continuous, so <a href="#prp-8-limit-is-fixed" class="quarto-xref">Proposition&nbsp;<span>8.1</span></a> makes <span class="math inline">\(x^\star\)</span> a fixed point. It is the only one: two fixed points <span class="math inline">\(x^\star,y^\star\)</span> would satisfy <span class="math inline">\(\norm{x^\star-y^\star}=\norm{g(x^\star)-g(y^\star)}\le r\norm{x^\star-y^\star}\)</span>, which forces <span class="math inline">\(\norm{x^\star-y^\star}=0\)</span> since <span class="math inline">\(r&lt;1\)</span>. Finally, hold <span class="math inline">\(k\)</span> fixed in <span class="math inline">\((\star)\)</span> and send <span class="math inline">\(l\to\infty\)</span>; continuity of the norm gives <span class="math inline">\(\norm{x^{(k)}-x^{(l)}}\to\norm{x^{(k)}-x^\star}\)</span>, which is <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a>. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>The bound <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a> gives linear convergence (<a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>): each additional correct digit requires roughly the same number of iterations.</p>
+<p>The contraction inequality also gives <span class="math inline">\(\norm{x^{(k+1)}-x^\star}\le r\norm{x^{(k)}-x^\star}\)</span>, hence linear convergence (<a href="#def-8-order-convergence" class="quarto-xref">Definition&nbsp;<span>8.5</span></a>).</p>
 <p><span id="linear-convergence-in-words"></span></p>
 </section>
 <section id="sec-8-contraction-test" class="level3">
@@ -457,7 +456,7 @@ Figure&nbsp;8.1: Fixed-point cobwebs for <span class="math inline">\(g(x)=x-\eps
 \]</span></p>
 </div>
 <div id="thm-8-contraction-jacobian" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.2 (Jacobian bound implies contraction)</strong></span> If there is <span class="math inline">\(k\in[0,1)\)</span> with <span class="math inline">\(\norm{Dg(x)}\le k\)</span> for all <span class="math inline">\(x\in\R^n\)</span> (induced norm matching the vector norm), then <span class="math inline">\(g\)</span> is a contraction with parameter <span class="math inline">\(k\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem 8.2 (Jacobian bound implies contraction)</strong></span> Let <span class="math inline">\(g:\R^n\to\R^n\)</span> be continuously differentiable. If there is <span class="math inline">\(r\in[0,1)\)</span> with <span class="math inline">\(\norm{Dg(x)}\le r\)</span> for all <span class="math inline">\(x\in\R^n\)</span> (induced norm matching the vector norm), then <span class="math inline">\(g\)</span> is a contraction with parameter <span class="math inline">\(r\)</span>.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(x,y\)</span> and join them by the segment <span class="math inline">\(z(t)=(1-t)x+ty\)</span>, <span class="math inline">\(t\in[0,1]\)</span>, so <span class="math inline">\(z(0)=x\)</span>, <span class="math inline">\(z(1)=y\)</span>, and <span class="math inline">\(z'(t)=y-x\)</span>. The fundamental theorem of calculus and the chain rule give <span class="math display">\[
@@ -465,8 +464,8 @@ g(y)-g(x)=\int_0^1\diff{}{t}g(z(t))\,\dd t=\int_0^1 Dg(z(t))\,[y-x]\,\dd t.
 \]</span> Taking norms and passing the triangle inequality through the integral, <span class="math display">\[
 \norm{g(y)-g(x)}\le\int_0^1\norm{Dg(z(t))\,[y-x]}\,\dd t
 \le\int_0^1\norm{Dg(z(t))}\,\norm{y-x}\,\dd t
-\le\int_0^1 k\,\norm{y-x}\,\dd t=k\,\norm{y-x},
-\]</span> using <span class="math inline">\(\norm{Mv}\le\norm{M}\norm{v}\)</span> and the hypothesis <span class="math inline">\(\norm{Dg(z(t))}\le k\)</span> along the segment. <span class="math inline">\(\square\)</span></p>
+\le\int_0^1 r\,\norm{y-x}\,\dd t=r\,\norm{y-x},
+\]</span> using <span class="math inline">\(\norm{Mv}\le\norm{M}\norm{v}\)</span> and the hypothesis <span class="math inline">\(\norm{Dg(z(t))}\le r\)</span> along the segment. <span class="math inline">\(\square\)</span></p>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -507,7 +506,7 @@ u\bigl((1-\tau)x+\tau y\bigr)&lt;(1-\tau)u(x)+\tau u(y).
 </div>
 </div>
 <div id="thm-8-gd" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.3 (Gradient descent converges linearly)</strong></span> Under the standing assumption, gradient descent <a href="#eq-8-gd" class="quarto-xref">Equation&nbsp;<span>8.6</span></a> with step size <span class="math inline">\(t=1/C\)</span> converges to the unique global minimizer <span class="math inline">\(x^\star\)</span> of <span class="math inline">\(u\)</span>. Moreover <span class="math inline">\(g(x)=x-\tfrac1C\nabla u(x)\)</span> is a contraction with parameter <span class="math inline">\(k=1-c/C\)</span>, so the <a href="#thm-8-banach">Banach theorem</a> gives <span id="eq-8-gd-error"><span class="math display">\[
+<p><span class="theorem-title"><strong>Theorem 8.3 (Gradient descent converges linearly)</strong></span> Under the standing assumption, gradient descent <a href="#eq-8-gd" class="quarto-xref">Equation&nbsp;<span>8.6</span></a> with step size <span class="math inline">\(t=1/C\)</span> converges to the unique global minimizer <span class="math inline">\(x^\star\)</span> of <span class="math inline">\(u\)</span>. Moreover <span class="math inline">\(g(x)=x-\tfrac1C\nabla u(x)\)</span> is a contraction with parameter <span class="math inline">\(r=1-c/C\)</span>, so the <a href="#thm-8-banach">Banach theorem</a> gives <span id="eq-8-gd-error"><span class="math display">\[
 \ntwo{x^{(k)}-x^\star}\le\Bigl(1-\frac{c}{C}\Bigr)^{k}\frac{C}{c}\,\ntwo{x^{(1)}-x^{(0)}}.
 \tag{8.7}\]</span></span></p>
 </div>
@@ -516,7 +515,7 @@ u\bigl((1-\tau)x+\tau y\bigr)&lt;(1-\tau)u(x)+\tau u(y).
 Dg(x)=I_n-\frac1C\,\nabla^2 u(x).
 \]</span> An eigenvalue <span class="math inline">\(\lambda\)</span> of <span class="math inline">\(\nabla^2 u(x)\)</span> becomes the eigenvalue <span class="math inline">\(1-\lambda/C\)</span> of <span class="math inline">\(Dg(x)\)</span>. Since <span class="math inline">\(c\le\lambda\le C\)</span> gives <span class="math inline">\(c/C\le\lambda/C\le1\)</span>, every eigenvalue of <span class="math inline">\(Dg(x)\)</span> lies in <span class="math inline">\([\,0,\,1-c/C\,]\)</span>. As <span class="math inline">\(\nabla^2 u\)</span> is symmetric, so is <span class="math inline">\(Dg(x)\)</span>, and its <span class="math inline">\(2\)</span>-norm equals its spectral radius (<a href="05-iterative-linear-systems.html#def-5-spectral-radius" class="quarto-xref">Definition&nbsp;<span>6.4</span></a>), <span class="math display">\[
 \ntwo{Dg(x)}=\spec(Dg(x))=\max_i\abs{\lambda_i(Dg(x))}\le1-\frac{c}{C},
-\]</span> the eigenvalues sitting in <span class="math inline">\([0,1-c/C]\)</span> with <span class="math inline">\(0\le1-c/C&lt;1\)</span>. Thus <span class="math inline">\(\ntwo{Dg(x)}\le k\)</span> with <span class="math inline">\(k=1-c/C\in[0,1)\)</span>, <span class="math inline">\(g\)</span> is a contraction, and the <a href="#thm-8-banach">Banach theorem</a> applies; <a href="#eq-8-gd-error" class="quarto-xref">Equation&nbsp;<span>8.7</span></a> is <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a> with <span class="math inline">\(1/(1-k)=C/c\)</span>. <span class="math inline">\(\square\)</span></p>
+\]</span> the eigenvalues sitting in <span class="math inline">\([0,1-c/C]\)</span> with <span class="math inline">\(0\le1-c/C&lt;1\)</span>. Thus <span class="math inline">\(\ntwo{Dg(x)}\le r\)</span> with <span class="math inline">\(r=1-c/C\in[0,1)\)</span>, <span class="math inline">\(g\)</span> is a contraction, and the <a href="#thm-8-banach">Banach theorem</a> applies; <a href="#eq-8-gd-error" class="quarto-xref">Equation&nbsp;<span>8.7</span></a> is <a href="#eq-8-banach-error" class="quarto-xref">Equation&nbsp;<span>8.5</span></a> with <span class="math inline">\(1/(1-r)=C/c\)</span>. <span class="math inline">\(\square\)</span></p>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -533,7 +532,7 @@ Dg(x)=I_n-\frac1C\,\nabla^2 u(x).
 </div>
 <p>For example, minimize the quadratic <span class="math display">\[
 u(x)=\tfrac12 x^\top A x,\qquad A=\diag(1,10),
-\]</span> whose gradient is <span class="math inline">\(\nabla u(x)=Ax=(x_1,\,10x_2)\)</span>. The eigenvalues of the (constant) Hessian <span class="math inline">\(A\)</span> are <span class="math inline">\(1\)</span> and <span class="math inline">\(10\)</span>, so <span class="math inline">\(c=1\)</span>, <span class="math inline">\(C=10\)</span>, the step is <span class="math inline">\(t=1/C=0.1\)</span>, and the contraction parameter is <span class="math inline">\(k=1-c/C=0.9\)</span>. The update reads <span class="math display">\[
+\]</span> whose gradient is <span class="math inline">\(\nabla u(x)=Ax=(x_1,\,10x_2)\)</span>. The eigenvalues of the (constant) Hessian <span class="math inline">\(A\)</span> are <span class="math inline">\(1\)</span> and <span class="math inline">\(10\)</span>, so <span class="math inline">\(c=1\)</span>, <span class="math inline">\(C=10\)</span>, the step is <span class="math inline">\(t=1/C=0.1\)</span>, and the contraction parameter is <span class="math inline">\(r=1-c/C=0.9\)</span>. The update reads <span class="math display">\[
 x^{(k+1)}=x^{(k)}-0.1\,(x_1^{(k)},\,10x_2^{(k)})=\bigl(0.9\,x_1^{(k)},\,0\bigr),
 \]</span> because the stiff coordinate has <span class="math inline">\(1-t\cdot10=0\)</span>: one step annihilates it. From <span class="math inline">\(x^{(0)}=(1,1)\)</span> the soft coordinate then decays by exactly <span class="math inline">\(0.9\)</span> each step while the stiff one stays pinned at <span class="math inline">\(0\)</span>:</p>
 <table class="caption-top table">
@@ -586,25 +585,20 @@ Figure&nbsp;8.2: Steepest descent on the level sets of <span class="math inline"
 <section id="sec-8-orders" class="level3">
 <h3 class="anchored" data-anchor-id="sec-8-orders">Orders of convergence</h3>
 <div id="def-8-order-convergence" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 8.5 (Order of convergence)</strong></span> Let an iterative method produce <span class="math inline">\(x^{(k)}\to x^\star\)</span>. The method has <strong>order of convergence</strong> <span class="math inline">\(q\)</span> (a real number <span class="math inline">\(q\ge1\)</span>) with <strong>rate</strong> <span class="math inline">\(M&gt;0\)</span> if <span class="math display">\[
-\frac{\norm{x^{(k+1)}-x^\star}}{\norm{x^{(k)}-x^\star}^{q}}\le M
-\qquad\Longleftrightarrow\qquad
-\norm{x^{(k+1)}-x^\star}\le M\,\norm{x^{(k)}-x^\star}^{q}
+<p><span class="theorem-title"><strong>Definition 8.5 (Order of convergence)</strong></span> Let <span class="math inline">\(E_k=\norm{x^{(k)}-x^\star}\)</span> for a sequence <span class="math inline">\(x^{(k)}\to x^\star\)</span>. It converges with <strong>order at least <span class="math inline">\(q\)</span></strong>, <span class="math inline">\(q\ge1\)</span>, if there is <span class="math inline">\(M&gt;0\)</span> such that <span class="math display">\[
+E_{k+1}\le M E_k^q
 \tag{$*$}
-\]</span> holds for all <span class="math inline">\(k\)</span>. The case <span class="math inline">\(q=1\)</span> is <strong>linear convergence</strong>, <span class="math inline">\(q&gt;1\)</span> is <strong>superlinear convergence</strong>, and <span class="math inline">\(q=2\)</span> is <strong>quadratic convergence</strong>.</p>
+\]</span> for all sufficiently large <span class="math inline">\(k\)</span>. For <span class="math inline">\(q=1\)</span> we require <span class="math inline">\(M&lt;1\)</span> and call the convergence <strong>linear</strong>; <span class="math inline">\(q=2\)</span> gives <strong>quadratic convergence</strong> (or faster).</p>
+<p><strong>Superlinear convergence</strong> means <span class="math inline">\(E_{k+1}/E_k\to0\)</span>. A fixed order <span class="math inline">\(q&gt;1\)</span> implies this, since <span class="math inline">\(E_{k+1}/E_k\le M E_k^{q-1}\to0\)</span>. The converse fails: <span class="math inline">\(E_k=e^{-k^2}\)</span> has <span class="math inline">\(E_{k+1}/E_k=e^{-2k-1}\to0\)</span>, but <span class="math inline">\(E_{k+1}/E_k^q=e^{(q-1)k^2-2k-1}\to\infty\)</span> for every fixed <span class="math inline">\(q&gt;1\)</span>.</p>
 </div>
-<p>The role of the rate <span class="math inline">\(M\)</span> differs between the two regimes.</p>
-<ul>
-<li><strong>Linear (<span class="math inline">\(q=1\)</span>).</strong> Then <span class="math inline">\((*)\)</span> reads <span class="math inline">\(\norm{x^{(k+1)}-x^\star}\le M\norm{x^{(k)}-x^\star}\)</span>, and only <span class="math inline">\(M&lt;1\)</span> forces the error down; otherwise the bound permits no progress, however close <span class="math inline">\(x^{(0)}\)</span> starts. So <span class="math inline">\(M&lt;1\)</span> is a silent requirement when <span class="math inline">\(q=1\)</span>, mirroring the role of <span class="math inline">\(k\)</span> in <a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>.</li>
-<li><strong>Superlinear (<span class="math inline">\(q&gt;1\)</span>).</strong> Now <span class="math inline">\(M\)</span> may exceed <span class="math inline">\(1\)</span> freely: provided <span class="math inline">\(x^{(0)}\)</span> lies close enough to <span class="math inline">\(x^\star\)</span>, the inequality <span class="math inline">\((*)\)</span> alone drags the error to zero. A superlinear method may dawdle far from the root and only reveal its speed once the iterate enters a neighborhood of <span class="math inline">\(x^\star\)</span>; the definition captures this <strong>asymptotic</strong> behavior, not the transient.</li>
-</ul>
+<p>With <span class="math inline">\(q&gt;1\)</span>, the bound <span class="math inline">\((*)\)</span> decreases the error once <span class="math inline">\(M E_k^{q-1}&lt;1\)</span>; <span class="math inline">\(M\)</span> itself can exceed <span class="math inline">\(1\)</span>. The next result assumes this fixed-order bound from the starting iterate, which can be obtained by reindexing once the iterates enter the relevant neighborhood.</p>
 <div id="thm-8-superlinear" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 8.4 (Superlinear convergence is doubly exponential)</strong></span> Suppose an iteration satisfies <span class="math inline">\((*)\)</span> with <span class="math inline">\(q&gt;1\)</span>. If the initial error obeys <span class="math inline">\(\norm{x^{(0)}-x^\star}&lt;M^{-1/(q-1)}\)</span>, then the method converges, and there are constants <span class="math inline">\(\alpha,C&gt;0\)</span> with <span id="eq-8-superlinear"><span class="math display">\[
+<p><span class="theorem-title"><strong>Theorem 8.4 (A fixed order above one gives a doubly exponential bound)</strong></span> Suppose <span class="math inline">\((*)\)</span> holds for all <span class="math inline">\(k\ge0\)</span> with <span class="math inline">\(q&gt;1\)</span>. If <span class="math inline">\(0&lt;E_0&lt;M^{-1/(q-1)}\)</span>, then there are constants <span class="math inline">\(\alpha,C&gt;0\)</span> with <span id="eq-8-superlinear"><span class="math display">\[
 \norm{x^{(k)}-x^\star}\le C\,e^{-\alpha q^{k}} .
-\tag{8.8}\]</span></span> One may take <span class="math inline">\(C=M^{-1/(q-1)}\)</span> and <span class="math inline">\(\alpha=-\log\!\bigl(M^{1/(q-1)}\norm{x^{(0)}-x^\star}\bigr)\)</span>, which is positive precisely because the hypothesis is strict.</p>
+\tag{8.8}\]</span></span> One may take <span class="math inline">\(C=M^{-1/(q-1)}\)</span> and <span class="math inline">\(\alpha=-\log(M^{1/(q-1)}E_0)&gt;0\)</span>. If an iterate reaches <span class="math inline">\(E_k=0\)</span>, the bound <span class="math inline">\((*)\)</span> keeps every subsequent error at zero.</p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Write <span class="math inline">\(E_k=\norm{x^{(k)}-x^\star}\)</span>, so <span class="math inline">\((*)\)</span> is <span class="math inline">\(E_{k+1}\le M E_k^{q}\)</span>. Logs turn the product into a linear recursion: <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\)</span> with <span class="math inline">\(b=\log M\)</span>. Define <span class="math inline">\(a_0=\log E_0\)</span>, <span class="math inline">\(a_{k+1}=b+q\,a_k\)</span>; then <span class="math inline">\(\log E_k\le a_k\)</span> for all <span class="math inline">\(k\)</span> by induction (the step is <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\le b+q a_k=a_{k+1}\)</span>). Solving the recursion, <span class="math display">\[
+<p><span class="proof-title"><em>Proof</em>. </span>Until an error is zero, take logs of <span class="math inline">\(E_{k+1}\le M E_k^q\)</span> to obtain the linear recursion: <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\)</span> with <span class="math inline">\(b=\log M\)</span>. Define <span class="math inline">\(a_0=\log E_0\)</span>, <span class="math inline">\(a_{k+1}=b+q\,a_k\)</span>; then <span class="math inline">\(\log E_k\le a_k\)</span> for all <span class="math inline">\(k\)</span> by induction (the step is <span class="math inline">\(\log E_{k+1}\le b+q\log E_k\le b+q a_k=a_{k+1}\)</span>). Solving the recursion, <span class="math display">\[
 a_k=q^{k}a_0+b\sum_{j=0}^{k-1}q^{j}=q^{k}a_0+b\,\frac{q^{k}-1}{q-1}
 =q^{k}\Bigl(a_0+\frac{b}{q-1}\Bigr)-\frac{b}{q-1}.
 \]</span> Put <span class="math inline">\(\alpha\defeq-\bigl(a_0+\tfrac{b}{q-1}\bigr)\)</span>. With <span class="math inline">\(a_0=\log E_0\)</span> and <span class="math inline">\(b=\log M\)</span>, the condition <span class="math inline">\(\alpha&gt;0\)</span> is <span class="math inline">\(\log\!\bigl(E_0 M^{1/(q-1)}\bigr)&lt;0\)</span>, i.e.&nbsp;<span class="math inline">\(E_0&lt;M^{-1/(q-1)}\)</span>, the hypothesis. Then <span class="math inline">\(\log E_k\le a_k=-\alpha q^{k}-\tfrac{b}{q-1}\)</span>, and exponentiating gives <span class="math inline">\(E_k\le C e^{-\alpha q^{k}}\)</span> with <span class="math inline">\(C=e^{-b/(q-1)}=M^{-1/(q-1)}\)</span>. Since <span class="math inline">\(\alpha&gt;0\)</span> and <span class="math inline">\(q&gt;1\)</span>, the exponent <span class="math inline">\(-\alpha q^{k}\to-\infty\)</span> and <span class="math inline">\(E_k\to0\)</span>. <span class="math inline">\(\square\)</span></p>
@@ -616,7 +610,7 @@ a_k=q^{k}a_0+b\sum_{j=0}^{k-1}q^{j}=q^{k}a_0+b\,\frac{q^{k}-1}{q-1}
 <img src="figures/08-convergence.svg" class="img-fluid figure-img" style="width:75.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-8-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.3: Error versus iteration count on a logarithmic scale. Linear convergence (<a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>) plots as a straight line whose slope is set by the contraction constant <span class="math inline">\(k\)</span>; a large condition number pushes <span class="math inline">\(k\)</span> toward <span class="math inline">\(1\)</span> and flattens the line. Quadratic convergence (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>) curves ever more steeply, each step roughly squares the error.
+Figure&nbsp;8.3: Error versus iteration count on a logarithmic scale. Linear convergence (<a href="#thm-8-banach" class="quarto-xref">Theorem&nbsp;<span>8.1</span></a>) plots as a straight line whose slope is set by the contraction constant <span class="math inline">\(r\)</span>; a large condition number pushes <span class="math inline">\(r\)</span> toward <span class="math inline">\(1\)</span> and flattens the line. Quadratic convergence (<a href="#thm-8-newton" class="quarto-xref">Theorem&nbsp;<span>8.5</span></a>) curves ever more steeply, each step roughly squares the error.
 </figcaption>
 </figure>
 </div>
@@ -630,9 +624,9 @@ F(x)\approx F(x^{(k)})+DF(x^{(k)})\,(x-x^{(k)}),
 x^{(k+1)}=x^{(k)}-DF(x^{(k)})^{-1}F(x^{(k)}).
 \tag{8.9}\]</span></span> For <span class="math inline">\(n=1\)</span> this is the schoolbook rule <span class="math display">\[
 x^{(k+1)}=x^{(k)}-\frac{F(x^{(k)})}{F'(x^{(k)})}.
-\]</span> In optimization, <span class="math inline">\(F=\nabla u\)</span> has Jacobian <span class="math inline">\(DF=\nabla^2 u\)</span>, so Newton minimizes <span class="math inline">\(u\)</span> by <span class="math display">\[
+\]</span> For the stationarity equation <span class="math inline">\(F=\nabla u=0\)</span>, the Jacobian is <span class="math inline">\(DF=\nabla^2u\)</span> and the update is <span class="math display">\[
 x^{(k+1)}=x^{(k)}-\nabla^2 u(x^{(k)})^{-1}\nabla u(x^{(k)}),
-\]</span> which for <span class="math inline">\(n=1\)</span> is <span class="math inline">\(x^{(k+1)}=x^{(k)}-u'(x^{(k)})/u''(x^{(k)})\)</span>.</p>
+\]</span> which for <span class="math inline">\(n=1\)</span> is <span class="math inline">\(x^{(k+1)}=x^{(k)}-u'(x^{(k)})/u''(x^{(k)})\)</span>. Near a critical point with positive-definite Hessian, the local theorem below gives convergence to a strict local minimum. With a different Hessian signature, the same root-finding iteration can converge to a maximum or saddle.</p>
 <div id="fig-8-newton-tangent" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-8-newton-tangent-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -673,7 +667,7 @@ Figure&nbsp;8.4: Newton’s method on <span class="math inline">\(F(x)=x^2-2\)</
 <div id="thm-8-newton" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 8.5 (Local quadratic convergence of Newton’s method)</strong></span> Suppose the coordinate functions of <span class="math inline">\(F:\R^n\to\R^n\)</span> are all twice continuously differentiable. Let <span class="math inline">\(x^\star\)</span> solve <span class="math inline">\(F(x)=0\)</span> and suppose <span class="math inline">\(DF(x^\star)\)</span> is invertible. Then for any initial guess <span class="math inline">\(x^{(0)}\)</span> sufficiently close to <span class="math inline">\(x^\star\)</span>, Newton’s method <a href="#eq-8-newton" class="quarto-xref">Equation&nbsp;<span>8.9</span></a> converges <strong>quadratically</strong> to <span class="math inline">\(x^\star\)</span>.</p>
 </div>
-<p>Invertibility of <span class="math inline">\(DF(x^\star)\)</span> is a <strong>nondegeneracy</strong> hypothesis. For <span class="math inline">\(n=1\)</span> it is <span class="math inline">\(F'(x^\star)\neq0\)</span>, i.e.&nbsp;a <em>simple</em> root; for optimization (<span class="math inline">\(F=\nabla u\)</span>) it demands <span class="math inline">\(\nabla^2 u(x^\star)\)</span> be invertible, i.e.&nbsp;<span class="math inline">\(x^\star\)</span> be a nondegenerate critical point (a strict local min, max, or saddle) rather than sit in a flat, degenerate valley. At a degenerate root the tangent model is too poor and the quadratic rate is lost.</p>
+<p>Invertibility of <span class="math inline">\(DF(x^\star)\)</span> is the nondegeneracy condition. In one dimension it means <span class="math inline">\(F'(x^\star)\ne0\)</span>, a simple root. At a multiple root, Newton’s method generally converges only linearly; for <span class="math inline">\(F(x)=(x-x^\star)^m\)</span>, <span class="math inline">\(m&gt;1\)</span>, its error is multiplied by <span class="math inline">\((m-1)/m\)</span> each step.</p>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>We do the scalar case <span class="math inline">\(n=1\)</span>; the vector case runs identically with multivariate Taylor expansion and matrix norms. Since <span class="math inline">\(F'(x^\star)\neq0\)</span> and <span class="math inline">\(F'\)</span> is continuous (<span class="math inline">\(F\in C^2\)</span>), pick <span class="math inline">\(\eps&gt;0\)</span> and <span class="math inline">\(\delta&gt;0\)</span> with <span class="math inline">\(\abs{F'(x)}\ge\eps\)</span> on <span class="math inline">\(I\defeq(x^\star-\delta,x^\star+\delta)\)</span>; and <span class="math inline">\(F''\)</span>, continuous hence bounded, satisfies <span class="math inline">\(\abs{F''(x)}\le C\)</span> on <span class="math inline">\(I\)</span>. Put <span class="math inline">\(M\defeq C/(2\eps)\)</span> and take <span class="math inline">\(x^{(0)}\)</span> close enough that <span class="math inline">\(E_0=\abs{x^{(0)}-x^\star}&lt;\min\{\delta,1/M\}\)</span>, so <span class="math inline">\(x^{(0)}\in I\)</span>.</p>
 <p>Assume inductively <span class="math inline">\(x^{(k)}\in I\)</span>. Expand <span class="math inline">\(F\)</span> about <span class="math inline">\(x^{(k)}\)</span> to first order with Lagrange remainder and evaluate at <span class="math inline">\(x^\star\)</span>: <span class="math display">\[
@@ -758,7 +752,7 @@ Table&nbsp;8.2: The three iterations sorted by order and per-step cost. The line
 <td style="text-align: center;"><span class="math inline">\(1\)</span></td>
 <td style="text-align: left;"><span class="math inline">\(F\)</span> only, via <span class="math inline">\(g=x-\eps F\)</span></td>
 <td style="text-align: left;">one <span class="math inline">\(g\)</span> evaluation</td>
-<td style="text-align: left;"><span class="math inline">\(\norm{Dg(x)}\le k&lt;1\)</span> (<a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a>)</td>
+<td style="text-align: left;"><span class="math inline">\(\norm{Dg(x)}\le r&lt;1\)</span> (<a href="#thm-8-contraction-jacobian" class="quarto-xref">Theorem&nbsp;<span>8.2</span></a>)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">gradient descent</td>

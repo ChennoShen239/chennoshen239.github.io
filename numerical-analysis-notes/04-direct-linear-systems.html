@@ -620,7 +620,7 @@ h_1&amp;2(h_1+h_2)&amp;h_2&amp;\\
 &amp;&amp;h_{n-2}&amp;2(h_{n-2}+h_{n-1})
 \end{pmatrix}
 \]</span> is not only tridiagonal but also SDD <strong>and</strong> SPD, so by <a href="#thm-4-sdd-nopivot" class="quarto-xref">Theorem&nbsp;<span>4.4</span></a> it needs no pivoting at all: the bare <span class="math inline">\(3n\)</span> recurrence is safe, and the spline coefficients follow in linear time.</p>
-<p>If pivoting <em>is</em> required (a general nonsingular tridiagonal matrix with no special structure), a partial-pivot step compares <span class="math inline">\(\abs{a_{11}}\)</span> with <span class="math inline">\(\abs{a_{21}}\)</span> and swaps the two rows when the subdiagonal entry is larger. A swap pulls the entry <span class="math inline">\(a_{23}\)</span> up into the pivot row, so <span class="math inline">\(U\)</span> can pick up a <em>second</em> superdiagonal (<span class="math inline">\(u_{i,i+2}\ne0\)</span>): its bandwidth grows from <span class="math inline">\(2\)</span> to <span class="math inline">\(3\)</span>. The factor <span class="math inline">\(L\)</span> still has at most one nonzero below the diagonal in each column. The total cost stays linear, at most <span class="math inline">\(4n\)</span> operations and <span class="math inline">\(n\)</span> comparisons, so even with pivoting a tridiagonal solve is <span class="math inline">\(\bigO(n)\)</span>.</p>
+<p>If pivoting <em>is</em> required (a general nonsingular tridiagonal matrix with no special structure), a partial-pivot step compares <span class="math inline">\(\abs{a_{11}}\)</span> with <span class="math inline">\(\abs{a_{21}}\)</span> and swaps the two rows when the subdiagonal entry is larger. A swap pulls the entry <span class="math inline">\(a_{23}\)</span> up into the pivot row, so <span class="math inline">\(U\)</span> can pick up a <em>second</em> superdiagonal (<span class="math inline">\(u_{i,i+2}\ne0\)</span>): its bandwidth grows from <span class="math inline">\(2\)</span> to <span class="math inline">\(3\)</span>. The factor <span class="math inline">\(L\)</span> still has at most one nonzero below the diagonal in each column. The total cost stays linear, with a constant amount of work per column, so even with pivoting a tridiagonal solve is <span class="math inline">\(\bigO(n)\)</span>.</p>
 <p><span id="exploit-structure-before-you-compute"></span></p>
 <div id="tbl-4-structure" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -664,9 +664,9 @@ Table&nbsp;4.1: Factorization, pivoting need, and cost for the matrix classes of
 </tr>
 <tr class="even">
 <td style="text-align: left;">tridiagonal (general)</td>
-<td style="text-align: left;">bidiagonal <span class="math inline">\(L,U\)</span> (with swaps)</td>
+<td style="text-align: left;"><span class="math inline">\(PA=LU\)</span>; <span class="math inline">\(U\)</span> has up to two superdiagonals</td>
 <td style="text-align: center;">yes</td>
-<td style="text-align: center;"><span class="math inline">\(4n\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\bigO(n)\)</span></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">tridiagonal SPD or SDD</td>
@@ -688,7 +688,7 @@ Table&nbsp;4.1: Factorization, pivoting need, and cost for the matrix classes of
 \cond(A)\defeq\norm{A}\,\norm{A^{-1}}\ \ge 1,
 \]</span> written <span class="math inline">\(\cond_2,\cond_\infty,\dots\)</span> to match the norm used. A matrix with <span class="math inline">\(\cond(A)\)</span> large is <strong>ill-conditioned</strong>; one with <span class="math inline">\(\cond(A)\)</span> near <span class="math inline">\(1\)</span> is <strong>well-conditioned</strong>.</p>
 </div>
-<p>Geometrically, each equation <span class="math inline">\(E_i\)</span> is a line (a hyperplane in general) in the <span class="math inline">\((x_1,x_2)\)</span> plane, and the solution is where they cross. If the lines meet near-orthogonally the crossing is sharply pinned: perturbing the data slides each line a little and the intersection barely moves. If the lines are nearly parallel, the equations are almost redundant, and the same small slide sends the intersection far. Ill-conditioning is exactly this near-parallelism, and <span class="math inline">\(\cond(A)\)</span> measures it (<a href="#fig-4-conditioning-geometry" class="quarto-xref">Figure&nbsp;<span>4.3</span></a>).</p>
+<p>For a <span class="math inline">\(2\times2\)</span> system, nearly parallel equation lines make their intersection sensitive to small shifts (<a href="#fig-4-conditioning-geometry" class="quarto-xref">Figure&nbsp;<span>4.3</span></a>). Row scaling matters too: <span class="math inline">\(A=\diag(1,10^{-12})\)</span> has orthogonal rows but <span class="math inline">\(\cond_2(A)=10^{12}\)</span>. A small perturbation to the second component of <span class="math inline">\(b\)</span> is multiplied by <span class="math inline">\(10^{12}\)</span> in <span class="math inline">\(x_2\)</span>. The condition number measures sensitivity in the chosen units and norm, including both effects.</p>
 <div id="fig-4-conditioning-geometry" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-4-conditioning-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">

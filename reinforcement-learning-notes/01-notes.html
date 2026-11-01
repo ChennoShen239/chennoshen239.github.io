@@ -371,7 +371,7 @@ v(s)=r(s)+\beta\int v(s')\,p(s'\given s)\,ds'
 \]</span> Apply <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> to <span class="math inline">\(\E[Y]\)</span>, using a constant learning rate <span class="math inline">\(\alpha\)</span>.</p>
 <p>At trajectory <span class="math inline">\(k\)</span> the realized value of <span class="math inline">\(Y\)</span> is <span class="math inline">\(r(s^{k})+\beta v(s'^{k})\)</span>. The true <span class="math inline">\(v(s'^{k})\)</span> is unknown. We <strong>bootstrap</strong> by substituting the current estimate <span class="math inline">\(\hat{v}^{k}\)</span> in its place: <span class="math display">\[
 x_{k}=r(s^{k})+\beta\,\hat{v}^{k}(s'^{k}).
-\]</span> If <span class="math inline">\(\hat{v}^{k}\to v\)</span> then <span class="math inline">\(x_{k}\to Y\)</span>, so the target is asymptotically unbiased. Feeding <span class="math inline">\(x_{k}\)</span> into the incremental rule <span class="math inline">\(\bar{x}_{k}=\bar{x}_{k-1}+\alpha(x_{k}-\bar{x}_{k-1})\)</span>, with <span class="math inline">\(\bar{x}_{k}=\hat{v}'^{k}(s^{k})\)</span> the <em>updated</em> estimate and <span class="math inline">\(\bar{x}_{k-1}=\hat{v}^{k}(s^{k})\)</span> the <em>old</em> one (a prime marks the post-update value), gives <span class="math display">\[
+\]</span> If <span class="math inline">\(\hat v^k\)</span> converges uniformly to <span class="math inline">\(v\)</span>, the conditional bias of this target tends to zero. Feeding <span class="math inline">\(x_{k}\)</span> into the incremental rule <span class="math inline">\(\bar{x}_{k}=\bar{x}_{k-1}+\alpha(x_{k}-\bar{x}_{k-1})\)</span>, with <span class="math inline">\(\bar{x}_{k}=\hat{v}'^{k}(s^{k})\)</span> the <em>updated</em> estimate and <span class="math inline">\(\bar{x}_{k-1}=\hat{v}^{k}(s^{k})\)</span> the <em>old</em> one (a prime marks the post-update value), gives <span class="math display">\[
 \begin{aligned}
 \hat{v}'^{k}(s^{k})
   &amp;=\hat{v}^{k}(s^{k})+\alpha\big[\,r(s^{k})+\beta\,\hat{v}^{k}(s'^{k})-\hat{v}^{k}(s^{k})\,\big] \\
@@ -404,8 +404,8 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The step <span class="math inline">\(\tfrac{1}{k}\)</span> in <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> weights samples equally; for a fixed distribution, its variance falls like <span class="math inline">\(1/k\)</span>. The TD target <span class="math inline">\(r+\beta\,\hat{v}(s')\)</span> moves as <span class="math inline">\(\hat{v}\)</span> and the policy change, so shrinking steps can track it slowly.</p>
-<p>A constant <span class="math inline">\(\alpha\)</span> gives an exponentially weighted average, <span class="math inline">\(\hat{v}\leftarrow(1-\alpha)\hat{v}+\alpha\cdot(\text{target})\)</span>. It retains sensitivity to new samples but leaves stationary fluctuations of standard deviation <span class="math inline">\(\propto\sqrt{\alpha}\)</span>. It violates the Robbins-Monro conditions <span class="math inline">\(\sum_{t}\alpha_{t}=\infty,\ \sum_{t}\alpha_{t}^{2}&lt;\infty\)</span>; convergence requires a decaying step.</p>
+<p>The step <span class="math inline">\(\tfrac{1}{k}\)</span> in <a href="#eq-running-mean" class="quarto-xref">Equation&nbsp;<span>1.1</span></a> weights samples equally; for iid observations with finite variance, its variance falls like <span class="math inline">\(1/k\)</span>. The TD target <span class="math inline">\(r+\beta\,\hat{v}(s')\)</span> moves as <span class="math inline">\(\hat{v}\)</span> and the policy change, so shrinking steps can track it slowly.</p>
+<p>A constant <span class="math inline">\(\alpha\)</span> keeps weight on new observations. For iid targets with variance <span class="math inline">\(\sigma^2\)</span> and <span class="math inline">\(0&lt;\alpha&lt;1\)</span>, the recursion <span class="math inline">\(\hat{v}\leftarrow(1-\alpha)\hat{v}+\alpha\cdot(\text{target})\)</span> has limiting variance <span class="math inline">\(\alpha\sigma^2/(2-\alpha)\)</span>. Persistent noise leaves fluctuations; a deterministic contraction can converge with a constant step. The Robbins-Monro conditions below give sufficient conditions for convergence with noisy updates.</p>
 </div>
 </div>
 <p>The trajectory average and the TD(0) update estimate the same <span class="math inline">\(v\)</span> with different bias, variance and timing:</p>
@@ -435,14 +435,14 @@ Table&nbsp;1.1: Monte Carlo vs.&nbsp;TD(0) as estimators of the value function.
 <td><span class="math inline">\(r+\beta\,\hat{v}(s')\)</span></td>
 </tr>
 <tr class="even">
-<td><strong>Bias</strong></td>
-<td>unbiased</td>
-<td>biased for finite <span class="math inline">\(\hat{v}\)</span> (unbiased only as <span class="math inline">\(\hat{v}\to v\)</span>)</td>
+<td><strong>Target bias</strong></td>
+<td>unbiased for a complete terminating or infinite return; truncation omits the tail</td>
+<td>conditional target bias <span class="math inline">\(\beta\,\E[\hat{v}(s')-v(s')\mid s]\)</span></td>
 </tr>
 <tr class="odd">
-<td><strong>Variance</strong></td>
-<td>high (sums many random steps)</td>
-<td>low (one random step plus a bootstrap)</td>
+<td><strong>Sampling noise</strong></td>
+<td>accumulated across rewards and transitions in the return</td>
+<td>one sampled transition and the current continuation estimate</td>
 </tr>
 <tr class="even">
 <td><strong>Updates</strong></td>
@@ -676,16 +676,7 @@ v(s_{i})=\max_{a\in\mathcal{A}}\Big\{\,r_{a}(s_{i})+\beta\sum_{s_{j}\in\mathcal{
 <img src="01-notes_files/figure-html/fig-1-vfi-vs-hpi-output-1.png" width="577" height="401" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-vfi-vs-hpi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 1.2: The two algorithms on the neoclassical growth model of <span
-class="citation" data-cites="exm-ncgm"><a class="quarto-xref" href="#exm-ncgm">Example <span>1.1</span></a></span>, with capital
-discretised onto a 250-point grid and <span
-class="math inline">\(\beta=0.96\)</span>. VFI has contraction modulus
-<span class="math inline">\(\beta\)</span>; its log error path is nearly
-linear. HPI reaches machine precision at iteration 18, and the policy
-stops changing at iteration 19. Matching that accuracy by VFI takes on
-the order of <span
-class="math inline">\(\log(10^{-15})/\log\beta\approx850\)</span>
-sweeps.
+Figure&nbsp;1.2: The two algorithms on the neoclassical growth model of <a href="#exm-ncgm" class="quarto-xref">Example&nbsp;<span>1.1</span></a>, with capital discretised onto a 250-point grid and <span class="math inline">\(\beta=0.96\)</span>. VFI has contraction modulus <span class="math inline">\(\beta\)</span>; its log error path is nearly linear. HPI reaches machine precision at iteration 18, and the policy stops changing at iteration 19. Matching that accuracy by VFI takes on the order of <span class="math inline">\(\log(10^{-15})/\log\beta\approx850\)</span> sweeps.
 </figcaption>
 </figure>
 </div>

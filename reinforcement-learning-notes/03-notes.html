@@ -505,7 +505,7 @@ Important
 <p>Recall from <a href="#eq-td-untouched" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> that <span class="math inline">\(\alpha_{t}(s)&gt;0\)</span> only when <span class="math inline">\(s_{t}=s\)</span>, and <span class="math inline">\(\alpha_{t}(s)=0\)</span> otherwise. So:</p>
 <ul>
 <li><span class="math inline">\(\sum_{t}\alpha_{t}(s)=\infty\)</span> <strong>for every <span class="math inline">\(s\)</span></strong> can only hold if every state is visited infinitely often. Thus the step-size condition also imposes an exploration requirement, which is why <span class="math inline">\(\eps\)</span>-greedy policies from <a href="02-notes.html#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a> reappear the moment we start improving the policy.</li>
-<li><span class="math inline">\(\sum_{t}\alpha_{t}^{2}(s)&lt;\infty\)</span> requires <span class="math inline">\(\alpha_{t}\to0\)</span>. In practice <span class="math inline">\(\alpha\)</span> is usually a small <strong>constant</strong>, which violates it. As <a href="02-notes.html#fig-2-step-size" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> showed, the estimate then does not converge to a point but fluctuates around the truth, and one settles for convergence in an expectation sense.</li>
+<li><span class="math inline">\(\sum_t\alpha_t^2(s)&lt;\infty\)</span> requires the steps on visits to <span class="math inline">\(s\)</span> to vanish. With a small constant step and persistent sampling noise, a stable recursion generally keeps fluctuating, as in <a href="02-notes.html#fig-2-step-size" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>. A constant-step deterministic contraction can still converge; the theorem supplies sufficient conditions for the noisy case.</li>
 </ul>
 </div>
 </div>
@@ -539,8 +539,8 @@ Table&nbsp;3.1: Timing and data requirements of TD and Monte Carlo; see <a href=
 </tr>
 <tr class="even">
 <td><strong>Task type</strong></td>
-<td>handles episodic <em>and</em> continuing tasks</td>
-<td>needs terminal states, so episodic tasks only</td>
+<td>handles episodic and continuing tasks</td>
+<td>complete returns for terminating tasks; finite rollouts of continuing tasks need tail control</td>
 </tr>
 <tr class="odd">
 <td><strong>Bootstrapping</strong></td>
@@ -548,9 +548,9 @@ Table&nbsp;3.1: Timing and data requirements of TD and Monte Carlo; see <a href=
 <td>no: estimates values directly from returns, no initial guess needed</td>
 </tr>
 <tr class="even">
-<td><strong>Variance</strong></td>
-<td>low: few random variables per update (Sarsa needs only <span class="math inline">\(r_{t+1},s_{t+1},a_{t+1}\)</span>)</td>
-<td>high: estimating <span class="math inline">\(q_{\pi}(s_{t},a_{t})\)</span> requires samples of <span class="math inline">\(r_{t+1}+\gamma r_{t+2}+\gamma^{2}r_{t+3}+\cdots\)</span>, and with episodes of length <span class="math inline">\(L\)</span> there are <span class="math inline">\(|\mathcal{A}|^{L}\)</span> possible episodes</td>
+<td><strong>Sampling noise</strong></td>
+<td>one reward and a bootstrapped continuation per update</td>
+<td>the full return combines reward and transition noise over the episode</td>
 </tr>
 </tbody>
 </table>
@@ -762,38 +762,36 @@ q_{t+1}(s_{t},a_{t})=q_{t}(s_{t},a_{t})+\alpha_{t}(s_{t},a_{t})\Big[\,r_{t+1}+\g
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    use_max=False is Sarsa @eq-sarsa, whose target uses the action a_{t+1} that the</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    eps-greedy behavior policy actually draws. Everything else is shared.</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Episodes begin at a uniformly drawn decision state. That exploring-starts device</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">    holds the two algorithms' visitation equal, so the difference the figure shows</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">    cannot be an artifact of one of them wandering somewhere the other does not: the</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">    only thing left that differs is the target. Step sizes are 1/n(s, a), the</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">    Robbins-Monro schedule both convergence theorems ask for.</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> RNG.normal(<span class="fl">0.0</span>, <span class="fl">1e-3</span>, (N_DEC, <span class="dv">2</span>))  <span class="co"># jitter only breaks the initial ties</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> np.zeros((N_DEC, <span class="dv">2</span>))               <span class="co"># visit counts, so alpha = 1 / n(s, a)</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    wanted <span class="op">=</span> <span class="bu">set</span>(checks.tolist())</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    qs, vals <span class="op">=</span> [], []</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ep <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_ep <span class="op">+</span> <span class="dv">1</span>):</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> <span class="bu">int</span>(RNG.integers(N_DEC))       <span class="co"># uniform state starts, not exploring starts:</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">#                                   the first action is still drawn eps-greedily</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        a <span class="op">=</span> eps_greedy(q, s)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="va">True</span>:</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            s2, r, done <span class="op">=</span> step(s, a)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> use_max:</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> q[s2].<span class="bu">max</span>()   <span class="co"># Q-learning: max over the table</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                a2 <span class="op">=</span> eps_greedy(q, s2)             <span class="co"># Sarsa: the action drawn next,</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> q[s2, a2]     <span class="co"># read before the update</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>            n[s, a] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>            q[s, a] <span class="op">+=</span> (target <span class="op">-</span> q[s, a]) <span class="op">/</span> n[s, a]</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            s, a <span class="op">=</span> s2, (eps_greedy(q, s2) <span class="cf">if</span> use_max <span class="cf">else</span> a2)</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ep <span class="kw">in</span> wanted:</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            qs.append(q.copy())</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            vals.append(policy_value(q[:, <span class="dv">1</span>] <span class="op">&gt;</span> q[:, <span class="dv">0</span>]))</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(qs), np.array(vals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Both algorithms use uniform starting states and steps 1/n(s, a).</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Separate runs consume different random draws and generate different trajectories;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">    the start distribution is shared, not the realized state-action visits.</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> RNG.normal(<span class="fl">0.0</span>, <span class="fl">1e-3</span>, (N_DEC, <span class="dv">2</span>))  <span class="co"># jitter only breaks the initial ties</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> np.zeros((N_DEC, <span class="dv">2</span>))               <span class="co"># visit counts, so alpha = 1 / n(s, a)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    wanted <span class="op">=</span> <span class="bu">set</span>(checks.tolist())</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    qs, vals <span class="op">=</span> [], []</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ep <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_ep <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> <span class="bu">int</span>(RNG.integers(N_DEC))       <span class="co"># uniform state starts, not exploring starts:</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">#                                   the first action is still drawn eps-greedily</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        a <span class="op">=</span> eps_greedy(q, s)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            s2, r, done <span class="op">=</span> step(s, a)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> use_max:</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> q[s2].<span class="bu">max</span>()   <span class="co"># Q-learning: max over the table</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                a2 <span class="op">=</span> eps_greedy(q, s2)             <span class="co"># Sarsa: the action drawn next,</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                target <span class="op">=</span> r <span class="op">+</span> GAMMA <span class="op">*</span> q[s2, a2]     <span class="co"># read before the update</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>            n[s, a] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>            q[s, a] <span class="op">+=</span> (target <span class="op">-</span> q[s, a]) <span class="op">/</span> n[s, a]</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> done:</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>            s, a <span class="op">=</span> s2, (eps_greedy(q, s2) <span class="cf">if</span> use_max <span class="cf">else</span> a2)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ep <span class="kw">in</span> wanted:</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            qs.append(q.copy())</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            vals.append(policy_value(q[:, <span class="dv">1</span>] <span class="op">&gt;</span> q[:, <span class="dv">0</span>]))</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(qs), np.array(vals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -874,7 +872,7 @@ f(a)\defeq\sum_{r}r\,p(r\given s,a)+\gamma\sum_{s'\in\mathcal{S}}p(s'\given s,a)
 <div id="def-on-off-policy" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 3.3 (On-policy and off-policy)</strong></span> An algorithm is <strong>on-policy</strong> if the data must be generated by the policy being learned. It is <strong>off-policy</strong> if the data may come from any <strong>behavior policy</strong>, while the <strong>target policy</strong> being learned is a different one.</p>
 </div>
-<p>Sarsa is on-policy: <span class="math inline">\(a_{t+1}\)</span> ties the update to the policy in force. Q-learning is off-policy, which is why it can learn the optimal policy from data collected by an arbitrarily exploratory behavior policy, or from a log recorded long ago.</p>
+<p>Sarsa is on-policy: <span class="math inline">\(a_{t+1}\)</span> ties the update to the policy in force. Q-learning is off-policy: its convergence theorem permits an exploratory behavior policy, with every state-action pair sampled infinitely often and the required step sizes. Stored transitions can also be used for updates; their coverage limits what can be learned.</p>
 <div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: policy searching by Q-learning">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -903,7 +901,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Compare this with policy searching by Sarsa: there is no <span class="math inline">\(a_{t+1}\)</span> anywhere. This version still generates its own data with an <span class="math inline">\(\eps\)</span>-greedy behavior policy, which makes it a convenient but not a <em>fully</em> off-policy implementation. A fully off-policy version draws all its data from a fixed exploratory behavior policy and never updates it.</p>
+<p>The behavior policy here changes with the <span class="math inline">\(q\)</span> table. The target remains <span class="math inline">\(\max_a q(s_{t+1},a)\)</span>, so this implementation is off-policy too. A fixed exploratory behavior policy is another way to collect the required transitions.</p>
 </div>
 </div>
 <div id="cell-fig-3-sarsa-q" class="cell" data-execution_count="4">
@@ -977,25 +975,7 @@ Tip
 <img src="03-notes_files/figure-html/fig-3-sarsa-q-output-1.png" width="891" height="361" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-sarsa-q-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 3.1: Sarsa and Q-learning on a five-state chain, run separately with <span
-class="math inline">\(\gamma=0.9\)</span> and <span
-class="math inline">\(\eps=0.2\)</span>. Walking the ledge pays 10 on
-arrival but a mis-step off it costs <span
-class="math inline">\(-12\)</span> and ends the episode; stepping aside
-at the start is a safe route worth 5. Acting optimally, the ledge wins
-(<span class="math inline">\(v^{*}(s_{0})=7.29\)</span>); acting <span
-class="math inline">\(\eps\)</span>-greedily it does not, because the
-exploration itself keeps falling off. <strong>Left:</strong> each
-algorithm converges to the fixed point of <em>its own</em> equation,
-Sarsa to <span class="math inline">\(q_{\pi}\)</span> for the best <span
-class="math inline">\(\eps\)</span>-greedy policy and Q-learning to
-<span class="math inline">\(q^{*}\)</span>, plotted as the share of the
-initial error still left. <strong>Right:</strong> the same runs scored
-by the value of the greedy policy each currently implies. Sarsa settles
-on the safe route, worth 5, because on-policy it is valuing what it will
-actually do, exploration and all. Q-learning settles on the ledge, worth
-7.29, because off-policy it is valuing what it <em>would</em> do if it
-stopped exploring.
+Figure&nbsp;3.1: Sarsa and Q-learning on a five-state chain, run separately with <span class="math inline">\(\gamma=0.9\)</span> and <span class="math inline">\(\eps=0.2\)</span>. Walking the ledge pays 10 on arrival but a mis-step off it costs <span class="math inline">\(-12\)</span> and ends the episode; stepping aside at the start is a safe route worth 5. Acting optimally, the ledge wins (<span class="math inline">\(v^{*}(s_{0})=7.29\)</span>); acting <span class="math inline">\(\eps\)</span>-greedily it does not, because the exploration itself keeps falling off. <strong>Left:</strong> each algorithm converges to the fixed point of <em>its own</em> equation, Sarsa to <span class="math inline">\(q_{\pi}\)</span> for the best <span class="math inline">\(\eps\)</span>-greedy policy and Q-learning to <span class="math inline">\(q^{*}\)</span>, plotted as the share of the initial error still left. <strong>Right:</strong> the same runs scored by the value of the greedy policy each currently implies. Sarsa settles on the safe route, worth 5, because on-policy it is valuing what it will actually do, exploration and all. Q-learning settles on the ledge, worth 7.29, because off-policy it is valuing what it <em>would</em> do if it stopped exploring.
 </figcaption>
 </figure>
 </div>
@@ -1118,34 +1098,7 @@ stopped exploring.
 <img src="03-notes_files/figure-html/fig-3-function-approx-output-1.png" width="882" height="362" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-function-approx-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 3.2: A 200-state chain on <span class="math inline">\([0,1]\)</span> at
-<span class="math inline">\(\gamma=0.98\)</span>: the policy induces a
-reflecting random walk, so <span class="math inline">\(v_{\pi}\)</span>
-solves <span class="math inline">\((I-\gamma P)v_{\pi}=r\)</span>
-exactly, and the grey dots are its 200 entries, one per state, which is
-everything a table has to store. <strong>Left:</strong> each feature map
-at its best, fitted by least squares, which under a uniform state
-distribution is exactly the minimizer of <span class="citation"
-data-cites="eq-fa-objective"><a class="quarto-xref" href="#eq-fa-objective">Equation <span>3.12</span></a></span>. The line of <span
-class="citation" data-cites="exm-linear-fa"><a class="quarto-xref" href="#exm-linear-fa">Example <span>3.1</span></a></span> has
-two numbers and cannot bend, so it misses by an RMSE of 2.65; six
-Gaussian bumps spread across the state space have six numbers and track
-a curve spanning nearly 11 units of value to an RMSE of 0.23.
-<strong>Right:</strong> every estimate starts at <span
-class="math inline">\(\hat{v}\equiv0\)</span>, a single state <span
-class="math inline">\(s_{t}\)</span> is visited, and the step size is
-set so the update lands <span
-class="math inline">\(\hat{v}(s_{t},w)\)</span> exactly on its target,
-which is what a table with <span class="math inline">\(\alpha=1\)</span>
-does as well. All three therefore move by the same amount at <span
-class="math inline">\(s_{t}\)</span> and differ only away from it: <span
-class="citation" data-cites="eq-td-untouched"><a class="quarto-xref" href="#eq-td-untouched">Equation <span>3.4</span></a></span>
-leaves the table’s other 199 entries precisely where they were, six
-features lift the whole neighbourhood while moving states more than
-<span class="math inline">\(0.4\)</span> away by at most <span
-class="math inline">\(0.78\)</span>, and two features lift every state
-in the chain by at least <span class="math inline">\(7.7\)</span>,
-including the ones whose true value is negative.
+Figure&nbsp;3.2: A 200-state chain on <span class="math inline">\([0,1]\)</span> at <span class="math inline">\(\gamma=0.98\)</span>: the policy induces a reflecting random walk, so <span class="math inline">\(v_{\pi}\)</span> solves <span class="math inline">\((I-\gamma P)v_{\pi}=r\)</span> exactly, and the grey dots are its 200 entries, one per state, which is everything a table has to store. <strong>Left:</strong> each feature map at its best, fitted by least squares, which under a uniform state distribution is exactly the minimizer of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a>. The line of <a href="#exm-linear-fa" class="quarto-xref">Example&nbsp;<span>3.1</span></a> has two numbers and cannot bend, so it misses by an RMSE of 2.65; six Gaussian bumps spread across the state space have six numbers and track a curve spanning nearly 11 units of value to an RMSE of 0.23. <strong>Right:</strong> every estimate starts at <span class="math inline">\(\hat{v}\equiv0\)</span>, a single state <span class="math inline">\(s_{t}\)</span> is visited, and the step size is set so the update lands <span class="math inline">\(\hat{v}(s_{t},w)\)</span> exactly on its target, which is what a table with <span class="math inline">\(\alpha=1\)</span> does as well. All three therefore move by the same amount at <span class="math inline">\(s_{t}\)</span> and differ only away from it: <a href="#eq-td-untouched" class="quarto-xref">Equation&nbsp;<span>3.4</span></a> leaves the table’s other 199 entries precisely where they were, six features lift the whole neighbourhood while moving states more than <span class="math inline">\(0.4\)</span> away by at most <span class="math inline">\(0.78\)</span>, and two features lift every state in the chain by at least <span class="math inline">\(7.7\)</span>, including the ones whose true value is negative.
 </figcaption>
 </figure>
 </div>
@@ -1155,7 +1108,7 @@ including the ones whose true value is negative.
 </section>
 <section id="fitting-w-by-stochastic-gradient-descent" class="level3">
 <h3 class="anchored" data-anchor-id="fitting-w-by-stochastic-gradient-descent">Fitting <span class="math inline">\(w\)</span> by stochastic gradient descent</h3>
-<p>Choose <span class="math inline">\(w\)</span> to minimize the mean squared error against the true value function,</p>
+<p>For a fixed policy <span class="math inline">\(\pi\)</span> and a fixed distribution over states <span class="math inline">\(S\)</span>, choose <span class="math inline">\(w\)</span> to minimize the mean squared error against the true value function,</p>
 <p><span id="eq-fa-objective"><span class="math display">\[
 J(w)=\E\Big[\big(v_{\pi}(S)-\hat{v}(S,w)\big)^{2}\Big].
 \tag{3.12}\]</span></span></p>
@@ -1209,9 +1162,12 @@ Table&nbsp;3.3: Monte Carlo and TD updates with function approximation.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The Monte Carlo row is a stochastic gradient step: <span class="math inline">\(g_{t}\)</span> does not depend on <span class="math inline">\(w\)</span>, so the increment really is an unbiased sample of the gradient of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a>.</p>
-<p>The TD row is not. Its target <span class="math inline">\(r_{t+1}+\gamma\hat{v}(s_{t+1},w_{t})\)</span> contains <span class="math inline">\(w_{t}\)</span>, so differentiating <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> properly would produce a second term in <span class="math inline">\(\gamma\nabla_{w}\hat{v}(s_{t+1},w_{t})\)</span> that the update simply drops. Dropping it is deliberate, and the result is called a <strong>semi-gradient</strong> method: it follows the gradient of the error while pretending the target is a constant.</p>
-<p>The gradient-based application of <a href="02-notes.html#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> above no longer applies directly. Convergence results require additional conditions: for <strong>linear</strong> <span class="math inline">\(\hat{v}\)</span> and <strong>on-policy</strong> sampling, with states drawn from the stationary distribution induced by <span class="math inline">\(\pi\)</span>, semi-gradient TD converges to the <em>TD fixed point</em>, which is not the minimizer of <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> but is within a bounded factor of it. Combine off-policy sampling with function approximation and bootstrapping and it can diverge outright.</p>
+<p>For a complete return under fixed <span class="math inline">\(\pi\)</span>, <span class="math inline">\(\E[g_t\mid s_t]=v_\pi(s_t)\)</span>. Sampling states with the weights in <a href="#eq-fa-objective" class="quarto-xref">Equation&nbsp;<span>3.12</span></a> therefore makes the Monte Carlo increment an unbiased estimate of <span class="math inline">\(-\tfrac12\nabla J(w_t)\)</span>. An artificial cutoff can bias the return.</p>
+<p>The true value <span class="math inline">\(v_\pi\)</span> in <span class="math inline">\(J\)</span> is fixed, so <span class="math inline">\(\nabla J\)</span> has no next-state derivative. TD substitutes a target that depends on <span class="math inline">\(w\)</span> and holds that target fixed during differentiation. For comparison, differentiating the squared <em>sample TD error</em> gives <span class="math display">\[
+\nabla_w\frac12\big[r+\gamma\hat v(s',w)-\hat v(s,w)\big]^2
+=\delta(w)\big[\gamma\nabla_w\hat v(s',w)-\nabla_w\hat v(s,w)\big].
+\]</span> Semi-gradient TD keeps only the current-state derivative, giving the update in <a href="#tbl-fa-methods" class="quarto-xref">Table&nbsp;<span>3.3</span></a>. This sample loss is a different objective from <span class="math inline">\(J\)</span>.</p>
+<p>For a finite ergodic MRP, bounded rewards, full-column-rank linear features and deterministic nonincreasing steps satisfying the Robbins-Monro conditions, on-policy TD converges to the projected Bellman fixed point in the stationary-distribution norm (<a href="https://web.stanford.edu/~bvr/pubs/td.pdf">Tsitsiklis and Van Roy, 1997</a>). That point generally differs from the least-squares minimizer of <span class="math inline">\(J\)</span>. Off-policy sampling changes the state weights and can make the TD recursion diverge, as the next example shows.</p>
 </div>
 </div>
 <p><a href="#fig-3-off-policy-divergence" class="quarto-xref">Figure&nbsp;<span>3.3</span></a> gives a two-state, one-weight example that the approximator represents exactly. Changing the sampling policy makes the TD updates diverge.</p>
@@ -1329,44 +1285,7 @@ Table&nbsp;3.3: Monte Carlo and TD updates with function approximation.
 <img src="03-notes_files/figure-html/fig-3-off-policy-divergence-output-1.png" width="889" height="360" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-off-policy-divergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 3.3: Two states share a single parameter: <span
-class="math inline">\(\phi(s_{1})=1\)</span> and <span
-class="math inline">\(\phi(s_{2})=2\)</span>, so <span
-class="math inline">\(\hat{v}(s_{1},w)=w\)</span> and <span
-class="math inline">\(\hat{v}(s_{2},w)=2w\)</span>. Every reward is mean
-zero, so <span class="math inline">\(v_{\pi}\equiv0\)</span> is
-represented exactly at <span class="math inline">\(w=0\)</span>. From
-<span class="math inline">\(s_{1}\)</span> the target policy always
-advances to <span class="math inline">\(s_{2}\)</span>, while the
-behavior policy stays at <span class="math inline">\(s_{1}\)</span> nine
-times out of ten. The update is the TD row of <span class="citation"
-data-cites="tbl-fa-methods"><a class="quarto-xref" href="#tbl-fa-methods">Table <span>3.3</span></a></span> with importance ratio
-<span
-class="math inline">\(\rho_{t}=\pi(a_{t}|s_{t})/b(a_{t}|s_{t})\)</span>,
-which corrects actions but leaves the behavior policy’s state
-distribution. <strong>Left:</strong> the same update rule and
-approximator under the two sampling policies, with <span
-class="math inline">\(\gamma=0.9\)</span>, <span
-class="math inline">\(\alpha=0.01\)</span> and mean-zero reward noise.
-On-policy the weight approaches <span class="math inline">\(0\)</span>
-and then fluctuates. Off-policy it multiplies by about <span
-class="math inline">\(1.005\)</span> per update, growing from <span
-class="math inline">\(1\)</span> to <span
-class="math inline">\(4\times10^{3}\)</span> in 1,600 updates; a smaller
-constant <span class="math inline">\(\alpha\)</span> slows this growth.
-<strong>Right:</strong> at <span class="math inline">\(s_{1}\)</span>
-the mean TD error is <span
-class="math inline">\(\gamma\,2w-w=(2\gamma-1)w\)</span>. For <span
-class="math inline">\(\gamma&gt;1/2\)</span>, increasing <span
-class="math inline">\(w\)</span> raises the bootstrapped target faster
-than the estimate, so the update amplifies the error. Updates at <span
-class="math inline">\(s_{2}\)</span> contribute <span
-class="math inline">\(2(\gamma-2)w\)</span> and oppose this drift. The
-expected drift is linear in the share of updates at <span
-class="math inline">\(s_{1}\)</span> and changes sign at <span
-class="math inline">\(0.73\)</span>; that share is <span
-class="math inline">\(0.5\)</span> on-policy and <span
-class="math inline">\(0.91\)</span> under the behavior policy.
+Figure&nbsp;3.3: Two states share a single parameter: <span class="math inline">\(\phi(s_{1})=1\)</span> and <span class="math inline">\(\phi(s_{2})=2\)</span>, so <span class="math inline">\(\hat{v}(s_{1},w)=w\)</span> and <span class="math inline">\(\hat{v}(s_{2},w)=2w\)</span>. Every reward is mean zero, so <span class="math inline">\(v_{\pi}\equiv0\)</span> is represented exactly at <span class="math inline">\(w=0\)</span>. From <span class="math inline">\(s_{1}\)</span> the target policy always advances to <span class="math inline">\(s_{2}\)</span>, while the behavior policy stays at <span class="math inline">\(s_{1}\)</span> nine times out of ten. The update is the TD row of <a href="#tbl-fa-methods" class="quarto-xref">Table&nbsp;<span>3.3</span></a> with importance ratio <span class="math inline">\(\rho_{t}=\pi(a_{t}|s_{t})/b(a_{t}|s_{t})\)</span>, which corrects actions but leaves the behavior policy’s state distribution. <strong>Left:</strong> the same update rule and approximator under the two sampling policies, with <span class="math inline">\(\gamma=0.9\)</span>, <span class="math inline">\(\alpha=0.01\)</span> and mean-zero reward noise. On-policy the weight approaches <span class="math inline">\(0\)</span> and then fluctuates. Off-policy it multiplies by about <span class="math inline">\(1.005\)</span> per update, growing from <span class="math inline">\(1\)</span> to <span class="math inline">\(4\times10^{3}\)</span> in 1,600 updates; a smaller constant <span class="math inline">\(\alpha\)</span> slows this growth. <strong>Right:</strong> at <span class="math inline">\(s_{1}\)</span> the mean TD error is <span class="math inline">\(\gamma\,2w-w=(2\gamma-1)w\)</span>. For <span class="math inline">\(\gamma&gt;1/2\)</span>, increasing <span class="math inline">\(w\)</span> raises the bootstrapped target faster than the estimate, so the update amplifies the error. Updates at <span class="math inline">\(s_{2}\)</span> contribute <span class="math inline">\(2(\gamma-2)w\)</span> and oppose this drift. The expected drift is linear in the share of updates at <span class="math inline">\(s_{1}\)</span> and changes sign at <span class="math inline">\(0.73\)</span>; that share is <span class="math inline">\(0.5\)</span> on-policy and <span class="math inline">\(0.91\)</span> under the behavior policy.
 </figcaption>
 </figure>
 </div>

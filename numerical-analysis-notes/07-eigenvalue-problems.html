@@ -742,7 +742,7 @@ K(x,y)=e^{-\frac{1}{2\sigma^2}\ntwo{x-y}^2}.
 <section id="sec-7-spectral-laplacian" class="level3">
 <h3 class="anchored" data-anchor-id="sec-7-spectral-laplacian">Graph Laplacians</h3>
 <div id="def-7-graph-laplacian" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 7.3 (Graph Laplacian)</strong></span> For a weighted adjacency <span class="math inline">\(A\)</span> with degree matrix <span class="math inline">\(D=\diag(A\mathbf 1)\)</span> (so <span class="math inline">\(D_{ii}=\sum_j A_{ij}\)</span>), the <strong>graph Laplacian</strong> is <span class="math inline">\(L=D-A\)</span>, i.e.&nbsp;<span class="math inline">\(L_{ij}=\delta_{ij}D_{ii}-A_{ij}\)</span>. Its <strong>symmetric normalized</strong> form is <span id="eq-7-norm-laplacian"><span class="math display">\[
+<p><span class="theorem-title"><strong>Definition 7.3 (Graph Laplacian)</strong></span> Let <span class="math inline">\(A\)</span> be symmetric with nonnegative entries and positive degrees <span class="math inline">\(D_{ii}=\sum_j A_{ij}\)</span>, collected in <span class="math inline">\(D=\diag(A\mathbf 1)\)</span>. The <strong>graph Laplacian</strong> is <span class="math inline">\(L=D-A\)</span>, i.e.&nbsp;<span class="math inline">\(L_{ij}=\delta_{ij}D_{ii}-A_{ij}\)</span>. Its <strong>symmetric normalized</strong> form is <span id="eq-7-norm-laplacian"><span class="math display">\[
 \hat L=D^{-1/2}LD^{-1/2}=I-D^{-1/2}AD^{-1/2},
 \qquad \hat L_{ij}=\delta_{ij}-\frac{A_{ij}}{\sqrt{D_{ii}D_{jj}}}.
 \tag{7.10}\]</span></span></p>
@@ -766,11 +766,14 @@ L=D^{-1}L=I-D^{-1}A\)</span>: for any <span class="math inline">\(v\)</span>, <s
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Why the <em>lowest</em> eigenvectors, not the highest
+<span class="screen-reader-only">Tip</span>Low eigenvalues and clusters
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For PCA we wanted the top eigenvectors, the directions of most variance. For clustering we want the <em>bottom</em> eigenvectors of <span class="math inline">\(\hat L\)</span>, and the smoothness reading explains the reversal. A low-<span class="math inline">\(\hat L\)</span> eigenvector is a graph function that changes little across strong edges, so it is nearly constant <em>within</em> a tightly-connected cluster and jumps only between clusters. Those functions are indicator-like: they label which cluster a vertex belongs to. The very lowest is the constant vector <span class="math inline">\(\mathbf 1\)</span> (eigenvalue <span class="math inline">\(0\)</span>), carrying no information; the next few carry the cluster structure.</p>
+<p>For a unit vector <span class="math inline">\(v\)</span>, <span class="math display">\[
+v^\top\hat Lv=\frac12\sum_{i,j}A_{ij}
+\left(\frac{v_i}{\sqrt{D_{ii}}}-\frac{v_j}{\sqrt{D_{jj}}}\right)^2.
+\]</span> A small eigenvalue means the degree-scaled entries <span class="math inline">\(v_i/\sqrt{D_{ii}}\)</span> vary little across strong edges. The zero eigenvector is <span class="math inline">\(D^{1/2}\mathbf1\)</span>, since <span class="math inline">\(\hat L D^{1/2}\mathbf1=D^{-1/2}L\mathbf1=0\)</span>. For a connected graph this spans the nullspace; with several connected components, each component contributes a degree-weighted indicator vector.</p>
 </div>
 </div>
 </section>
@@ -778,7 +781,7 @@ L=D^{-1}L=I-D^{-1}A\)</span>: for any <span class="math inline">\(v\)</span>, <s
 <h3 class="anchored" data-anchor-id="sec-7-spectral-embedding">Spectral embedding</h3>
 <p>A <strong>spectral embedding</strong> is a map <span class="math inline">\(\Phi:\{1,\dots,n\}\to\R^d\)</span> sending vertex <span class="math inline">\(i\)</span> (data point <span class="math inline">\(x_i\)</span>) to a new point <span class="math inline">\(\Phi(i)\)</span>. Let <span class="math inline">\(Q=[v_1,\dots,v_d]\in\R^{n\times d}\)</span> hold the orthonormal eigenvectors of the <span class="math inline">\(d\)</span> <strong>lowest</strong> eigenvalues of <span class="math inline">\(\hat L\)</span>. Since we want the <em>lowest</em> eigenpairs, run subspace iteration on <span class="math inline">\(2I-\hat L\)</span>: its dominant eigenvectors are those of <span class="math inline">\(\hat L\)</span>’s smallest eigenvalues, and this is valid precisely because <span class="math inline">\(\spec(\hat L)\subseteq[0,2]\)</span> by <a href="#prp-7-laplacian-spectrum" class="quarto-xref">Proposition&nbsp;<span>7.2</span></a> keeps <span class="math inline">\(2I-\hat L\)</span> positive semidefinite. The embedding is <span class="math display">\[
 \Phi(i)=[Q_{i,:}]^\top\in\R^d ,
-\]</span> the <span class="math inline">\(i\)</span>-th row of <span class="math inline">\(Q\)</span>. Points in one cluster land near one another in <span class="math inline">\(\R^d\)</span> even when the original clusters interleave geometrically, which is what pulls apart the rings of <a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.5</span></a>.</p>
+\]</span> the <span class="math inline">\(i\)</span>-th row of <span class="math inline">\(Q\)</span>. These rows retain degree-dependent magnitudes: even on a disconnected component, the corresponding null vector has entries proportional to <span class="math inline">\(\sqrt{d_i}\)</span>. A common variant normalizes each nonzero row to <span class="math inline">\(Q_{i,:}/\ntwo{Q_{i,:}}\)</span> before clustering. This removes the row’s magnitude; the figure below uses the raw rows.</p>
 <div id="fig-7-spectral" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-7-spectral-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -812,7 +815,7 @@ F(z_1,\dots,z_k,c)=\sum_{j=1}^k\sum_{i:\,c(i)=j}\ntwo{x_i-z_j}^2
 </ol>
 </div>
 </div>
-<p>Each step can only lower <a href="#eq-7-kmeans-objective" class="quarto-xref">Equation&nbsp;<span>7.11</span></a>, so Lloyd’s algorithm never increases the objective and terminates, but with <strong>no guarantee of the global optimum</strong>: it can stall in a bad local minimum, and random restarts are the standard cure. Run on interleaved data it fails; run on the spectral embedding it succeeds, because the embedding has already converted “same cluster” into “nearby in <span class="math inline">\(\R^d\)</span>.”</p>
+<p>Each centroid or assignment update weakly decreases <a href="#eq-7-kmeans-objective" class="quarto-xref">Equation&nbsp;<span>7.11</span></a>. Different starts can reach different local minima, so several random starts can give better assignments. For the rings in <a href="#fig-7-spectral" class="quarto-xref">Figure&nbsp;<span>7.5</span></a>, the raw spectral coordinates separate the two groups that overlap in the original coordinates; this is the case where <span class="math inline">\(k\)</span>-means benefits from the embedding.</p>
 </section>
 </section>
 <section id="sec-7-recap-table" class="level2" data-number="7.7">

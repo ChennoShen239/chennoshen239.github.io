@@ -459,9 +459,9 @@ q_{\pi_{k}}(s,a)
 <p><a href="#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a> introduces two distinct sources of error:</p>
 <ol type="1">
 <li>a <strong>finite number of episodes</strong> <span class="math inline">\(N\)</span>, which is sampling error;</li>
-<li><strong>truncation</strong> of each episode at a finite horizon <span class="math inline">\(T\)</span>, which is a bias of order <span class="math inline">\(\gamma^{T}\)</span>.</li>
+<li><strong>truncation</strong> at <span class="math inline">\(T\)</span>, which drops the continuation return. If <span class="math inline">\(|r|\le R\)</span>, its absolute expected size is at most <span class="math inline">\(R\gamma^{T+1}/(1-\gamma)\)</span>.</li>
 </ol>
-<p>Both vanish as <span class="math inline">\(N,T\to\infty\)</span>.</p>
+<p>Increasing <span class="math inline">\(N\)</span> averages out sampling noise; increasing <span class="math inline">\(T\)</span> reduces the omitted tail.</p>
 </div>
 </div>
 <div id="cell-fig-2-mc-errors" class="cell" data-execution_count="2">
@@ -597,7 +597,7 @@ Table&nbsp;2.2: MC Basic is Howard policy iteration with sample averages in plac
 </figure>
 </div>
 <p>Step 1 assumes episodes can be started from <em>any</em> pair <span class="math inline">\((s,a)\)</span>, an assumption usually called <strong>exploring starts</strong>. This supplies exploration; the next section replaces it with policy-based exploration.</p>
-<p><strong>Convergence.</strong> Policy iteration converges, and MC Basic is policy iteration, so MC Basic converges too, given sufficiently many episodes at every step.</p>
+<p>With exact action values, the greedy step is ordinary policy improvement. Finite batches can reverse the ranking of two actions, even when both estimates are close. The policy-iteration convergence theorem applies in the exact-evaluation limit; a finite-sample convergence result also needs a schedule controlling these evaluation errors.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -616,7 +616,7 @@ Important
 <h3 class="anchored" data-anchor-id="removing-exploring-starts-eps-greedy-policies">Removing exploring starts: <span class="math inline">\(\eps\)</span>-greedy policies</h3>
 <p>Exploring starts requires resetting the environment to an arbitrary state-action pair, which is usually unavailable. Greedy improvement in step 3 of MC Basic assigns probability 1 to one action, so following it supplies no data about other actions. A policy that retains some randomization supplies exploration without arbitrary resets.</p>
 <div id="def-eps-greedy" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 2.2 (ε-greedy policy)</strong></span> For <span class="math inline">\(\eps\in[0,1]\)</span>, the <strong><span class="math inline">\(\eps\)</span>-greedy</strong> policy with respect to <span class="math inline">\(q\)</span> is <span class="math display">\[
+<p><span class="theorem-title"><strong>Definition 2.2 (ε-greedy policy)</strong></span> For <span class="math inline">\(\eps\in[0,1]\)</span>, choose one maximizer of <span class="math inline">\(q(s,\cdot)\)</span> using a fixed tie-breaking rule. The <strong><span class="math inline">\(\eps\)</span>-greedy</strong> policy is <span class="math display">\[
 \pi(a\given s)=
 \begin{cases}
 1-\dfrac{\eps}{|\mathcal{A}(s)|}\big(|\mathcal{A}(s)|-1\big) &amp; \text{if } a=\argmax_{a'}q(s,a'),\\[8pt]
@@ -634,10 +634,10 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Read <a href="#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a> as: with probability <span class="math inline">\(1-\eps\)</span> act greedily, and with probability <span class="math inline">\(\eps\)</span> pick uniformly at random among <em>all</em> actions. The greedy action keeps the largest share for any <span class="math inline">\(\eps&lt;1\)</span>, so the policy still improves; but every action keeps probability at least <span class="math inline">\(\eps/|\mathcal{A}(s)|&gt;0\)</span>, so no action is ever starved of data. Setting <span class="math inline">\(\eps=0\)</span> recovers the greedy policy of MC Basic; setting <span class="math inline">\(\eps=1\)</span> gives the uniform policy.</p>
+<p>With probability <span class="math inline">\(1-\eps\)</span>, choose the selected maximizer; with probability <span class="math inline">\(\eps\)</span>, draw uniformly from all actions. For <span class="math inline">\(\eps&gt;0\)</span>, every action has probability at least <span class="math inline">\(\eps/|\mathcal A(s)|\)</span>. The endpoints are the greedy policy at <span class="math inline">\(\eps=0\)</span> and the uniform policy at <span class="math inline">\(\eps=1\)</span>.</p>
 </div>
 </div>
-<p>The parameter <span class="math inline">\(\eps\)</span> controls the exploitation-exploration trade-off. An <span class="math inline">\(\eps\)</span>-greedy policy is <em>soft</em>: every action has positive probability everywhere, so a single sufficiently long episode visits every <span class="math inline">\((s,a)\)</span> pair infinitely often, provided every state is reachable under <span class="math inline">\(\pi\)</span> from the start distribution and the induced chain is therefore irreducible on <span class="math inline">\(\mathcal{S}\)</span>. Under these conditions, the policy supplies exploration without exploring starts.</p>
+<p>For a fixed policy with <span class="math inline">\(\eps&gt;0\)</span> on a finite continuing MDP, irreducibility of the induced state chain gives infinitely many visits to every state-action pair almost surely. Reachability from the starting state is insufficient: a chain that moves from state 0 to absorbing state 1 visits state 0 only once. In an episodic problem, visitation must come from repeated episodes and their reset distribution.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -648,7 +648,7 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Restricting improvement to <span class="math inline">\(\eps\)</span>-greedy policies means the algorithm converges to the best policy <em>among <span class="math inline">\(\eps\)</span>-greedy policies</em>, not to the optimal policy, and the gap grows with <span class="math inline">\(\eps\)</span>. The standard fix is to shrink <span class="math inline">\(\eps\)</span> toward zero as learning proceeds: explore aggressively while the estimates are bad, and act greedily once they are good.</p>
+<p>With exact <span class="math inline">\(q_\pi\)</span>, the <span class="math inline">\(\eps\)</span>-greedy update is a policy-improvement step when <span class="math inline">\(\pi(a\mid s)\ge\eps/|\mathcal A(s)|\)</span> for all pairs: it maximizes <span class="math inline">\(\sum_a\pi'(a\mid s)q_\pi(s,a)\)</span> subject to those same probability floors. Fixed <span class="math inline">\(\eps&gt;0\)</span> therefore restricts the policies available. Convergence to an unrestricted optimum requires both increasingly greedy policies and enough exploration to estimate every relevant action value; <span class="math inline">\(\eps_t\to0\)</span> alone gives neither accurate estimates nor infinite visitation.</p>
 </div>
 </div>
 </section>
@@ -993,16 +993,7 @@ Note
 <img src="02-notes_files/figure-html/fig-2-step-size-output-1.png" width="543" height="417" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-step-size-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 2.2: The recursion <span class="citation"
-data-cites="eq-mean-general"><a class="quarto-xref" href="#eq-mean-general">Equation <span>2.9</span></a></span> uses one stream of
-draws <span class="math inline">\(x_k\sim N(1,1)\)</span> and starts at
-<span class="math inline">\(w_1=5\)</span>. With <span
-class="math inline">\(\alpha_k=1/k\)</span> (thick), the estimate
-converges to <span class="math inline">\(\E[X]\)</span>. Constant steps
-retain fluctuations under this sampling noise. Shading marks one
-stationary standard deviation, <span
-class="math inline">\(\sigma\sqrt{\alpha/(2-\alpha)}\)</span>, on either
-side of the mean; larger steps give wider bands.
+Figure&nbsp;2.2: The recursion <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> uses one stream of draws <span class="math inline">\(x_k\sim N(1,1)\)</span> and starts at <span class="math inline">\(w_1=5\)</span>. With <span class="math inline">\(\alpha_k=1/k\)</span> (thick), the estimate converges to <span class="math inline">\(\E[X]\)</span>. Constant steps retain fluctuations under this sampling noise. Shading marks one stationary standard deviation, <span class="math inline">\(\sigma\sqrt{\alpha/(2-\alpha)}\)</span>, on either side of the mean; larger steps give wider bands.
 </figcaption>
 </figure>
 </div>
