@@ -684,8 +684,8 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 </div>
 </div>
 <section id="a-clarification-about-the-pseudocode" class="level3">
-<h3 class="anchored" data-anchor-id="a-clarification-about-the-pseudocode">A clarification about the pseudocode</h3>
-<p><a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> uses a frozen rollout parameter <span class="math inline">\(\theta_j\)</span>, as in Moll’s episode-level formula and Murphy’s equation (3.19). Every score is evaluated at the parameter that generated the episode.</p>
+<h3 class="anchored" data-anchor-id="a-clarification-about-the-pseudocode">Parameters in the post-episode loop</h3>
+<p><a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> evaluates every score at the parameter <span class="math inline">\(\theta_j\)</span> that generated the episode, as in Moll’s episode-level formula and Murphy’s equation (3.19).</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: accumulating the episode gradient">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -716,7 +716,7 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Sutton and Barto (§13.3), Zhao (Algorithm 9.1), and Murphy (Algorithm 3) print parameter assignments inside the post-episode loop without a separate frozen copy. Read literally, these update the score’s parameter between terms. They still wait for a completed episode, but differ from <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> at a finite step size. Returns sampled under <span class="math inline">\(\theta_j\)</span> do not generally give an unbiased policy-gradient estimate at the changed parameter. To implement <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>, evaluate all scores at <span class="math inline">\(\theta_j\)</span> before updating, or retain a frozen copy.</p>
+<p>Sutton and Barto (§13.3), Zhao (Algorithm 9.1), and Murphy (Algorithm 3) print parameter assignments inside the post-episode loop without a separate frozen copy. With these assignments, the score’s parameter changes between terms. The update uses a completed episode and differs from <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> at a finite step size. Returns sampled under <span class="math inline">\(\theta_j\)</span> generally give a biased policy-gradient estimate at the changed parameter. To implement <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>, evaluate all scores at <span class="math inline">\(\theta_j\)</span> before updating, or retain a frozen copy.</p>
 </div>
 </div>
 </section>

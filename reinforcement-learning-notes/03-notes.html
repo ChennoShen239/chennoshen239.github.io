@@ -669,16 +669,16 @@ v_{\pi}(s)=\sum_{a\in\mathcal{A}}\pi(a\given s)\,q_{\pi}(s,a)
 <p><strong>Step 3, the contraction.</strong> Conditioning on <span class="math inline">\(\mathcal H_t\)</span> fixes <span class="math inline">\(q_t\)</span> and <span class="math inline">\((s_t,a_t)\)</span>. The remaining randomness is the next reward, state, and action under the fixed policy <span class="math inline">\(\pi\)</span>. The bound is trivial for unvisited pairs. For <span class="math inline">\((s,a)=(s_t,a_t)\)</span>, <span class="math display">\[
 \E[\eta_t(s,a)\given\mathcal H_t]
 =\E\big[r_{t+1}+\gamma q_t(s_{t+1},a_{t+1})\given\mathcal H_t\big]-q_\pi(s_t,a_t).
-\]</span> The state-value proof subtracted the Bellman equation for <span class="math inline">\(v_{\pi}\)</span> at this point. Subtract <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> instead, which is exactly what the proof above licensed, and the reward terms cancel in the same way, leaving only the gap between estimate and truth at the <em>next</em> pair: <span class="math display">\[
+\]</span> Subtracting <a href="#eq-bellman-q" class="quarto-xref">Equation&nbsp;<span>3.8</span></a> cancels the reward terms, as in the proof for <span class="math inline">\(v_{\pi}\)</span>, and leaves the error at the next pair: <span class="math display">\[
 \E[\eta_t(s,a)\given\mathcal H_t]
 =\gamma\sum_{s'\in\mathcal S}\sum_{a'\in\mathcal A}
 p(s'\given s_t,a_t)\,\pi(a'\given s')\big[q_t(s',a')-q_\pi(s',a')\big].
-\]</span> The weights here are the factored joint <span class="math inline">\(p(s',a'\given s_{t},a_{t})\)</span> from that same proof: non-negative, and summing to one over pairs. Bounding the sum by its largest term therefore works verbatim, <span class="math display">\[
+\]</span> The joint probabilities <span class="math inline">\(p(s',a'\given s_{t},a_{t})\)</span> are nonnegative and sum to one, so <span class="math display">\[
 \big|\E[\eta_t(s,a)\given\mathcal H_t]\big|
 \le\gamma\max_{(s',a')}\big|q_t(s',a')-q_\pi(s',a')\big|
 =\gamma\|\Delta_t\|_\infty,
-\]</span> with <span class="math inline">\(\gamma\in(0,1)\)</span> the discount factor once again supplying the contraction.</p>
-<p><strong>Step 4, the variance.</strong> Unchanged. The constant <span class="math inline">\(q_{\pi}(s,a)\)</span> drops out of the variance, <span class="math inline">\(r_{t+1}\)</span> is bounded, and <span class="math inline">\(q_{t}\)</span> differs from the fixed <span class="math inline">\(q_{\pi}\)</span> by at most <span class="math inline">\(\|\Delta_{t}\|_{\infty}\)</span>, so condition 3 holds for the same reason it did before.</p>
+\]</span> where <span class="math inline">\(\gamma\in(0,1)\)</span> is the discount factor.</p>
+<p><strong>Step 4, the variance.</strong> The constant <span class="math inline">\(q_{\pi}(s,a)\)</span> drops out of the variance, <span class="math inline">\(r_{t+1}\)</span> is bounded, and <span class="math inline">\(q_{t}\)</span> differs from the fixed <span class="math inline">\(q_{\pi}\)</span> by at most <span class="math inline">\(\|\Delta_{t}\|_{\infty}\)</span>, so condition 3 holds.</p>
 <p>All three conditions of <a href="#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> hold on the index set <span class="math inline">\(\mathcal{S}\times\mathcal{A}\)</span>, so <span class="math inline">\(\Delta_{t}(s,a)\to0\)</span> almost surely for every pair. <span class="math inline">\(\square\)</span></p>
 </div>
 </div>
@@ -693,7 +693,7 @@ p(s'\given s_t,a_t)\,\pi(a'\given s')\big[q_t(s',a')-q_\pi(s',a')\big].
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The larger index set requires more exploration. Since <span class="math inline">\(\alpha_{t}(s,a)&gt;0\)</span> only when <span class="math inline">\((s_{t},a_{t})=(s,a)\)</span>, requiring <span class="math inline">\(\sum_{t}\alpha_{t}(s,a)=\infty\)</span> for <strong>every pair</strong> demands that every pair be visited infinitely often, and visiting every state infinitely often does not deliver that. A fixed deterministic policy can tour all of <span class="math inline">\(\mathcal{S}\)</span> forever while taking exactly one action in each state, leaving <span class="math inline">\(|\mathcal{S}|(|\mathcal{A}|-1)\)</span> entries of the table with <span class="math inline">\(\alpha_{t}=0\)</span> at every <span class="math inline">\(t\)</span>, frozen at their initial guesses. With <span class="math inline">\(|\mathcal A|&gt;1\)</span>, such a policy cannot meet the pairwise visitation condition.</p>
+<p>Since <span class="math inline">\(\alpha_{t}(s,a)&gt;0\)</span> only when <span class="math inline">\((s_{t},a_{t})=(s,a)\)</span>, the condition <span class="math inline">\(\sum_{t}\alpha_{t}(s,a)=\infty\)</span> for every pair requires infinitely many visits to each pair. A fixed deterministic policy can visit every state in <span class="math inline">\(\mathcal{S}\)</span> infinitely often while sampling one action per state, leaving <span class="math inline">\(|\mathcal{S}|(|\mathcal{A}|-1)\)</span> entries with <span class="math inline">\(\alpha_{t}=0\)</span> at every <span class="math inline">\(t\)</span>. These entries retain their initial values. With <span class="math inline">\(|\mathcal A|&gt;1\)</span>, the policy cannot meet the pairwise visitation condition.</p>
 </div>
 </div>
 <p>The theorem evaluates <span class="math inline">\(q_{\pi}\)</span> for a fixed policy <span class="math inline">\(\pi\)</span>. Policy search also requires an improvement step.</p>
