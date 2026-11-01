@@ -209,7 +209,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#worked-example-to-carry-an-umbrella" id="toc-worked-example-to-carry-an-umbrella" class="nav-link" data-scroll-target="#worked-example-to-carry-an-umbrella">Worked example: to carry an umbrella?</a></li>
   </ul></li>
-  <li><a href="#the-road-ahead" id="toc-the-road-ahead" class="nav-link" data-scroll-target="#the-road-ahead"><span class="header-section-number">1.4</span> The road ahead</a></li>
+  <li><a href="#the-road-ahead" id="toc-the-road-ahead" class="nav-link" data-scroll-target="#the-road-ahead"><span class="header-section-number">1.4</span> Classification of games</a></li>
   </ul>
 </nav>
     </div>
@@ -249,7 +249,7 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>Game theory is the study of <strong>strategic interaction</strong>: situations in which the outcome for each participant depends not only on what <em>they</em> do, but on what <em>everybody else</em> does too. This short chapter says what makes such situations different from the optimisation problems of single-agent economics, what game theory offers in return, and reviews the one tool from decision theory we rely on throughout — expected utility.</p>
+<p>Game theory studies strategic interaction: each participant’s outcome depends on their own choices and those of others. This chapter compares strategic interaction with single-agent optimisation and reviews expected utility.</p>
 <section id="individual-decisions-versus-strategic-interactions" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="individual-decisions-versus-strategic-interactions"><span class="header-section-number">1.1</span> Individual decisions versus strategic interactions</h2>
 <p>In intermediate microeconomics every problem is an <strong>individual decision problem</strong>: a single decision-maker chooses to maximise an objective that is <em>completely determined by their own choice</em>. Two familiar examples:</p>
@@ -262,13 +262,13 @@ window.Quarto = {
 \max_{y \ge 0} \; p\,y - c(y).
 \]</span></li>
 </ul>
-<p>Both are solved with the standard toolkit — first-order conditions, Lagrange multipliers. The defining feature is that nobody else’s behaviour enters the objective.</p>
-<p>Most interesting economic situations are not like this. In chess, oligopolistic competition, an auction, or a political campaign, one participant’s payoff depends on the choices of <em>others</em> as well as their own. We call these <strong>strategic interactions</strong>.</p>
-<p>What makes them genuinely harder is that beliefs become circular. Consider rock–paper–scissors:</p>
+<p>Both are solved with the standard toolkit: first-order conditions, Lagrange multipliers. The defining feature is that nobody else’s behaviour enters the objective.</p>
+<p>In chess, oligopolistic competition, an auction, or a political campaign, one participant’s payoff depends on the choices of <em>others</em> as well as their own. We call these <strong>strategic interactions</strong>.</p>
+<p>Beliefs about others’ choices can be circular. Consider rock–paper–scissors:</p>
 <blockquote class="blockquote">
-<p>If I predict that you will play Rock, I should play Paper. But if you anticipate <em>that</em> prediction, you will play Scissors — in which case I should play Rock — in which case you should play Paper — …</p>
+<p>If I predict that you will play Rock, I should play Paper. If you anticipate that prediction, you will play Scissors; I should then play Rock, you should play Paper, and so on.</p>
 </blockquote>
-<p>There is no end to the regress, and no first-order condition that resolves it. A strategic interaction is not a simple optimisation problem, because the “right” choice for me depends on a choice you are making for symmetric reasons. We need a framework that closes this loop.</p>
+<p>Each player’s optimal choice depends on the other’s reasoning. A first-order condition alone does not resolve this interdependence; game theory supplies an equilibrium framework.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -279,23 +279,21 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>“[I]t is unlikely that a mere repetition of the tricks which served us so well in physics will do for the social phenomena too. … [The] process of mathematization is not at all obvious.”</p>
 </blockquote>
-<p>Game theory is the body of mathematics that grew up to meet the problem.</p>
 </div>
 </div>
 </div>
 </section>
 <section id="what-game-theory-provides" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="what-game-theory-provides"><span class="header-section-number">1.2</span> What game theory provides</h2>
-<p>Game theory does two things for us.</p>
 <ol type="1">
-<li><strong>A language.</strong> It gives a precise, formal way to <em>describe</em> a strategic interaction — who the players are, what they can do, what they know, and what they care about. Much of the work in any application is learning to write the situation down as a formal <strong>model</strong>.</li>
-<li><strong>A prediction.</strong> Given that model, it offers a prediction of what <em>rational</em> players will do — a <strong>solution concept</strong>. Most of this book is about defining, justifying, and computing such solutions.</li>
+<li>A formal model specifies the players, their actions, information and payoffs. Applying game theory requires expressing the situation in these terms.</li>
+<li>A solution concept predicts rational play in the model. The following chapters define, justify and compute these solutions.</li>
 </ol>
 <p>Throughout, we maintain the standing assumption that players are <strong>rational</strong>: each player acts so as to maximise their own payoff, given what they know and believe about the others.</p>
 </section>
 <section id="a-review-of-expected-utility" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="a-review-of-expected-utility"><span class="header-section-number">1.3</span> A review of expected utility</h2>
-<p>Because players will often face uncertainty — over a chance move, or over what an opponent does — we need to say how a rational player evaluates a <em>gamble</em> over outcomes rather than a single sure outcome. The answer is <strong>expected utility</strong>, and it requires only two definitions.</p>
+<p>Players face uncertainty about chance moves and opponents’ choices. Expected utility evaluates the resulting lotteries over outcomes.</p>
 <div id="def-lottery" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 1.1 (Simple lottery)</strong></span> A <strong>simple lottery</strong> over a finite set of outcomes <span class="math inline">\(X = \{x_1, x_2, \dots, x_n\}\)</span> is a probability distribution <span class="math inline">\(p = \big(p(x_1), \dots, p(x_n)\big)\)</span>, where <span class="math inline">\(p(x_k) \ge 0\)</span> for every <span class="math inline">\(k\)</span> and <span class="math inline">\(\sum_{k=1}^{n} p(x_k) = 1\)</span>.</p>
 </div>
@@ -348,15 +346,15 @@ Table&nbsp;1.1: Payoffs from the umbrella decision.
 \E[u \mid \text{carry}] = 0.8\times(-1) + 0.15\times(-1) + 0.05\times 10 = -0.45,
 \]</span> <span class="math display">\[
 \E[u \mid \text{don't carry}] = 0.8\times 0 + 0.15\times 0 + 0.05\times(-10) = -0.5 .
-\]</span> Since <span class="math inline">\(-0.45 &gt; -0.5\)</span>, <strong>carrying the umbrella is optimal</strong>. This is still an <em>individual</em> decision problem — nobody else’s choice entered. From the next chapter on, the lotteries a player faces will be generated by the choices of <em>other players</em>, and expected utility is exactly the criterion we use to evaluate them.</p>
+\]</span> Since <span class="math inline">\(-0.45 &gt; -0.5\)</span>, <strong>carrying the umbrella is optimal</strong>. This is still an <em>individual</em> decision problem: nobody else’s choice entered. From the next chapter on, the lotteries a player faces will be generated by the choices of <em>other players</em>, and expected utility is exactly the criterion we use to evaluate them.</p>
 </section>
 </section>
 <section id="the-road-ahead" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="the-road-ahead"><span class="header-section-number">1.4</span> The road ahead</h2>
-<p>The rest of the book is organised by two binary distinctions that between them classify every game we study.</p>
+<h2 data-number="1.4" class="anchored" data-anchor-id="the-road-ahead"><span class="header-section-number">1.4</span> Classification of games</h2>
+<p>We classify games by timing and information.</p>
 <ul>
 <li><strong>Static vs.&nbsp;dynamic.</strong> In a <em>static</em> game players move simultaneously (or, more precisely, without observing each other’s moves). In a <em>dynamic</em> game they move in sequence and can condition on what they have seen.</li>
-<li><strong>Complete vs.&nbsp;incomplete information.</strong> Under <em>complete</em> information the structure of the game — including every player’s payoffs — is common knowledge. Under <em>incomplete</em> information some players hold private information (their “type”) that others do not observe.</li>
+<li><strong>Complete vs.&nbsp;incomplete information.</strong> Under <em>complete</em> information the structure of the game (including every player’s payoffs) is common knowledge. Under <em>incomplete</em> information some players hold private information (their “type”) that others do not observe.</li>
 </ul>
 <p>Crossing the two distinctions gives four classes of game, each with its own solution concept, and each concept a refinement that fixes a shortcoming of the last:</p>
 <table class="caption-top table">

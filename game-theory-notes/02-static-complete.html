@@ -265,14 +265,14 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>This chapter develops the workhorse model of game theory: the <strong>normal-form game</strong>, in which players choose once and simultaneously, and everything about the game is common knowledge. We build up the central solution concept — <strong>Nash equilibrium</strong> — through a sequence of weaker ideas (dominance, iterated elimination, best response), then put it to work on Cournot, Bertrand and electoral competition, and finally extend it to <strong>mixed strategies</strong> so that an equilibrium is guaranteed to exist.</p>
+<p>In a normal-form game, players choose once and simultaneously, and the game is common knowledge. Dominance, iterated elimination and best response lead to Nash equilibrium, applied here to Cournot, Bertrand and electoral competition. Allowing mixed strategies guarantees equilibrium existence in finite games.</p>
 <section id="normal-form-games" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="normal-form-games"><span class="header-section-number">2.1</span> Normal-form games</h2>
 <div id="def-2-normalform" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.1 (Normal-form game)</strong></span> A <strong>normal-form game</strong> consists of three ingredients:</p>
 <ol type="1">
 <li>a finite <strong>set of players</strong> <span class="math inline">\(N = \{1, 2, \dots, n\}\)</span>;</li>
-<li>for each player <span class="math inline">\(i\)</span>, a <strong>strategy space</strong> <span class="math inline">\(S_i\)</span> — the set of strategies available to <span class="math inline">\(i\)</span>;</li>
+<li>for each player <span class="math inline">\(i\)</span>, a <strong>strategy space</strong> <span class="math inline">\(S_i\)</span>: the set of strategies available to <span class="math inline">\(i\)</span>;</li>
 <li>for each player <span class="math inline">\(i\)</span>, a <strong>payoff function</strong> <span class="math inline">\(v_i : S_1 \times \cdots \times S_n \to \R\)</span>.</li>
 </ol>
 <p>We write the game as the triple <span class="math inline">\(\Gamma = \big(N, \{S_i\}_{i=1}^n, \{v_i\}_{i=1}^n\big)\)</span>.</p>
@@ -356,7 +356,7 @@ Table&nbsp;2.2: Rock–paper–scissors.
 </div>
 </figure>
 </div>
-<p><strong>Voting on a new agenda.</strong> Three voters <span class="math inline">\(N=\{1,2,3\}\)</span> each choose <span class="math inline">\(Y\)</span> (yes), <span class="math inline">\(N\)</span> (no) or <span class="math inline">\(A\)</span> (abstain). A new policy passes under majority rule iff strictly more than half of those who <em>vote</em> (do not abstain) choose <span class="math inline">\(Y\)</span>. Relative to the status quo (payoff <span class="math inline">\(0\)</span> to all), the new policy is worth <span class="math inline">\(+1\)</span> to voters 1 and 2 and <span class="math inline">\(-1\)</span> to voter 3. This is a three-player game, so it takes three bimatrices (one per choice of voter 3) to display — a first hint that the matrix representation does not scale.</p>
+<p><strong>Voting on a new agenda.</strong> Three voters <span class="math inline">\(N=\{1,2,3\}\)</span> each choose <span class="math inline">\(Y\)</span> (yes), <span class="math inline">\(N\)</span> (no) or <span class="math inline">\(A\)</span> (abstain). A new policy passes under majority rule iff strictly more than half of those who <em>vote</em> (do not abstain) choose <span class="math inline">\(Y\)</span>. Relative to the status quo (payoff <span class="math inline">\(0\)</span> to all), the new policy is worth <span class="math inline">\(+1\)</span> to voters 1 and 2 and <span class="math inline">\(-1\)</span> to voter 3. This three-player game requires three bimatrices, one per choice of voter 3; matrix representations grow with the number of players.</p>
 </section>
 </section>
 <section id="dominance" class="level2" data-number="2.2">
@@ -375,23 +375,23 @@ v_i(s_i, s_{-i}) &gt; v_i(s_i', s_{-i}) \qquad \text{for all } s_{-i} \in S_{-i}
 <div id="def-2-dse" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.4 (Strictly dominant strategy equilibrium)</strong></span> A profile <span class="math inline">\(s \in S\)</span> is a <strong>strictly dominant strategy equilibrium</strong> if <span class="math inline">\(s_i\)</span> is a strictly dominant strategy for <em>every</em> player <span class="math inline">\(i\)</span>.</p>
 </div>
-<p>In the Prisoner’s Dilemma, confessing strictly dominates denying for each suspect: whatever the other does, confessing shaves a year off the sentence. So <span class="math inline">\((C,C)\)</span> is a strictly dominant strategy equilibrium — a remarkably sharp prediction that requires only that each player be rational, with no assumption about beliefs.</p>
+<p>In the Prisoner’s Dilemma, confessing strictly dominates denying for each suspect: whatever the other does, confessing shaves a year off the sentence. So <span class="math inline">\((C,C)\)</span> is a strictly dominant strategy equilibrium. This prediction requires each player to be rational and is independent of beliefs.</p>
 <div id="lem-2-dominant-unique" class="theorem lemma">
 <p><span class="theorem-title"><strong>Lemma 2.1 (Uniqueness of a dominant strategy)</strong></span> If player <span class="math inline">\(i\)</span> has a strictly dominant strategy, it is unique.</p>
 </div>
 <div id="prp-2-dse-unique" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 2.1 (Uniqueness of the dominant-strategy equilibrium)</strong></span> If a game has a strictly dominant strategy equilibrium <span class="math inline">\(s\)</span>, then <span class="math inline">\(s\)</span> is its unique dominant strategy equilibrium.</p>
 </div>
-<p>Both follow immediately from the strict inequalities in the definitions (if two strategies were each dominant, each would have to strictly beat the other — a contradiction), and the slides leave them as quick exercises.</p>
+<p>Both follow immediately from the strict inequalities in the definitions (if two strategies were each dominant, each would have to strictly beat the other, a contradiction), and the slides leave them as quick exercises.</p>
 <p>The dominant-strategy prediction can be collectively self-defeating.</p>
 <div id="def-2-pareto" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.5 (Pareto dominance and Pareto optimality)</strong></span> A profile <span class="math inline">\(s\)</span> <strong>Pareto dominates</strong> <span class="math inline">\(s'\)</span> if <span class="math inline">\(v_i(s) \ge v_i(s')\)</span> for all <span class="math inline">\(i\)</span>, with strict inequality for at least one <span class="math inline">\(i\)</span>. A profile is <strong>Pareto optimal</strong> (or <strong>Pareto efficient</strong>) if no other profile Pareto dominates it.</p>
 </div>
-<p>In the Prisoner’s Dilemma the equilibrium <span class="math inline">\((C,C)\)</span> pays <span class="math inline">\((-4,-4)\)</span>, yet <span class="math inline">\((D,D)\)</span> pays <span class="math inline">\((-2,-2)\)</span> and Pareto dominates it. Rational individual behaviour leads to a collectively worse outcome — the defining tension of the game, and the reason it is the canonical model of why cooperation is hard to sustain.</p>
+<p>In the Prisoner’s Dilemma the equilibrium <span class="math inline">\((C,C)\)</span> pays <span class="math inline">\((-4,-4)\)</span>, yet <span class="math inline">\((D,D)\)</span> pays <span class="math inline">\((-2,-2)\)</span> and Pareto dominates it. Rational individual behaviour leads to a collectively worse outcome, illustrating the difficulty of sustaining cooperation.</p>
 </section>
 <section id="iterated-elimination-of-strictly-dominated-strategies" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="iterated-elimination-of-strictly-dominated-strategies"><span class="header-section-number">2.3</span> Iterated elimination of strictly dominated strategies</h2>
-<p>Most games have no dominant strategy. But we can still apply the logic of dominance <em>repeatedly</em>: if I am rational I delete my dominated strategies; if I know you are rational I can delete yours; if I know that you know that I am rational I can delete more of mine; and so on. The “and so on” needs a name.</p>
+<p>Most games have no dominant strategy. But we can still apply the logic of dominance <em>repeatedly</em>: if I am rational I delete my dominated strategies; if I know you are rational I can delete yours; if I know that you know that I am rational I can delete more of mine; and so on. This requires common knowledge of rationality.</p>
 <div id="def-2-ck" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.6 (Common knowledge)</strong></span> An event <span class="math inline">\(E\)</span> is <strong>common knowledge</strong> if everyone knows <span class="math inline">\(E\)</span>, everyone knows that everyone knows <span class="math inline">\(E\)</span>, everyone knows that everyone knows that everyone knows <span class="math inline">\(E\)</span>, and so on <em>ad infinitum</em>.</p>
 </div>
@@ -448,14 +448,14 @@ Table&nbsp;2.3: An IESDS example.
 </div>
 </figure>
 </div>
-<p>For player 2, <span class="math inline">\(C\)</span> is strictly dominated (by <span class="math inline">\(R\)</span>, say); delete it. In the resulting <span class="math inline">\(3\times2\)</span> game, <span class="math inline">\(M\)</span> and <span class="math inline">\(D\)</span> become strictly dominated for player 1 by <span class="math inline">\(U\)</span>; delete them. Now player 2 prefers <span class="math inline">\(L\)</span> to <span class="math inline">\(R\)</span>; delete <span class="math inline">\(R\)</span>. Only <span class="math inline">\((U,L)\)</span> survives. The prediction is unique — but note what it rests on: not just that both players are rational, but that this is <em>common knowledge</em>. The third deletion uses “player 2 knows that player 1 knows that player 2 is rational.”</p>
+<p>For player 2, <span class="math inline">\(C\)</span> is strictly dominated (by <span class="math inline">\(R\)</span>, say); delete it. In the resulting <span class="math inline">\(3\times2\)</span> game, <span class="math inline">\(M\)</span> and <span class="math inline">\(D\)</span> become strictly dominated for player 1 by <span class="math inline">\(U\)</span>; delete them. Now player 2 prefers <span class="math inline">\(L\)</span> to <span class="math inline">\(R\)</span>; delete <span class="math inline">\(R\)</span>. Only <span class="math inline">\((U,L)\)</span> survives. The unique prediction requires common knowledge of rationality. The third deletion uses “player 2 knows that player 1 knows that player 2 is rational.”</p>
 <div id="prp-2-dse-survives" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 2.2 (Dominant equilibria survive IESDS)</strong></span> If <span class="math inline">\(s\)</span> is a strictly dominant strategy equilibrium, then for every player <span class="math inline">\(s_i\)</span> is the <em>unique</em> survivor of IESDS.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>For each player <span class="math inline">\(i\)</span>, every other strategy <span class="math inline">\(s_i' \ne s_i\)</span> is strictly dominated by <span class="math inline">\(s_i\)</span> (that is what dominance means), so all of them are deleted in the very first round, leaving <span class="math inline">\(s_i\)</span> alone. <span class="math inline">\(\square\)</span></p>
 </div>
-<p><strong>Order independence.</strong> For a <strong>finite</strong> game the procedure terminates, and the surviving set <span class="math inline">\(S^*\)</span> does <em>not</em> depend on the order in which dominated strategies are removed — it is enough that <em>some</em> dominated strategy be deleted each round. For <strong>infinite</strong> games the process may not terminate, and to keep the answer order-independent one insists that <em>all</em> currently-dominated strategies be deleted in each round.</p>
+<p><strong>Order independence.</strong> For a <strong>finite</strong> game the procedure terminates, and the surviving set <span class="math inline">\(S^*\)</span> does <em>not</em> depend on the order in which dominated strategies are removed; it is enough that <em>some</em> dominated strategy be deleted each round. For <strong>infinite</strong> games the process may not terminate, and to keep the answer order-independent one insists that <em>all</em> currently-dominated strategies be deleted in each round.</p>
 <section id="sec-2-cournot-iesds" class="level3">
 <h3 class="anchored" data-anchor-id="sec-2-cournot-iesds">IESDS in the Cournot duopoly</h3>
 <p>Two firms choose quantities <span class="math inline">\(q_1, q_2 \ge 0\)</span>. The market price is <span class="math inline">\(P(Q) = \max\{100 - Q, 0\}\)</span> with <span class="math inline">\(Q = q_1 + q_2\)</span>, and each firm has constant marginal cost <span class="math inline">\(10\)</span>, so <span class="math display">\[
@@ -466,7 +466,7 @@ v_i(q_i, q_j) = \max\{100 - q_i - q_j,\, 0\}\, q_i - 10\, q_i .
 <li>Given <span class="math inline">\(q_j \in [0,45]\)</span>, the best reply lies in <span class="math inline">\([22.5, 45]\)</span>, and any <span class="math inline">\(q_i &lt; 22.5\)</span> is now strictly dominated by <span class="math inline">\(22.5\)</span>, so <span class="math inline">\(S^2 = [22.5, 45]\)</span>.</li>
 <li>Iterating, <span class="math inline">\(S^3 = [22.5, 33.75]\)</span>, <span class="math inline">\(S^4 = [28.125, 33.75]\)</span>, and so on.</li>
 </ul>
-<p>The endpoints are successive iterates of <span class="math inline">\(\phi\)</span> starting from <span class="math inline">\(0\)</span>, and since <span class="math inline">\(\phi^{(k)}(0) \to 30\)</span>, the intervals collapse: <span class="math inline">\(S_i^* = \bigcap_{k} S_i^k = \{30\}\)</span> (<a href="#fig-2-cournot-iesds" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>). IESDS alone pins down the Cournot quantity <span class="math inline">\(q_1 = q_2 = 30\)</span> — no equilibrium concept required yet.</p>
+<p>The endpoints are successive iterates of <span class="math inline">\(\phi\)</span> starting from <span class="math inline">\(0\)</span>, and since <span class="math inline">\(\phi^{(k)}(0) \to 30\)</span>, the intervals collapse: <span class="math inline">\(S_i^* = \bigcap_{k} S_i^k = \{30\}\)</span> (<a href="#fig-2-cournot-iesds" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>). IESDS therefore determines the Cournot quantity <span class="math inline">\(q_1 = q_2 = 30\)</span>.</p>
 <div id="fig-2-cournot-iesds" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-2-cournot-iesds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -486,7 +486,7 @@ Figure&nbsp;2.1: IESDS in the Cournot duopoly: the surviving interval <span clas
 v_i(s_i, s_{-i}) \ge v_i(s_i', s_{-i}) \qquad \text{for all } s_i' \in S_i .
 \]</span></p>
 </div>
-<p>Dominance and best response are two sides of the same coin.</p>
+<p>Dominance restricts best responses as follows.</p>
 <div id="prp-2-dom-not-br" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 2.3 (Dominated strategies are never best responses)</strong></span> If <span class="math inline">\(s_i\)</span> is strictly dominated, then it is not a best response to any <span class="math inline">\(s_{-i}\)</span>.</p>
 </div>
@@ -496,12 +496,12 @@ v_i(s_i, s_{-i}) \ge v_i(s_i', s_{-i}) \qquad \text{for all } s_i' \in S_i .
 <div id="prp-2-dominant-br" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 2.4 (Dominant strategies are the unique best response)</strong></span> If <span class="math inline">\(s_i\)</span> is strictly dominant, it is the unique best response to every <span class="math inline">\(s_{-i}\)</span>.</p>
 </div>
-<p>This is immediate from the definitions. A subtler fact ties best response to the survivors of IESDS, and it is the first place where finiteness does real work.</p>
+<p>This follows from the definitions. In finite games, best responses also characterise a unique IESDS survivor.</p>
 <div id="prp-2-iesds-br" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 2.5 (The IESDS survivor is a best response)</strong></span> In a <strong>finite</strong> game, if <span class="math inline">\(s^*\)</span> is the unique profile surviving IESDS, then <span class="math inline">\(s_i^*\)</span> is the unique best response to <span class="math inline">\(s_{-i}^*\)</span> for every player <span class="math inline">\(i\)</span>.</p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(i\)</span> and suppose, for contradiction, that <span class="math inline">\(s_i^*\)</span> is <em>not</em> a best response to <span class="math inline">\(s_{-i}^*\)</span>. Then some <span class="math inline">\(s_i^1\)</span> does strictly better: <span class="math inline">\(v_i(s_i^1, s_{-i}^*) &gt; v_i(s_i^*, s_{-i}^*)\)</span>. Since <span class="math inline">\(s_i^*\)</span> survives but <span class="math inline">\(s_i^1\)</span> does not, <span class="math inline">\(s_i^1\)</span> was deleted in some round — and a strategy is deleted only when strictly dominated, hence (against the surviving <span class="math inline">\(s_{-i}^*\)</span>) there is some <span class="math inline">\(s_i^2\)</span> with <span class="math inline">\(v_i(s_i^2, s_{-i}^*) &gt; v_i(s_i^1, s_{-i}^*)\)</span>. But <span class="math inline">\(s_i^2\)</span> is also deleted, so there is <span class="math inline">\(s_i^3\)</span> beating it, and so on without end. This produces infinitely many distinct strategies, contradicting finiteness. Hence <span class="math inline">\(s_i^*\)</span> is a best response; that it is the <em>unique</em> best response follows from <a href="#prp-2-dom-not-br" class="quarto-xref">Proposition&nbsp;<span>2.3</span></a>. <span class="math inline">\(\square\)</span></p>
+<p><span class="proof-title"><em>Proof</em>. </span>Fix <span class="math inline">\(i\)</span> and suppose, for contradiction, that <span class="math inline">\(s_i^*\)</span> is <em>not</em> a best response to <span class="math inline">\(s_{-i}^*\)</span>. Then some <span class="math inline">\(s_i^1\)</span> does strictly better: <span class="math inline">\(v_i(s_i^1, s_{-i}^*) &gt; v_i(s_i^*, s_{-i}^*)\)</span>. Since <span class="math inline">\(s_i^*\)</span> survives but <span class="math inline">\(s_i^1\)</span> does not, <span class="math inline">\(s_i^1\)</span> was deleted in some round, and a strategy is deleted only when strictly dominated, hence (against the surviving <span class="math inline">\(s_{-i}^*\)</span>) there is some <span class="math inline">\(s_i^2\)</span> with <span class="math inline">\(v_i(s_i^2, s_{-i}^*) &gt; v_i(s_i^1, s_{-i}^*)\)</span>. But <span class="math inline">\(s_i^2\)</span> is also deleted, so there is <span class="math inline">\(s_i^3\)</span> beating it, and so on without end. This produces infinitely many distinct strategies, contradicting finiteness. Hence <span class="math inline">\(s_i^*\)</span> is a best response; that it is the <em>unique</em> best response follows from <a href="#prp-2-dom-not-br" class="quarto-xref">Proposition&nbsp;<span>2.3</span></a>. <span class="math inline">\(\square\)</span></p>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -530,10 +530,10 @@ v_i(s_i^*, s_{-i}^*) \ge v_i(s_i, s_{-i}^*) \qquad \text{for all } s_i \in S_i,
 <div id="def-2-deviation" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.9 (Profitable deviation)</strong></span> Given a profile <span class="math inline">\(s\)</span>, player <span class="math inline">\(i\)</span> has a <strong>profitable deviation</strong> if some <span class="math inline">\(s_i'\)</span> gives <span class="math inline">\(v_i(s_i', s_{-i}) &gt; v_i(s_i, s_{-i})\)</span>.</p>
 </div>
-<p>So a profile is a Nash equilibrium <strong>if and only if no player has a profitable deviation</strong> — the form in which equilibrium is usually checked. Conceptually, a Nash equilibrium combines two requirements:</p>
+<p>So a profile is a Nash equilibrium <strong>if and only if no player has a profitable deviation</strong>, the form in which equilibrium is usually checked. Conceptually, a Nash equilibrium combines two requirements:</p>
 <ul>
-<li><strong>rationality</strong> — each player chooses a best response to their belief about what the others do; and</li>
-<li><strong>consistency of beliefs</strong> — those beliefs are correct, i.e.&nbsp;each player correctly anticipates the others’ equilibrium strategies.</li>
+<li>rationality: each player chooses a best response to their belief about what the others do; and</li>
+<li>consistency of beliefs: each player correctly anticipates the others’ equilibrium strategies.</li>
 </ul>
 <p>The concept is named for John Nash (Nobel Prize, 1994). It is the central prediction of non-cooperative game theory, and it relates cleanly to the earlier concepts.</p>
 <div id="prp-2-dse-nash" class="theorem proposition">
@@ -556,7 +556,7 @@ v_i(s_i^*, s_{-i}^*) \ge v_i(s_i, s_{-i}^*) \qquad \text{for all } s_i \in S_i,
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Consider the variant of Battle of the Sexes with payoffs <span class="math inline">\((O,O)=(2,1)\)</span>, <span class="math inline">\((O,F)=(0,0)\)</span>, <span class="math inline">\((F,O)=(2,1)\)</span>, <span class="math inline">\((F,F)=(1,2)\)</span>. The profiles <span class="math inline">\((O,O)\)</span> and <span class="math inline">\((F,O)\)</span> give the <em>same</em> payoff <span class="math inline">\((2,1)\)</span>, yet <span class="math inline">\((O,O)\)</span> is a Nash equilibrium while <span class="math inline">\((F,O)\)</span> is not: at <span class="math inline">\((F,O)\)</span>, player 2 — facing <span class="math inline">\(F\)</span> — strictly prefers <span class="math inline">\(F\)</span> to <span class="math inline">\(O\)</span> and deviates. Equilibrium is a property of the <em>strategy profile</em> and the incentives it creates, not of the payoff it happens to deliver.</p>
+<p>Consider the variant of Battle of the Sexes with payoffs <span class="math inline">\((O,O)=(2,1)\)</span>, <span class="math inline">\((O,F)=(0,0)\)</span>, <span class="math inline">\((F,O)=(2,1)\)</span>, <span class="math inline">\((F,F)=(1,2)\)</span>. The profiles <span class="math inline">\((O,O)\)</span> and <span class="math inline">\((F,O)\)</span> give the <em>same</em> payoff <span class="math inline">\((2,1)\)</span>, yet <span class="math inline">\((O,O)\)</span> is a Nash equilibrium while <span class="math inline">\((F,O)\)</span> is not: at <span class="math inline">\((F,O)\)</span>, player 2 (facing <span class="math inline">\(F\)</span>) strictly prefers <span class="math inline">\(F\)</span> to <span class="math inline">\(O\)</span> and deviates. Equilibrium is a property of the <em>strategy profile</em> and the incentives it creates, not of the payoff it happens to deliver.</p>
 </div>
 </div>
 </section>
@@ -595,7 +595,7 @@ Table&nbsp;2.4: The Stag Hunt.
 </div>
 </figure>
 </div>
-<p>Both <span class="math inline">\((S,S)\)</span> and <span class="math inline">\((H,H)\)</span> are Nash equilibria. The cooperative equilibrium <span class="math inline">\((S,S)\)</span> Pareto dominates <span class="math inline">\((H,H)\)</span>, yet <span class="math inline">\((H,H)\)</span> can persist purely through pessimistic, self-fulfilling beliefs: if each expects the other to hunt hare, hunting hare is optimal. Two societies with identical fundamentals can settle into very different equilibria — a parable for why “norms of behaviour” matter. The <strong>driving game</strong> (both drive <span class="math inline">\(L\)</span> or both drive <span class="math inline">\(R\)</span>, each a Nash equilibrium) makes the same point about social conventions.</p>
+<p>Both <span class="math inline">\((S,S)\)</span> and <span class="math inline">\((H,H)\)</span> are Nash equilibria. The cooperative equilibrium <span class="math inline">\((S,S)\)</span> Pareto dominates <span class="math inline">\((H,H)\)</span>, yet <span class="math inline">\((H,H)\)</span> can persist purely through pessimistic, self-fulfilling beliefs: if each expects the other to hunt hare, hunting hare is optimal. Two societies with identical fundamentals can settle into very different equilibria, illustrating how norms of behaviour can select equilibria. The <strong>driving game</strong> (both drive <span class="math inline">\(L\)</span> or both drive <span class="math inline">\(R\)</span>, each a Nash equilibrium) makes the same point about social conventions.</p>
 </section>
 <section id="sec-2-cournot" class="level3">
 <h3 class="anchored" data-anchor-id="sec-2-cournot">Cournot competition</h3>
@@ -631,7 +631,7 @@ Q(p_i)(p_i - c), &amp; p_i &lt; p_j,\\[2pt]
 \tfrac12 Q(p_i)(p_i - c), &amp; p_i = p_j,\\[2pt]
 0, &amp; p_i &gt; p_j .
 \end{cases}
-\]</span> The unique Nash equilibrium is <span class="math inline">\(p_1^* = p_2^* = c\)</span>: <strong>price equals marginal cost</strong>, the competitive outcome, with just two firms. The argument is by elimination — any common price above <span class="math inline">\(c\)</span> invites a tiny undercut that steals the whole market, and below <span class="math inline">\(c\)</span> both firms lose money. Tellingly, the best-response correspondence is <em>empty</em> on the range <span class="math inline">\(c &lt; p_j \le p^m\)</span> (the firm wants to undercut to <span class="math inline">\(p_j - \eps\)</span>, but there is no smallest such price), which is exactly why one must argue by elimination rather than by intersecting best-response curves.</p>
+\]</span> The unique Nash equilibrium is <span class="math inline">\(p_1^* = p_2^* = c\)</span>: <strong>price equals marginal cost</strong>, the competitive outcome, with just two firms. The argument is by elimination: any common price above <span class="math inline">\(c\)</span> invites a tiny undercut that steals the whole market, and below <span class="math inline">\(c\)</span> both firms lose money. The best-response correspondence is <em>empty</em> on the range <span class="math inline">\(c &lt; p_j \le p^m\)</span> (the firm wants to undercut to <span class="math inline">\(p_j - \eps\)</span>, but there is no smallest such price), which is exactly why one must argue by elimination rather than by intersecting best-response curves.</p>
 <p>With <strong>asymmetric</strong> costs <span class="math inline">\(c_1 &lt; c_2\)</span> the best-response correspondences never meet, and <strong>no pure-strategy Nash equilibrium exists</strong>: the low-cost firm always wants to sit just below the other’s price, so no profile is stable.</p>
 </section>
 <section id="electoral-competition-and-the-median-voter" class="level3">
@@ -651,9 +651,9 @@ Q(p_i)(p_i - c), &amp; p_i &lt; p_j,\\[2pt]
 </section>
 <section id="mixed-strategies" class="level2" data-number="2.7">
 <h2 data-number="2.7" class="anchored" data-anchor-id="mixed-strategies"><span class="header-section-number">2.7</span> Mixed strategies</h2>
-<p>Rock–paper–scissors and matching pennies have <em>no</em> Nash equilibrium in the strategies considered so far — whatever you do, your opponent would want to respond in a way that makes you want to change. The fix is to let players <strong>randomise</strong>.</p>
+<p>Rock–paper–scissors and matching pennies have no pure-strategy Nash equilibrium: each profile admits a profitable deviation. We therefore allow players to randomise.</p>
 <div id="def-2-mixed" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 2.10 (Mixed strategy)</strong></span> Let <span class="math inline">\(S_i = \{s_{i1}, \dots, s_{im}\}\)</span> be finite. A <strong>mixed strategy</strong> is a probability distribution <span class="math inline">\(\sigma_i\)</span> over <span class="math inline">\(S_i\)</span> — an element of the <strong>simplex</strong> <span class="math inline">\(\Delta S_i = \big\{ \sigma_i : S_i \to [0,1] \,\big|\, \sum_{s_i \in S_i} \sigma_i(s_i) = 1 \big\}\)</span>. A pure strategy is the degenerate mixed strategy putting probability <span class="math inline">\(1\)</span> on a single action.</p>
+<p><span class="theorem-title"><strong>Definition 2.10 (Mixed strategy)</strong></span> Let <span class="math inline">\(S_i = \{s_{i1}, \dots, s_{im}\}\)</span> be finite. A <strong>mixed strategy</strong> is a probability distribution <span class="math inline">\(\sigma_i\)</span> over <span class="math inline">\(S_i\)</span>, an element of the <strong>simplex</strong> <span class="math inline">\(\Delta S_i = \big\{ \sigma_i : S_i \to [0,1] \,\big|\, \sum_{s_i \in S_i} \sigma_i(s_i) = 1 \big\}\)</span>. A pure strategy is the degenerate mixed strategy putting probability <span class="math inline">\(1\)</span> on a single action.</p>
 </div>
 <div id="def-2-support" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.11 (Support)</strong></span> The <strong>support</strong> of <span class="math inline">\(\sigma_i\)</span> is the set of pure strategies it plays with positive probability, <span class="math inline">\(\operatorname{supp}\sigma_i = \{ s_i : \sigma_i(s_i) &gt; 0 \}\)</span>.</p>
@@ -661,14 +661,14 @@ Q(p_i)(p_i - c), &amp; p_i &lt; p_j,\\[2pt]
 <p>Players are <strong>expected-utility maximisers</strong>, so they evaluate a mixed profile by its expected payoff. If each player randomises independently, the profile <span class="math inline">\(s = (s_1, \dots, s_n)\)</span> occurs with probability <span class="math inline">\(\prod_j \sigma_j(s_j)\)</span>, and <span class="math display">\[
 v_i(\sigma) = \sum_{s \in S} \Big( \prod_{j=1}^n \sigma_j(s_j) \Big) v_i(s)
             = \sum_{s_i \in S_i} \sigma_i(s_i)\, v_i(s_i, \sigma_{-i}) .
-\]</span> The second form — a weighted average of the expected payoffs to <span class="math inline">\(i\)</span>’s <em>pure</em> strategies — is the one we use constantly below.</p>
+\]</span> The second form (a weighted average of the expected payoffs to <span class="math inline">\(i\)</span>’s <em>pure</em> strategies) is the one we use constantly below.</p>
 </section>
 <section id="mixed-strategy-nash-equilibrium" class="level2" data-number="2.8">
 <h2 data-number="2.8" class="anchored" data-anchor-id="mixed-strategy-nash-equilibrium"><span class="header-section-number">2.8</span> Mixed-strategy Nash equilibrium</h2>
 <div id="def-2-mixed-br" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.12 (Best response in mixed strategies)</strong></span> <span class="math inline">\(\sigma_i\)</span> is a best response to <span class="math inline">\(\sigma_{-i}\)</span> if <span class="math inline">\(v_i(\sigma_i, \sigma_{-i}) \ge v_i(s_i, \sigma_{-i})\)</span> for every pure <span class="math inline">\(s_i \in S_i\)</span>. (Checking against pure strategies suffices: a mixture of weakly-worse pure strategies is weakly worse.)</p>
 </div>
-<p>The key computational tool is the following characterisation of when a mixture is optimal.</p>
+<p>The following result characterises optimal mixtures.</p>
 <div id="lem-2-indifference" class="theorem lemma">
 <p><span class="theorem-title"><strong>Lemma 2.2 (Indifference principle)</strong></span> A mixed strategy <span class="math inline">\(\sigma_i\)</span> is a best response to <span class="math inline">\(\sigma_{-i}\)</span> <strong>if and only if</strong> every pure strategy in <span class="math inline">\(\operatorname{supp}\sigma_i\)</span> is itself a best response to <span class="math inline">\(\sigma_{-i}\)</span>. In particular, player <span class="math inline">\(i\)</span> is <strong>indifferent</strong> among all pure strategies in the support.</p>
 </div>
@@ -680,7 +680,7 @@ v_i(\sigma_i, \sigma_{-i}) = \sum_{s_i \in \operatorname{supp}\sigma_i} \sigma_i
 <p><em>(Only if.)</em> Suppose <span class="math inline">\(\sigma_i\)</span> is a best response but some <span class="math inline">\(s_i\)</span> in its support is <em>not</em>. Let <span class="math inline">\(\hat s_i\)</span> be a best response, so <span class="math inline">\(v_i(\hat s_i, \sigma_{-i}) &gt; v_i(s_i, \sigma_{-i})\)</span> while <span class="math inline">\(v_i(\hat s_i, \sigma_{-i}) \ge v_i(s_i', \sigma_{-i})\)</span> for all <span class="math inline">\(s_i'\)</span>. Then, averaging over the support, <span class="math display">\[
 v_i(\hat s_i, \sigma_{-i}) = \sum_{s_i' \in \operatorname{supp}\sigma_i} \sigma_i(s_i')\, v_i(\hat s_i, \sigma_{-i})
 &gt; \sum_{s_i' \in \operatorname{supp}\sigma_i} \sigma_i(s_i')\, v_i(s_i', \sigma_{-i}) = v_i(\sigma_i, \sigma_{-i}),
-\]</span> the strict inequality coming from the dominated term <span class="math inline">\(s_i\)</span>. This contradicts <span class="math inline">\(\sigma_i\)</span> being a best response. Hence every support strategy is a best response, and they all attain the same maximal value — the indifference condition. <span class="math inline">\(\square\)</span></p>
+\]</span> the strict inequality coming from the dominated term <span class="math inline">\(s_i\)</span>. This contradicts <span class="math inline">\(\sigma_i\)</span> being a best response. Hence every support strategy is a best response, and they all attain the same maximal value: the indifference condition. <span class="math inline">\(\square\)</span></p>
 </div>
 <div id="def-2-msne" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.13 (Mixed-strategy Nash equilibrium)</strong></span> A mixed profile <span class="math inline">\(\sigma^* = (\sigma_1^*, \dots, \sigma_n^*)\)</span> is a <strong>Nash equilibrium</strong> if each <span class="math inline">\(\sigma_i^*\)</span> is a best response to <span class="math inline">\(\sigma_{-i}^*\)</span>.</p>
@@ -698,7 +698,7 @@ Figure&nbsp;2.3: Matching pennies. Player 1’s best-response correspondence (ju
 </figure>
 </div>
 <p><strong>Rock–paper–scissors.</strong> A support argument rules out any equilibrium in which a player uses only one or two of the three actions; both players must randomise over all three. Indifference then forces the uniform mixture: the unique equilibrium is <span class="math inline">\(\big(\tfrac13, \tfrac13, \tfrac13\big)\)</span> for each player.</p>
-<p><strong>Battle of the Sexes.</strong> Beyond the two pure equilibria <span class="math inline">\((O,O)\)</span> and <span class="math inline">\((F,F)\)</span>, there is a mixed equilibrium. Writing <span class="math inline">\(\sigma_1(O)=p\)</span>, <span class="math inline">\(\sigma_2(O)=q\)</span>: player 1’s indifference <span class="math inline">\(2q = 1-q\)</span> gives <span class="math inline">\(q = \tfrac13\)</span>, and player 2’s indifference <span class="math inline">\(p = 2(1-p)\)</span> gives <span class="math inline">\(p = \tfrac23\)</span>. The mixed equilibrium is <span class="math inline">\(\big(\tfrac23 O + \tfrac13 F,\ \tfrac13 O + \tfrac23 F\big)\)</span> — note that the players coordinate <em>less</em> often here than at either pure equilibrium.</p>
+<p><strong>Battle of the Sexes.</strong> Beyond the two pure equilibria <span class="math inline">\((O,O)\)</span> and <span class="math inline">\((F,F)\)</span>, there is a mixed equilibrium. Writing <span class="math inline">\(\sigma_1(O)=p\)</span>, <span class="math inline">\(\sigma_2(O)=q\)</span>: player 1’s indifference <span class="math inline">\(2q = 1-q\)</span> gives <span class="math inline">\(q = \tfrac13\)</span>, and player 2’s indifference <span class="math inline">\(p = 2(1-p)\)</span> gives <span class="math inline">\(p = \tfrac23\)</span>. The mixed equilibrium is <span class="math inline">\(\big(\tfrac23 O + \tfrac13 F,\ \tfrac13 O + \tfrac23 F\big)\)</span>; the players coordinate <em>less</em> often here than at either pure equilibrium.</p>
 </section>
 <section id="existence-of-equilibrium" class="level2" data-number="2.9">
 <h2 data-number="2.9" class="anchored" data-anchor-id="existence-of-equilibrium"><span class="header-section-number">2.9</span> Existence of equilibrium</h2>
@@ -706,7 +706,7 @@ Figure&nbsp;2.3: Matching pennies. Player 1’s best-response correspondence (ju
 <div id="thm-2-existence" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 2.1 (Nash, 1950)</strong></span> Every finite normal-form game has a Nash equilibrium, possibly in mixed strategies.</p>
 </div>
-<p>This is why we bothered with mixed strategies: matching pennies and rock–paper–scissors have no pure equilibrium, but the theorem assures us they have a mixed one — and we found it. (The proof, via Kakutani’s fixed-point theorem, is beyond our scope.)</p>
+<p>Matching pennies and rock–paper–scissors illustrate the theorem: each has a mixed equilibrium and no pure equilibrium. The theorem’s proof uses Kakutani’s fixed-point theorem and is omitted here.</p>
 </section>
 <section id="dominance-and-iesds-revisited" class="level2" data-number="2.10">
 <h2 data-number="2.10" class="anchored" data-anchor-id="dominance-and-iesds-revisited"><span class="header-section-number">2.10</span> Dominance and IESDS, revisited</h2>
@@ -758,28 +758,28 @@ Table&nbsp;2.5: A game requiring dominance by mixtures.
 </figure>
 </div>
 <p>no column is dominated by another column, but <span class="math inline">\(L\)</span> is strictly dominated by <span class="math inline">\(\tfrac12 C + \tfrac12 R\)</span>; deleting <span class="math inline">\(L\)</span>, then <span class="math inline">\(U\)</span> (now dominated by <span class="math inline">\(\tfrac12 M + \tfrac12 R\)</span>), leaves the <span class="math inline">\(\{M,D\}\times\{C,R\}\)</span> subgame, whose equilibria are <span class="math inline">\((M,R)\)</span>, <span class="math inline">\((D,C)\)</span> and the mixture <span class="math inline">\(\big(\tfrac16 M + \tfrac56 D,\ \tfrac37 C + \tfrac47 R\big)\)</span>.</p>
-<p>That this deletion is legitimate — that it removes no equilibrium — is the content of the final result.</p>
+<p>The final result shows that deletion preserves equilibria.</p>
 <div id="prp-2-iesds-reduce" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 2.9 (IESDS preserves the equilibrium set)</strong></span> In a finite game, <span class="math inline">\(\sigma^*\)</span> is a Nash equilibrium of the original game if and only if it is a Nash equilibrium of the reduced game obtained by IESDS (allowing deletion by mixed strategies).</p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span><em>(If.)</em> Let <span class="math inline">\(\sigma^*\)</span> be an equilibrium of the reduced game and suppose it is not one of the original. Then some player <span class="math inline">\(i\)</span> has a profitable deviation <span class="math inline">\(s_i^1\)</span>, which must have been deleted (it is not in the reduced game). A deleted strategy is strictly dominated against the surviving opponents, so some <span class="math inline">\(s_i^2\)</span> beats <span class="math inline">\(s_i^1\)</span> against <span class="math inline">\(\sigma_{-i}^*\)</span>; but <span class="math inline">\(s_i^2\)</span> is also deleted, so some <span class="math inline">\(s_i^3\)</span> beats it, and so on — infinitely many distinct strategies, contradicting finiteness.</p>
+<p><span class="proof-title"><em>Proof</em>. </span><em>(If.)</em> Let <span class="math inline">\(\sigma^*\)</span> be an equilibrium of the reduced game and suppose it is not one of the original. Then some player <span class="math inline">\(i\)</span> has a profitable deviation <span class="math inline">\(s_i^1\)</span>, which must have been deleted (it is not in the reduced game). A deleted strategy is strictly dominated against the surviving opponents, so some <span class="math inline">\(s_i^2\)</span> beats <span class="math inline">\(s_i^1\)</span> against <span class="math inline">\(\sigma_{-i}^*\)</span>; but <span class="math inline">\(s_i^2\)</span> is also deleted, so some <span class="math inline">\(s_i^3\)</span> beats it, and so on: infinitely many distinct strategies, contradicting finiteness.</p>
 <p><em>(Only if.)</em> No pure strategy in the support of an equilibrium mixed strategy is ever strictly dominated: if <span class="math inline">\(s_i \in \operatorname{supp}\sigma_i^*\)</span> were dominated by some <span class="math inline">\(\sigma_i\)</span>, then averaging over <span class="math inline">\(\sigma_{-i}^*\)</span> would give <span class="math inline">\(v_i(\sigma_i, \sigma_{-i}^*) &gt; v_i(s_i, \sigma_{-i}^*)\)</span>, contradicting that <span class="math inline">\(s_i\)</span> is a best response (<a href="#lem-2-indifference" class="quarto-xref">Lemma&nbsp;<span>2.2</span></a>). So IESDS never deletes a support strategy, and <span class="math inline">\(\sigma^*\)</span> remains an equilibrium of the reduced game. <span class="math inline">\(\square\)</span></p>
 </div>
-<p>This is genuinely useful: IESDS first shrinks a large game, and <a href="#prp-2-iesds-reduce" class="quarto-xref">Proposition&nbsp;<span>2.9</span></a> guarantees that hunting for equilibria in the small reduced game loses nothing.</p>
+<p>By <a href="#prp-2-iesds-reduce" class="quarto-xref">Proposition&nbsp;<span>2.9</span></a>, equilibria can be computed in the smaller game produced by IESDS without losing any equilibrium of the original game.</p>
 </section>
 <section id="chapter-summary" class="level2" data-number="2.11">
 <h2 data-number="2.11" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">2.11</span> Chapter summary</h2>
 <ul>
-<li>A <strong>normal-form game</strong> <span class="math inline">\(\Gamma = (N, \{S_i\}, \{v_i\})\)</span> specifies players, strategies and payoffs; two-player games are displayed as bimatrices.</li>
-<li><strong>Dominance</strong> gives the sharpest predictions where it applies: a rational player never plays a strictly dominated strategy, and the Prisoner’s Dilemma is solved by dominance alone — though its equilibrium is not Pareto optimal.</li>
-<li><strong>IESDS</strong> iterates this logic under <em>common knowledge of rationality</em>; for finite games the result is order-independent.</li>
-<li>A <strong>Nash equilibrium</strong> is a profile in which everyone best-responds to everyone else — rationality plus correct beliefs. It nests the earlier concepts: dominant and IESDS solutions are Nash, and every Nash equilibrium survives IESDS.</li>
-<li>Applications: <strong>Cournot</strong> (interior equilibrium <span class="math inline">\((a-2c_i+c_j)/3b\)</span>), <strong>Bertrand</strong> (price <span class="math inline">\(=\)</span> marginal cost; <em>no</em> equilibrium under asymmetric costs), and the <strong>median voter theorem</strong> in electoral competition.</li>
-<li>Allowing <strong>mixed strategies</strong>, every finite game has an equilibrium (<a href="#thm-2-existence" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>); they are computed via the <strong>indifference principle</strong> (<a href="#lem-2-indifference" class="quarto-xref">Lemma&nbsp;<span>2.2</span></a>).</li>
+<li>A normal-form game <span class="math inline">\(\Gamma = (N, \{S_i\}, \{v_i\})\)</span> specifies players, strategies and payoffs; two-player games are displayed as bimatrices.</li>
+<li>Dominance restricts behaviour: a rational player never plays a strictly dominated strategy, and the Prisoner’s Dilemma is solved by dominance alone, though its equilibrium is not Pareto optimal.</li>
+<li>IESDS iterates this logic under <em>common knowledge of rationality</em>; for finite games the result is order-independent.</li>
+<li>A Nash equilibrium is a profile in which everyone best-responds to everyone else, combining rationality with correct beliefs. It nests the earlier concepts: dominant and IESDS solutions are Nash, and every Nash equilibrium survives IESDS.</li>
+<li>Applications: Cournot (interior equilibrium <span class="math inline">\((a-2c_i+c_j)/3b\)</span>), Bertrand (price <span class="math inline">\(=\)</span> marginal cost; <em>no</em> equilibrium under asymmetric costs), and the median voter theorem in electoral competition.</li>
+<li>Allowing mixed strategies, every finite game has an equilibrium (<a href="#thm-2-existence" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>); they are computed via the indifference principle (<a href="#lem-2-indifference" class="quarto-xref">Lemma&nbsp;<span>2.2</span></a>).</li>
 <li>IESDS by mixtures preserves the full set of equilibria (<a href="#prp-2-iesds-reduce" class="quarto-xref">Proposition&nbsp;<span>2.9</span></a>).</li>
 </ul>
-<p>The next chapter lets players move in <strong>sequence</strong>, which both enriches the strategy space and exposes a weakness of Nash equilibrium — its tolerance of non-credible threats.</p>
+<p>The next chapter lets players move in sequence, which both enriches the strategy space and exposes a weakness of Nash equilibrium: its tolerance of non-credible threats.</p>
 
 
 </section>

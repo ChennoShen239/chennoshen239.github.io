@@ -203,10 +203,10 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#what-these-notes-reconstruct" id="toc-what-these-notes-reconstruct" class="nav-link active" data-scroll-target="#what-these-notes-reconstruct">What these notes reconstruct</a></li>
+  <li><a href="#what-these-notes-reconstruct" id="toc-what-these-notes-reconstruct" class="nav-link active" data-scroll-target="#what-these-notes-reconstruct">Main sources</a></li>
   <li><a href="#cited-along-the-way" id="toc-cited-along-the-way" class="nav-link" data-scroll-target="#cited-along-the-way">Cited along the way</a></li>
   <li><a href="#further-reading-the-lectures-recommend" id="toc-further-reading-the-lectures-recommend" class="nav-link" data-scroll-target="#further-reading-the-lectures-recommend">Further reading the lectures recommend</a></li>
-  <li><a href="#everything-this-book-stops-short-of" id="toc-everything-this-book-stops-short-of" class="nav-link" data-scroll-target="#everything-this-book-stops-short-of">Everything this book stops short of</a></li>
+  <li><a href="#everything-this-book-stops-short-of" id="toc-everything-this-book-stops-short-of" class="nav-link" data-scroll-target="#everything-this-book-stops-short-of">Topics beyond the lectures</a></li>
   </ul>
 </nav>
     </div>
@@ -233,11 +233,11 @@ window.Quarto = {
 
 
 <section id="what-these-notes-reconstruct" class="level2">
-<h2 class="anchored" data-anchor-id="what-these-notes-reconstruct">What these notes reconstruct</h2>
+<h2 class="anchored" data-anchor-id="what-these-notes-reconstruct">Main sources</h2>
 <p><strong>Ben Moll</strong>, <em>Reinforcement Learning for Economists</em>, lecture slides, London School of Economics. <a href="https://benjaminmoll.com/lectures/" class="uri">https://benjaminmoll.com/lectures/</a></p>
 <p>: The primary source. Four lectures, one per chapter here.</p>
 <p><strong>Shiyu Zhao</strong>, <em>Mathematical Foundations of Reinforcement Learning</em>, Springer, 2024. <a href="https://github.com/MathFoundationRL/Book-Mathematical-Foundation-of-Reinforcement-Learning" class="uri">https://github.com/MathFoundationRL/Book-Mathematical-Foundation-of-Reinforcement-Learning</a></p>
-<p>: Moll’s slides state twice that they are “mostly a shortened/adapted version” of Zhao’s, so this book sits behind the lectures throughout. It is also where the slides send the reader whenever a proof is deferred, and therefore the source consulted for every argument this book fills in: Dvoretzky’s theorem and its multi-variable form (Chapter 6 there), the convergence of TD, Sarsa, and Q-learning and the action-value Bellman equations (Chapter 7), and the policy gradient theorem (Chapter 9). The full book and individual chapter PDFs are free on the repository above, which also carries the grid-world code the lectures point at.</p>
+<p>: Moll describes his slides as “mostly a shortened/adapted version” of Zhao’s book and refers to it for omitted proofs. It supplies the proofs developed here: Dvoretzky’s theorem and its multi-variable form (Chapter 6 there), the convergence of TD, Sarsa, and Q-learning and the action-value Bellman equations (Chapter 7), and the policy gradient theorem (Chapter 9). The full book and individual chapter PDFs are free on the repository above, which also carries the grid-world code the lectures point at.</p>
 </section>
 <section id="cited-along-the-way" class="level2">
 <h2 class="anchored" data-anchor-id="cited-along-the-way">Cited along the way</h2>
@@ -254,20 +254,20 @@ window.Quarto = {
 </dd>
 </dl>
 <p><strong>Kevin P. Murphy</strong>, <em>Reinforcement Learning: An Overview</em>, 2025. <a href="https://arxiv.org/abs/2412.05265" class="uri">https://arxiv.org/abs/2412.05265</a></p>
-<p>: A broad and current survey. Less accessible than Zhao as a first pass, and cited in Chapter 4 for the framing of actor-critic methods.</p>
+<p>: A survey cited in Chapter 4 for its treatment of actor-critic methods; it is less accessible than Zhao as an introduction.</p>
 </section>
 <section id="further-reading-the-lectures-recommend" class="level2">
 <h2 class="anchored" data-anchor-id="further-reading-the-lectures-recommend">Further reading the lectures recommend</h2>
 <p><strong>Lilian Weng</strong>, “Policy Gradient Algorithms”, 2018. <a href="https://lilianweng.github.io/posts/2018-04-08-policy-gradient/" class="uri">https://lilianweng.github.io/posts/2018-04-08-policy-gradient/</a></p>
-<p>: A clear map of the policy gradient family beyond what Chapter 4 covers, including the algorithms this book stops short of.</p>
+<p>: A survey of policy gradient algorithms beyond those covered in Chapter 4.</p>
 <p><strong>Andrej Karpathy</strong>, “Deep Dive into LLMs like ChatGPT”, 2025. <a href="https://www.youtube.com/watch?v=7xTGNNLPyMI" class="uri">https://www.youtube.com/watch?v=7xTGNNLPyMI</a></p>
-<p>: For where Chapter 4 actually gets used: RLHF, RLVR, and reasoning models.</p>
+<p>: Applications of Chapter 4: RLHF, RLVR, and reasoning models.</p>
 <p><strong>John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov</strong>, “Proximal Policy Optimization Algorithms”, 2017. <a href="https://arxiv.org/abs/1707.06347" class="uri">https://arxiv.org/abs/1707.06347</a></p>
 <p>: The standard practical policy gradient algorithm, and the natural next step from the on-policy constraint that closes Chapter 4.</p>
 </section>
 <section id="everything-this-book-stops-short-of" class="level2">
-<h2 class="anchored" data-anchor-id="everything-this-book-stops-short-of">Everything this book stops short of</h2>
-<p>The reconstruction follows the lectures and does not go past them. Readers wanting the topics the four lectures skip should go to Zhao: <span class="math inline">\(n\)</span>-step Sarsa and TD(<span class="math inline">\(\lambda\)</span>), off-policy learning with importance sampling, Deep Q-learning with experience replay and target networks, the convergence theory of function approximation, and the wider actor-critic family (A2C, DPG, TRPO, PPO).</p>
+<h2 class="anchored" data-anchor-id="everything-this-book-stops-short-of">Topics beyond the lectures</h2>
+<p>Zhao covers further topics: <span class="math inline">\(n\)</span>-step Sarsa and TD(<span class="math inline">\(\lambda\)</span>), off-policy learning with importance sampling, Deep Q-learning with experience replay and target networks, the convergence theory of function approximation, and the wider actor-critic family (A2C, DPG, TRPO, PPO).</p>
 
 
 </section>

@@ -249,7 +249,7 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>The book deliberately changes dialect once, at the start of Chapter 2, because the lectures do. Chapter 1 is dynamic programming and speaks the economist’s notation; everything after it is reinforcement learning and speaks the RL literature’s. The switch is announced where it happens, but the two conventions are collected here side by side so nothing has to be reconstructed from memory.</p>
+<p>The notation follows the lectures: Chapter 1 uses dynamic-programming conventions, and Chapters 2 to 4 use RL conventions. The change occurs at the start of Chapter 2.</p>
 <section id="the-one-deliberate-switch" class="level2">
 <h2 class="anchored" data-anchor-id="the-one-deliberate-switch">The one deliberate switch</h2>
 <div id="tbl-n-switch" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -292,7 +292,7 @@ Table&nbsp;1: The notation changes at the Chapter 1 / Chapter 2 boundary and now
 </div>
 </figure>
 </div>
-<p>The reward indexing in the third row is worth care. From Chapter 2 onward, <span class="math inline">\(r_{t+1}\)</span> is the reward received for taking <span class="math inline">\(a_{t}\)</span> in <span class="math inline">\(s_{t}\)</span>. The offset looks gratuitous until an update has to be written down: it makes <span class="math inline">\((s_{t},a_{t},r_{t+1},s_{t+1})\)</span> the natural unit of experience, which is exactly what <a href="03-notes.html#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>, <a href="03-notes.html#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> and <a href="03-notes.html#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a> consume.</p>
+<p>From Chapter 2 onward, <span class="math inline">\(r_{t+1}\)</span> is the reward received for taking <span class="math inline">\(a_{t}\)</span> in <span class="math inline">\(s_{t}\)</span>. Thus <span class="math inline">\((s_{t},a_{t},r_{t+1},s_{t+1})\)</span> records one transition, as used in <a href="03-notes.html#eq-td-state" class="quarto-xref">Equation&nbsp;<span>3.3</span></a>, <a href="03-notes.html#eq-sarsa" class="quarto-xref">Equation&nbsp;<span>3.7</span></a> and <a href="03-notes.html#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a>.</p>
 </section>
 <section id="the-problem" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem">The problem</h2>
@@ -326,7 +326,7 @@ Table&nbsp;1: The notation changes at the Chapter 1 / Chapter 2 boundary and now
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(\gamma\in(0,1)\)</span></td>
-<td>discount factor. Load-bearing: it is the contraction modulus in <a href="03-notes.html#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a> and what makes <span class="math inline">\(I-\gamma\mathbf{P}_{\pi}\)</span> invertible in <a href="04-notes.html#thm-spg" class="quarto-xref">Theorem&nbsp;<span>4.2</span></a></td>
+<td>discount factor: the contraction modulus in <a href="03-notes.html#thm-td-convergence" class="quarto-xref">Theorem&nbsp;<span>3.1</span></a>, which makes <span class="math inline">\(I-\gamma\mathbf{P}_{\pi}\)</span> invertible in <a href="04-notes.html#thm-spg" class="quarto-xref">Theorem&nbsp;<span>4.2</span></a></td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\pi\)</span>, <span class="math inline">\(\pi^{*}\)</span></td>
@@ -389,7 +389,7 @@ Table&nbsp;1: The notation changes at the Chapter 1 / Chapter 2 boundary and now
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Three things vary independently and are easy to conflate.</p>
+<p>Value symbols distinguish the following independent choices.</p>
 <ul>
 <li><strong>What is being valued</strong>: a state (<span class="math inline">\(v\)</span>) or a state-action pair (<span class="math inline">\(q\)</span>).</li>
 <li><strong>Under which policy</strong>: a given <span class="math inline">\(\pi\)</span> (subscript <span class="math inline">\(\pi\)</span>, an <em>evaluation</em> object) or the best one (superscript <span class="math inline">\(*\)</span>, an <em>optimality</em> object).</li>
@@ -454,7 +454,7 @@ Table&nbsp;1: The notation changes at the Chapter 1 / Chapter 2 boundary and now
 </section>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
-<p>Two different things get parameterized, in two different chapters, and they are not the same object.</p>
+<p>The value and the policy use separate parameter vectors.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -511,7 +511,7 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><span class="math inline">\(w\)</span> and <span class="math inline">\(\theta\)</span> are the difference between the last two chapters. Chapter 3 parameterizes a value and reads a policy off it by <span class="math inline">\(\argmax\)</span>; Chapter 4 parameterizes the policy and never forms a table of values at all. Actor-critic uses both at once: <span class="math inline">\(\theta\)</span> for the actor, <span class="math inline">\(w\)</span> for the critic.</p>
+<p>Parameters <span class="math inline">\(w\)</span> and <span class="math inline">\(\theta\)</span> distinguish the last two chapters: Chapter 3 parameterizes a value and obtains the policy by <span class="math inline">\(\argmax\)</span>. Chapter 4 parameterizes the policy directly. Actor-critic uses both: <span class="math inline">\(\theta\)</span> for the actor, <span class="math inline">\(w\)</span> for the critic.</p>
 </div>
 </div>
 </section>

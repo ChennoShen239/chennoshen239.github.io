@@ -93,7 +93,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#the-traps" id="toc-the-traps" class="nav-link" data-scroll-target="#the-traps">The traps</a></li>
   <li><a href="#what-it-costs" id="toc-what-it-costs" class="nav-link" data-scroll-target="#what-it-costs">What it costs</a></li>
   <li><a href="#what-transfers" id="toc-what-transfers" class="nav-link" data-scroll-target="#what-transfers">What transfers</a></li>
-  <li><a href="#a-closing-checklist" id="toc-a-closing-checklist" class="nav-link" data-scroll-target="#a-closing-checklist">A closing checklist</a></li>
+  <li><a href="#a-closing-checklist" id="toc-a-closing-checklist" class="nav-link" data-scroll-target="#a-closing-checklist">Run checklist</a></li>
   </ul>
 </nav>
 </div>
@@ -150,7 +150,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>The disposable cluster: a head node schedules, four 48-vCPU compute nodes work, everything shares one EFS volume, and the private subnet reaches the world only through the NAT gateway.</figcaption>
 </figure>
 </div>
-<p>The lines of the config that actually shape the experience (ParallelCluster 3.15, us-east-1):</p>
+<p>The main configuration settings (ParallelCluster 3.15, us-east-1):</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Scheduling</span><span class="kw">:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">Scheduler</span><span class="kw">:</span><span class="at"> slurm</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">SlurmSettings</span><span class="kw">:</span></span>
@@ -167,11 +167,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MinCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">MaxCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The two-type pool lets EC2 Fleet order the candidates by price and try the cheaper one first; it is a preference, not a guarantee. The June run happened to land on c7i.12xlarge throughout, so the diagram and the cost table below are stated in c7i terms.</p>
-<p>Three configuration choices that mattered later:</p>
+<p>The following settings affected the runs:</p>
 <ul>
 <li><code>MinCount: 0</code> means precisely “keep no compute nodes when there is no work”; with the two-minute scale-down, nodes vanish on their own after a job. It does not mean an idle cluster is free: the head node, the shared volume, and a NAT left up keep billing.</li>
-<li>Do not starve the head node. My first attempt used a t3.small and the dependency install ran out of memory; t3.large ended the problem.</li>
-<li>Instance generations are not cosmetic: on my XGBoost tasks, the same batch ran about 20% slower on previous-generation c6i than on c7i at nearly the same hourly price, so the pool holds current-generation types only.</li>
+<li>My first head node was a t3.small, which ran out of memory during dependency installation. A t3.large completed the installation.</li>
+<li>On my XGBoost tasks, the same batch ran about 20% slower on c6i than on c7i at nearly the same hourly price, so the pool holds current-generation types only.</li>
 </ul>
 <p>Spot capacity is cheaper, and the tasks can be restarted. I used on-demand capacity for the first production run. On the dense grid a single horizon runs about 20 hours and writes its output only at the end, so a reclaimed node loses the whole task, and I had no per-task checkpointing; I also wanted a predictable finish time. And I had not set up the extra IAM piece spot requires (the service-linked role), which removed any temptation to improvise. If the grid were split into many shorter tasks, spot would be the better call.</p>
 </section>
@@ -186,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Pull the results back with <code>rsync</code>.</li>
 <li>Delete the cluster, take the NAT down.</li>
 </ol>
-<p>Steps 5 and 6 are in that order on purpose.</p>
+<p>Retrieve the results before deleting the cluster and its shared volume.</p>
 <p>The full submission is an ordinary Slurm array, one task per horizon:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-24%24        # up to 24 tasks concurrent</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=8      # reserves 8 vCPU per task</span></span>
@@ -199,7 +199,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Exact tiling: 24 tasks of 8 vCPU fill four 48-vCPU nodes, six per node; a fifth node would sit idle.</figcaption>
 </figure>
 </div>
-<p>Once four nodes are up, all 24 horizons are already running, so adding a fifth node cannot shorten the pass. Adding threads per task buys little either: the per-fit data is small enough that a single fit saturates around eight threads. What the measured 796% utilization (of an 800% ceiling) does show is that the packing wasted almost nothing. Four nodes are the saturation point for this task split; going faster means making the single task faster, or splitting the grid into more, shorter tasks.</p>
+<p>Once four nodes are up, all 24 horizons are already running, so adding a fifth node cannot shorten the pass. Adding threads per task buys little either: the per-fit data is small enough that a single fit saturates around eight threads. The measured utilization was 796% of an 800% ceiling, so the allocated CPUs were almost fully used. Four nodes are the saturation point for this task split; going faster means making the single task faster, or splitting the grid into more, shorter tasks.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/fig_wall_by_horizon.svg" class="img-fluid figure-img" alt="Dot plot of wall-clock hours by forecast horizon, declining from about 21.6 hours at h equals 1 to about 19.2 hours at h equals 24, with the h equals 1 point highlighted in red as the job wall"></p>
@@ -239,8 +239,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>The compute subnet’s route table in the console as I write this: the default route still points at the deleted NAT, status Blackhole (IDs redacted).</figcaption>
 </figure>
 </div>
-<p><strong>The most dangerous default.</strong> In my configuration the shared EFS volume is part of the cluster and is deleted with it, the default <code>DeletionPolicy: Delete</code>. It can be set to <code>Retain</code> instead; I chose not to, preferring a clean site per run with the local copy as ground truth over a standing cloud volume that bills monthly and might hold the only copy of something. I retrieve the results before every teardown.</p>
-<p><strong>Quotas.</strong> A fresh account’s on-demand vCPU quota is far below four 48-vCPU nodes. Check Service Quotas and request the raise days before the deadline run, not the night of. I asked for 1,024 vCPUs; the reviewers granted my freshly created account 500, which turned out to be plenty.</p>
+<p><strong>EFS deletion.</strong> In my configuration the shared EFS volume is part of the cluster and is deleted with it, the default <code>DeletionPolicy: Delete</code>. It can be set to <code>Retain</code> instead; I kept the deletion policy and used my local copy as the master copy. Each run starts with a fresh volume, and there is no standing cloud volume to bill monthly or hold the only copy of a file. I retrieve the results before every teardown.</p>
+<p><strong>Quotas.</strong> A fresh account’s on-demand vCPU quota is far below four 48-vCPU nodes. Check Service Quotas and request the increase several days before the deadline run. I asked for 1,024 vCPUs; the reviewers granted my freshly created account 500, which turned out to be plenty.</p>
 <p><strong>Failed bootstraps still bill.</strong> Instances bill from launch whether or not they ever join the queue. The July incident, priced from the instance records:</p>
 <table class="caption-top table">
 <colgroup>
@@ -273,7 +273,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>$2.7 that bought no compute, but did cap the damage. This is what the smoke test is for: make the mistakes on one node, then scale up to the real run.</p>
+<p>The failed smoke test cost about $2.7 and delayed the run by about two hours. Testing on one node limited the cost before scaling up.</p>
 </section>
 <section id="what-it-costs" class="level2">
 <h2 class="anchored" data-anchor-id="what-it-costs">What it costs</h2>
@@ -343,8 +343,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="what-transfers" class="level2">
 <h2 class="anchored" data-anchor-id="what-transfers">What transfers</h2>
-<p>The shape that fits: tasks independent of one another, CPU-hungry but data-light, with no chatter between nodes. Batches split by horizon, by bootstrap draw, by simulation seed, by grid point, or by region all qualify. The misfits are just as clear: tasks that need to talk to each other constantly (that is MPI territory); data under compliance or residency constraints (settle the permissions before the architecture); and any case where the campus cluster’s queue is short and its software current, because free is the best price.</p>
-<p>The deep-learning side of my work takes the opposite route for the same reason. Training a neural network is one long job on one GPU, so there I rent a single pod on RunPod instead of building a cluster: no scheduler, no NAT, just a machine with an SSH port. I keep the workflow in a pair of small scripts (<a href="https://github.com/ChennoShen239/runpod_scripts">runpod_scripts</a>): <code>rsync</code> the project to the pod’s <code>/workspace</code>, build the environment once with <code>uv sync</code>, run the entry file inside <code>tmux</code> so the job survives a dropped connection, and mail the results back when it ends.</p>
+<p>This setup suits independent tasks that need substantial CPU time but little data, with no communication between nodes. Batches split by horizon, by bootstrap draw, by simulation seed, by grid point, or by region all qualify. Tasks with frequent communication between nodes call for MPI. Data subject to compliance or residency constraints require permission before choosing the infrastructure. A campus cluster is preferable when its queue is short and its software current, since access is free.</p>
+<p>My deep-learning jobs are single training runs on one GPU, so I rent a RunPod pod with SSH access. This requires no scheduler or NAT. I keep the workflow in a pair of small scripts (<a href="https://github.com/ChennoShen239/runpod_scripts">runpod_scripts</a>): <code>rsync</code> the project to the pod’s <code>/workspace</code>, build the environment once with <code>uv sync</code>, run the entry file inside <code>tmux</code> so the job survives a dropped connection, and mail the results back when it ends.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -394,14 +394,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/fig_quadrant.svg" class="img-fluid figure-img" alt="Two-by-two quadrant diagram with axes one job versus many independent jobs and CPU-bound versus GPU-bound: your laptop for one CPU job, ParallelCluster plus Slurm highlighted in red for many CPU jobs, a rented GPU pod for one GPU job, and GPU queue or serverless, marked not covered here, for many GPU jobs"></p>
-<figcaption>Task shape picks the tool: many independent CPU tasks want a batch queue; one long GPU job wants a single rented machine. The fourth quadrant is outside this note’s scope.</figcaption>
+<figcaption>Task shape picks the tool: many independent CPU tasks want a batch queue; one long GPU job wants a single rented machine. The fourth quadrant, many GPU jobs, is not covered here.</figcaption>
 </figure>
 </div>
 <p>For price anchors, RunPod’s posted on-demand rates as of August 2026: an RTX 4090 is $0.69 per hour, an 80 GB A100 about $1.4–1.5, an H100 about $2.9–3.2. So an H100 rents for a bit more per hour than one entire 48-vCPU compute node, and a 4090 for about a third of one.</p>
 </section>
 <section id="a-closing-checklist" class="level2">
-<h2 class="anchored" data-anchor-id="a-closing-checklist">A closing checklist</h2>
-<p>By the time this note went up, I had spent a fair amount on these runs. Using this checklist had kept the wasted amount at about $2.7.</p>
+<h2 class="anchored" data-anchor-id="a-closing-checklist">Run checklist</h2>
+<p>By publication, this checklist had kept wasted spending across these runs to about $2.7.</p>
 <p>Before a run:</p>
 <ol type="1">
 <li>NAT up? The default route must point at a live gateway.</li>

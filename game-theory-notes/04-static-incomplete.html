@@ -263,7 +263,7 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>So far players have known everything about the game they are playing. But in many strategic situations a player is uncertain about something fundamental — a rival’s costs, a buyer’s valuation, an opponent’s preferences. This chapter develops the model of <strong>incomplete information</strong>, in which each player has a privately known <strong>type</strong>. The central device, due to John Harsanyi, is to let a fictitious player “Nature” draw the types at the start of the game, converting incomplete information into an extensive-form game of <em>imperfect</em> information that we can analyse with the tools of <a href="03-dynamic-complete.html" class="quarto-xref"><span>Chapter 3</span></a>. The resulting equilibrium concept is the <strong>Bayesian Nash equilibrium</strong>, and we put it to work on Cournot competition, public-good provision, the market for lemons, jury voting, the purification of mixed strategies, and the theory of auctions.</p>
+<p>So far players have known everything about the game they are playing. But in many strategic situations a player is uncertain about something fundamental: a rival’s costs, a buyer’s valuation, an opponent’s preferences. This chapter develops the model of <strong>incomplete information</strong>, in which each player has a privately known <strong>type</strong>. The central device, due to John Harsanyi, is to let a fictitious player “Nature” draw the types at the start of the game, converting incomplete information into an extensive-form game of <em>imperfect</em> information that we can analyse with the tools of <a href="03-dynamic-complete.html" class="quarto-xref"><span>Chapter 3</span></a>. The resulting equilibrium concept is the <strong>Bayesian Nash equilibrium</strong>, and we put it to work on Cournot competition, public-good provision, the market for lemons, jury voting, the purification of mixed strategies, and the theory of auctions.</p>
 <section id="sec-4-chicken" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="sec-4-chicken"><span class="header-section-number">4.1</span> A motivating example</h2>
 <p>Two teenagers drive toward each other; each can <strong>swerve</strong> (be “chicken”) or <strong>continue</strong> straight. In the complete-information <strong>game of Chicken</strong>, player 1 chooses a row <span class="math inline">\(C\)</span> (swerve) or <span class="math inline">\(D\)</span> (drive on) and player 2 a column <span class="math inline">\(c\)</span> or <span class="math inline">\(d\)</span>:</p>
@@ -297,8 +297,8 @@ Table&nbsp;4.1: The game of Chicken with common-knowledge punishment <span class
 </div>
 </figure>
 </div>
-<p>Here <span class="math inline">\(R&gt;0\)</span> is the prize (the respect won by the bolder driver) and <span class="math inline">\(k\ge 0\)</span> is the <strong>punishment</strong> — the personal cost of a collision, which depends on how harshly a teenager’s parents will react.</p>
-<p>Now suppose the punishment is each player’s <strong>private information</strong>. A teenager’s parents are <strong>harsh</strong> (<span class="math inline">\(k_i = H\)</span>, “high”) or <strong>lenient</strong> (<span class="math inline">\(k_i = L\)</span>, “low”), each with probability <span class="math inline">\(\tfrac12\)</span>, independently across the two players. Player <span class="math inline">\(i\)</span> knows his own <span class="math inline">\(k_i\)</span> but not his rival’s. This is a game of <em>incomplete</em> information: the payoffs depend on something — the rival’s <span class="math inline">\(k\)</span> — that a player does not observe.</p>
+<p>Here <span class="math inline">\(R&gt;0\)</span> is the prize (the respect won by the bolder driver) and <span class="math inline">\(k\ge 0\)</span> is the <strong>punishment</strong>, the personal cost of a collision, which depends on how harshly a teenager’s parents will react.</p>
+<p>Now suppose the punishment is each player’s <strong>private information</strong>. A teenager’s parents are <strong>harsh</strong> (<span class="math inline">\(k_i = H\)</span>, “high”) or <strong>lenient</strong> (<span class="math inline">\(k_i = L\)</span>, “low”), each with probability <span class="math inline">\(\tfrac12\)</span>, independently across the two players. Player <span class="math inline">\(i\)</span> knows his own <span class="math inline">\(k_i\)</span> but not his rival’s. This is a game of <em>incomplete</em> information: the payoffs depend on something (the rival’s <span class="math inline">\(k\)</span>) that a player does not observe.</p>
 <p><strong>Harsanyi’s idea.</strong> Introduce a fictitious player <span class="math inline">\(0\)</span>, <strong>Nature</strong>, who moves first and draws the type profile <span class="math inline">\((k_1,k_2)\)</span> from <span class="math inline">\(\{LL, LH, HL, HH\}\)</span>, each with probability <span class="math inline">\(\tfrac14\)</span> (a fixed behaviour strategy). Player 1 observes <span class="math inline">\(k_1\)</span> but not <span class="math inline">\(k_2\)</span>; player 2 observes <span class="math inline">\(k_2\)</span> but neither <span class="math inline">\(k_1\)</span> nor player 1’s choice; players 1 and 2 then move simultaneously. This is an extensive-form game of imperfect information (<a href="#fig-4-chicken" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>). The dashed lines are information sets: player 1’s two information sets group the nodes sharing <span class="math inline">\(k_1=L\)</span> (after <span class="math inline">\(LL\)</span> and <span class="math inline">\(LH\)</span>) and those sharing <span class="math inline">\(k_1=H\)</span> (after <span class="math inline">\(HL\)</span> and <span class="math inline">\(HH\)</span>); player 2’s two information sets group the nodes sharing <span class="math inline">\(k_2=L\)</span> (after <span class="math inline">\(LL\)</span> and <span class="math inline">\(HL\)</span>) and those sharing <span class="math inline">\(k_2=H\)</span> (after <span class="math inline">\(LH\)</span> and <span class="math inline">\(HH\)</span>).</p>
 <div id="fig-4-chicken" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -310,7 +310,7 @@ Figure&nbsp;4.1: The extensive form of Chicken with private punishment. Nature (
 </figcaption>
 </figure>
 </div>
-<p>Because player 1 has two information sets and a binary action at each, he has four <strong>strategies</strong>, <span class="math inline">\(S_1 = \{CC, CD, DC, DD\}\)</span>, under the convention that the first letter is the action when <span class="math inline">\(k_1 = L\)</span> and the second when <span class="math inline">\(k_1 = H\)</span> — so <span class="math inline">\(DC\)</span> means “drive on if lenient, swerve if harsh.” Likewise <span class="math inline">\(S_2 = \{cc, cd, dc, dd\}\)</span>, with the first letter the action when <span class="math inline">\(k_2 = L\)</span>.</p>
+<p>Because player 1 has two information sets and a binary action at each, he has four <strong>strategies</strong>, <span class="math inline">\(S_1 = \{CC, CD, DC, DD\}\)</span>, under the convention that the first letter is the action when <span class="math inline">\(k_1 = L\)</span> and the second when <span class="math inline">\(k_1 = H\)</span>, so <span class="math inline">\(DC\)</span> means “drive on if lenient, swerve if harsh.” Likewise <span class="math inline">\(S_2 = \{cc, cd, dc, dd\}\)</span>, with the first letter the action when <span class="math inline">\(k_2 = L\)</span>.</p>
 <p>For a profile <span class="math inline">\((A_L A_H,\, a_L a_H)\)</span>, Nature’s draw makes the outcome a lottery, <span class="math display">\[
 \tfrac14\,(LL, A_L, a_L) + \tfrac14\,(LH, A_L, a_H)
 + \tfrac14\,(HL, A_H, a_L) + \tfrac14\,(HH, A_H, a_H),
@@ -371,12 +371,12 @@ Table&nbsp;4.2: Chicken with private punishment, <span class="math inline">\(R=8
 </div>
 </figure>
 </div>
-<p>Checking best responses cell by cell, the game has a <strong>unique pure-strategy Nash equilibrium, <span class="math inline">\((DC, dc)\)</span></strong>. Reading off the convention: a teenager with <em>harsh</em> parents (<span class="math inline">\(k_i = H\)</span>) swerves, while a teenager with <em>lenient</em> parents (<span class="math inline">\(k_i = L\)</span>) drives on. The threat of severe punishment makes the harsh-parented type back down, exactly as intuition would suggest — and the analysis required nothing beyond turning the incomplete-information game into a familiar extensive form.</p>
+<p>Checking best responses cell by cell, the game has a <strong>unique pure-strategy Nash equilibrium, <span class="math inline">\((DC, dc)\)</span></strong>. Reading off the convention: a teenager with <em>harsh</em> parents (<span class="math inline">\(k_i = H\)</span>) swerves, while a teenager with <em>lenient</em> parents (<span class="math inline">\(k_i = L\)</span>) drives on. The threat of severe punishment makes the harsh-parented type back down, as obtained by transforming the incomplete-information game into an extensive form.</p>
 </section>
 <section id="sec-4-bayesian" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="sec-4-bayesian"><span class="header-section-number">4.2</span> Bayesian games</h2>
-<p>The Harsanyi recipe generalises. Each player <span class="math inline">\(i\)</span> has a <strong>type</strong> <span class="math inline">\(\theta_i\)</span> summarising his privately known characteristics, drawn from a <strong>type space</strong> <span class="math inline">\(\Theta_i\)</span>. Write <span class="math inline">\(\Theta = \Theta_1 \times \cdots \times \Theta_n\)</span> for the set of type profiles and <span class="math inline">\(A = A_1 \times \cdots \times A_n\)</span> for the set of action profiles. Payoffs may depend on the whole type profile, <span class="math inline">\(v_i : A \times \Theta \to
-\R\)</span>. The distribution of types is governed by a <strong>common prior</strong> — a single probability distribution over <span class="math inline">\(\Theta\)</span> that is common knowledge.</p>
+<p>The general Bayesian-game model uses types and a prior. Each player <span class="math inline">\(i\)</span> has a <strong>type</strong> <span class="math inline">\(\theta_i\)</span> summarising his privately known characteristics, drawn from a <strong>type space</strong> <span class="math inline">\(\Theta_i\)</span>. Write <span class="math inline">\(\Theta = \Theta_1 \times \cdots \times \Theta_n\)</span> for the set of type profiles and <span class="math inline">\(A = A_1 \times \cdots \times A_n\)</span> for the set of action profiles. Payoffs may depend on the whole type profile, <span class="math inline">\(v_i : A \times \Theta \to
+\R\)</span>. The distribution of types is governed by a <strong>common prior</strong>: a single probability distribution over <span class="math inline">\(\Theta\)</span> that is common knowledge.</p>
 <div id="def-4-bayesian-game" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 4.1 (Bayesian game)</strong></span> The normal-form representation of an <span class="math inline">\(n\)</span>-player <strong>Bayesian game</strong> (or <strong>static game of incomplete information</strong>) is the tuple <span class="math display">\[
 \big(N,\ \{A_i\}_{i=1}^n,\ \{\Theta_i\}_{i=1}^n,\ \{v_i\}_{i=1}^n,\ \Prob\big),
@@ -509,16 +509,16 @@ v_i\big(s_i^*(\theta_i), s_{-i}^*(\theta_{-i});\ \theta\big).
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Beliefs, not the prior, are what matter — and the common prior can be dropped
+<span class="screen-reader-only">Note</span>Posterior beliefs without a common prior
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Inspecting <a href="#def-4-bne" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>, the prior <span class="math inline">\(\Prob\)</span> enters only through the posterior beliefs <span class="math inline">\(\{\phi_i\}\)</span>. One may therefore specify the <strong>system of posterior beliefs</strong> <span class="math inline">\(\{\phi_i\}\)</span> directly, and the BNE definition still applies. This enlarges the scope of Bayesian games to settings <em>without</em> a common prior — at the cost that such a game can no longer be transformed into an equivalent extensive form with a single Nature move.</p>
-<p>A no-common-prior belief system genuinely exists. Take two types <span class="math inline">\(H, L\)</span> for each player and the beliefs <span class="math display">\[
+<p>Inspecting <a href="#def-4-bne" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>, the prior <span class="math inline">\(\Prob\)</span> enters only through the posterior beliefs <span class="math inline">\(\{\phi_i\}\)</span>. One may therefore specify the <strong>system of posterior beliefs</strong> <span class="math inline">\(\{\phi_i\}\)</span> directly, and the BNE definition still applies without a common prior. Such a game cannot be transformed into an equivalent extensive form with a single Nature move.</p>
+<p>For an example without a common prior, take two types <span class="math inline">\(H, L\)</span> for each player and the beliefs <span class="math display">\[
 \phi_1 = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{pmatrix},
 \qquad
 \phi_2 = \begin{pmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{pmatrix},
-\]</span> where the rows of <span class="math inline">\(\phi_1\)</span> are player 1’s own type <span class="math inline">\(\theta_1 \in \{H, L\}\)</span> and the columns are <span class="math inline">\(\theta_2 \in \{H, L\}\)</span> (and symmetrically for <span class="math inline">\(\phi_2\)</span>). Suppose a common prior <span class="math inline">\(\Prob\)</span> generated these. From <span class="math inline">\(\phi_1\)</span>, type <span class="math inline">\(H\)</span> of player 1 is <em>sure</em> the opponent is <span class="math inline">\(H\)</span>, so <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) = 0\)</span>. But from <span class="math inline">\(\phi_2\)</span>, type <span class="math inline">\(H\)</span> of player 2 is sure player 1 is <span class="math inline">\(L\)</span>, which forces <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) &gt; 0\)</span>. Contradiction — no common prior exists.</p>
+\]</span> where the rows of <span class="math inline">\(\phi_1\)</span> are player 1’s own type <span class="math inline">\(\theta_1 \in \{H, L\}\)</span> and the columns are <span class="math inline">\(\theta_2 \in \{H, L\}\)</span> (and symmetrically for <span class="math inline">\(\phi_2\)</span>). Suppose a common prior <span class="math inline">\(\Prob\)</span> generated these. From <span class="math inline">\(\phi_1\)</span>, type <span class="math inline">\(H\)</span> of player 1 is <em>sure</em> the opponent is <span class="math inline">\(H\)</span>, so <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) = 0\)</span>. But from <span class="math inline">\(\phi_2\)</span>, type <span class="math inline">\(H\)</span> of player 2 is sure player 1 is <span class="math inline">\(L\)</span>, which forces <span class="math inline">\(\Prob(\theta_1 = H, \theta_2 = L) &gt; 0\)</span>. Contradiction: no common prior exists.</p>
 </div>
 </div>
 </section>
@@ -554,7 +554,7 @@ c_\ell)\)</span> in firm 1’s outputs: relative to a firm that knew its own cos
 <p>A strategy is a function <span class="math inline">\(\sigma_i : [0,1] \to [0,1]\)</span>, where <span class="math inline">\(\sigma_i(\theta_i)\)</span> is the probability that type <span class="math inline">\(\theta_i\)</span> exerts effort. From the other student’s perspective, the probability that <span class="math inline">\(i\)</span> exerts effort is <span class="math display">\[
 p^{\sigma_i} = \int_0^1 \sigma_i(\theta_i)\, f(\theta_i)\,\mathrm d\theta_i
 = \int_0^1 \sigma_i(\theta_i)\,\mathrm d\theta_i,
-\]</span> since the density <span class="math inline">\(f \equiv 1\)</span> on <span class="math inline">\([0,1]\)</span>. Consider student 1 of type <span class="math inline">\(\theta_1\)</span> facing <span class="math inline">\(\sigma_2\)</span>. Exerting effort guarantees success and pays <span class="math inline">\(\theta_1^2 - c\)</span>. Shirking yields a success — worth <span class="math inline">\(\theta_1^2\)</span> — only if student 2 exerts effort, which happens with probability <span class="math inline">\(p^{\sigma_2}\)</span>, for an expected payoff <span class="math inline">\(p^{\sigma_2}\theta_1^2\)</span>. So effort is optimal exactly when <span class="math inline">\(\theta_1^2 - c &gt;
+\]</span> since the density <span class="math inline">\(f \equiv 1\)</span> on <span class="math inline">\([0,1]\)</span>. Consider student 1 of type <span class="math inline">\(\theta_1\)</span> facing <span class="math inline">\(\sigma_2\)</span>. Exerting effort guarantees success and pays <span class="math inline">\(\theta_1^2 - c\)</span>. Shirking yields success, worth <span class="math inline">\(\theta_1^2\)</span>, only if student 2 exerts effort, which happens with probability <span class="math inline">\(p^{\sigma_2}\)</span>, for an expected payoff <span class="math inline">\(p^{\sigma_2}\theta_1^2\)</span>. So effort is optimal exactly when <span class="math inline">\(\theta_1^2 - c &gt;
 p^{\sigma_2}\theta_1^2\)</span>, i.e.&nbsp;<span class="math inline">\(\theta_1^2 &gt; c/(1 - p^{\sigma_2})\)</span>. The best response is the <strong>cutoff (threshold) strategy</strong> <span id="eq-4-sg-br1"><span class="math display">\[
 \sigma_1(\theta_1) =
 \begin{cases}
@@ -567,7 +567,7 @@ p^{\sigma_2}\theta_1^2\)</span>, i.e.&nbsp;<span class="math inline">\(\theta_1^
 1, &amp; \theta_2^2 &gt; c/(1 - p^{\sigma_1}),\\
 0, &amp; \theta_2^2 &lt; c/(1 - p^{\sigma_1}).
 \end{cases}
-\tag{4.3}\]</span></span> Higher types — who value success more — work; lower types free-ride. Integrating the cutoff rules gives the fixed-point equations for the effort probabilities, <span id="eq-4-sg-fp1"><span class="math display">\[
+\tag{4.3}\]</span></span> Higher types, who value success more, work; lower types free-ride. Integrating the cutoff rules gives the fixed-point equations for the effort probabilities, <span id="eq-4-sg-fp1"><span class="math display">\[
 p^{\sigma_1} = 1 - \min\!\Big\{1,\ \sqrt{c/(1 - p^{\sigma_2})}\Big\},
 \tag{4.4}\]</span></span> <span id="eq-4-sg-fp2"><span class="math display">\[
 p^{\sigma_2} = 1 - \min\!\Big\{1,\ \sqrt{c/(1 - p^{\sigma_1})}\Big\}.
@@ -578,7 +578,7 @@ p^{\sigma_2} = 1 - \min\!\Big\{1,\ \sqrt{c/(1 - p^{\sigma_1})}\Big\}.
 1, &amp; \theta_i &gt; c^{1/3},\\
 0, &amp; \theta_i &lt; c^{1/3}.
 \end{cases}
-\]</span> (“Essentially” because the borderline type <span class="math inline">\(\theta_i = c^{1/3}\)</span> may play any <span class="math inline">\(\sigma_i(\theta_i) \in [0,1]\)</span> without affecting anything, the event having probability zero.) Only sufficiently high types contribute, and the free-riding that besets public goods reappears here through the cutoff.</p>
+\]</span> (“Essentially” because the borderline type <span class="math inline">\(\theta_i = c^{1/3}\)</span> may play any <span class="math inline">\(\sigma_i(\theta_i) \in [0,1]\)</span> without affecting anything, the event having probability zero.) Only sufficiently high types contribute; the cutoff reflects free-riding in public-good provision.</p>
 </section>
 </section>
 <section id="sec-4-applications" class="level2" data-number="4.4">
@@ -593,11 +593,11 @@ v_2(\theta) =
 \begin{cases} 14, &amp; \theta = P\\ 24, &amp; \theta = F\\ 34, &amp; \theta = G. \end{cases}
 \]</span> The buyer values the car more than the seller in every state (<span class="math inline">\(v_2 &gt; v_1\)</span>), so trade is always efficient.</p>
 <p><strong>Complete-information benchmark.</strong> If the condition were commonly known, model the trade as an ultimatum game: player 2 announces a price <span class="math inline">\(p\)</span>, and player 1 accepts or rejects (no trade if rejected). The unique subgame-perfect outcome (<a href="03-dynamic-complete.html#def-3-spe" class="quarto-xref">Definition&nbsp;<span>3.11</span></a>) has the buyer offer exactly the seller’s reservation value: trade occurs at <span class="math inline">\(p = 10\)</span> if <span class="math inline">\(\theta = P\)</span>, at <span class="math inline">\(p = 20\)</span> if <span class="math inline">\(\theta = F\)</span>, and at <span class="math inline">\(p = 30\)</span> if <span class="math inline">\(\theta = G\)</span>. Trade always occurs, and the outcome is <strong>efficient</strong>.</p>
-<p><strong>Private information.</strong> Now the condition is known only to the seller. Model the encounter as a (simultaneous-move) Bayesian game in which the seller of type <span class="math inline">\(\theta\)</span> chooses an acceptance plan <span class="math inline">\(s_1^\theta : \R \to \{a, r\}\)</span> — accept or reject as a function of the price. We show that good and fair cars never trade.</p>
-<p><strong>Step 1 — the good type cannot sell.</strong> Suppose, toward a contradiction, that in equilibrium the good type accepts the equilibrium price, <span class="math inline">\(s_1^G(p) = a\)</span>. Acceptance by the good type requires <span class="math inline">\(p \ge 30\)</span>; but then <span class="math inline">\(p \ge 30 \ge v_1(F) \ge v_1(P)\)</span>, so the fair and poor types accept as well, <span class="math inline">\(s_1^F(p) = s_1^P(p) = a\)</span>. Facing all three types with equal probability, the buyer’s expected payoff from <span class="math inline">\(p\)</span> is <span class="math display">\[
+<p><strong>Private information.</strong> Now the condition is known only to the seller. Model the encounter as a (simultaneous-move) Bayesian game in which the seller of type <span class="math inline">\(\theta\)</span> chooses an acceptance plan <span class="math inline">\(s_1^\theta : \R \to \{a, r\}\)</span>: accept or reject as a function of the price. We show that good and fair cars never trade.</p>
+<p><strong>Step 1: the good type cannot sell.</strong> Suppose, toward a contradiction, that in equilibrium the good type accepts the equilibrium price, <span class="math inline">\(s_1^G(p) = a\)</span>. Acceptance by the good type requires <span class="math inline">\(p \ge 30\)</span>; but then <span class="math inline">\(p \ge 30 \ge v_1(F) \ge v_1(P)\)</span>, so the fair and poor types accept as well, <span class="math inline">\(s_1^F(p) = s_1^P(p) = a\)</span>. Facing all three types with equal probability, the buyer’s expected payoff from <span class="math inline">\(p\)</span> is <span class="math display">\[
 \tfrac13 v_2(P) + \tfrac13 v_2(F) + \tfrac13 v_2(G) - p = 24 - p &lt; 0,
-\]</span> since <span class="math inline">\(p \ge 30\)</span>. By deviating to <span class="math inline">\(p' = 0\)</span> (which no type accepts) the buyer secures at least <span class="math inline">\(0\)</span> — a profitable deviation. Contradiction.</p>
-<p><strong>Step 2 — the fair type cannot sell.</strong> Knowing the good type never sells at the equilibrium price, suppose the fair type accepts, <span class="math inline">\(s_1^F(p) = a\)</span>. This requires <span class="math inline">\(p \ge 20\)</span>, so the poor type also accepts, <span class="math inline">\(s_1^P(p) = a\)</span>. Conditioning on the two types who would trade, the buyer’s expected payoff is <span class="math display">\[
+\]</span> since <span class="math inline">\(p \ge 30\)</span>. By deviating to <span class="math inline">\(p' = 0\)</span> (which no type accepts) the buyer secures at least <span class="math inline">\(0\)</span>, a profitable deviation. Contradiction.</p>
+<p><strong>Step 2: the fair type cannot sell.</strong> Knowing the good type never sells at the equilibrium price, suppose the fair type accepts, <span class="math inline">\(s_1^F(p) = a\)</span>. This requires <span class="math inline">\(p \ge 20\)</span>, so the poor type also accepts, <span class="math inline">\(s_1^P(p) = a\)</span>. Conditioning on the two types who would trade, the buyer’s expected payoff is <span class="math display">\[
 \tfrac12 v_2(P) + \tfrac12 v_2(F) - p = 19 - p &lt; 0,
 \]</span> since <span class="math inline">\(p \ge 20\)</span>. Again deviating to <span class="math inline">\(p' = 0\)</span> gives at least <span class="math inline">\(0\)</span>. Contradiction.</p>
 <p><strong>Conclusion.</strong> In any BNE the fair and good cars are <strong>not</strong> sold. There is a BNE in which only the poor car trades, at <span class="math inline">\(p = 10\)</span>, with each type following the reservation rule <span class="math display">\[
@@ -760,7 +760,7 @@ Table&nbsp;4.7: Posterior of <span class="math inline">\((\text{state},\theta_2)
 \]</span> If juror 1 convicts (<span class="math inline">\(c\)</span>), the verdict is convict only when juror 2 also votes <span class="math inline">\(c\)</span> (i.e.&nbsp;<span class="math inline">\(\theta_2 = \theta_G\)</span>), which is correct only in state <span class="math inline">\(G\)</span>; the expected payoff is <span class="math display">\[
 \frac{q(1-p)p + (1-q)p^2}{\Prob(\theta_1 = \theta_I)}.
 \]</span> Comparing numerators, conviction does at least as well whenever <span class="math inline">\(q(1-p)p \ge
-(1-q)p(1-p)\)</span>, i.e.&nbsp;<span class="math inline">\(q \ge 1-q\)</span>, which holds because <span class="math inline">\(q &gt; \tfrac12\)</span>. So juror 1 prefers to convict despite his “innocent” signal — and <strong>voting one’s own signal is not a Bayesian Nash equilibrium</strong>.</p>
+(1-q)p(1-p)\)</span>, i.e.&nbsp;<span class="math inline">\(q \ge 1-q\)</span>, which holds because <span class="math inline">\(q &gt; \tfrac12\)</span>. So juror 1 prefers to convict despite his “innocent” signal, and <strong>voting one’s own signal is not a Bayesian Nash equilibrium</strong>.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -778,7 +778,7 @@ Table&nbsp;4.7: Posterior of <span class="math inline">\((\text{state},\theta_2)
 = \frac{\Prob(G, \theta_1 = \theta_I, \theta_2 = \theta_G)}
 {\Prob(I, \theta_1 = \theta_I, \theta_2 = \theta_G)}
 = \frac{q(1-p)p}{(1-q)p(1-p)} = \frac{q}{1-q} &gt; 1.
-\]</span> Being pivotal means juror 2 saw a guilty signal, which is bad news for the defendant — so even a juror with an innocent signal may rationally vote to convict.</p>
+\]</span> Being pivotal means juror 2 saw a guilty signal, which is bad news for the defendant, so even a juror with an innocent signal may rationally vote to convict.</p>
 </div>
 </div>
 </section>
@@ -815,7 +815,7 @@ Table&nbsp;4.8: Matching Pennies.
 </div>
 </figure>
 </div>
-<p>Its unique Nash equilibrium has each player mixing <span class="math inline">\(\tfrac12 H + \tfrac12 T\)</span>, with each player exactly indifferent between <span class="math inline">\(H\)</span> and <span class="math inline">\(T\)</span>. Harsanyi found this knife-edge precision uncomfortable: do players really randomise so finely when indifferent? His <strong>purification</strong> answer: players may always have a slight strict preference one way or the other; the apparent mixing is an artefact of an outside observer’s imprecise information about those preferences.</p>
+<p>Its unique Nash equilibrium has each player mixing <span class="math inline">\(\tfrac12 H + \tfrac12 T\)</span>, with each player exactly indifferent between <span class="math inline">\(H\)</span> and <span class="math inline">\(T\)</span>. Harsanyi’s <strong>purification</strong> interpretation replaces exact randomization at indifference with private payoff variation: players may always have a slight strict preference one way or the other; the apparent mixing is an artefact of an outside observer’s imprecise information about those preferences.</p>
 <p>Perturb the payoffs with small, privately known shocks:</p>
 <div id="tbl-4-pmp" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -901,7 +901,7 @@ p^{\sigma_2} =
 </section>
 <section id="sec-4-auctions" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="sec-4-auctions"><span class="header-section-number">4.5</span> Auctions</h2>
-<p>Auctions are the workhorse application of Bayesian games. There are four classic formats:</p>
+<p>Four standard auction formats illustrate Bayesian games:</p>
 <ul>
 <li>the <strong>English</strong> (open ascending) auction, in which the price rises until one bidder remains;</li>
 <li>the <strong>Dutch</strong> (open descending) auction, in which the price falls until a bidder claims the object;</li>
@@ -941,15 +941,15 @@ v_i(\theta_i, b_{-i}; \theta_i) &gt; v_i(b_i, b_{-i}; \theta_i).
 <p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(m = \max_{j \ne i} b_j\)</span> be the highest competing bid.</p>
 <p><em>Case <span class="math inline">\(b_i &lt; \theta_i\)</span> (underbidding).</em> If <span class="math inline">\(m &lt; b_i\)</span> or <span class="math inline">\(m \ge \theta_i\)</span>, then bid <span class="math inline">\(b_i\)</span> and bid <span class="math inline">\(\theta_i\)</span> produce the same outcome (winning at price <span class="math inline">\(m\)</span> in the first sub-case, losing in the second), so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) = v_i(\theta_i,
 b_{-i}; \theta_i)\)</span>. But if <span class="math inline">\(b_i \le m &lt; \theta_i\)</span>, then bidding <span class="math inline">\(b_i\)</span> loses (or ties at a bad price) whereas bidding <span class="math inline">\(\theta_i\)</span> wins at price <span class="math inline">\(m &lt; \theta_i\)</span> for a strict gain, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
-<p><em>Case <span class="math inline">\(b_i &gt; \theta_i\)</span> (overbidding).</em> If <span class="math inline">\(m \le \theta_i\)</span> or <span class="math inline">\(m &gt; b_i\)</span>, the two bids again give the same outcome. But if <span class="math inline">\(\theta_i &lt; m \le b_i\)</span>, then bidding <span class="math inline">\(b_i\)</span> wins at price <span class="math inline">\(m &gt; \theta_i\)</span> — a negative payoff — whereas bidding <span class="math inline">\(\theta_i\)</span> loses and gets <span class="math inline">\(0\)</span>, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
+<p><em>Case <span class="math inline">\(b_i &gt; \theta_i\)</span> (overbidding).</em> If <span class="math inline">\(m \le \theta_i\)</span> or <span class="math inline">\(m &gt; b_i\)</span>, the two bids again give the same outcome. But if <span class="math inline">\(\theta_i &lt; m \le b_i\)</span>, then bidding <span class="math inline">\(b_i\)</span> wins at price <span class="math inline">\(m &gt; \theta_i\)</span> (a negative payoff) whereas bidding <span class="math inline">\(\theta_i\)</span> loses and gets <span class="math inline">\(0\)</span>, so <span class="math inline">\(v_i(b_i, b_{-i}; \theta_i) &lt; v_i(\theta_i, b_{-i}; \theta_i)\)</span>.</p>
 <p>In all cases <a href="#eq-4-2p-weak" class="quarto-xref">Equation&nbsp;<span>4.8</span></a> holds, and the strict sub-cases establish <a href="#eq-4-2p-strict" class="quarto-xref">Equation&nbsp;<span>4.9</span></a>. Hence bidding one’s valuation is a <strong>weakly dominant strategy</strong>. <span class="math inline">\(\square\)</span></p>
 </div>
 <p>Because <span class="math inline">\(s_i(\theta_i) = \theta_i\)</span> is a best response to <em>any</em> <span class="math inline">\(s_{-i}\)</span>, it is in particular a best response against equilibrium play: <span class="math display">\[
 \E_{\theta_{-i}}\big[v_i(\theta_i, s_{-i}(\theta_{-i}); \theta_i)\big]
 \ge \E_{\theta_{-i}}\big[v_i(b_i, s_{-i}(\theta_{-i}); \theta_i)\big]
 \quad \text{for all } b_i,
-\]</span> so <strong>bidding your value is a Bayesian Nash equilibrium</strong>. Three features deserve note. First, the equilibrium is <strong>distribution-free</strong>: a bidder need not know the distribution of opponents’ types, or even have any idea of their valuations, to know that truthful bidding is optimal. Second, in the private-value setting the result survives even if types are <strong>correlated</strong>, since weak dominance holds bid by bid. Third, the outcome is <strong>efficient</strong> — the highest-value bidder always wins.</p>
-<p><strong>English auction.</strong> Picture the “hands-up” version: the auctioneer raises the price continuously from <span class="math inline">\(0\)</span>, and each bidder keeps a hand up until the price exceeds her willingness to pay, at which point she drops out irrevocably. The auction ends when the second-to-last bidder drops out; the remaining bidder wins and pays the current price — which is the second-highest valuation. The English auction is therefore equivalent to the second-price auction (up to the minimum bid increment), and again bidding (dropping out at) one’s valuation is a BNE.</p>
+\]</span> so <strong>bidding your value is a Bayesian Nash equilibrium</strong>. The equilibrium has three properties. First, the equilibrium is <strong>distribution-free</strong>: a bidder need not know the distribution of opponents’ types, or even have any idea of their valuations, to know that truthful bidding is optimal. Second, in the private-value setting the result survives even if types are <strong>correlated</strong>, since weak dominance holds bid by bid. Third, the outcome is <strong>efficient</strong>: the highest-value bidder always wins.</p>
+<p><strong>English auction.</strong> Picture the “hands-up” version: the auctioneer raises the price continuously from <span class="math inline">\(0\)</span>, and each bidder keeps a hand up until the price exceeds her willingness to pay, at which point she drops out irrevocably. The auction ends when the second-to-last bidder drops out; the remaining bidder wins and pays the current price, which is the second-highest valuation. The English auction is therefore equivalent to the second-price auction (up to the minimum bid increment), and again bidding (dropping out at) one’s valuation is a BNE.</p>
 </section>
 <section id="sec-4-first-price" class="level3">
 <h3 class="anchored" data-anchor-id="sec-4-first-price">First-price and Dutch auctions</h3>
@@ -959,7 +959,7 @@ v_i(b_i, b_{-i}; \theta_i) =
 \dfrac{\theta_i - b_i}{|\{k : b_k = \max_j b_j\}|}, &amp; b_i = \max_j b_j,\\[3mm]
 0, &amp; b_i &lt; \max_j b_j.
 \end{cases}
-\]</span> Bidding one’s valuation is now a bad idea — it guarantees a payoff of <span class="math inline">\(0\)</span> — whereas bidding a little below the valuation earns a positive expected profit when one wins. So bidders <strong>shade</strong> their bids, and we look for a symmetric BNE in <strong>strictly increasing</strong> strategies, <span class="math inline">\(s_i(\theta_i) &lt; s_i(\theta_i')\)</span> whenever <span class="math inline">\(\theta_i &lt; \theta_i'\)</span>.</p>
+\]</span> Bidding one’s valuation guarantees a payoff of <span class="math inline">\(0\)</span>, whereas bidding below the valuation earns a positive profit upon winning. So bidders <strong>shade</strong> their bids, and we look for a symmetric BNE in <strong>strictly increasing</strong> strategies, <span class="math inline">\(s_i(\theta_i) &lt; s_i(\theta_i')\)</span> whenever <span class="math inline">\(\theta_i &lt; \theta_i'\)</span>.</p>
 <p>Fix bidder <span class="math inline">\(i\)</span> of type <span class="math inline">\(\theta_i\)</span> facing increasing strategies <span class="math inline">\(s_{-i}\)</span>. Bidding <span class="math inline">\(b_i\)</span>, bidder <span class="math inline">\(i\)</span> is the sole winner iff <span class="math inline">\(s_j(\theta_j) &lt; b_i\)</span> for all <span class="math inline">\(j \ne i\)</span>, i.e.&nbsp;<span class="math inline">\(\theta_j &lt; s_j^{-1}(b_i)\)</span> (inverting the increasing <span class="math inline">\(s_j\)</span>). By independence the probability of winning is <span class="math display">\[
 \Prob\big(\theta_j &lt; s_j^{-1}(b_i)\ \forall j \ne i\big)
 = \prod_{j \ne i} F_j\big(s_j^{-1}(b_i)\big),
@@ -987,11 +987,11 @@ F^{n-1}(\theta) s(\theta)
 \]</span> Since <span class="math inline">\(F(\underline\theta) = 0\)</span>, evaluating at <span class="math inline">\(\theta = \underline\theta\)</span> forces <span class="math inline">\(k = 0\)</span>, giving the <strong>symmetric first-price BNE</strong> <span id="eq-4-fpa-bid"><span class="math display">\[
 \boxed{\ s(\theta) = \theta - \frac{\displaystyle\int_{\underline\theta}^{\theta}
 F^{n-1}(x)\,\mathrm dx}{F^{n-1}(\theta)}.\ }
-\tag{4.10}\]</span></span> This <span class="math inline">\(s\)</span> is strictly increasing and differentiable, so the conjecture is self-consistent; each bidder bids strictly below her valuation (the subtracted term is positive), and because <span class="math inline">\(s\)</span> is increasing the highest-value bidder still wins — the outcome is efficient.</p>
+\tag{4.10}\]</span></span> This <span class="math inline">\(s\)</span> is strictly increasing and differentiable, so the conjecture is self-consistent; each bidder bids strictly below her valuation (the subtracted term is positive), and because <span class="math inline">\(s\)</span> is increasing the highest-value bidder still wins; the outcome is efficient.</p>
 <p><strong>Uniform special case.</strong> If <span class="math inline">\(F\)</span> is uniform on <span class="math inline">\([0,1]\)</span>, then <span class="math inline">\(F^{n-1}(x) =
 x^{n-1}\)</span> and <span class="math display">\[
 s(\theta) = \theta - \frac{\theta^n / n}{\theta^{n-1}} = \frac{n-1}{n}\,\theta.
-\]</span> A bidder shades by the factor <span class="math inline">\((n-1)/n\)</span>, which approaches <span class="math inline">\(1\)</span> as the number of competitors grows — more rivals, less shading (<a href="#fig-4-fpa-bid" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>). One can verify optimality directly: given <span class="math inline">\(s_2 = \cdots = s_n = s\)</span>, the expected payoff of bidder 1 with valuation <span class="math inline">\(\theta_1\)</span> from a bid <span class="math inline">\(b_1\)</span> is <span class="math display">\[
+\]</span> A bidder shades by the factor <span class="math inline">\((n-1)/n\)</span>, which approaches <span class="math inline">\(1\)</span> as the number of competitors grows: more rivals, less shading (<a href="#fig-4-fpa-bid" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>). One can verify optimality directly: given <span class="math inline">\(s_2 = \cdots = s_n = s\)</span>, the expected payoff of bidder 1 with valuation <span class="math inline">\(\theta_1\)</span> from a bid <span class="math inline">\(b_1\)</span> is <span class="math display">\[
 \begin{cases}
 0, &amp; b_1 \le 0,\\[2pt]
 \left(\dfrac{n b_1}{n-1}\right)^{n-1}(\theta_1 - b_1),
@@ -1013,7 +1013,7 @@ Figure&nbsp;4.2: The symmetric uniform first-price bid function <span class="mat
 </section>
 <section id="sec-4-revenue" class="level3">
 <h3 class="anchored" data-anchor-id="sec-4-revenue">Revenue equivalence</h3>
-<p>We have two efficient auctions — second-price and first-price — with very different bidding behaviour. Remarkably, they raise the <strong>same expected revenue</strong> for the seller. We verify this in the symmetric uniform <span class="math inline">\([0,1]\)</span> case.</p>
+<p>We have two efficient auctions (second-price and first-price) with very different bidding behaviour. They raise the same expected revenue for the seller under the conditions below. We verify this in the symmetric uniform <span class="math inline">\([0,1]\)</span> case.</p>
 <p><strong>Second-price revenue.</strong> Every bidder bids her value, and the winner pays the second-highest value, so the seller’s revenue is the <strong>second-order statistic</strong> <span class="math inline">\(\theta_n^{[2]}\)</span> of <span class="math inline">\(\theta_1, \dots, \theta_n\)</span>. Its cdf is <span class="math display">\[
 F_n^{[2]}(x) = \Prob(\theta_n^{[2]} \le x)
 = \sum_{i=1}^n (1 - F(x)) F(x)^{n-1} + F(x)^n
@@ -1031,7 +1031,7 @@ f_n^{[1]}(x) = \frac{n^2}{n-1}\left(\frac{nx}{n-1}\right)^{n-1},
 \]</span> and the expected revenue is <span class="math display">\[
 \E\big(b_n^{[1]}\big) = \int_0^{\frac{n-1}{n}} x f_n^{[1]}(x)\,\mathrm dx
 = \frac{n-1}{n+1},
-\]</span> <strong>exactly the same</strong> as the second-price auction. This is not a coincidence but an instance of a general principle.</p>
+\]</span> the same as the second-price auction, as implied by revenue equivalence.</p>
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -1064,24 +1064,24 @@ s_1(t) = s_2(t) = t.
 t_1 + \E(t_2 \given t_2 &lt; t_1)
 = t_1 + \frac{\int_0^{t_1} t_2\,\mathrm dt_2}{\Prob(t_2 &lt; t_1)}
 = t_1 + \frac{t_1}{2} &lt; t_1 + \tfrac12.
-\]</span> Winning is “bad news” — it reveals that one was the more optimistic bidder and thus probably overestimated the object. This is the <strong>winner’s curse</strong>, a hallmark of common-value auctions, and a rational bidder must shade his bid to account for it. (Paul Milgrom and Robert Wilson received the Nobel Prize in 2020 for improvements to auction theory and the design of new auction formats.)</p>
+\]</span> Winning is “bad news”; it reveals that one was the more optimistic bidder and thus probably overestimated the object. This is the <strong>winner’s curse</strong>, a hallmark of common-value auctions, and a rational bidder must shade his bid to account for it. (Paul Milgrom and Robert Wilson received the Nobel Prize in 2020 for improvements to auction theory and the design of new auction formats.)</p>
 </section>
 </section>
 <section id="sec-4-summary" class="level2" data-number="4.6">
 <h2 data-number="4.6" class="anchored" data-anchor-id="sec-4-summary"><span class="header-section-number">4.6</span> Chapter summary</h2>
 <ul>
-<li>A <strong>Bayesian game</strong> <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>
+<li>A Bayesian game <span class="math inline">\(\big(N, \{A_i\}, \{\Theta_i\}, \{v_i\}, \Prob\big)\)</span>
 <ol class="example" type="1">
-<li>models incomplete information through privately known <strong>types</strong>; Harsanyi’s device of a chance move by <strong>Nature</strong> turns it into an extensive-form game of imperfect information.</li>
+<li>models incomplete information through privately known types; Harsanyi’s device of a chance move by Nature turns it into an extensive-form game of imperfect information.</li>
 </ol></li>
-<li>Each player updates to a <strong>posterior belief</strong> <span class="math inline">\(\phi_i(\cdot \given \theta_i)\)</span> by Bayes’ rule; with independent types posteriors equal marginals, with correlated types they need not.</li>
-<li>A <strong>Bayesian Nash equilibrium</strong> (<a href="#def-4-bne" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>) requires <em>every type</em> of every player to best-respond; a profile is a BNE if and only if it is a Nash equilibrium of the equivalent extensive form (<a href="#thm-4-bne-ne" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>). Since only posteriors matter, one can even drop the common prior, allowing no-common-prior belief systems.</li>
-<li>Worked examples: <strong>Cournot with private cost</strong> (closed-form <span class="math inline">\(q_h^*, q_\ell^*,
-q_2^*\)</span>) and <strong>study groups</strong> (continuum of types, cutoff strategy, unique cutoff <span class="math inline">\(c^{1/3}\)</span>).</li>
-<li>Applications: <strong>adverse selection</strong> in the lemons market (only the poorest cars trade — Akerlof’s inefficiency), <strong>jury voting</strong> under unanimity (voting one’s signal is not a BNE; condition on being pivotal), and <strong>purification</strong> (a mixed equilibrium of Matching Pennies is the <span class="math inline">\(\eps \to 0\)</span> limit of pure BNE of perturbed games).</li>
-<li><strong>Auctions</strong>: in the second-price and English formats bidding your value is weakly dominant, a BNE, and efficient; in the first-price and Dutch formats bidders shade to <span class="math inline">\(s(\theta) = \theta - \int_{\underline\theta}^{\theta} F^{n-1}/F^{n-1}(\theta)\)</span>, which is <span class="math inline">\(\frac{n-1}{n}\theta\)</span> in the uniform case. All four standard formats raise the same expected revenue (<span class="math inline">\(\frac{n-1}{n+1}\)</span> for uniform <span class="math inline">\([0,1]\)</span>) — the <strong>Revenue Equivalence Theorem</strong>. In <strong>common-value</strong> auctions, winning is bad news: the <strong>winner’s curse</strong> forces additional shading.</li>
+<li>Each player updates to a posterior belief <span class="math inline">\(\phi_i(\cdot \given \theta_i)\)</span> by Bayes’ rule; with independent types posteriors equal marginals, with correlated types they need not.</li>
+<li>A Bayesian Nash equilibrium (<a href="#def-4-bne" class="quarto-xref">Definition&nbsp;<span>4.3</span></a>) requires <em>every type</em> of every player to best-respond; a profile is a BNE if and only if it is a Nash equilibrium of the equivalent extensive form (<a href="#thm-4-bne-ne" class="quarto-xref">Theorem&nbsp;<span>4.1</span></a>). Since only posteriors matter, one can even drop the common prior, allowing no-common-prior belief systems.</li>
+<li>Worked examples: Cournot with private cost (closed-form <span class="math inline">\(q_h^*, q_\ell^*,
+q_2^*\)</span>) and study groups (continuum of types, cutoff strategy, unique cutoff <span class="math inline">\(c^{1/3}\)</span>).</li>
+<li>Applications: adverse selection in the lemons market (only the poorest cars trade, Akerlof’s inefficiency), jury voting under unanimity (voting one’s signal is not a BNE; condition on being pivotal), and purification (a mixed equilibrium of Matching Pennies is the <span class="math inline">\(\eps \to 0\)</span> limit of pure BNE of perturbed games).</li>
+<li>Auctions: in the second-price and English formats bidding your value is weakly dominant, a BNE, and efficient; in the first-price and Dutch formats bidders shade to <span class="math inline">\(s(\theta) = \theta - \int_{\underline\theta}^{\theta} F^{n-1}/F^{n-1}(\theta)\)</span>, which is <span class="math inline">\(\frac{n-1}{n}\theta\)</span> in the uniform case. All four standard formats raise the same expected revenue (<span class="math inline">\(\frac{n-1}{n+1}\)</span> for uniform <span class="math inline">\([0,1]\)</span>), as stated by the Revenue Equivalence Theorem. In common-value auctions, winning is bad news: the winner’s curse forces additional shading.</li>
 </ul>
-<p>The next chapter combines sequential moves with incomplete information, refining Bayesian Nash equilibrium into <strong>perfect Bayesian equilibrium</strong> for dynamic games.</p>
+<p>The next chapter combines sequential moves with incomplete information, refining Bayesian Nash equilibrium into perfect Bayesian equilibrium for dynamic games.</p>
 
 
 </section>

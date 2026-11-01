@@ -295,7 +295,7 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>Chapter 1 ended at a doorway: every RL algorithm starts from Howard policy iteration and replaces its exact policy-evaluation step with something estimated from samples. This chapter walks through that doorway twice. First <strong>directly</strong>, by replacing the evaluation step with a plain sample average of returns, which gives the MC Basic algorithm. Then <strong>more carefully</strong>, by asking what it means to solve an equation when you only ever see noisy observations of it, which is the theory of <strong>stochastic approximation</strong> and the bridge from Monte Carlo to temporal-difference learning.</p>
+<p>Replacing Howard policy iteration’s exact evaluation step with a sample average of returns gives the MC Basic algorithm. Stochastic approximation then provides convergence results for equations observed with noise and the basis for temporal-difference learning.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -316,7 +316,7 @@ window.Quarto = {
 v(s_{0})=\max_{\{a_{t}\}_{t=0}^{\infty}}\E_{0}\!\left[\sum_{t=0}^{\infty}\beta^{t}r(s_{t},a_{t})\right]
 \quad\text{s.t.}\quad s_{t+1}\sim p(\cdot\given s_{t},a_{t}),\ \ s_{0}\text{ given},
 \]</span></p>
-<p>whose solution is an optimal policy <span class="math inline">\(a=\pi(s)\)</span>. That goal does not change in this chapter. Two conventions do.</p>
+<p>whose solution is an optimal policy <span class="math inline">\(a=\pi(s)\)</span>. We now use two RL conventions.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Notation: from β to γ, and from deterministic to stochastic policies">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -327,12 +327,12 @@ v(s_{0})=\max_{\{a_{t}\}_{t=0}^{\infty}}\E_{0}\!\left[\sum_{t=0}^{\infty}\beta^{
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>From here on the book speaks RL rather than dynamic programming:</p>
+<p>From this chapter onward:</p>
 <ul>
 <li>the discount factor is written <strong><span class="math inline">\(\gamma\)</span></strong> rather than <span class="math inline">\(\beta\)</span>;</li>
 <li>policies are <strong>stochastic</strong>, <span class="math inline">\(a_{t}\sim\pi(\cdot\given s_{t})\)</span>, so <span class="math inline">\(\pi(a\given s)\)</span> is a probability rather than a chosen action.</li>
 </ul>
-<p>Chapter 1 keeps <span class="math inline">\(\beta\)</span> and deterministic <span class="math inline">\(\pi(s)\)</span> because it is dynamic programming. Nothing about the problem changes at this line; only the dialect does.</p>
+<p>Chapter 1 uses <span class="math inline">\(\beta\)</span> and deterministic <span class="math inline">\(\pi(s)\)</span>; the underlying control problem is unchanged.</p>
 </div>
 </div>
 <p>Under a stochastic policy the maximization in the Bellman equation <a href="01-notes.html#eq-bellman" class="quarto-xref">Equation&nbsp;<span>1.4</span></a> is over <em>distributions</em> over actions rather than over actions, so the one-step reward and the transition both get averaged against <span class="math inline">\(\pi\)</span>:</p>
@@ -367,7 +367,7 @@ Tip
 </section>
 <section id="monte-carlo-methods" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="monte-carlo-methods"><span class="header-section-number">2.2</span> Monte Carlo methods</h2>
-<p>The goal of this section is one idea: <strong>make policy iteration model-free.</strong></p>
+<p>Monte Carlo policy iteration estimates action values from sampled returns.</p>
 <section id="where-the-model-still-hides" class="level3">
 <h3 class="anchored" data-anchor-id="where-the-model-still-hides">Where the model still hides</h3>
 <p>Recall the two steps of Howard policy iteration, now in RL notation:</p>
@@ -377,7 +377,7 @@ Tip
 \boldsymbol{\pi}_{k+1} &amp;= \argmax_{\pi}\big(\mathbf{r}_{\pi}+\gamma\,\mathbf{P}_{\pi}\mathbf{v}_{\pi_{k}}\big)
 \end{cases}
 \tag{2.3}\]</span></span></p>
-<p>the first being policy evaluation (PE) and the second policy improvement (PI). Writing PI out one state at a time exposes what the improvement step is really doing:</p>
+<p>The first step is policy evaluation (PE), and the second is policy improvement (PI). State by state, PI is</p>
 <p><span id="eq-pi-elementwise"><span class="math display">\[
 \begin{aligned}
 \pi_{k+1}(s)
@@ -385,7 +385,7 @@ Tip
 &amp;=\argmax_{\pi}\sum_{a}\pi(a\given s)\,q_{\pi_{k}}(s,a).
 \end{aligned}
 \tag{2.4}\]</span></span></p>
-<p>So the entire algorithm reduces to one question: <strong>how do we get <span class="math inline">\(q_{\pi_{k}}(s,a)\)</span>?</strong></p>
+<p>The remaining task is to estimate <span class="math inline">\(q_{\pi_{k}}(s,a)\)</span>.</p>
 </section>
 <section id="two-expressions-for-the-action-value" class="level3">
 <h3 class="anchored" data-anchor-id="two-expressions-for-the-action-value">Two expressions for the action value</h3>
@@ -436,11 +436,10 @@ Table&nbsp;2.1: The same action value, obtained from a model or from data.
 </div>
 </figure>
 </div>
-<p>The two agree, which is exactly what the derivation under <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> established. <strong>This is the whole trick</strong>: <a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> is an expectation, and Chapter 1 already showed that an expectation you cannot integrate is an expectation you can average.</p>
+<p>The derivation under <a href="01-notes.html#def-qfun" class="quarto-xref">Definition&nbsp;<span>1.3</span></a> establishes their equivalence. Since <a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a> is an expectation, it can be estimated by averaging sampled returns.</p>
 </section>
 <section id="estimating-q-from-episodes" class="level3">
 <h3 class="anchored" data-anchor-id="estimating-q-from-episodes">Estimating <span class="math inline">\(q\)</span> from episodes</h3>
-<p>Concretely:</p>
 <ul>
 <li>start from <span class="math inline">\((s,a)\)</span>, follow <span class="math inline">\(\pi_{k}\)</span>, and generate an episode <span class="math inline">\(t=0,1,\dots,T\)</span>;</li>
 <li>do this <span class="math inline">\(N\)</span> times, collecting episodes <span class="math inline">\(i=1,2,\dots,N\)</span>;</li>
@@ -451,13 +450,13 @@ q_{\pi_{k}}(s,a)
 =\E_{\pi_{k}}\!\left[\sum_{t=0}^{\infty}\gamma^{t}r(s_{t},a_{t})\ \given\ s_{0}=s,\,a_{0}=a\right]
 \approx\frac{1}{N}\sum_{i=1}^{N}\sum_{t=0}^{T}\gamma^{t}r\big(s_{t}^{i},a_{t}^{i}\big).
 \tag{2.7}\]</span></span></p>
-<div class="callout callout-style-default callout-warning callout-titled" title="Two approximation errors, not one">
+<div class="callout callout-style-default callout-warning callout-titled" title="Sampling error and truncation bias">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Warning</span>Two approximation errors, not one
+<span class="screen-reader-only">Warning</span>Sampling error and truncation bias
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -466,7 +465,7 @@ q_{\pi_{k}}(s,a)
 <li>a <strong>finite number of episodes</strong> <span class="math inline">\(N\)</span>, which is sampling error;</li>
 <li><strong>truncation</strong> of each episode at a finite horizon <span class="math inline">\(T\)</span>, which is a bias of order <span class="math inline">\(\gamma^{T}\)</span>.</li>
 </ol>
-<p>Both vanish as <span class="math inline">\(N,T\to\infty\)</span>, but they are controlled by different knobs: more episodes reduce the first, longer episodes the second.</p>
+<p>Both vanish as <span class="math inline">\(N,T\to\infty\)</span>: more episodes reduce sampling error, and longer episodes reduce truncation bias.</p>
 </div>
 </div>
 <div id="cell-fig-2-mc-errors" class="cell" data-execution_count="2">
@@ -527,7 +526,7 @@ Figure&nbsp;2.1: The two errors of <a href="#eq-mc-return" class="quarto-xref">E
 </section>
 <section id="the-mc-basic-algorithm" class="level3">
 <h3 class="anchored" data-anchor-id="the-mc-basic-algorithm">The MC Basic algorithm</h3>
-<p>Substituting <a href="#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a> for the evaluation step of <a href="#eq-hpi-rl" class="quarto-xref">Equation&nbsp;<span>2.3</span></a> gives the simplest model-free algorithm there is.</p>
+<p>Substituting <a href="#eq-mc-return" class="quarto-xref">Equation&nbsp;<span>2.7</span></a> for the evaluation step of <a href="#eq-hpi-rl" class="quarto-xref">Equation&nbsp;<span>2.3</span></a> gives MC Basic.</p>
 <div class="callout callout-style-simple callout-note callout-titled" title="Algorithm: MC Basic">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -602,9 +601,8 @@ Table&nbsp;2.2: MC Basic is Howard policy iteration with sample averages in plac
 </div>
 </figure>
 </div>
-<p>Three remarks are worth making.</p>
-<p><strong>Why action values rather than state values.</strong> Because a state value cannot be turned into a decision on its own: converting <span class="math inline">\(v\)</span> into a policy requires the model, as the improvement row of <a href="#tbl-mcbasic-hpi" class="quarto-xref">Table&nbsp;<span>2.2</span></a> shows. When the model is unavailable, estimate the object that <em>is</em> directly comparable across actions.</p>
-<p><strong>Exploration is smuggled in as an assumption.</strong> Step 1 assumes episodes can be started from <em>any</em> pair <span class="math inline">\((s,a)\)</span>, an assumption usually called <strong>exploring starts</strong>. It is doing all the work of exploration, and it is the one assumption we can actually get rid of, which the next section does.</p>
+<p>A state value cannot be turned into a decision on its own: converting <span class="math inline">\(v\)</span> into a policy requires the model, as the improvement row of <a href="#tbl-mcbasic-hpi" class="quarto-xref">Table&nbsp;<span>2.2</span></a> shows. When the model is unavailable, estimate the object that <em>is</em> directly comparable across actions.</p>
+<p>Step 1 assumes episodes can be started from <em>any</em> pair <span class="math inline">\((s,a)\)</span>, an assumption usually called <strong>exploring starts</strong>. This supplies exploration; the next section replaces it with policy-based exploration.</p>
 <p><strong>Convergence.</strong> Policy iteration converges, and MC Basic is policy iteration, so MC Basic converges too, given sufficiently many episodes at every step.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -616,13 +614,13 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>MC Basic is not a practical algorithm. It re-collects a fresh batch of episodes for <strong>every</strong> state-action pair at <strong>every</strong> iteration and throws away everything it learned from the previous batch, which makes it hopelessly sample-inefficient. Its purpose here is to isolate the one conceptual move (expectation <span class="math inline">\(\to\)</span> sample average) before the efficiency questions arrive.</p>
+<p>MC Basic collects a fresh batch of episodes for every state-action pair at every iteration and discards previous batches. This makes it sample-inefficient. It illustrates the replacement expectation <span class="math inline">\(\to\)</span> sample average.</p>
 </div>
 </div>
 </section>
 <section id="removing-exploring-starts-eps-greedy-policies" class="level3">
 <h3 class="anchored" data-anchor-id="removing-exploring-starts-eps-greedy-policies">Removing exploring starts: <span class="math inline">\(\eps\)</span>-greedy policies</h3>
-<p>Exploring starts is an assumption about the <em>environment</em>, and usually a false one: you rarely get to reset a system into an arbitrary state-action pair. But notice what it was for. Greedy improvement in step 3 of MC Basic produces a policy that puts probability 1 on one action, so following it never generates data about the others, and an action never tried can never be found to be good. Exploring starts patched that from outside. The alternative is to patch it from inside, by refusing to make the policy fully greedy.</p>
+<p>Exploring starts requires resetting the environment to an arbitrary state-action pair, which is usually unavailable. Greedy improvement in step 3 of MC Basic assigns probability 1 to one action, so following it supplies no data about other actions. A policy that retains some randomization supplies exploration without arbitrary resets.</p>
 <div id="def-eps-greedy" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 2.2 (ε-greedy policy)</strong></span> For <span class="math inline">\(\eps\in[0,1]\)</span>, the <strong><span class="math inline">\(\eps\)</span>-greedy</strong> policy with respect to <span class="math inline">\(q\)</span> is <span class="math display">\[
 \pi(a\given s)=
@@ -645,7 +643,7 @@ Tip
 <p>Read <a href="#def-eps-greedy" class="quarto-xref">Definition&nbsp;<span>2.2</span></a> as: with probability <span class="math inline">\(1-\eps\)</span> act greedily, and with probability <span class="math inline">\(\eps\)</span> pick uniformly at random among <em>all</em> actions. The greedy action keeps the largest share for any <span class="math inline">\(\eps&lt;1\)</span>, so the policy still improves; but every action keeps probability at least <span class="math inline">\(\eps/|\mathcal{A}(s)|&gt;0\)</span>, so no action is ever starved of data. Setting <span class="math inline">\(\eps=0\)</span> recovers the greedy policy of MC Basic; setting <span class="math inline">\(\eps=1\)</span> gives the uniform policy.</p>
 </div>
 </div>
-<p>This is the <strong>exploitation-exploration trade-off</strong>, and <span class="math inline">\(\eps\)</span> is the dial. An <span class="math inline">\(\eps\)</span>-greedy policy is <em>soft</em>: every action has positive probability everywhere, so a single sufficiently long episode visits every <span class="math inline">\((s,a)\)</span> pair infinitely often, provided every state is reachable under <span class="math inline">\(\pi\)</span> from the start distribution and the induced chain is therefore irreducible on <span class="math inline">\(\mathcal{S}\)</span>. Exploring starts becomes unnecessary, because exploration is now a property of the policy rather than a favour asked of the environment.</p>
+<p>The parameter <span class="math inline">\(\eps\)</span> controls the exploitation-exploration trade-off. An <span class="math inline">\(\eps\)</span>-greedy policy is <em>soft</em>: every action has positive probability everywhere, so a single sufficiently long episode visits every <span class="math inline">\((s,a)\)</span> pair infinitely often, provided every state is reachable under <span class="math inline">\(\pi\)</span> from the start distribution and the induced chain is therefore irreducible on <span class="math inline">\(\mathcal{S}\)</span>. Under these conditions, the policy supplies exploration without exploring starts.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -656,21 +654,21 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Nothing is free. Restricting improvement to <span class="math inline">\(\eps\)</span>-greedy policies means the algorithm converges to the best policy <em>among <span class="math inline">\(\eps\)</span>-greedy policies</em>, not to the optimal policy, and the gap grows with <span class="math inline">\(\eps\)</span>. The standard fix is to shrink <span class="math inline">\(\eps\)</span> toward zero as learning proceeds: explore aggressively while the estimates are bad, and act greedily once they are good.</p>
+<p>Restricting improvement to <span class="math inline">\(\eps\)</span>-greedy policies means the algorithm converges to the best policy <em>among <span class="math inline">\(\eps\)</span>-greedy policies</em>, not to the optimal policy, and the gap grows with <span class="math inline">\(\eps\)</span>. The standard fix is to shrink <span class="math inline">\(\eps\)</span> toward zero as learning proceeds: explore aggressively while the estimates are bad, and act greedily once they are good.</p>
 </div>
 </div>
 </section>
 </section>
 <section id="stochastic-approximation" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="stochastic-approximation"><span class="header-section-number">2.3</span> Stochastic approximation</h2>
-<p>There are two reasons to leave RL for a section and study stochastic approximation on its own terms.</p>
+<p>Stochastic approximation is useful here for two reasons.</p>
 <ol type="1">
 <li>It is the essential preliminary for <strong>temporal-difference learning</strong>, and so the bridge from Monte Carlo RL to TD, the update Chapter 1 introduced as <a href="01-notes.html#eq-td0" class="quarto-xref">Equation&nbsp;<span>1.3</span></a> without justifying it.</li>
 <li>It has many applications in economics beyond RL.</li>
 </ol>
 <section id="motivating-example-mean-estimation" class="level3">
 <h3 class="anchored" data-anchor-id="motivating-example-mean-estimation">Motivating example: mean estimation</h3>
-<p>Return to the plainest possible version of the problem. Given a random variable <span class="math inline">\(X\)</span> and iid samples <span class="math inline">\(\{x_{i}\}_{i=1}^{N}\)</span>, estimate <span class="math inline">\(\E[X]\)</span> by</p>
+<p>Consider mean estimation. Given a random variable <span class="math inline">\(X\)</span> and iid samples <span class="math inline">\(\{x_{i}\}_{i=1}^{N}\)</span>, estimate <span class="math inline">\(\E[X]\)</span> by</p>
 <p><span class="math display">\[
 \E[X]\approx\bar{x}=\frac{1}{N}\sum_{i=1}^{N}x_{i},
 \qquad
@@ -686,10 +684,10 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Because in RL almost everything is an expectation. Action values are expectations, <a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a>. Policy gradients are expectations. Every algorithm in this book is, underneath, a way of estimating a mean under awkward conditions.</p>
+<p>Action values (<a href="#eq-q-mc" class="quarto-xref">Equation&nbsp;<span>2.6</span></a>) and policy gradients are expectations, so mean estimation underlies the algorithms developed here.</p>
 </div>
 </div>
-<p>The interesting question is not <em>what</em> <span class="math inline">\(\bar{x}\)</span> is but <em>how</em> to compute it.</p>
+<p>There are two ways to compute <span class="math inline">\(\bar{x}\)</span>.</p>
 <ol type="1">
 <li><strong>Batch.</strong> Collect all samples, then average. The drawback: if samples arrive one at a time over a period, nothing can be reported until the last one lands.</li>
 <li><strong>Incremental.</strong> Update the estimate as each sample arrives.</li>
@@ -780,7 +778,7 @@ w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}).
 </section>
 <section id="the-robbins-monro-algorithm" class="level3">
 <h3 class="anchored" data-anchor-id="the-robbins-monro-algorithm">The Robbins-Monro algorithm</h3>
-<p><strong>Stochastic approximation (SA)</strong> refers to a broad class of stochastic iterative algorithms for root-finding or optimization. What makes it powerful, relative to gradient-based methods, is that it requires knowing <strong>neither the expression of the objective function nor its derivative</strong>. The <strong>Robbins-Monro (RM)</strong> algorithm is the pioneering work in the field; stochastic gradient descent is a special case of it, and it is what explains why <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a> works.</p>
+<p>Stochastic approximation (SA) uses stochastic iterative algorithms for root-finding or optimization. It can operate with noisy function observations, without an explicit objective or its derivative. The Robbins-Monro (RM) algorithm is an early example; stochastic gradient descent is a special case, and its convergence theorem explains <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a>.</p>
 <div class="callout callout-style-simple callout-note callout-titled" title="Preliminary: the gradient">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -830,10 +828,10 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Root-finding is less special than it looks. If <span class="math inline">\(J(w)\)</span> is an objective to be minimized, its first-order condition <span class="math inline">\(g(w)=\nabla_{w}J(w)=0\)</span> is a root-finding problem. Optimization is root-finding on the gradient.</p>
+<p>Optimization also leads to root-finding. If <span class="math inline">\(J(w)\)</span> is an objective to be minimized, its first-order condition <span class="math inline">\(g(w)=\nabla_{w}J(w)=0\)</span> is a root-finding problem. Optimization is root-finding on the gradient.</p>
 </div>
 </div>
-<p>How to solve <span class="math inline">\(g(w)=0\)</span> splits along the same line as everything else in this chapter:</p>
+<p>The method for solving <span class="math inline">\(g(w)=0\)</span> depends on the information available:</p>
 <ul>
 <li><strong>Model-based.</strong> If the expression of <span class="math inline">\(g\)</span> is known, standard numerical algorithms apply.</li>
 <li><strong>Model-free.</strong> What if the expression of <span class="math inline">\(g\)</span> is unknown, and all we obtain are <em>noisy observations</em> of its values?</li>
@@ -874,8 +872,7 @@ w_{k+1}=w_{k}-\alpha_{k}\,\tilde{g}(w_{k},\eta_{k}),
 </section>
 <section id="why-the-robbins-monro-theorem-is-true" class="level3">
 <h3 class="anchored" data-anchor-id="why-the-robbins-monro-theorem-is-true">Why the Robbins-Monro theorem is true</h3>
-<p><a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> is usually quoted and not proved. It is worth proving, because the argument is short once the right tool is in hand, and because that same tool proves every convergence result in the next chapter.</p>
-<p>The tool is a classical result of Dvoretzky on stochastic processes of a particular shape.</p>
+<p>Dvoretzky’s theorem proves <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> and also supports the convergence arguments in the next chapter.</p>
 <div id="thm-dvoretzky" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 2.2 (Dvoretzky)</strong></span> Consider the stochastic process <span id="eq-dvoretzky"><span class="math display">\[
 \Delta_{k+1}=(1-\alpha_{k})\Delta_{k}+\beta_{k}\eta_{k},
@@ -896,8 +893,8 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Read <a href="#eq-dvoretzky" class="quarto-xref">Equation&nbsp;<span>2.11</span></a> as a tug of war. The factor <span class="math inline">\((1-\alpha_{k})\)</span> contracts the error toward zero; the term <span class="math inline">\(\beta_{k}\eta_{k}\)</span> kicks it away at random. Condition 1 says the contraction wins: <span class="math inline">\(\sum\alpha_{k}=\infty\)</span> makes the pulling relentless, while <span class="math inline">\(\sum\alpha_{k}^{2},\sum\beta_{k}^{2}&lt;\infty\)</span> make the accumulated kicking finite. Condition 2 says the kicks are unbiased with bounded variance, so they cancel rather than drift.</p>
-<p>Two things separate <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> from the naive argument. First, <span class="math inline">\(\alpha_{k}\)</span> and <span class="math inline">\(\beta_{k}\)</span> are allowed to be <strong>random</strong>, and to depend on the history: that is exactly what is needed below, where the effective step size turns out to depend on the current iterate. Second, the conclusion is almost-sure convergence, not convergence in mean. The proof of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> itself rests on convergence results for quasimartingales and is not reproduced here; the RM theorem is a corollary of it, and that corollary is the part worth seeing.</p>
+<p>In <a href="#eq-dvoretzky" class="quarto-xref">Equation&nbsp;<span>2.11</span></a>, contraction competes with noise. The factor <span class="math inline">\((1-\alpha_{k})\)</span> contracts the error toward zero; the term <span class="math inline">\(\beta_{k}\eta_{k}\)</span> adds random noise. Condition 1 says the contraction wins: <span class="math inline">\(\sum\alpha_{k}=\infty\)</span> gives unbounded cumulative contraction, while <span class="math inline">\(\sum\alpha_{k}^{2},\sum\beta_{k}^{2}&lt;\infty\)</span> bound the accumulated noise. Condition 2 requires zero-mean noise with bounded variance, so it adds no systematic drift.</p>
+<p>Two features of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> are useful here. First, <span class="math inline">\(\alpha_{k}\)</span> and <span class="math inline">\(\beta_{k}\)</span> are allowed to be <strong>random</strong>, and to depend on the history: that is exactly what is needed below, where the effective step size turns out to depend on the current iterate. Second, the conclusion is almost-sure convergence, not convergence in mean. The proof of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> itself rests on convergence results for quasimartingales and is not reproduced here; the RM theorem follows as a corollary.</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled" title="Proof of the Robbins-Monro theorem">
@@ -914,7 +911,7 @@ Tip
 <div class="callout-body-container callout-body">
 <p>Let <span class="math inline">\(w^{*}\)</span> be the root, so <span class="math inline">\(g(w^{*})=0\)</span>, and write the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> with the noisy observation expanded: <span class="math display">\[
 w_{k+1}=w_{k}-\alpha_{k}\tilde{g}(w_{k},\eta_{k})=w_{k}-\alpha_{k}\big[g(w_{k})+\eta_{k}\big].
-\]</span> Subtract <span class="math inline">\(w^{*}\)</span> from both sides and insert <span class="math inline">\(g(w^{*})=0\)</span> for free: <span class="math display">\[
+\]</span> Subtract <span class="math inline">\(w^{*}\)</span> from both sides and use <span class="math inline">\(g(w^{*})=0\)</span>: <span class="math display">\[
 w_{k+1}-w^{*}=w_{k}-w^{*}-\alpha_{k}\big[g(w_{k})-g(w^{*})+\eta_{k}\big].
 \]</span> By the mean value theorem there is a <span class="math inline">\(w_{k}'\)</span> between <span class="math inline">\(w_{k}\)</span> and <span class="math inline">\(w^{*}\)</span> with <span class="math display">\[
 g(w_{k})-g(w^{*})=\nabla_{w}g(w_{k}')\,(w_{k}-w^{*}).
@@ -942,7 +939,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Notice where hypothesis 1 of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> was spent. The lower bound <span class="math inline">\(c_{1}&gt;0\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}=\infty\)</span> from collapsing, which is what stops the iteration stalling at a point where <span class="math inline">\(g\)</span> has gone flat; the upper bound <span class="math inline">\(c_{2}\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}^{2}\)</span> finite, which is what stops a steep <span class="math inline">\(g\)</span> from turning a small step into a large jump. The condition is not a technicality but the precise statement that <span class="math inline">\(g\)</span> is neither too flat nor too steep anywhere.</p>
+<p>Notice where hypothesis 1 of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> was spent. The lower bound <span class="math inline">\(c_{1}&gt;0\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}=\infty\)</span> from collapsing, which is what stops the iteration stalling at a point where <span class="math inline">\(g\)</span> has gone flat; the upper bound <span class="math inline">\(c_{2}\)</span> keeps <span class="math inline">\(\sum\bar{\alpha}_{k}^{2}\)</span> finite, which is what stops a steep <span class="math inline">\(g\)</span> from turning a small step into a large jump. The condition bounds the slope of <span class="math inline">\(g\)</span> away from zero and infinity.</p>
 <p>Notice also that <span class="math inline">\(\bar{\alpha}_{k}\)</span> depends on <span class="math inline">\(w_{k}'\)</span>, hence on the iterate, hence on the history. A version of <a href="#thm-dvoretzky" class="quarto-xref">Theorem&nbsp;<span>2.2</span></a> requiring deterministic step sizes would not close this argument.</p>
 </div>
 </div>
@@ -965,7 +962,7 @@ g(w)=w-\E[X],
 \]</span></p></li>
 <li><p><strong>Apply RM.</strong> Substituting into <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a>, <span class="math display">\[
 w_{k+1}=w_{k}-\alpha_{k}\,\tilde{g}(w_{k},x_{k})=w_{k}-\alpha_{k}(w_{k}-x_{k}),
-\]</span> which is precisely <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a>. Its convergence is therefore not a separate fact to be proved but a corollary of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>.</p></li>
+\]</span> which is precisely <a href="#eq-mean-general" class="quarto-xref">Equation&nbsp;<span>2.9</span></a>. Its convergence follows from <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>.</p></li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -980,7 +977,7 @@ Note
 <p>Check the hypotheses hold here: <span class="math inline">\(\nabla_{w}g(w)=1\)</span>, so condition 1 is satisfied with <span class="math inline">\(c_{1}=c_{2}=1\)</span>; and <span class="math inline">\(\eta=\E[X]-x\)</span> has mean zero by construction, so condition 3 holds whenever <span class="math inline">\(X\)</span> has finite variance. Only condition 2 constrains the algorithm, and it is a constraint on the step sizes we choose, not on the problem.</p>
 </div>
 </div>
-<p>Since condition 2 is the only one with any bite here, it is worth seeing what it does.</p>
+<p>The figure compares step sizes that satisfy or violate condition 2.</p>
 <div id="cell-fig-2-step-size" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>One sample stream, three step-size rules, run through <span class="citation" data-cites="eq-mean-general">@eq-mean-general</span></summary>
@@ -1038,7 +1035,7 @@ Figure&nbsp;2.2: The recursion <a href="#eq-mean-general" class="quarto-xref">Eq
 </section>
 <section id="stochastic-gradient-descent" class="level3">
 <h3 class="anchored" data-anchor-id="stochastic-gradient-descent">Stochastic gradient descent</h3>
-<p>The same argument, applied to a gradient instead of to a residual, produces the workhorse of everything that follows. Suppose we want to minimize</p>
+<p>Applying the same argument to a gradient gives stochastic gradient descent. Suppose we want to minimize</p>
 <p><span id="eq-sgd-objective"><span class="math display">\[
 J(w)=\E\big[f(w,X)\big]
 \tag{2.12}\]</span></span></p>
@@ -1087,7 +1084,7 @@ Table&nbsp;2.3: Three ways down the same objective <a href="#eq-sgd-objective" c
 <p><span id="eq-sgd"><span class="math display">\[
 w_{k+1}=w_{k}-\alpha_{k}\,\nabla_{w}f(w_{k},x_{k}).
 \tag{2.13}\]</span></span></p>
-<p>It replaces the true gradient by a <em>single-sample</em> estimate of it, which is a wildly noisy substitute. That it works at all is <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>.</p>
+<p>It replaces the true gradient with a noisy single-sample estimate. Its convergence follows from <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> under that theorem’s assumptions.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Derivation: SGD is Robbins-Monro on the first-order condition">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1106,11 +1103,10 @@ g(w)\defeq\nabla_{w}J(w)=\E\big[\nabla_{w}f(w,X)\big]=0 ,
 \tilde{g}(w,x)=\nabla_{w}f(w,x)
 =\underbrace{\E\big[\nabla_{w}f(w,X)\big]}_{g(w)}
 +\underbrace{\Big(\nabla_{w}f(w,x)-\E\big[\nabla_{w}f(w,X)\big]\Big)}_{\eta} .
-\]</span> Substituting into the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> gives exactly <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a>. So SGD is not a separate algorithm with its own theory: it is RM applied to a gradient, and its convergence conditions are the three of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>, read on <span class="math inline">\(g=\nabla_{w}J\)</span>.</p>
+\]</span> Substituting into the RM algorithm <a href="#eq-rm" class="quarto-xref">Equation&nbsp;<span>2.10</span></a> gives exactly <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a>. SGD is RM applied to a gradient, with the three convergence conditions of <a href="#thm-robbins-monro" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a> imposed on <span class="math inline">\(g=\nabla_{w}J\)</span>.</p>
 </div>
 </div>
 </div>
-<p>The circle closes on the example this section started from.</p>
 <div id="exm-mean-sgd" class="theorem example">
 <p><span class="theorem-title"><strong>Example 2.1 (Mean estimation is SGD)</strong></span> Take <span class="math inline">\(f(w,x)=\tfrac{1}{2}|w-x|^{2}\)</span>, so that <span class="math inline">\(J(w)=\tfrac{1}{2}\E|w-X|^{2}\)</span> is minimized at <span class="math inline">\(w^{*}=\E[X]\)</span>. Then <span class="math inline">\(\nabla_{w}f(w,x)=w-x\)</span>, and <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> reads <span class="math display">\[
 w_{k+1}=w_{k}-\alpha_{k}(w_{k}-x_{k}),
@@ -1126,7 +1122,7 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> is the engine of the rest of the book. Chapter 3 uses it to fit a parametric value function <span class="math inline">\(\hat{v}(s,w)\)</span> by descending the squared error, which is what turns tabular TD learning into TD learning with function approximation. Chapter 4 runs it in the other direction, as stochastic gradient <em>ascent</em> on the value of a parameterized policy, which is what policy gradient methods are.</p>
+<p>The following chapters use <a href="#eq-sgd" class="quarto-xref">Equation&nbsp;<span>2.13</span></a> in two ways. Chapter 3 uses it to fit a parametric value function <span class="math inline">\(\hat{v}(s,w)\)</span> by descending the squared error, which is what turns tabular TD learning into TD learning with function approximation. Chapter 4 runs it in the other direction, as stochastic gradient <em>ascent</em> on the value of a parameterized policy, which is what policy gradient methods are.</p>
 </div>
 </div>
 

@@ -280,7 +280,9 @@ window.Quarto = {
 </header>
 
 
-<p>This chapter is the master notation table for the whole book. The conventions here are field-standard and override the courseware wherever they differ; the <strong>“Course writes”</strong> column records each deviation so you can cross-reference Zhang Bo’s slides. The choice of notation policy is recorded in <code>docs/adr/0002-pragmatic-notation-standardization.md</code>, and the canonical <em>word</em> for each concept in <code>CONTEXT.md</code>.</p>
+<p>These conventions apply throughout the book. The “Course writes” column records differences from Zhang Bo’s notation.</p>
+<!-- The notation policy is recorded in
+`docs/adr/0002-pragmatic-notation-standardization.md`, and terminology in `CONTEXT.md`. -->
 <section id="sets-spaces-and-general-symbols" class="level2">
 <h2 class="anchored" data-anchor-id="sets-spaces-and-general-symbols">Sets, spaces, and general symbols</h2>
 <table class="caption-top table">
@@ -418,7 +420,7 @@ window.Quarto = {
 <tr class="odd">
 <td><span class="math inline">\(\tau=\operatorname{tr}A,\ \Delta=\det A\)</span></td>
 <td>trace and determinant (phase classification)</td>
-<td><span class="math inline">\(\sigma,\ \tau\)</span> (swapped!)</td>
+<td><span class="math inline">\(\sigma,\ \tau\)</span> (swapped)</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(e^{At}\)</span></td>
@@ -438,7 +440,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p>The course labels the trace <span class="math inline">\(\sigma\)</span> and the determinant <span class="math inline">\(\tau\)</span> in the planar-system classification. We use the more common <span class="math inline">\(\tau=\operatorname{tr}A\)</span> and <span class="math inline">\(\Delta=\det A\)</span> with discriminant <span class="math inline">\(\tau^2-4\Delta\)</span>. Watch this when comparing the <span class="math inline">\(\sigma\)</span>–<span class="math inline">\(\tau\)</span> diagrams.</p>
+<p>The course labels the trace <span class="math inline">\(\sigma\)</span> and the determinant <span class="math inline">\(\tau\)</span> in the planar-system classification. We use the more common <span class="math inline">\(\tau=\operatorname{tr}A\)</span> and <span class="math inline">\(\Delta=\det A\)</span> with discriminant <span class="math inline">\(\tau^2-4\Delta\)</span>. Use these conventions when comparing the <span class="math inline">\(\sigma\)</span>–<span class="math inline">\(\tau\)</span> diagrams.</p>
 </div>
 </div>
 </div>
@@ -635,7 +637,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p><strong>The discount trap.</strong> The course writes the discrete-time Bellman discount and the continuous-time discount with the <em>same</em> symbol <span class="math inline">\(\rho\)</span>, even though one is a factor in <span class="math inline">\((0,1)\)</span> and the other a rate in <span class="math inline">\((0,\infty)\)</span>. Throughout these notes: <strong><span class="math inline">\(\rho\)</span> is the continuous-time rate</strong> (<span class="math inline">\(e^{-\rho t}\)</span>, Ch. 3–4 and continuous DP) and <strong><span class="math inline">\(\beta=1/(1+\rho)\)</span> is the discrete-time factor</strong> (Ch. 5). Here <span class="math inline">\(\beta=1/(1+\rho)\)</span> is the per-period (simple) factor, whereas <span class="math inline">\(e^{-\rho}\)</span> is the continuous-compounding factor; the two agree only to first order, <span class="math inline">\(\beta=1-\rho+O(\rho^2)=e^{-\rho}+O(\rho^2)\)</span>, and the <span class="math inline">\(\rho\)</span> in each is a distinct object (a discrete per-period rate vs.&nbsp;a continuous-time rate).</p>
+<p><strong>Discount rate and factor.</strong> The course writes the discrete-time Bellman discount and the continuous-time discount with the <em>same</em> symbol <span class="math inline">\(\rho\)</span>, even though one is a factor in <span class="math inline">\((0,1)\)</span> and the other a rate in <span class="math inline">\((0,\infty)\)</span>. Throughout these notes: <strong><span class="math inline">\(\rho\)</span> is the continuous-time rate</strong> (<span class="math inline">\(e^{-\rho t}\)</span>, Ch. 3–4 and continuous DP) and <strong><span class="math inline">\(\beta=1/(1+\rho)\)</span> is the discrete-time factor</strong> (Ch. 5). Here <span class="math inline">\(\beta=1/(1+\rho)\)</span> is the per-period (simple) factor, whereas <span class="math inline">\(e^{-\rho}\)</span> is the continuous-compounding factor; the two agree only to first order, <span class="math inline">\(\beta=1-\rho+O(\rho^2)=e^{-\rho}+O(\rho^2)\)</span>, and the <span class="math inline">\(\rho\)</span> in each is a distinct object (a discrete per-period rate vs.&nbsp;a continuous-time rate).</p>
 </div>
 </div>
 </div>
