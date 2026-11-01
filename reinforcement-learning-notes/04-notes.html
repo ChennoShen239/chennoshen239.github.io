@@ -665,7 +665,7 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 </ol>
 </div>
 </div>
-<p>REINFORCE is <strong>episodic</strong> in the exact sense of <a href="03-notes.html#def-incremental" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>: <span class="math inline">\(G_{0}\)</span> cannot be formed until the reward at <span class="math inline">\(T\)</span> has been observed, so <span class="math inline">\(\theta\)</span> cannot move until the episode is over. That is the same limitation MC Basic had in Chapter 2, arriving now in parameter space rather than in a table.</p>
+<p>REINFORCE is <strong>episodic</strong> (<a href="03-notes.html#def-incremental" class="quarto-xref">Definition&nbsp;<span>3.1</span></a>): each <span class="math inline">\(G_t\)</span> uses rewards through the episode’s end, so the update waits for the final reward.</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="What the update does, one term at a time">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -685,14 +685,14 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 </div>
 <section id="a-clarification-about-the-pseudocode" class="level3">
 <h3 class="anchored" data-anchor-id="a-clarification-about-the-pseudocode">A clarification about the pseudocode</h3>
-<p>Standard presentations of REINFORCE, in Zhao, in Sutton and Barto, and in Murphy, write the update as a loop over <span class="math inline">\(t\)</span> inside each episode, which makes it look as though <span class="math inline">\(\theta\)</span> is being updated at every time step. It is not. <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> is one update per episode, and the inner loop is only an efficient way of accumulating its sum.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Derivation: the inner loop is an accumulator, not a sequence of updates">
+<p><a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> uses a frozen rollout parameter <span class="math inline">\(\theta_j\)</span>, as in Moll’s episode-level formula and Murphy’s equation (3.19). Every score is evaluated at the parameter that generated the episode.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Derivation: accumulating the episode gradient">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Derivation: the inner loop is an accumulator, not a sequence of updates
+<span class="screen-reader-only">Note</span>Derivation: accumulating the episode gradient
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -700,23 +700,23 @@ G_{t}\defeq\sum_{k=t}^{T}\gamma^{k-t}r_{k+1}.
 <div class="callout-body-container callout-body">
 <p>Write <span class="math inline">\(\theta_{j}^{t}\)</span> for the running value of the accumulator inside episode <span class="math inline">\(j\)</span>, initialized at <span class="math inline">\(\theta_{j}^{0}=\theta_{j}\)</span>. The inner loop performs <span class="math display">\[
 \theta_{j}^{t+1}=\theta_{j}^{t}+\alpha\gamma^{t}G_{t}\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j}),\qquad t=0,\dots,T.
-\]</span> The point is the argument of the score: it is <span class="math inline">\(\theta_{j}\)</span>, the parameter that generated the episode, held fixed throughout the loop, and never <span class="math inline">\(\theta_{j}^{t}\)</span>. So every increment is a fixed vector, and unrolling the recursion is just addition: <span class="math display">\[
+\]</span> Holding the score’s argument at <span class="math inline">\(\theta_j\)</span> makes each increment a fixed vector. Unrolling the recursion gives <span class="math display">\[
 \theta_{j}^{T+1}=\theta_{j}^{0}+\alpha\sum_{t=0}^{T}\gamma^{t}G_{t}\nabla_{\theta}\ln\pi(a_{t}\given s_{t},\theta_{j})=\theta_{j+1},
-\]</span> which is <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>. The accumulator therefore gives one update per episode.</p>
+\]</span> which is <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>.</p>
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-warning callout-titled" title="Where implementations depart from the theorem">
+<div class="callout callout-style-default callout-note callout-titled" title="Successive post-episode updates">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Warning</span>Where implementations depart from the theorem
+<span class="screen-reader-only">Note</span>Successive post-episode updates
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Some implementations genuinely do refresh <span class="math inline">\(\theta\)</span> inside the loop, evaluating the score at the current running value rather than at <span class="math inline">\(\theta_{j}\)</span>. This is done for sample efficiency, since it extracts several updates from one episode, but it is no longer <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>: the scores are then evaluated at parameters that have drifted away from the policy which generated the data, so the estimator is biased. The score’s parameter argument distinguishes the two implementations.</p>
+<p>Sutton and Barto (§13.3), Zhao (Algorithm 9.1), and Murphy (Algorithm 3) print parameter assignments inside the post-episode loop without a separate frozen copy. Read literally, these update the score’s parameter between terms. They still wait for a completed episode, but differ from <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a> at a finite step size. Returns sampled under <span class="math inline">\(\theta_j\)</span> do not generally give an unbiased policy-gradient estimate at the changed parameter. To implement <a href="#eq-reinforce" class="quarto-xref">Equation&nbsp;<span>4.11</span></a>, evaluate all scores at <span class="math inline">\(\theta_j\)</span> before updating, or retain a frozen copy.</p>
 </div>
 </div>
 </section>

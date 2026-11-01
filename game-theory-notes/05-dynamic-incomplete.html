@@ -381,7 +381,7 @@ Table&nbsp;5.2: The chain-store game at <span class="math inline">\(p=\tfrac12\)
 </section>
 <section id="why-subgame-perfection-has-no-bite" class="level3">
 <h3 class="anchored" data-anchor-id="why-subgame-perfection-has-no-bite">Why subgame perfection has no bite</h3>
-<p>The reason subgame perfection fails to eliminate <span class="math inline">\((SS,F)\)</span> is structural. The only proper subgame of <a href="#fig-5-chainstore-incomplete" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> is the <strong>whole game</strong>: because the incumbent’s two nodes lie in a <em>single</em> information set, no smaller subtree begins at a single node. With only the trivial subgame, every Nash equilibrium is automatically subgame perfect: <strong>Nash <span class="math inline">\(=\)</span> SPE</strong>.</p>
+<p>The reason subgame perfection fails to eliminate <span class="math inline">\((SS,F)\)</span> is structural. The only subgame of <a href="#fig-5-chainstore-incomplete" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> is the <strong>whole game</strong>: because the incumbent’s two nodes lie in a <em>single</em> information set, no smaller subtree begins at a single node. With only the trivial subgame, every Nash equilibrium is automatically subgame perfect: <strong>Nash <span class="math inline">\(=\)</span> SPE</strong>.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -392,7 +392,7 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This is a general feature of dynamic games with incomplete information: although the incumbent observes the entrant’s <em>action</em>, it does not observe the entrant’s <em>type</em>, so the information set spanning both types prevents the tree from splitting into proper subgames. Subgame perfection therefore has “no bite,” and we need a finer concept that extends sequential rationality to information sets <em>inside</em> a game. That concept is perfect Bayesian equilibrium.</p>
+<p>Here the incumbent observes the entrant’s action but not its type. The information set spanning both types prevents any proper subgame from starting at the incumbent’s decision. Incomplete information alone does not rule out proper subgames. Perfect Bayesian equilibrium imposes sequential rationality at information sets, including those that cannot start a subgame.</p>
 </div>
 </div>
 </section>
@@ -595,7 +595,7 @@ B \text{ is optimal after } U \iff \mu_U \le \tfrac38 .
 (0,1)\)</span>. Consistency gives <span class="math inline">\(\mu_D = 1\)</span> (only <span class="math inline">\(H\)</span> ever chooses <span class="math inline">\(D\)</span>) and <span class="math display">\[
 \mu_U = \frac{pq}{pq + (1-p)} = \frac{q}{q+1} .
 \]</span> For the <span class="math inline">\(H\)</span> type to be willing to mix, player 2 must make him indifferent by mixing <span class="math inline">\(M\)</span> and <span class="math inline">\(B\)</span> with equal probability after <span class="math inline">\(U\)</span>; and for player 2 to be willing to mix, she must be indifferent after <span class="math inline">\(U\)</span>, which by <a href="#eq-5-employer-br" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> requires <span class="math inline">\(\mu_U = \tfrac38\)</span>. Setting <span class="math inline">\(\tfrac{q}{q+1} = \tfrac38\)</span> gives <span class="math inline">\(q =
-\tfrac35\)</span>. So the <span class="math inline">\(H\)</span> type educates with probability <span class="math inline">\(\tfrac35\)</span>, player 2 randomises equally over <span class="math inline">\(M\)</span> and <span class="math inline">\(B\)</span> after <span class="math inline">\(U\)</span>, and <span class="math inline">\(\mu_U = \tfrac38\)</span>, <span class="math inline">\(\mu_D =
+\tfrac35\)</span>. So the <span class="math inline">\(H\)</span> type educates with probability <span class="math inline">\(1-q=\tfrac25\)</span>, player 2 randomises equally over <span class="math inline">\(M\)</span> and <span class="math inline">\(B\)</span> after <span class="math inline">\(U\)</span>, and <span class="math inline">\(\mu_U = \tfrac38\)</span>, <span class="math inline">\(\mu_D =
 1\)</span>.</p>
 </section>
 <section id="a-finite-signaling-game-a-continuum-of-equilibria" class="level3">
@@ -822,11 +822,11 @@ s_2(a_1'') = \begin{cases} \dfrac{\theta^*}{2}, &amp; a_1'' \ne a_1',\\[6pt]
 <section id="chapter-summary" class="level2" data-number="5.7">
 <h2 data-number="5.7" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">5.7</span> Chapter summary</h2>
 <ul>
-<li>With incomplete information, sequential play creates information sets that prevent the tree from splitting into proper subgames, so Nash <span class="math inline">\(=\)</span> SPE and subgame perfection “has no bite”, motivating a finer concept.</li>
+<li>In the chain-store example there are no proper subgames, so Nash <span class="math inline">\(=\)</span> SPE. Perfect Bayesian equilibrium also requires optimality at information sets that cannot start a subgame.</li>
 <li>A perfect Bayesian equilibrium (<a href="#def-5-pbe" class="quarto-xref">Definition&nbsp;<span>5.3</span></a>) augments a Bayesian Nash equilibrium with a system of beliefs <span class="math inline">\(\mu\)</span> (<a href="#def-5-beliefs" class="quarto-xref">Definition&nbsp;<span>5.2</span></a>) and imposes four requirements: beliefs exist; on-path beliefs obey Bayes’ rule (<span class="math inline">\(\mu(x) = \Prob^{\sigma^*}(x)/\Prob^{\sigma^*}(h)\)</span>); off-path beliefs are unrestricted; and strategies are sequentially rational given beliefs.</li>
 <li>When a BNE reaches <em>every</em> information set, the consistent belief system is unique and the BNE is automatically a PBE (<a href="#prp-5-unique-belief" class="quarto-xref">Proposition&nbsp;<span>5.1</span></a>).</li>
 <li>In signaling games, an informed sender’s costly action can credibly convey its type. In Spence’s education model, the degree is completely unproductive yet signals high ability in the separating equilibrium <span class="math inline">\((DU,
-BM)\)</span>, because imitation is too costly for the low type (<span class="math inline">\(c_L = 5 &gt; c_H = 2\)</span>); there is also a pooling equilibrium <span class="math inline">\((UU, BB)\)</span> revealing nothing, and (at <span class="math inline">\(p = \tfrac12\)</span>) a mixed equilibrium with the high type educating with probability <span class="math inline">\(\tfrac35\)</span>.</li>
+BM)\)</span>, because imitation is too costly for the low type (<span class="math inline">\(c_L = 5 &gt; c_H = 2\)</span>); there is also a pooling equilibrium <span class="math inline">\((UU, BB)\)</span> revealing nothing, and (at <span class="math inline">\(p = \tfrac12\)</span>) a mixed equilibrium with the high type educating with probability <span class="math inline">\(\tfrac25\)</span>.</li>
 <li>The intuitive criterion (<a href="#def-5-intuitive" class="quarto-xref">Definition&nbsp;<span>5.4</span></a>) refines PBE by deleting off-path beliefs on types <span class="math inline">\(D(a_1)\)</span> that would never deviate; the pooling equilibrium fails it because <span class="math inline">\(U(H) = 6 &lt; 8\)</span>, while the separating equilibrium survives.</li>
 <li>In cheap talk, the message is costless and payoff-irrelevant: full revelation is impossible for any bias (Claim 5.1), babbling always exists (Claim 5.2), and a partially informative two-message equilibrium with cutoff <span class="math inline">\(\theta^* = \tfrac12 - 2b\)</span> exists exactly when <span class="math inline">\(b &lt; \tfrac14\)</span> (Claims 5.3–5.4).</li>
 </ul>

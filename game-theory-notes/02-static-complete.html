@@ -624,7 +624,7 @@ Figure&nbsp;2.2: Cournot best responses. The two downward-sloping best-response 
 </section>
 <section id="bertrand-competition" class="level3">
 <h3 class="anchored" data-anchor-id="bertrand-competition">Bertrand competition</h3>
-<p>Now firms compete in <strong>prices</strong> rather than quantities. With identical marginal cost <span class="math inline">\(c\)</span>, demand <span class="math inline">\(Q(p) = \max\{a - p, 0\}\)</span>, and the lower-priced firm capturing the whole market (ties split it), <span class="math display">\[
+<p>Now firms compete in <strong>prices</strong> rather than quantities. With identical marginal cost <span class="math inline">\(c\)</span> with <span class="math inline">\(0\le c&lt;a\)</span>, demand <span class="math inline">\(Q(p) = \max\{a - p, 0\}\)</span>, and the lower-priced firm capturing the whole market (ties split it), <span class="math display">\[
 v_i(p_i, p_j) =
 \begin{cases}
 Q(p_i)(p_i - c), &amp; p_i &lt; p_j,\\[2pt]
@@ -632,7 +632,7 @@ Q(p_i)(p_i - c), &amp; p_i &lt; p_j,\\[2pt]
 0, &amp; p_i &gt; p_j .
 \end{cases}
 \]</span> The unique Nash equilibrium is <span class="math inline">\(p_1^* = p_2^* = c\)</span>: <strong>price equals marginal cost</strong>, the competitive outcome, with just two firms. The argument is by elimination: any common price above <span class="math inline">\(c\)</span> invites a tiny undercut that steals the whole market, and below <span class="math inline">\(c\)</span> both firms lose money. The best-response correspondence is <em>empty</em> on the range <span class="math inline">\(c &lt; p_j \le p^m\)</span> (the firm wants to undercut to <span class="math inline">\(p_j - \eps\)</span>, but there is no smallest such price), which is exactly why one must argue by elimination rather than by intersecting best-response curves.</p>
-<p>With <strong>asymmetric</strong> costs <span class="math inline">\(c_1 &lt; c_2\)</span> the best-response correspondences never meet, and <strong>no pure-strategy Nash equilibrium exists</strong>: the low-cost firm always wants to sit just below the other’s price, so no profile is stable.</p>
+<p>With asymmetric costs <span class="math inline">\(0\le c_1&lt;c_2\)</span>, let <span class="math inline">\(p_1^m=(a+c_1)/2\)</span> and assume <span class="math inline">\(c_1&lt;a\)</span>. If <span class="math inline">\(c_2&lt;p_1^m\)</span>, no pure-strategy Nash equilibrium exists under equal sharing at ties. Equal prices either leave firm 2 making a loss or invite profitable undercutting. At unequal prices, the loser can profitably undercut or the winner can raise its price. If <span class="math inline">\(c_2\ge p_1^m\)</span>, however, firm 1 can charge <span class="math inline">\(p_1^m\)</span> while firm 2 charges any <span class="math inline">\(p_2&gt;c_2\)</span>. Firm 1 earns its monopoly profit, and firm 2 cannot profitably undercut it.</p>
 </section>
 <section id="electoral-competition-and-the-median-voter" class="level3">
 <h3 class="anchored" data-anchor-id="electoral-competition-and-the-median-voter">Electoral competition and the median voter</h3>
@@ -757,7 +757,7 @@ Table&nbsp;2.5: A game requiring dominance by mixtures.
 </div>
 </figure>
 </div>
-<p>no column is dominated by another column, but <span class="math inline">\(L\)</span> is strictly dominated by <span class="math inline">\(\tfrac12 C + \tfrac12 R\)</span>; deleting <span class="math inline">\(L\)</span>, then <span class="math inline">\(U\)</span> (now dominated by <span class="math inline">\(\tfrac12 M + \tfrac12 R\)</span>), leaves the <span class="math inline">\(\{M,D\}\times\{C,R\}\)</span> subgame, whose equilibria are <span class="math inline">\((M,R)\)</span>, <span class="math inline">\((D,C)\)</span> and the mixture <span class="math inline">\(\big(\tfrac16 M + \tfrac56 D,\ \tfrac37 C + \tfrac47 R\big)\)</span>.</p>
+<p>no column is dominated by another column, but <span class="math inline">\(L\)</span> is strictly dominated by <span class="math inline">\(\tfrac12 C + \tfrac12 R\)</span>; deleting <span class="math inline">\(L\)</span>, then <span class="math inline">\(U\)</span> (now dominated by <span class="math inline">\(\tfrac12 M + \tfrac12 D\)</span>), leaves the <span class="math inline">\(\{M,D\}\times\{C,R\}\)</span> subgame, whose equilibria are <span class="math inline">\((M,R)\)</span>, <span class="math inline">\((D,C)\)</span> and the mixture <span class="math inline">\(\big(\tfrac16 M + \tfrac56 D,\ \tfrac37 C + \tfrac47 R\big)\)</span>.</p>
 <p>The final result shows that deletion preserves equilibria.</p>
 <div id="prp-2-iesds-reduce" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposition 2.9 (IESDS preserves the equilibrium set)</strong></span> In a finite game, <span class="math inline">\(\sigma^*\)</span> is a Nash equilibrium of the original game if and only if it is a Nash equilibrium of the reduced game obtained by IESDS (allowing deletion by mixed strategies).</p>
@@ -775,7 +775,7 @@ Table&nbsp;2.5: A game requiring dominance by mixtures.
 <li>Dominance restricts behaviour: a rational player never plays a strictly dominated strategy, and the Prisoner’s Dilemma is solved by dominance alone, though its equilibrium is not Pareto optimal.</li>
 <li>IESDS iterates this logic under <em>common knowledge of rationality</em>; for finite games the result is order-independent.</li>
 <li>A Nash equilibrium is a profile in which everyone best-responds to everyone else, combining rationality with correct beliefs. It nests the earlier concepts: dominant and IESDS solutions are Nash, and every Nash equilibrium survives IESDS.</li>
-<li>Applications: Cournot (interior equilibrium <span class="math inline">\((a-2c_i+c_j)/3b\)</span>), Bertrand (price <span class="math inline">\(=\)</span> marginal cost; <em>no</em> equilibrium under asymmetric costs), and the median voter theorem in electoral competition.</li>
+<li>Applications: Cournot (interior equilibrium <span class="math inline">\((a-2c_i+c_j)/3b\)</span>), Bertrand (<span class="math inline">\(p=c\)</span> with equal costs; with asymmetric costs, no pure equilibrium when <span class="math inline">\(c_2&lt;p_1^m\)</span>), and the median voter theorem in electoral competition.</li>
 <li>Allowing mixed strategies, every finite game has an equilibrium (<a href="#thm-2-existence" class="quarto-xref">Theorem&nbsp;<span>2.1</span></a>); they are computed via the indifference principle (<a href="#lem-2-indifference" class="quarto-xref">Lemma&nbsp;<span>2.2</span></a>).</li>
 <li>IESDS by mixtures preserves the full set of equilibria (<a href="#prp-2-iesds-reduce" class="quarto-xref">Proposition&nbsp;<span>2.9</span></a>).</li>
 </ul>
