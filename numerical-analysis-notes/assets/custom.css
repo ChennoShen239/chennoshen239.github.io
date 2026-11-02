@@ -1,7 +1,7 @@
 /* Homepage typography and colors. */
 :root{
   --ink:#1a1a1a; --text:#1a1a1a; --muted:#5f6368;
-  --red:#94070a; --red-2:#7a0608; --tint:rgba(148,7,10,.06);
+  --red:#e0112b; --red-2:#e0112b; --tint:rgba(224,17,43,.06);
   --line:rgba(22,24,29,.12); --line-2:rgba(22,24,29,.22);
   --sans:'Spectral',Georgia,'Times New Roman',serif;
   --body:'Spectral',Georgia,'Times New Roman',serif;
