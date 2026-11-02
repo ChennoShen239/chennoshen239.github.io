@@ -29,6 +29,7 @@ h2{font-size:22px}
 
 .hero{display:grid;grid-template-columns:1fr 220px;gap:40px;align-items:start}
 .contact{margin-top:1em}
+.contact-address{margin-top:1em;color:var(--muted);font-style:normal}
 
 section{display:grid;grid-template-columns:150px 1fr;gap:24px;border-top:1px solid var(--line);margin-top:40px;padding-top:28px}
 section ul{list-style:none}
