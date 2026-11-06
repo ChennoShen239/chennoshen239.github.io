@@ -27,41 +27,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -250,24 +215,11 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#why-group-states" id="toc-why-group-states" class="nav-link active" data-scroll-target="#why-group-states"><span class="header-section-number">5.1</span> Why group states?</a></li>
-  <li><a href="#can-the-label-predict-what-happens-next" id="toc-can-the-label-predict-what-happens-next" class="nav-link" data-scroll-target="#can-the-label-predict-what-happens-next"><span class="header-section-number">5.2</span> Can the label predict what happens next?</a>
+  <li><a href="#can-the-label-predict-what-happens-next" id="toc-can-the-label-predict-what-happens-next" class="nav-link active" data-scroll-target="#can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> Predicting the next state</a></li>
+  <li><a href="#how-much-does-the-label-need-to-tell-us-to-act" id="toc-how-much-does-the-label-need-to-tell-us-to-act" class="nav-link" data-scroll-target="#how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> Choosing an action</a></li>
+  <li><a href="#application-monetary-transmission-with-menu-costs" id="toc-application-monetary-transmission-with-menu-costs" class="nav-link" data-scroll-target="#application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.3</span> Monetary policy and the mean price gap</a>
   <ul class="collapse">
-  <li><a href="#under-a-fixed-policy" id="toc-under-a-fixed-policy" class="nav-link" data-scroll-target="#under-a-fixed-policy">Under a fixed policy</a></li>
-  </ul></li>
-  <li><a href="#how-much-does-the-label-need-to-tell-us-to-act" id="toc-how-much-does-the-label-need-to-tell-us-to-act" class="nav-link" data-scroll-target="#how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.3</span> How much does the label need to tell us to act?</a>
-  <ul class="collapse">
-  <li><a href="#equal-action-values-with-different-forecasts" id="toc-equal-action-values-with-different-forecasts" class="nav-link" data-scroll-target="#equal-action-values-with-different-forecasts">Equal action values with different forecasts</a></li>
-  </ul></li>
-  <li><a href="#sec-sa-planning" id="toc-sec-sa-planning" class="nav-link" data-scroll-target="#sec-sa-planning"><span class="header-section-number">5.4</span> Can the smaller model find the optimal action?</a>
-  <ul class="collapse">
-  <li><a href="#a-common-optimal-action-with-an-error-in-planning" id="toc-a-common-optimal-action-with-an-error-in-planning" class="nav-link" data-scroll-target="#a-common-optimal-action-with-an-error-in-planning">A common optimal action with an error in planning</a></li>
-  </ul></li>
-  <li><a href="#application-monetary-transmission-with-menu-costs" id="toc-application-monetary-transmission-with-menu-costs" class="nav-link" data-scroll-target="#application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.5</span> Application: monetary transmission with menu costs</a>
-  <ul class="collapse">
-  <li><a href="#the-pricing-rule" id="toc-the-pricing-rule" class="nav-link" data-scroll-target="#the-pricing-rule">The pricing rule</a></li>
-  <li><a href="#the-central-banks-problem" id="toc-the-central-banks-problem" class="nav-link" data-scroll-target="#the-central-banks-problem">The central bank’s problem</a></li>
-  <li><a href="#when-is-the-mean-enough-for-an-optimal-policy" id="toc-when-is-the-mean-enough-for-an-optimal-policy" class="nav-link" data-scroll-target="#when-is-the-mean-enough-for-an-optimal-policy">When is the mean enough for an optimal policy?</a></li>
+  <li><a href="#when-is-the-mean-enough-for-an-optimal-policy" id="toc-when-is-the-mean-enough-for-an-optimal-policy" class="nav-link" data-scroll-target="#when-is-the-mean-enough-for-an-optimal-policy">Is the mean enough to choose?</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -308,521 +260,83 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>A job passes through two processing stages before settlement. Advancing from the first stage leaves the job in progress. Advancing from the second settles it. A learner that records both stages as <em>in progress</em> can use an observation from either stage to update the same row of its Q-table. Can that row tell the learner whether to advance, even though the two stages lead to different labels?</p>
-<section id="why-group-states" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="why-group-states"><span class="header-section-number">5.1</span> Why group states?</h2>
-<p>Tabular Q-learning updates one state-action entry per observed transition. Adding state coordinates can spread the same data across many more rows. Twenty binary coordinates allow <span class="math inline">\(2^{20}\)</span> possible states before we count the actions. Grouping states saves storage and lets observations from different full states update a shared estimate. This is the tabular analogue of parameter sharing in <a href="./03-notes.html#td-learning-with-function-approximation">Chapter 3</a>.</p>
-<p>In a heterogeneous-agent model, the household’s Bellman equation can depend on the entire wealth distribution. The Krusell–Smith forecasting rule predicts next period’s aggregate capital from current capital and productivity. This lets the modeler use a grid for capital and productivity alongside the household’s individual state variables. See the <a href="https://chennoshen239.github.io/compecon-notes/lectures/05-krusell-smith.html">computational economics notes on Krusell–Smith</a>.</p>
+<p><a href="./03-notes.html#eq-qlearning">Chapter 3</a> uses a Q-table with one row per state. A state that the learner rarely visits gets few updates. Grouping states lets the learner use observations from several states to update the same row.</p>
 <div id="def-sa-abstraction" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 5.1 (State abstraction)</strong></span> A <strong>state abstraction</strong> is a map <span class="math inline">\(f\colon\mathcal S\to\mathcal X\)</span> from full states to compressed states, where <span class="math inline">\(\mathcal X=f(\mathcal S)\)</span>. The agent records <span class="math inline">\(x=f(s)\)</span> in place of <span class="math inline">\(s\)</span>. The class <span class="math inline">\(\mathcal S_x=f^{-1}(\{x\})\)</span> is the set of full states with label <span class="math inline">\(x\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition 5.1 (State abstraction)</strong></span> A <strong>state abstraction</strong> is a map <span class="math inline">\(f\)</span> from full states <span class="math inline">\(s\)</span> to summaries <span class="math inline">\(x=f(s)\)</span>. Full states with the same summary are treated as one state.</p>
 </div>
-<p>Write <span class="math inline">\(u,v\)</span> for the processing stages and <span class="math inline">\(z\)</span> for settlement. Under advance <span class="math inline">\(a\)</span>, the job follows this path. <span class="math display">\[
-\underbrace{u\xrightarrow{a}v}_{\text{in progress }(X)}
-\xrightarrow{a}
-\underbrace{z}_{\text{settled }(Y)}.
-\]</span></p>
-<p>If <span class="math inline">\(N\)</span> full states share <span class="math inline">\(K\)</span> labels and there are <span class="math inline">\(m\)</span> actions, the Q-table shrinks from <span class="math inline">\(Nm\)</span> to <span class="math inline">\(Km\)</span> entries. A representation on the labels gives the same answer for each full state in a class. Predicting a transition, valuing each action, and picking an action impose different requirements on that answer.</p>
+<p>The same choice comes up when solving a Bellman equation. In the pricing example below, the full state is the distribution of firms’ price gaps. Using its mean would give us fewer states to keep track of.</p>
+<section id="can-the-label-predict-what-happens-next" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> Predicting the next state</h2>
+<p>Given the full state <span class="math inline">\(s\)</span> and action <span class="math inline">\(a\)</span>, the probability of a next summary <span class="math inline">\(y\)</span> is the sum of the probabilities of all full states that map to <span class="math inline">\(y\)</span>. <span id="eq-sa-closure"><span class="math display">\[
+\sum_{s':\,f(s')=y}p(s'\given s,a).
+\tag{5.1}\]</span></span> For a single transition law on <span class="math inline">\(x\)</span> to work from every starting state, this sum must agree across all <span class="math inline">\(s\)</span> with the same <span class="math inline">\(x\)</span>, for each <span class="math inline">\(a\)</span> and <span class="math inline">\(y\)</span>. If the expected reward <span class="math inline">\(r(s,a)\)</span> also agrees across those states for each <span class="math inline">\(a\)</span>, we can write the Bellman equation on <span class="math inline">\(x\)</span> alone.</p>
 </section>
-<section id="can-the-label-predict-what-happens-next" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="can-the-label-predict-what-happens-next"><span class="header-section-number">5.2</span> Can the label predict what happens next?</h2>
-<p>Take a finite <a href="./01-notes.html#def-mdp">MDP</a> with transition probabilities <span class="math inline">\(p(s'\given s,a)\)</span>, expected reward <span class="math inline">\(r(s,a)\)</span>, a common finite action set <span class="math inline">\(\mathcal A\)</span>, and discount factor <span class="math inline">\(0&lt;\gamma&lt;1\)</span>. In the job example, the same action on the same label can lead to different labels. To check whether that happens in general, sum the transition probabilities over the whole destination class. <span id="eq-sa-pushforward"><span class="math display">\[
-p_f(y\given s,a)=\sum_{s'\in\mathcal S_y}p(s'\given s,a).
-\tag{5.1}\]</span></span> Transitions may differ within a destination class while giving the same probability of reaching it.</p>
-<div id="prp-sa-closure" class="theorem proposition">
-<p><span class="theorem-title"><strong>Proposition 5.1 (Markov closure under every action)</strong></span> One transition kernel on the compressed states applies to all full initial states and all actions if and only if each class satisfies the following equality. <span id="eq-sa-closure"><span class="math display">\[
-p_f(y\given s_1,a)=p_f(y\given s_2,a)
-\qquad
-\text{for every }s_1,s_2\in\mathcal S_x,\ a\in\mathcal A,\ \text{and }y.
-\tag{5.2}\]</span></span></p>
+<section id="how-much-does-the-label-need-to-tell-us-to-act" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> Choosing an action</h2>
+<p>A policy using only <span class="math inline">\(x\)</span> can be optimal from every starting state if and only if, for each <span class="math inline">\(x\)</span>, some action maximizes <span class="math inline">\(q^*(s,a)\)</span> at every <span class="math inline">\(s\)</span> that maps to <span class="math inline">\(x\)</span>.</p>
+<p>To store the exact <span class="math inline">\(q^*(s,a)\)</span> in a shared Q-table, all states with the same <span class="math inline">\(x\)</span> must agree on the value of every action. At <span class="math inline">\(q^*\)</span>, samples for a given action then give the same Q-learning target on average. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman (2006)</a>.</p>
+</section>
+<section id="application-monetary-transmission-with-menu-costs" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.3</span> Monetary policy and the mean price gap</h2>
+<p>A firm’s <strong>price gap</strong> is its target log price minus its current log price. Take four groups of firms with equal weights. Their target log price equals log nominal spending. The mean gap <span class="math inline">\(x\)</span> is log real spending, measured as log nominal spending minus the average log price.</p>
+<p>The central bank can hold nominal spending fixed or raise it by one log percentage point. The increase shifts every price gap up by one before firms adjust. A group resets its price to the target if its gap is at least <span class="math inline">\(2.8\)</span> points in absolute value. Its gap then falls to zero. The threshold represents a cost of changing prices. <a href="https://economics.mit.edu/sites/default/files/publications/Price%20stickiness%20in%20Ss%20models%20-%20New%20interpretation.pdf">Caballero and Engel (2007)</a>.</p>
+<p>Economy A starts at <span class="math inline">\((-1.6,-1.2,1.2,1.6)\)</span> and B at <span class="math inline">\((-2,0,0,2)\)</span>. Both have mean zero. After a one-point increase, every group in A keeps its price. In B, the gap of <span class="math inline">\(2\)</span> rises to <span class="math inline">\(3\)</span> and the group resets its price. Its weight is <span class="math inline">\(1/4\)</span>, so inflation is <span class="math inline">\(3/4\)</span> of a point. Starting from zero, the next mean gap equals the spending increase minus inflation, giving <span class="math inline">\(1\)</span> in A and <span class="math inline">\(1/4\)</span> in B. The same mean and action lead to different next means.</p>
+<div id="cell-fig-sa-impact" class="cell" data-fig-height="2.5" data-fig-width="7.2" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div id="fig-sa-impact" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="state-abstraction_files/figure-html/fig-sa-impact-output-1.png" width="657" height="223" class="figure-img">
 </div>
-<div class="block-derivation callout callout-style-default callout-note callout-titled" title="Derivation">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: How a one-point increase in nominal spending is split between inflation and higher real spending.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="figures/state-abstraction-inflation.pdf">Download the figure (PDF)</a></p>
+<section id="when-is-the-mean-enough-for-an-optimal-policy" class="level3">
+<h3 class="anchored" data-anchor-id="when-is-the-mean-enough-for-an-optimal-policy">Is the mean enough to choose?</h3>
+<p>The bank minimizes discounted loss over an infinite horizon, with discount factor <span class="math inline">\(1/2\)</span>. Its loss in a period is <span id="eq-sa-loss"><span class="math display">\[
+\text{period loss}=(x'-1)^2+\lambda(\text{inflation})^2.
+\tag{5.2}\]</span></span> Here <span class="math inline">\(x'\)</span> is the mean gap after the action and <span class="math inline">\(\lambda\geq 0\)</span> is the weight on inflation.</p>
+<p>When <span class="math inline">\(\lambda=1/2\)</span>, the bank should raise spending in both starting states, despite their different inflation forecasts. When <span class="math inline">\(\lambda=3\)</span>, it should raise spending in A and hold in B. Across all states reachable from these two starts, a policy using only the mean can be optimal exactly for <span class="math inline">\(2/81\leq\lambda\leq22/9\)</span>.</p>
+<div class="block-derivation callout callout-style-default callout-note callout-titled" title="Deriving the policy range">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Derivation
+<span class="screen-reader-only">Note</span>Deriving the policy range
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Write <span class="math inline">\(X_t=f(S_t)\)</span> and let <span class="math inline">\(H_t\)</span> contain the observed compressed history through <span class="math inline">\(X_t=x\)</span>. By conditioning on the current full state, <span id="eq-sa-history"><span class="math display">\[
-\Prob(X_{t+1}=y\given H_t,A_t=a)
-=\sum_{s\in\mathcal S_x}p_f(y\given s,a)
-  \Prob(S_t=s\given H_t,A_t=a).
-\tag{5.3}\]</span></span> The history can change the mixture over full states. Under <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a>, each term being averaged has the same transition probability, so the mixture is irrelevant. For necessity, start separately at <span class="math inline">\(s_1\)</span> and <span class="math inline">\(s_2\)</span> and take <span class="math inline">\(a\)</span> at time zero. Both starts must give the same transition probabilities at <span class="math inline">\(x\)</span> under the common kernel.</p>
-</div>
-</div>
-</div>
-<p>To preserve the <strong>one-step model</strong>, also require <span class="math inline">\(r(s_1,a)=r(s_2,a)\)</span> for each such pair and action. Equality of expected rewards suffices for expected discounted returns. Li, Walsh, and Littman call this condition together with <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a> <em>model irrelevance</em>.</p>
-<section id="under-a-fixed-policy" class="level3">
-<h3 class="anchored" data-anchor-id="under-a-fixed-policy">Under a fixed policy</h3>
-<p>For a stationary policy <span class="math inline">\(\pi(a\given s)\)</span>, the full-state transition averages over actions. The relevant probabilities are <span id="eq-sa-policy-transition"><span class="math display">\[
-p_f^\pi(y\given s)=\sum_a\pi(a\given s)\,p_f(y\given s,a).
-\tag{5.4}\]</span></span> Under this policy, a single Markov kernel works for every starting state if and only if <span class="math inline">\(p_f^\pi(y\given s)\)</span> is constant within each class for every <span class="math inline">\(y\)</span>. It can be constant even if individual actions violate <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a>. Conversely, action-by-action closure carries over automatically to policies that use only <span class="math inline">\(x\)</span>. A policy that uses <span class="math inline">\(s\)</span> can mix the actions differently within the class. The paper’s <span class="math inline">\(q_\pi\)</span> criterion concerns equality of action values across states under policies. The criterion here concerns transitions under one fixed policy.</p>
-</section>
-</section>
-<section id="how-much-does-the-label-need-to-tell-us-to-act" class="level2" data-number="5.3">
-<h2 data-number="5.3" class="anchored" data-anchor-id="how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.3</span> How much does the label need to tell us to act?</h2>
-<p>The Bellman equation combines an immediate reward and a discounted continuation value into one number. Two states can agree on that number even when they lead to different next labels. A policy needs still less information. It can choose any action that attains the maximum throughout the class.</p>
-<p>Let <span class="math inline">\(q^*(s,a)\)</span> be the value of taking <span class="math inline">\(a\)</span> and then acting optimally, and let <span class="math inline">\(v^*(s)=\max_a q^*(s,a)\)</span>. Define the set of optimal actions <span class="math inline">\(A^*(s)=\argmax_a q^*(s,a)\)</span>. A stationary policy based only on <span class="math inline">\(x\)</span> can be optimal from every full state exactly when <span id="eq-sa-common-action"><span class="math display">\[
-\bigcap_{s\in\mathcal S_x} A^*(s)\ne\varnothing
-\qquad\text{for every }x.
-\tag{5.5}\]</span></span> Choosing a shared maximizer in every class makes <span class="math inline">\(v^*\)</span> a fixed point of policy evaluation. Conversely, an optimal policy can assign positive probability only to actions that maximize <span class="math inline">\(q^*\)</span> in every full state where the policy uses them.</p>
-<p>The following conditions impose successively less equality within each class. The terminology comes from <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman (2006), §3.3</a>.</p>
-<div id="tbl-sa-conditions" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sa-conditions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5.1: Four preservation conditions for state aggregation.
-</figcaption>
-<div aria-describedby="tbl-sa-conditions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<p>Holding leaves all gaps fixed and produces zero inflation, so holding forever costs <span class="math inline">\(H=2(x-1)^2\)</span>. If expanding now and then acting optimally costs <span class="math inline">\(C\)</span>, holding for <span class="math inline">\(k\)</span> periods before expanding costs <span class="math inline">\(H+2^{-k}(C-H)\)</span>. The minimum is attained by holding forever or expanding now.</p>
+<p>Successive expansions produce these means. The last entry in each row returns to an earlier full state in that row.</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
 <thead>
 <tr class="header">
-<th>What the class preserves</th>
-<th>Condition within the class</th>
-<th>Li, Walsh, and Littman’s term</th>
+<th>Start</th>
+<th>Means along the expansion path</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>The one-step model</td>
-<td>Same expected reward and same probabilities over destination classes, for every action</td>
-<td>Model irrelevance</td>
+<td>A</td>
+<td><span class="math inline">\(0,1,3/10,13/10,8/5,1/4,5/4,3/2,1/4\)</span></td>
 </tr>
 <tr class="even">
-<td>Every optimal action value</td>
-<td>Same <span class="math inline">\(q^*(s,a)\)</span> for every action, including suboptimal ones</td>
-<td><span class="math inline">\(q^*\)</span> irrelevance</td>
-</tr>
-<tr class="odd">
-<td>The optimal value and a common optimal action</td>
-<td>Same <span class="math inline">\(v^*(s)\)</span> and a nonempty intersection in <a href="#eq-sa-common-action" class="quarto-xref">Equation&nbsp;<span>5.5</span></a></td>
-<td><span class="math inline">\(a^*\)</span> irrelevance</td>
-</tr>
-<tr class="even">
-<td>A common optimal action</td>
-<td>A nonempty intersection in <a href="#eq-sa-common-action" class="quarto-xref">Equation&nbsp;<span>5.5</span></a></td>
-<td><span class="math inline">\(\pi^*\)</span> irrelevance</td>
+<td>B</td>
+<td><span class="math inline">\(0,1/4,5/4,3/4,1,5/4\)</span></td>
 </tr>
 </tbody>
 </table>
-</div>
-</figure>
-</div>
-<p>The Bellman argument in <a href="#sec-sa-planning" class="quarto-xref"><span>Section 5.4</span></a> gives the first implication. The remaining implications follow by taking the maximum and its maximizers. For example, action values <span class="math inline">\((2,0)\)</span> and <span class="math inline">\((2,1)\)</span> give the same optimal value and action, with different values for the second action.</p>
-<section id="equal-action-values-with-different-forecasts" class="level3">
-<h3 class="anchored" data-anchor-id="equal-action-values-with-different-forecasts">Equal action values with different forecasts</h3>
-<p>Return to the job. Advancing at settlement starts the next job at <span class="math inline">\(u\)</span>. Add a second action <span class="math inline">\(b\)</span> (<strong>wait</strong>) that stays in place and pays zero. With the rewards below and <span class="math inline">\(\gamma=1/2\)</span>, the continuation values <span class="math inline">\(v^*(u)=v^*(v)=2\)</span> and <span class="math inline">\(v^*(z)=1\)</span> make advance strictly better in every state. The values therefore satisfy the optimal Bellman equation.</p>
-<div id="tbl-sa-cycle" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sa-cycle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5.2: Full-state values in the three-state cycle.
-</figcaption>
-<div aria-describedby="tbl-sa-cycle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 22%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>State</th>
-<th>Successor under advance</th>
-<th style="text-align: right;">Reward under advance</th>
-<th style="text-align: right;"><span class="math inline">\(q^*(s,a)\)</span></th>
-<th style="text-align: right;"><span class="math inline">\(q^*(s,b)\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(u\)</span></td>
-<td><span class="math inline">\(v\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(v\)</span></td>
-<td><span class="math inline">\(z\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(z\)</span></td>
-<td><span class="math inline">\(u\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/2\)</span></td>
-</tr>
-</tbody>
-</table>
-</div>
-</figure>
-</div>
-<p>The two stages in class <span class="math inline">\(X\)</span> have the same action values. For advance, a smaller reward at <span class="math inline">\(u\)</span> is offset by a larger continuation value. Both <span class="math inline">\(1+\tfrac12\cdot 2\)</span> and <span class="math inline">\(\tfrac32+\tfrac12\cdot 1\)</span> equal <span class="math inline">\(2\)</span>. The shared row can store both stages’ values.</p>
-<p>Start uniformly over the three states and always advance. At time 1, the history <span class="math inline">\((X,X)\)</span> puts the full state at <span class="math inline">\(v\)</span>, so the next label is <span class="math inline">\(Y\)</span>. The history <span class="math inline">\((Y,X)\)</span> puts it at <span class="math inline">\(u\)</span>, so the next label is <span class="math inline">\(X\)</span>. The label can tell the learner to advance, but forecasting the next label still uses the history. Under the fixed policy of always waiting, each label stays where it is and the compressed process is Markov.</p>
-<p>Recovering <span class="math inline">\(q^*\)</span> with a shared row requires the action values to agree. In <a href="./03-notes.html#eq-qlearning">Q-learning</a>, if <span class="math inline">\(\tilde q\)</span> represents <span class="math inline">\(q^*\)</span> on the compressed table, then the sample target <span class="math inline">\(r_{t+1}+\gamma\max_b\tilde q(X_{t+1},b)\)</span> has conditional mean <span class="math inline">\(\tilde q(X_t,A_t)\)</span> at every full state in the class. Changing the mixture of full states leaves that mean unchanged. The convergence result also needs visitation and step-size conditions. See <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Li, Walsh, and Littman (2006), Theorem 4(1)</a>.</p>
-</section>
-</section>
-<section id="sec-sa-planning" class="level2" data-number="5.4">
-<h2 data-number="5.4" class="anchored" data-anchor-id="sec-sa-planning"><span class="header-section-number">5.4</span> Can the smaller model find the optimal action?</h2>
-<p>The common-action test asks whether a policy on the labels <em>can represent</em> an optimal decision rule. To compute such a rule by planning on the labels, we need a reward and a transition row for each label and action. A natural construction averages the rows of the full states in the class. For each class choose weights <span class="math inline">\(w(s\given x)\ge 0\)</span> with <span class="math inline">\(\sum_{s\in\mathcal S_x}w(s\given x)=1\)</span>. The weighted model has the following reward and transition. <span id="eq-sa-weighted-model"><span class="math display">\[
-\bar r(x,a)=\sum_{s\in\mathcal S_x}w(s\given x)\,r(s,a),
-\qquad
-\bar p(y\given x,a)=\sum_{s\in\mathcal S_x}w(s\given x)\,p_f(y\given s,a).
-\tag{5.6}\]</span></span> This is a well-defined MDP. Its weights are fixed, while the weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> are conditional on what the agent has observed. When <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a> holds, the choice of weights makes no difference to the transition kernel. This construction is Definition 1 of <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman (2006)</a>.</p>
-<div id="prp-sa-planning" class="theorem proposition">
-<p><span class="theorem-title"><strong>Proposition 5.2 (Optimal planning after aggregation)</strong></span> If <span class="math inline">\(q^*(s,a)\)</span> is constant on each class for every action, solving the weighted MDP recovers these action values. If <span class="math inline">\(v^*(s)\)</span> is constant on each class and each class has a common optimal action, solving the weighted MDP recovers these state values. In the second case, with positive weights on every full state, every optimal abstract action is optimal throughout its class.</p>
-</div>
-<div class="block-derivation callout callout-style-default callout-note callout-titled" title="Bellman argument">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Bellman argument
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>For any table <span class="math inline">\(\bar q\)</span>, lift it to the full state space by setting <span class="math inline">\(q^{\uparrow}(s,a)=\bar q(f(s),a)\)</span>. The abstract Bellman update averages the full-state updates. <span id="eq-sa-bellman-average"><span class="math display">\[
-(\bar T\bar q)(x,a)
-=\sum_{s\in\mathcal S_x}w(s\given x)\,(Tq^{\uparrow})(s,a),
-\tag{5.7}\]</span></span> where <span class="math inline">\((Tq)(s,a)=r(s,a)+\gamma\sum_{s'}p(s'\given s,a)\max_b q(s',b)\)</span>. Both operators are contractions with factor <span class="math inline">\(\gamma\)</span> in the sup norm.</p>
-<p>Under model irrelevance, <span class="math inline">\(Tq^{\uparrow}\)</span> is constant within each class. Lifting the abstract fixed point then gives a fixed point of <span class="math inline">\(T\)</span>, which must be <span class="math inline">\(q^*\)</span> by contraction. If <span class="math inline">\(q^*\)</span> is already constant within each class, <a href="#eq-sa-bellman-average" class="quarto-xref">Equation&nbsp;<span>5.7</span></a> shows that its compressed table is itself the fixed point of <span class="math inline">\(\bar T\)</span> for any weights.</p>
-<p>For the state-value claim, write <span class="math inline">\(\tilde v(x)=v^*(s)\)</span> for <span class="math inline">\(s\in\mathcal S_x\)</span>. The abstract state-value update at <span class="math inline">\(\tilde v\)</span> is <span class="math inline">\(\max_a\sum_{s\in\mathcal S_x}w(s\given x)q^*(s,a)\)</span>. Each average is at most <span class="math inline">\(\tilde v(x)\)</span> and a common optimal action attains it. With positive weights, equality requires optimality at every state in the class. If a weight is zero, the abstract average can tie for an action that is suboptimal at the omitted state.</p>
-</div>
-</div>
-</div>
-<p>For the job, equal weights give <span class="math inline">\(\bar p(Y\given X,a)=1/2\)</span>. This is also the true one-step probability conditional only on <span class="math inline">\(X_t=X\)</span> when the agent starts uniformly and always advances. Yet the averaged model assigns probability <span class="math inline">\((2/3)(1/2)^2=1/6\)</span> to three successive <span class="math inline">\(X\)</span> labels, which the job cannot produce. The same model recovers both action values by <a href="#prp-sa-planning" class="quarto-xref">Proposition&nbsp;<span>5.2</span></a>.</p>
-<section id="a-common-optimal-action-with-an-error-in-planning" class="level3">
-<h3 class="anchored" data-anchor-id="a-common-optimal-action-with-an-error-in-planning">A common optimal action with an error in planning</h3>
-<p>In a separate MDP, both actions at <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span> lead to an absorbing zero-reward state. The first action pays <span class="math inline">\(2\)</span> at <span class="math inline">\(u\)</span> and <span class="math inline">\(6\)</span> at <span class="math inline">\(v\)</span>. The second pays zero at both. Merge <span class="math inline">\(u,v\)</span> into <span class="math inline">\(X\)</span>, which has a common optimal action. From a predecessor <span class="math inline">\(s_0\)</span>, the agent can enter <span class="math inline">\(u\)</span> for no immediate reward or stop for <span class="math inline">\(3/2\)</span>. At <span class="math inline">\(\gamma=1/2\)</span>, entering is worth <span class="math inline">\(1\)</span> in the full model. Equal weights instead give <span class="math inline">\(\bar v^*(X)=4\)</span>, so the abstract model values entering at <span class="math inline">\(2\)</span> and selects it. The optimal policy is representable on the compressed states. Solving the averaged model chooses the wrong action at <span class="math inline">\(s_0\)</span>. Compare <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=7">Li, Walsh, and Littman (2006), Figure 1(b)</a>.</p>
-</section>
-</section>
-<section id="application-monetary-transmission-with-menu-costs" class="level2" data-number="5.5">
-<h2 data-number="5.5" class="anchored" data-anchor-id="application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.5</span> Application: monetary transmission with menu costs</h2>
-<p>When a central bank raises nominal spending, the price response depends on which firms are near a price reset. A policy based on the mean price gap gives the same decision to all distributions with that mean. The four-group economy below lets us check whether they also give the same forecast and whether they need the same action. The price-setting mechanism follows the adjustment margin in <a href="https://economics.mit.edu/sites/default/files/publications/Price%20stickiness%20in%20Ss%20models%20-%20New%20interpretation.pdf">Caballero and Engel (2007)</a>.</p>
-<section id="the-pricing-rule" class="level3">
-<h3 class="anchored" data-anchor-id="the-pricing-rule">The pricing rule</h3>
-<p>There are four equally weighted groups of price setters. Write prices and spending in logs scaled by 100, so their differences are in log percentage points. Each group’s target log price is nominal spending <span class="math inline">\(m_t\)</span>. Given its posted log price <span class="math inline">\(p_{it}\)</span>, its <strong>price gap</strong> is <span class="math inline">\(g_{it}=m_t-p_{it}\)</span>. The state <span class="math inline">\(g_t\)</span> collects the four gaps, sorted from smallest to largest. With an equal-weight log price index, the mean gap <span class="math inline">\(x_t=\tfrac14\sum_i g_{it}\)</span> is log real spending.</p>
-<p>On a grid of 27 equally spaced gaps, four groups can form <span class="math inline">\(\binom{30}{4}=27{,}405\)</span> distinct sorted profiles. Their means take at most <span class="math inline">\(105\)</span> values. From the two initial profiles used here, thirteen profiles are reachable under the policy choices below. Grouping by the mean reduces those thirteen states to nine.</p>
-<p>The central bank chooses to hold (<span class="math inline">\(a_t=0\)</span>) or raise nominal spending by one log percentage point (<span class="math inline">\(a_t=1\)</span>). This shifts all target prices by <span class="math inline">\(a_t\)</span>. Each group uses the threshold rule from comparing a fixed reset cost with the current quadratic loss from keeping its price. With the threshold at <span class="math inline">\(2.8\)</span>, a group resets to its new target when <span class="math inline">\(|g_{it}+a_t|\ge 2.8\)</span>. Its price then changes by <span class="math inline">\(g_{it}+a_t\)</span> and its gap falls to zero. A group that keeps its price carries the shifted gap into the next period. The adjustment rule gives <span id="eq-sa-inflation"><span class="math display">\[
-\varpi_{t+1}=\tfrac14\sum_{i:\,|g_{it}+a_t|\ge 2.8}(g_{it}+a_t),
-\qquad
-x_{t+1}=x_t+a_t-\varpi_{t+1},
-\tag{5.8}\]</span></span> where <span class="math inline">\(\varpi_{t+1}\)</span> is inflation from <span class="math inline">\(t\)</span> to <span class="math inline">\(t+1\)</span>. The transition is deterministic.</p>
-<p>Start from either of the distributions in <a href="#tbl-sa-impact" class="quarto-xref">Table&nbsp;<span>5.3</span></a>. Both have mean zero and variance two. In economy B, the positive gap of 2 rises to 3 after an expansion. That group accounts for a quarter of the price index, so inflation is <span class="math inline">\(3/4\)</span>. In economy A, the largest shifted gap is <span class="math inline">\(1.6+1=2.6\)</span>, below the adjustment threshold.</p>
-<div id="tbl-sa-impact" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5.3: Two distributions with the same mean and variance. Gaps and inflation are in log percentage points.
-</figcaption>
-<div aria-describedby="tbl-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 21%">
-<col style="width: 21%">
-<col style="width: 28%">
-<col style="width: 28%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Initial state</th>
-<th>Price gaps</th>
-<th style="text-align: right;">Inflation after expansion</th>
-<th style="text-align: right;">Next mean gap</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(A_0\)</span></td>
-<td><span class="math inline">\((-1.6,-1.2,1.2,1.6)\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(B_0\)</span></td>
-<td><span class="math inline">\((-2,0,0,2)\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/4\)</span></td>
-</tr>
-</tbody>
-</table>
-</div>
-</figure>
-</div>
-<p>The two states start at the same mean and take the same action, yet arrive at different means. This violates <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a>, even for the summary that includes both the mean and the variance. <a href="#fig-sa-impact" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> shows where the two inflation responses first diverge.</p>
-<div id="cell-fig-sa-impact" class="cell" data-fig-height="4.2" data-fig-width="7.2" data-execution_count="1">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="st">"figures"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> _style <span class="im">import</span> COL, INK, new_ax, label_at</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>profiles <span class="op">=</span> {</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Economy A"</span>: np.array([<span class="op">-</span><span class="fl">1.6</span>, <span class="op">-</span><span class="fl">1.2</span>, <span class="fl">1.2</span>, <span class="fl">1.6</span>]),</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Economy B"</span>: np.array([<span class="op">-</span><span class="fl">2.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">2.0</span>]),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>threshold, upper <span class="op">=</span> <span class="fl">2.8</span>, <span class="fl">2.02</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> new_ax(<span class="fl">7.2</span>, <span class="fl">4.2</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> economy, color, linestyle, marker <span class="kw">in</span> (</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Economy B"</span>, COL[<span class="st">"blue"</span>], <span class="st">"-"</span>, <span class="st">"s"</span>),</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Economy A"</span>, <span class="st">"#68737c"</span>, <span class="st">"--"</span>, <span class="st">"o"</span>),</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    gaps <span class="op">=</span> profiles[economy]</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    crossings <span class="op">=</span> threshold <span class="op">-</span> gaps</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    interior <span class="op">=</span> np.unique(crossings[(<span class="dv">0</span> <span class="op">&lt;</span> crossings) <span class="op">&amp;</span> (crossings <span class="op">&lt;</span> upper)])</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    boundaries <span class="op">=</span> np.r_[<span class="dv">0</span>, interior, upper]</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    last_inflation <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start, end <span class="kw">in</span> <span class="bu">zip</span>(boundaries[:<span class="op">-</span><span class="dv">1</span>], boundaries[<span class="dv">1</span>:]):</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        adjusting <span class="op">=</span> gaps[crossings <span class="op">&lt;</span> (start <span class="op">+</span> end) <span class="op">/</span> <span class="dv">2</span>]</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        inflation <span class="op">=</span> (adjusting.<span class="bu">sum</span>() <span class="op">+</span> adjusting.size <span class="op">*</span> np.array([start, end])) <span class="op">/</span> <span class="bu">len</span>(gaps)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        ax.plot([start, end], inflation, color<span class="op">=</span>color, linestyle<span class="op">=</span>linestyle, linewidth<span class="op">=</span><span class="fl">2.2</span>)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        ax.plot([start, start], [last_inflation, inflation[<span class="dv">0</span>]], color<span class="op">=</span>color, linestyle<span class="op">=</span><span class="st">":"</span>,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>                linewidth<span class="op">=</span><span class="fl">1.1</span>)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        last_inflation <span class="op">=</span> inflation[<span class="dv">1</span>]</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    impact <span class="op">=</span> (gaps[crossings <span class="op">&lt;=</span> <span class="dv">1</span>] <span class="op">+</span> <span class="dv">1</span>).<span class="bu">sum</span>() <span class="op">/</span> <span class="bu">len</span>(gaps)</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    ax.plot(<span class="dv">1</span>, impact, color<span class="op">=</span>color, marker<span class="op">=</span>marker, markersize<span class="op">=</span><span class="dv">6</span>, clip_on<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    ax.annotate(<span class="ss">f"</span><span class="sc">{</span>impact<span class="sc">:g}</span><span class="ss">"</span>, (<span class="dv">1</span>, impact), xytext<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), textcoords<span class="op">=</span><span class="st">"offset points"</span>,</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span>color, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    label_at(ax, upper <span class="op">+</span> <span class="fl">0.04</span>, last_inflation, economy, color<span class="op">=</span>color)</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">1</span>, color<span class="op">=</span><span class="st">"#b9c1c9"</span>, linewidth<span class="op">=</span><span class="fl">0.9</span>, zorder<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">2.38</span>), ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">1.90</span>), xticks<span class="op">=</span>np.arange(<span class="dv">0</span>, <span class="fl">2.01</span>, <span class="fl">0.5</span>),</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>       yticks<span class="op">=</span>np.arange(<span class="dv">0</span>, <span class="fl">1.51</span>, <span class="fl">0.5</span>))</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Increase in nominal spending (log percentage points)"</span>, loc<span class="op">=</span><span class="st">"right"</span>,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>              fontweight<span class="op">=</span><span class="st">"bold"</span>, color<span class="op">=</span>INK)</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="dv">0</span>, <span class="fl">1.05</span>, <span class="st">"Inflation on impact (log percentage points)"</span>, transform<span class="op">=</span>ax.transAxes,</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        fontweight<span class="op">=</span><span class="st">"bold"</span>, color<span class="op">=</span>INK, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>fig.subplots_adjust(left<span class="op">=</span><span class="fl">0.12</span>, right<span class="op">=</span><span class="fl">0.98</span>, bottom<span class="op">=</span><span class="fl">0.18</span>, top<span class="op">=</span><span class="fl">0.88</span>)</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> plt.rc_context({<span class="st">"pdf.fonttype"</span>: <span class="dv">42</span>}):</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    fig.savefig(<span class="st">"figures/state-abstraction-inflation.pdf"</span>, metadata<span class="op">=</span>{<span class="st">"CreationDate"</span>: <span class="va">None</span>})</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-display">
-<div id="fig-sa-impact" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="state-abstraction_files/figure-html/fig-sa-impact-output-1.png" width="637" height="364" class="figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.1: On impact, the first price reset occurs at a nominal spending increase of 0.8 in economy B and 1.2 in economy A. Markers show the one-point expansion available to the central bank.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p><a href="figures/state-abstraction-inflation.pdf">Inflation response figure (vector PDF)</a>.</p>
-<p>Under the fixed policy of always holding, every gap stays where it is and the mean is Markov. Under a policy that randomizes between the actions, past means can help predict the next one.</p>
-<div class="block-derivation callout callout-style-default callout-note callout-titled" title="Two histories with the same current mean">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Two histories with the same current mean
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>Start with equal probabilities on <span class="math inline">\(A_0\)</span> and <span class="math inline">\(B_0\)</span>. At each decision independently choose each action with probability <span class="math inline">\(1/2\)</span>. The histories <span class="math display">\[
-(0,1,1,1,1)
-\quad\text{and}\quad
-(0,1/4,5/4,3/4,1)
-\]</span> both occur with positive probability. The first comes from <span class="math inline">\(A_0\)</span> after expanding once and holding three times, leaving full state <span class="math inline">\(A_1\)</span>. The second comes from <span class="math inline">\(B_0\)</span> after four expansions, leaving <span class="math inline">\(B_4\)</span>. As <a href="#tbl-sa-reachable" class="quarto-xref">Table&nbsp;<span>5.4</span></a> shows, another expansion takes the mean to <span class="math inline">\(3/10\)</span> from <span class="math inline">\(A_1\)</span> and to <span class="math inline">\(5/4\)</span> from <span class="math inline">\(B_4\)</span>. Thus the conditional probability of <span class="math inline">\(X_5=3/10\)</span> is <span class="math inline">\(1/2\)</span> after the first history and zero after the second, although both end at <span class="math inline">\(X_4=1\)</span>.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="the-central-banks-problem" class="level3">
-<h3 class="anchored" data-anchor-id="the-central-banks-problem">The central bank’s problem</h3>
-<p>Let <span class="math inline">\(F(g,a)\)</span> denote the next full state. The central bank minimizes discounted loss, with discount factor <span class="math inline">\(\gamma=1/2\)</span> and period loss <span id="eq-sa-loss"><span class="math display">\[
-\ell(g,a)=(x'-1)^2+\lambda\varpi^2,
-\qquad \lambda\ge 0.
-\tag{5.9}\]</span></span> Here <span class="math inline">\(x'\)</span> and <span class="math inline">\(\varpi\)</span> are the mean gap and inflation after the action. The target for log real spending is one, and <span class="math inline">\(\lambda\)</span> is the weight on inflation. In the reward convention above, <span class="math inline">\(r(g,a)=-\ell(g,a)\)</span>.</p>
-<p>Every reachable gap is inside the adjustment band. Holding leaves the state fixed and generates zero inflation. The cost of holding forever is therefore <span class="math inline">\(2(x-1)^2\)</span>. Writing <span class="math inline">\(J(g)\)</span> for the minimum discounted loss, the Bellman equation reduces to <span id="eq-sa-stop"><span class="math display">\[
-J(g)=\min\left\{2(x-1)^2,\ \ell(g,1)+\tfrac12 J(F(g,1))\right\}.
-\tag{5.10}\]</span></span> To see this, write <span class="math inline">\(C=\ell(g,1)+\tfrac12 J(F(g,1))\)</span>. The original Bellman equation is <span class="math inline">\(J(g)=\min\{(x-1)^2+J(g)/2,C\}\)</span>. If <span class="math inline">\(C\)</span> is below the cost of holding forever, expanding now is optimal. If <span class="math inline">\(C\)</span> is above that cost, holding forever is optimal. Both actions are optimal at equality.</p>
-</section>
-<section id="when-is-the-mean-enough-for-an-optimal-policy" class="level3">
-<h3 class="anchored" data-anchor-id="when-is-the-mean-enough-for-an-optimal-policy">When is the mean enough for an optimal policy?</h3>
-<p>Across all thirteen reachable states, a policy using only <span class="math inline">\(x\)</span> can be optimal exactly when <span id="eq-sa-weight"><span class="math display">\[
-\boxed{\tfrac{2}{81}\le\lambda\le\tfrac{22}{9}}.
-\tag{5.11}\]</span></span> For smaller weights, the two states at <span class="math inline">\(x=5/4\)</span> require different actions. For larger weights, the two initial states at <span class="math inline">\(x=0\)</span> require different actions. The endpoints admit a shared optimal action. The other repeated means are <span class="math inline">\(1/4\)</span>, where expansion is optimal in both states, and <span class="math inline">\(1\)</span>, where holding is optimal in both.</p>
-<p>Inside this interval the mean passes the common-action test <a href="#eq-sa-common-action" class="quarto-xref">Equation&nbsp;<span>5.5</span></a>. At the two initial states with mean zero, the optimal value is zero at <span class="math inline">\(A_0\)</span> and strictly negative at <span class="math inline">\(B_0\)</span>, since either first action at <span class="math inline">\(B_0\)</span> incurs a positive loss. The mean therefore preserves an optimal policy while losing both value levels and the controlled transition law.</p>
-<div class="block-derivation callout callout-style-default callout-note callout-titled" title="Deriving the two cutoffs">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Deriving the two cutoffs
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>From <span class="math inline">\(A_0\)</span>, one expansion reaches the target with zero inflation. The bank can hold there at zero loss. From <span class="math inline">\(B_0\)</span>, successive expansions take the mean through <span class="math inline">\(1/4\)</span>, <span class="math inline">\(5/4\)</span>, <span class="math inline">\(3/4\)</span>, and <span class="math inline">\(1\)</span>. Their inflation rates are <span class="math inline">\(3/4\)</span>, <span class="math inline">\(0\)</span>, <span class="math inline">\(3/2\)</span>, and <span class="math inline">\(3/4\)</span>, respectively. Label the resulting states <span class="math inline">\(B_1\)</span> through <span class="math inline">\(B_4\)</span>.</p>
-<p>At <span class="math inline">\(B_2\)</span>, holding costs <span class="math inline">\(1/8\)</span>, and expanding once and then holding costs <span class="math inline">\(1/8+9\lambda/4\)</span>. Expanding twice reaches <span class="math inline">\(B_4\)</span>, where holding has zero loss. Thus <span id="eq-sa-b2"><span class="math display">\[
-J(B_2)=\min\left\{\tfrac18,\ \tfrac1{16}+\tfrac{81}{32}\lambda\right\}.
-\tag{5.12}\]</span></span> It is optimal to hold at <span class="math inline">\(B_2\)</span> when <span class="math inline">\(\lambda\ge 2/81\)</span>. In the <span class="math inline">\(A\)</span> economy’s state with the same mean, <span class="math inline">\(A_6\)</span>, even the immediate loss from expanding is above <span class="math inline">\(1/8\)</span>, so holding is optimal at every weight.</p>
-<p>At <span class="math inline">\(B_1\)</span>, expanding costs <span class="math inline">\(1/16+J(B_2)/2\)</span>, below the cost <span class="math inline">\(9/8\)</span> of holding forever. For <span class="math inline">\(\lambda\ge 2/81\)</span>, this gives <span class="math inline">\(J(B_1)=1/8\)</span>. At <span class="math inline">\(B_0\)</span>, the choice is then between holding at cost <span class="math inline">\(2\)</span> and expanding at cost <span class="math display">\[
-\tfrac9{16}(1+\lambda)+\tfrac12 J(B_1)
-=\tfrac{10+9\lambda}{16}.
-\]</span> The bank expands at <span class="math inline">\(B_0\)</span> for <span class="math inline">\(\lambda&lt;22/9\)</span> and holds for <span class="math inline">\(\lambda&gt;22/9\)</span>. For <span class="math inline">\(\lambda&lt;2/81\)</span>, the bound <span class="math inline">\(J(B_1)\le 1/8\)</span> also gives expansion.</p>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled" title="The thirteen reachable states">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>The thirteen reachable states
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>Each row gives the successor and inflation from an expansion. Holding returns to the same state. Starting from <span class="math inline">\(A_0\)</span> and <span class="math inline">\(B_0\)</span>, these two transitions exhaust the state space. The zero-loss states at <span class="math inline">\(x=1\)</span> and the strict preference for holding at <span class="math inline">\(A_6\)</span> break the expansion cycles in the Bellman calculation.</p>
-<div id="tbl-sa-reachable" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sa-reachable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5.4: Expansion transitions and optimal losses.
-</figcaption>
-<div aria-describedby="tbl-sa-reachable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 22%">
-<col style="width: 16%">
-<col style="width: 22%">
-<col style="width: 22%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>State</th>
-<th style="text-align: right;">Mean gap <span class="math inline">\(x\)</span></th>
-<th>Expansion successor</th>
-<th style="text-align: right;">Inflation</th>
-<th style="text-align: right;">Optimal loss <span class="math inline">\(J\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(A_0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td><span class="math inline">\(A_1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(A_1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td><span class="math inline">\(A_2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(17/10\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(A_2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/10\)</span></td>
-<td><span class="math inline">\(A_3\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(9/50\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(A_3\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(13/10\)</span></td>
-<td><span class="math inline">\(A_4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(7/10\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(9/50\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(A_4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(8/5\)</span></td>
-<td><span class="math inline">\(A_5\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(47/20\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(\min\{18/25,\;5/8+2209\lambda/400\}\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(A_5\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/4\)</span></td>
-<td><span class="math inline">\(A_6\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/8\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(A_6\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(5/4\)</span></td>
-<td><span class="math inline">\(A_7\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/8\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(A_7\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/2\)</span></td>
-<td><span class="math inline">\(A_5\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(9/4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/2\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(B_0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td><span class="math inline">\(B_1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(\min\{2,\;9(1+\lambda)/16+J(B_1)/2\}\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(B_1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/4\)</span></td>
-<td><span class="math inline">\(B_2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1/16+J(B_2)/2\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(B_2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(5/4\)</span></td>
-<td><span class="math inline">\(B_3\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(\min\{1/8,\;1/16+81\lambda/32\}\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(B_3\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/4\)</span></td>
-<td><span class="math inline">\(B_4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(\min\{1/8,\;9\lambda/16\}\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(B_4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td><span class="math inline">\(B_2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3/4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-</tr>
-</tbody>
-</table>
-</div>
-</figure>
-</div>
+<p>Only means shared by two full states can require conflicting choices. At <span class="math inline">\(x=1\)</span>, both states can hold at zero loss. At <span class="math inline">\(x=1/4\)</span>, in both states one expansion reaches <span class="math inline">\(5/4\)</span> with zero inflation. Expanding and holding there costs <span class="math inline">\(1/8\)</span> in total, while holding forever at <span class="math inline">\(1/4\)</span> costs <span class="math inline">\(9/8\)</span>.</p>
+<p>At <span class="math inline">\(x=5/4\)</span>, both states can hold for a total loss of <span class="math inline">\(1/8\)</span>. In A, an expansion moves the mean to <span class="math inline">\(3/2\)</span>, giving an immediate loss of at least <span class="math inline">\(1/4\)</span>. In B, two expansions reach the target <span class="math inline">\(1\)</span> through <span class="math inline">\(3/4\)</span>, with inflation <span class="math inline">\(3/2\)</span> and <span class="math inline">\(3/4\)</span>. That plan costs <span class="math inline">\(1/16+81\lambda/32\)</span>. Expanding once and then holding costs <span class="math inline">\(1/8+9\lambda/4\)</span>. Holding is therefore optimal in both states at <span class="math inline">\(5/4\)</span> exactly when <span class="math inline">\(\lambda\geq 2/81\)</span>.</p>
+<p>At <span class="math inline">\(x=0\)</span>, A can expand straight to the target with zero inflation. In B, an expansion gives inflation <span class="math inline">\(3/4\)</span> and moves the mean to <span class="math inline">\(1/4\)</span>. For <span class="math inline">\(\lambda\geq 2/81\)</span>, the optimal loss starting at that <span class="math inline">\(1/4\)</span> state is <span class="math inline">\(1/8\)</span>. Expanding now therefore costs <span class="math inline">\(9(1+\lambda)/16+(1/2)(1/8)=(10+9\lambda)/16\)</span>, compared with <span class="math inline">\(2\)</span> from holding forever. Both starting states can expand optimally for <span class="math inline">\(\lambda\leq22/9\)</span>. Below the lower cutoff the continuation loss from <span class="math inline">\(1/4\)</span> is at most <span class="math inline">\(1/8\)</span>, so expansion at <span class="math inline">\(x=0\)</span> remains optimal in B. At either cutoff, the state that switches actions is indifferent and can use the action shared by the other state.</p>
 </div>
 </div>
 </div>
