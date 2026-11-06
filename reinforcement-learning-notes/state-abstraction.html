@@ -215,15 +215,18 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#can-the-label-predict-what-happens-next" id="toc-can-the-label-predict-what-happens-next" class="nav-link active" data-scroll-target="#can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> When is the compressed state Markov?</a></li>
-  <li><a href="#how-much-does-the-label-need-to-tell-us-to-act" id="toc-how-much-does-the-label-need-to-tell-us-to-act" class="nav-link" data-scroll-target="#how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> What does a shared Q-table learn?</a></li>
-  <li><a href="#averaging-over-full-states" id="toc-averaging-over-full-states" class="nav-link" data-scroll-target="#averaging-over-full-states"><span class="header-section-number">5.3</span> Averaging over full states</a></li>
-  <li><a href="#application-monetary-transmission-with-menu-costs" id="toc-application-monetary-transmission-with-menu-costs" class="nav-link" data-scroll-target="#application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.4</span> Monetary policy with menu costs</a>
+  <li><a href="#q-learning-on-abstract-states" id="toc-q-learning-on-abstract-states" class="nav-link active" data-scroll-target="#q-learning-on-abstract-states"><span class="header-section-number">5.1</span> Q-learning on abstract states</a></li>
+  <li><a href="#can-the-label-predict-what-happens-next" id="toc-can-the-label-predict-what-happens-next" class="nav-link" data-scroll-target="#can-the-label-predict-what-happens-next"><span class="header-section-number">5.2</span> When the abstract state is Markov</a>
   <ul class="collapse">
-  <li><a href="#when-is-the-mean-enough-for-an-optimal-policy" id="toc-when-is-the-mean-enough-for-an-optimal-policy" class="nav-link" data-scroll-target="#when-is-the-mean-enough-for-an-optimal-policy">Solving with the full state</a></li>
-  <li><a href="#solving-after-averaging" id="toc-solving-after-averaging" class="nav-link" data-scroll-target="#solving-after-averaging">Solving after averaging</a></li>
+  <li><a href="#under-a-fixed-policy" id="toc-under-a-fixed-policy" class="nav-link" data-scroll-target="#under-a-fixed-policy">Under a fixed policy</a></li>
   </ul></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">5.5</span> Check your understanding</a></li>
+  <li><a href="#averaging-over-full-states" id="toc-averaging-over-full-states" class="nav-link" data-scroll-target="#averaging-over-full-states"><span class="header-section-number">5.3</span> An MDP on abstract states</a></li>
+  <li><a href="#how-much-does-the-label-need-to-tell-us-to-act" id="toc-how-much-does-the-label-need-to-tell-us-to-act" class="nav-link" data-scroll-target="#how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.4</span> Preserving values and decisions</a>
+  <ul class="collapse">
+  <li><a href="#optimal-action-values" id="toc-optimal-action-values" class="nav-link" data-scroll-target="#optimal-action-values">Optimal action values</a></li>
+  <li><a href="#an-optimal-policy" id="toc-an-optimal-policy" class="nav-link" data-scroll-target="#an-optimal-policy">An optimal policy</a></li>
+  <li><a href="#when-solving-the-averaged-mdp-gives-an-optimal-policy" id="toc-when-solving-the-averaged-mdp-gives-an-optimal-policy" class="nav-link" data-scroll-target="#when-solving-the-averaged-mdp-gives-an-optimal-policy">When solving the averaged MDP gives an optimal policy</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -263,179 +266,117 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p><a href="./03-notes.html#eq-qlearning">Chapter 3</a> learns a separate action value for each state and action. Suppose the state records one price gap for each of four groups of firms, with each gap on the same evenly spaced grid of <span class="math inline">\(m\)</span> points. There are <span class="math inline">\(m^4\)</span> possible vectors and <span class="math inline">\(4m-3\)</span> possible means. A Q-table indexed by the mean has fewer rows and can use observations from different vectors to update the same row. Which observations can we pool without changing what the table learns?</p>
+<p>In <a href="./03-notes.html#eq-qlearning">Chapter 3’s Q-learning update</a>, a transition <span class="math inline">\((s_t,a_t,r_{t+1},s_{t+1})\)</span> revises the estimate <span class="math inline">\(q_t(s_t,a_t)\)</span>. The row that changes is the one for <span class="math inline">\(s_t\)</span>. Giving several states one row reduces the number of entries to estimate and lets visits to any of those states update that row. We want to know when these shared estimates can recover the optimal action values and when they suffice to choose an optimal action.</p>
+<p>We use the finite discounted MDP of Chapters 1–3, with state space <span class="math inline">\(\mathcal S\)</span>, the same finite action set <span class="math inline">\(\mathcal A\)</span> at every state, bounded rewards, and <span class="math inline">\(0&lt;\gamma&lt;1\)</span>. Call a state <span class="math inline">\(s\)</span> of this MDP a <strong>full state</strong>.</p>
 <div id="def-sa-abstraction" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 5.1 (State abstraction)</strong></span> A <strong>state abstraction</strong> is a map <span class="math inline">\(\phi\)</span> that replaces a full state <span class="math inline">\(s\)</span> with a summary <span class="math inline">\(x=\phi(s)\)</span>. Write <span class="math inline">\(S_x=\{s:\phi(s)=x\}\)</span> for the full states assigned to <span class="math inline">\(x\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition 5.1 (State abstraction)</strong></span> A <strong>state abstraction</strong> maps each full state <span class="math inline">\(s\)</span> to a label <span class="math inline">\(x=\phi(s)\)</span>, called an <strong>abstract state</strong>. Write <span class="math inline">\(\overline{\mathcal S}\)</span> for the set of labels and <span class="math inline">\(\mathcal S_x=\{s\in\mathcal S:\phi(s)=x\}\)</span> for the group with label <span class="math inline">\(x\)</span>.</p>
 </div>
-<p>We will use the mean price gap as the summary. The example gives a case where the central bank can act optimally using the mean, yet Q-learning on that mean can learn the wrong action.</p>
-<section id="can-the-label-predict-what-happens-next" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> When is the compressed state Markov?</h2>
-<p>In a finite MDP, the conditional distribution <span class="math inline">\(p(s'\given s,a)\)</span> depends only on the current state <span class="math inline">\(s\)</span> and action <span class="math inline">\(a\)</span>. For the next summary to be <span class="math inline">\(y\)</span>, the next full state can be any member of <span class="math inline">\(S_y\)</span>. Its probability is <span id="eq-sa-closure"><span class="math display">\[
-p_\phi(y\given s,a)=\sum_{s'\in S_y}p(s'\given s,a).
-\tag{5.1}\]</span></span> The sum compares probabilities of reaching the same <strong>summary</strong>. It can agree for two current states even if they lead to different full states inside <span class="math inline">\(S_y\)</span>.</p>
-<p>Let <span class="math inline">\(h_t\)</span> denote the observed history through <span class="math inline">\(x_t=x\)</span>, before choosing <span class="math inline">\(a_t\)</span>. Given the history and action, we may still be uncertain which <span class="math inline">\(s_t\)</span> in <span class="math inline">\(S_x\)</span> we occupy. The law of total probability gives <span id="eq-sa-history"><span class="math display">\[
-\Prob(x_{t+1}=y\given h_t,a_t=a)
-=\sum_{s\in S_x}\Prob(s_t=s\given h_t,a_t=a)\,p_\phi(y\given s,a).
-\tag{5.2}\]</span></span> If <span class="math inline">\(p_\phi(y\given s,a)\)</span> is the same for all <span class="math inline">\(s\in S_x\)</span>, the weights sum out and history drops from the forecast. For a single controlled transition law valid from every full starting state, this equality must hold for every <span class="math inline">\(x,y,a\)</span>. To see necessity, start in two states with the same <span class="math inline">\(x\)</span> and take the same action. The forecasts must agree at that first step.</p>
-<p>Under a <strong>fixed policy</strong> <span class="math inline">\(\pi(a\given s)\)</span>, average over its action before doing the same check. The condition for a single Markov transition law under <span class="math inline">\(\pi\)</span>, valid from every starting state, is that <span class="math display">\[
-\sum_a \pi(a\given s)\,p_\phi(y\given s,a)
-\]</span> agree across <span class="math inline">\(s\in S_x\)</span> for each <span class="math inline">\(x,y\)</span>. This can hold for the policy being evaluated even if it fails for some other action. To also preserve the one-period expected reward under <span class="math inline">\(\pi\)</span>, check that <span class="math inline">\(\sum_a\pi(a\given s)r(s,a)\)</span> agrees within each group. An MDP on <span class="math inline">\(x\)</span> that preserves the one-step model needs both the probabilities in <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.1</span></a> and the expected reward <span class="math inline">\(r(s,a)\)</span> to agree across <span class="math inline">\(s\in S_x\)</span> for every action. See <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman (2006), §3.3, Definition 3(1)</a>.</p>
-</section>
-<section id="how-much-does-the-label-need-to-tell-us-to-act" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> What does a shared Q-table learn?</h2>
-<p>With a table <span class="math inline">\(\bar q\)</span> indexed by <span class="math inline">\(x\)</span>, the <a href="./03-notes.html#eq-qlearning">Q-learning update</a> moves <span class="math inline">\(\bar q(x,a)\)</span> toward <span class="math inline">\(r_{t+1}+\gamma\max_b\bar q(x_{t+1},b)\)</span>. Conditional on the full state and action, the expected target is <span id="eq-sa-target"><span class="math display">\[
+<p>Like the feature map in <a href="./03-notes.html#values-as-parameterized-functions">Chapter 3</a>, <span class="math inline">\(\phi\)</span> represents a state in a form that the learner uses to estimate values. Here the label selects one row, giving a table with <span class="math inline">\(|\overline{\mathcal S}|\,|\mathcal A|\)</span> entries. The definition follows <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman (2006), §3.1</a>.</p>
+<section id="q-learning-on-abstract-states" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="q-learning-on-abstract-states"><span class="header-section-number">5.1</span> Q-learning on abstract states</h2>
+<p>Write <span class="math inline">\(x_t=\phi(s_t)\)</span> and let <span class="math inline">\(\bar q_t(x,a)\)</span> be the table indexed by abstract state and action. In <a href="03-notes.html#eq-qlearning" class="quarto-xref">Equation&nbsp;<span>3.9</span></a>, replace the two state arguments with <span class="math inline">\(x_t\)</span> and <span class="math inline">\(x_{t+1}\)</span>. Let <span class="math inline">\(\alpha_t(x,a)\)</span> be the step size for entry <span class="math inline">\((x,a)\)</span>. The TD error <span class="math inline">\(\delta_t\)</span> and the update are</p>
+<p><span id="eq-sa-qlearning"><span class="math display">\[
+\begin{aligned}
+\delta_t
+  &amp;=r_{t+1}+\gamma\max_{b\in\mathcal A}\bar q_t(x_{t+1},b)-\bar q_t(x_t,a_t),\\
+\bar q_{t+1}(x_t,a_t)
+  &amp;=\bar q_t(x_t,a_t)+\alpha_t(x_t,a_t)\delta_t .
+\end{aligned}
+\tag{5.1}\]</span></span></p>
+<p>Two full states with the same label now update the same entry for a given action. To see when those updates agree in expectation, first compute the probability of the next label <span class="math inline">\(y\)</span>. It is the sum of the transition probabilities to the full states in its group,</p>
+<p><span id="eq-sa-closure"><span class="math display">\[
+p_\phi(y\given s,a)
+=\sum_{s'\in\mathcal S_y}p(s'\given s,a).
+\tag{5.2}\]</span></span></p>
+<p>For a given table <span class="math inline">\(\bar q\)</span>, write <span class="math inline">\(g_{\bar q}(s,a)\)</span> for the expected TD target conditional on <span class="math inline">\(s_t=s\)</span> and <span class="math inline">\(a_t=a\)</span>. The reward <span class="math inline">\(r(s,a)\)</span> is the conditional mean of <span class="math inline">\(r_{t+1}\)</span>. Grouping the possible next states by their label gives</p>
+<p><span id="eq-sa-target"><span class="math display">\[
 \begin{aligned}
 g_{\bar q}(s,a)
-&amp;=\E[r_{t+1}+\gamma\max_b\bar q(x_{t+1},b)\given s_t=s,a_t=a]\\
-&amp;=r(s,a)+\gamma\sum_y p_\phi(y\given s,a)\max_b\bar q(y,b).
+&amp;=r(s,a)+\gamma\sum_{s'\in\mathcal S}p(s'\given s,a)
+                    \max_{b\in\mathcal A}\bar q(\phi(s'),b)\\
+&amp;=r(s,a)+\gamma\sum_{y\in\overline{\mathcal S}}
+    p_\phi(y\given s,a)\max_{b\in\mathcal A}\bar q(y,b).
 \end{aligned}
 \tag{5.3}\]</span></span></p>
-<p><strong>Preserving transitions and rewards.</strong> The model conditions make <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> agree across <span class="math inline">\(S_x\)</span> for every table. Conversely, setting <span class="math inline">\(\bar q=0\)</span> isolates the reward, and setting <span class="math inline">\(\bar q(y,b)=\mathbf 1\{y=y_0\}\)</span> for every <span class="math inline">\(b\)</span> isolates the transition probability to <span class="math inline">\(y_0\)</span> once rewards agree. Under these conditions, Bellman iteration from zero keeps every iterate constant within each group. Since <span class="math inline">\(0&lt;\gamma&lt;1\)</span>, the iterates converge to <span class="math inline">\(q^*\)</span>, which has the same property.</p>
-<p><strong>Preserving optimal action values.</strong> It is enough that <span class="math inline">\(q^*(s,a)\)</span> agrees across <span class="math inline">\(s\in S_x\)</span> for every <span class="math inline">\(a\)</span>. Then it fits in a table <span class="math inline">\(\bar q^*(x,a)\)</span>, and the full Bellman equation gives <span class="math inline">\(g_{\bar q^*}(s,a)=q^*(s,a)\)</span>. Every state in the group gives the same expected target <em>at this table</em>. Their expected targets can differ at other tables.</p>
-<p><strong>Preserving an optimal action.</strong> An optimal policy can depend on <span class="math inline">\(x\)</span> alone exactly when each group has an action that maximizes <span class="math inline">\(q^*(s,a)\)</span> for every <span class="math inline">\(s\in S_x\)</span>. Choosing that action at every <span class="math inline">\(x\)</span> makes <span class="math inline">\(v^*\)</span> satisfy the Bellman equation of the resulting policy. The value of the maximizing action can differ across the group.</p>
-<p>Each requirement implies the next. The reverse implications fail in general. The three conditions are items 1, 3, and 5 of Definition 3. With infinite visits to every full state-action pair and suitable decreasing step sizes, the paper’s Q-learning result applies when all optimal action values are preserved. A shared optimal action alone gives no such guarantee. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Li, Walsh, and Littman, §3.3 and §3.4, Theorems 2 and 4</a>.</p>
+<p>This is the expectation in the <a href="./03-notes.html#eq-bellman-opt-q">Q-learning Bellman equation</a> with the continuation value taken from the shared table.</p>
+</section>
+<section id="can-the-label-predict-what-happens-next" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="can-the-label-predict-what-happens-next"><span class="header-section-number">5.2</span> When the abstract state is Markov</h2>
+<p>Let <span class="math inline">\(h_t\)</span> be the history of observed labels, actions, and rewards through the current label <span class="math inline">\(x_t=x\)</span>, before taking action <span class="math inline">\(a_t\)</span>. Conditional on that history and the current action, the next label has distribution</p>
+<p><span id="eq-sa-history"><span class="math display">\[
+\Prob(x_{t+1}=y\given h_t,a_t=a)
+=\sum_{s\in\mathcal S_x}\Prob(s_t=s\given h_t,a_t=a)\,p_\phi(y\given s,a).
+\tag{5.4}\]</span></span></p>
+<p>This is the law of total probability. If <span class="math inline">\(p_\phi(y\given s,a)\)</span> agrees across all <span class="math inline">\(s\in\mathcal S_x\)</span> for every <span class="math inline">\(x,y,a\)</span>, we can take it outside the sum. The weights sum to one, and the result depends only on <span class="math inline">\(x\)</span> and <span class="math inline">\(a\)</span>. The condition is also necessary for a single transition law valid from every full starting state. Start separately from any two states in the same group and take the same action. Their first-step distributions over labels must agree.</p>
+<p>To preserve the one-step model, also require <span class="math inline">\(r(s,a)\)</span> to agree within each group for every action. Then <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> agrees within the group for <strong>every</strong> table <span class="math inline">\(\bar q\)</span>. The transition condition only compares the total probability of reaching each group. Within a destination group, the probabilities of reaching particular full states may differ. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(1)</a>.</p>
+<section id="under-a-fixed-policy" class="level3">
+<h3 class="anchored" data-anchor-id="under-a-fixed-policy">Under a fixed policy</h3>
+<p>The forecast in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> conditions on the current action. Under a fixed stationary policy <span class="math inline">\(\pi(a\given s)\)</span>, we can instead predict the next label before seeing the action. Chapter 2 averages over the action to get <span class="math inline">\(r_\pi(s)\)</span> and <span class="math inline">\(p_\pi(s'\given s)\)</span> (<a href="02-notes.html#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>). Applying <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a> to <span class="math inline">\(p_\pi\)</span> gives the transition probability to label <span class="math inline">\(y\)</span>,</p>
+<p><span class="math display">\[
+\sum_{s'\in\mathcal S_y}p_\pi(s'\given s)
+=\sum_{a\in\mathcal A}\pi(a\given s)\,p_\phi(y\given s,a).
+\]</span></p>
+<p>For a single transition law under <span class="math inline">\(\pi\)</span> valid from every starting state, this sum must agree across <span class="math inline">\(s\in\mathcal S_x\)</span> for every <span class="math inline">\(x,y\)</span>. To preserve the expected reward under <span class="math inline">\(\pi\)</span>, check <span class="math inline">\(r_\pi(s)\)</span> within each group as well. The policy averages can agree even when the probabilities differ for an individual action. If the policy uses only <span class="math inline">\(x\)</span>, agreement for each action also gives agreement after averaging over the policy.</p>
+</section>
 </section>
 <section id="averaging-over-full-states" class="level2" data-number="5.3">
-<h2 data-number="5.3" class="anchored" data-anchor-id="averaging-over-full-states"><span class="header-section-number">5.3</span> Averaging over full states</h2>
-<p>Pick weights <span class="math inline">\(w_x(s)\geq 0\)</span> that sum to one over <span class="math inline">\(s\in S_x\)</span>. An MDP on the summaries can always be defined by <span id="eq-sa-weighted-model"><span class="math display">\[
+<h2 data-number="5.3" class="anchored" data-anchor-id="averaging-over-full-states"><span class="header-section-number">5.3</span> An MDP on abstract states</h2>
+<p>We can construct an MDP on the labels by choosing a distribution <span class="math inline">\(w_x(s)\)</span> over the full states in each group <span class="math inline">\(\mathcal S_x\)</span>. Keep the same actions and discount factor, and define its reward and transition probability by</p>
+<p><span id="eq-sa-weighted-model"><span class="math display">\[
 \begin{aligned}
-\bar r(x,a)&amp;=\sum_{s\in S_x}w_x(s)r(s,a),\\
-\bar p(y\given x,a)&amp;=\sum_{s\in S_x}w_x(s)p_\phi(y\given s,a).
+\bar r(x,a)&amp;=\sum_{s\in\mathcal S_x} w_x(s)\,r(s,a),\\
+\bar p(y\given x,a)&amp;=\sum_{s\in\mathcal S_x} w_x(s)\,p_\phi(y\given s,a).
 \end{aligned}
-\tag{5.4}\]</span></span> The transition probabilities sum to one since each of the distributions in the average does. This is the construction in <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman, §3.1, Definition 1</a>.</p>
-<p>The expected Q-learning target for this MDP is <span class="math inline">\(\sum_{s\in S_x}w_x(s)g_{\bar q}(s,a)\)</span>. To sample it in a simulator, select a pair <span class="math inline">\((x,a)\)</span>, draw a fresh starting state <span class="math inline">\(s\)</span> from <span class="math inline">\(w_x\)</span>, and simulate one step with <span class="math inline">\(a\)</span>. With infinitely many such draws for each pair and the usual decreasing step sizes, tabular Q-learning converges to the optimal action values of this averaged MDP.</p>
-<p>Along a trajectory, the weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.2</span></a> are conditional probabilities that can change with the history and action. Changing the behavior policy can then change the expected target for the same table entry. Q-learning takes a maximum over next actions, and its updates still depend on which full states it samples.</p>
+\tag{5.5}\]</span></span></p>
+<p>The second expression averages probability distributions, so it defines a probability distribution for each <span class="math inline">\((x,a)\)</span>. Under the model conditions above, every term in each average agrees and the weights do not affect the result. In general the weights here are fixed by construction. The weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> describe which full state we occupy given the history and action, so they can change from one observation to the next. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman, Definition 1</a>.</p>
+<p>The Bellman optimality operator <span class="math inline">\(\bar T\)</span> for the averaged MDP applies the right-hand side of the Q-learning Bellman equation to the current table. From <a href="#eq-sa-weighted-model" class="quarto-xref">Equation&nbsp;<span>5.5</span></a> and <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a>,</p>
+<p><span id="eq-sa-weighted-backup"><span class="math display">\[
+\begin{aligned}
+(\bar T\bar q)(x,a)
+&amp;=\bar r(x,a)+\gamma\sum_{y\in\overline{\mathcal S}}\bar p(y\given x,a)
+                    \max_{b\in\mathcal A}\bar q(y,b)\\
+&amp;=\sum_{s\in\mathcal S_x}w_x(s)\,g_{\bar q}(s,a).
+\end{aligned}
+\tag{5.6}\]</span></span></p>
+<p>The operator contracts by <span class="math inline">\(\gamma\)</span>. A change of at most <span class="math inline">\(\varepsilon\)</span> in each table entry changes a maximum by at most <span class="math inline">\(\varepsilon\)</span> and the discounted average by at most <span class="math inline">\(\gamma\varepsilon\)</span>. Its unique fixed point <span class="math inline">\(\bar q^*\)</span> is the optimal action-value function of the averaged MDP.</p>
+<p>If each sample for <span class="math inline">\((x,a)\)</span> starts with a fresh draw <span class="math inline">\(s\)</span> from <span class="math inline">\(w_x\)</span> and then takes action <span class="math inline">\(a\)</span> in the full MDP, its expected TD target is <span class="math inline">\((\bar T\bar q)(x,a)\)</span>. Use the per-entry step size conditions in <a href="03-notes.html#thm-sarsa-convergence" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a>. The step sizes on updates to each entry must be positive and at most one, with a divergent sum and a finite sum of squares. For this sampler, choose the step size after selecting <span class="math inline">\((x,a)\)</span> and before drawing <span class="math inline">\(s\)</span>. The step size then cannot change the relative weight of different full states in the update. With infinitely many such samples for each pair, tabular Q-learning converges to <span class="math inline">\(\bar q^*\)</span>.</p>
+<p>Along a trajectory, changing the behavior policy can change which full states supply updates to a shared entry. The expected TD target then averages <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> with the conditional weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a>.</p>
 </section>
-<section id="application-monetary-transmission-with-menu-costs" class="level2" data-number="5.4">
-<h2 data-number="5.4" class="anchored" data-anchor-id="application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.4</span> Monetary policy with menu costs</h2>
-<p>Four groups of firms each have weight <span class="math inline">\(1/4\)</span> in the price index. Firms within a group share a price, and all groups target a log price equal to log nominal spending. A firm’s <strong>price gap</strong> is its target log price minus its current log price. The vector of gaps is <span class="math inline">\(s\)</span> and their mean <span class="math inline">\(x\)</span> is log real spending, measured as log nominal spending minus the average log price.</p>
-<p>The central bank either holds nominal spending fixed (<span class="math inline">\(a=0\)</span>) or raises it by one log percentage point (<span class="math inline">\(a=1\)</span>). The action adds <span class="math inline">\(a\)</span> to each gap. A group resets its price to the target if the resulting gap is at least four log percentage points in absolute value. A reset adds that gap to the group’s log price and returns its gap to zero. This pricing rule and the bank’s loss below define a teaching example. For the role of reset thresholds in aggregate price adjustment, see <a href="https://economics.mit.edu/sites/default/files/publications/Price%20stickiness%20in%20Ss%20models%20-%20New%20interpretation.pdf#page=10">Caballero and Engel (2007), §3</a>.</p>
-<p>Start in <span class="math inline">\(A=(-1,-1,-1,3)\)</span> or <span class="math inline">\(B=(0,0,0,0)\)</span>. Both have <span class="math inline">\(x=0\)</span>. A raise in <span class="math inline">\(A\)</span> takes the last gap to four, so that group resets and inflation is <span class="math inline">\(4/4=1\)</span> point. All gaps are then zero, giving <span class="math inline">\(B\)</span> as the next state. A raise in <span class="math inline">\(B\)</span> takes each gap to one with zero inflation, giving <span class="math inline">\(C=(1,1,1,1)\)</span>. Thus <span class="math inline">\(p_\phi(1\given A,1)=0\)</span> and <span class="math inline">\(p_\phi(1\given B,1)=1\)</span>. The full vector determines the next state. If the bank always holds, every gap stays fixed, so the mean alone predicts the next mean.</p>
-<div id="cell-fig-sa-impact" class="cell" data-fig-height="1.65" data-fig-width="7.2" data-execution_count="1">
-<div class="cell-output cell-output-display">
-<div id="fig-sa-impact" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A and B are grouped at mean gap zero. An arrow from A to B indicates one point of inflation. An arrow from B to C, at mean gap one, indicates zero inflation.">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="state-abstraction_files/figure-html/fig-sa-impact-output-1.png" alt="A and B are grouped at mean gap zero. An arrow from A to B indicates one point of inflation. An arrow from B to C, at mean gap one, indicates zero inflation." width="697" height="171" class="figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.1: A one-point spending increase moves A to B and B to C. A and B have the same mean price gap before the action.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<section id="when-is-the-mean-enough-for-an-optimal-policy" class="level3">
-<h3 class="anchored" data-anchor-id="when-is-the-mean-enough-for-an-optimal-policy">Solving with the full state</h3>
-<p>The bank discounts at <span class="math inline">\(\gamma=1/2\)</span>. Its period loss is <span id="eq-sa-loss"><span class="math display">\[
-\ell(s,a)=(x'-1)^2+\tfrac34(\text{inflation})^2,
-\tag{5.5}\]</span></span> where <span class="math inline">\(x'\)</span> and inflation are measured after the action and price resets. The reward in the Q-learning equation is <span class="math inline">\(r(s,a)=-\ell(s,a)\)</span>.</p>
-<p>The table lists every state reachable from <span class="math inline">\(A\)</span> or <span class="math inline">\(B\)</span>. Holding leaves the state unchanged with zero inflation. Each listed transition under a raise has probability one, with probability zero on all other states.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">State <span class="math inline">\(s\)</span></th>
-<th style="text-align: right;">Mean <span class="math inline">\(x\)</span></th>
-<th style="text-align: right;">Loss if hold</th>
-<th style="text-align: left;">Next state if raise</th>
-<th style="text-align: right;">Inflation if raise</th>
-<th style="text-align: right;">Loss if raise</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><span class="math inline">\(A=(-1,-1,-1,3)\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td style="text-align: left;"><span class="math inline">\(B\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(7/4\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><span class="math inline">\(B=(0,0,0,0)\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td style="text-align: left;"><span class="math inline">\(C\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><span class="math inline">\(C=(1,1,1,1)\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: left;"><span class="math inline">\(D\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><span class="math inline">\(D=(2,2,2,2)\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(2\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
-<td style="text-align: left;"><span class="math inline">\(E\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(4\)</span></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><span class="math inline">\(E=(3,3,3,3)\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(3\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(4\)</span></td>
-<td style="text-align: left;"><span class="math inline">\(B\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(4\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(13\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>Let <span class="math inline">\(V(s)\)</span> be the minimum discounted loss. Holding in <span class="math inline">\(C\)</span> yields zero loss forever, so <span class="math inline">\(V(C)=0\)</span>. Raising in <span class="math inline">\(B\)</span> takes the bank there at zero cost, so <span class="math inline">\(V(B)=0\)</span> too. The Bellman equation in <span class="math inline">\(A\)</span> is <span class="math display">\[
-V(A)=\min\{1+\tfrac12 V(A),\;\tfrac74+\tfrac12 V(B)\}
-     =\min\{1+\tfrac12 V(A),\;\tfrac74\}.
-\]</span> Its solution is <span class="math inline">\(V(A)=7/4\)</span>, since holding first costs <span class="math inline">\(1+\frac12(7/4)=15/8\)</span>. In <span class="math inline">\(D\)</span> and <span class="math inline">\(E\)</span>, holding forever costs <span class="math inline">\(2\)</span> and <span class="math inline">\(8\)</span>, respectively, below the immediate losses from raising. Holding is optimal in both.</p>
-<p>An optimal policy uses only the mean. Raise at <span class="math inline">\(x=0\)</span> and hold at <span class="math inline">\(x=1,2,3\)</span>. The action values of raising at <span class="math inline">\(x=0\)</span> differ, with <span class="math inline">\(q^*(A,1)=-7/4\)</span> and <span class="math inline">\(q^*(B,1)=0\)</span>.</p>
+<section id="how-much-does-the-label-need-to-tell-us-to-act" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.4</span> Preserving values and decisions</h2>
+<section id="optimal-action-values" class="level3">
+<h3 class="anchored" data-anchor-id="optimal-action-values">Optimal action values</h3>
+<p>The full optimal action values <span class="math inline">\(q^*(s,a)\)</span> fit in one table on the labels exactly when they agree within every group for each action. The model condition is sufficient. Start value iteration for the full Q-table at zero. If an iterate agrees within each group, its Bellman update is given by <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> and also agrees under the model condition. The limit <span class="math inline">\(q^*\)</span> has the same property.</p>
+<p>Suppose <span class="math inline">\(q^*(s,a)\)</span> agrees within each group, even though some transitions or expected rewards may differ. Define a candidate table by <span class="math inline">\(\bar q(\phi(s),a)=q^*(s,a)\)</span>. Substituting this table into <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> gives <span class="math inline">\(g_{\bar q}(s,a)=q^*(s,a)\)</span> by the full Bellman equation. Consequently every weighted average in <a href="#eq-sa-weighted-backup" class="quarto-xref">Equation&nbsp;<span>5.6</span></a> returns the same entry <span class="math inline">\(\bar q(x,a)\)</span>. This table is the fixed point <span class="math inline">\(\bar q^*\)</span> for any choice of weights.</p>
+<p>The same equality explains why Q-learning can recover <span class="math inline">\(q^*\)</span> without a fixed mix of full states. At the table representing <span class="math inline">\(q^*\)</span>, the expected TD error is zero conditional on each full pair <span class="math inline">\((s,a)\)</span>. For any other table <span class="math inline">\(\bar q\)</span>,</p>
+<p><span class="math display">\[
+\big|g_{\bar q}(s,a)-\bar q^*(\phi(s),a)\big|
+\leq \gamma\|\bar q-\bar q^*\|_\infty .
+\]</span></p>
+<p>The contraction argument now applies at each full state before averaging. Suppose each full state-action pair is visited infinitely often and each step size is chosen before the new reward and next state. Under the same per-entry step size bounds and sums, the shared Q-table converges to the table representing <span class="math inline">\(q^*\)</span>. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(3)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Theorem 4(1)</a>.</p>
 </section>
-<section id="solving-after-averaging" class="level3">
-<h3 class="anchored" data-anchor-id="solving-after-averaging">Solving after averaging</h3>
-<p>For each one-step training sample at <span class="math inline">\(x=0\)</span>, start the simulator in <span class="math inline">\(A\)</span> with probability <span class="math inline">\(w=3/4\)</span> and in <span class="math inline">\(B\)</span> otherwise, for either action. At all other means there is just one full state. In the averaged MDP, raising at <span class="math inline">\(x=0\)</span> costs <span class="math inline">\(w(7/4)\)</span> in expectation and returns to <span class="math inline">\(x=0\)</span> with probability <span class="math inline">\(w\)</span>. It otherwise goes to <span class="math inline">\(x=1\)</span>, where holding yields zero loss. The averaged Bellman equation is <span id="eq-sa-averaged-loss"><span class="math display">\[
-\bar V(0)=\min\left\{1+\tfrac12\bar V(0),\;
-                       w\big(\tfrac74+\tfrac12\bar V(0)\big)\right\}.
-\tag{5.6}\]</span></span> At <span class="math inline">\(\bar V(0)=2\)</span>, the cost of holding is <span class="math inline">\(2\)</span> and the cost of raising is <span class="math inline">\(\tfrac34(\tfrac74+1)=33/16&gt;2\)</span>. The discounted Bellman equation has a unique solution, so the optimal action in the averaged MDP is <strong>hold</strong>. With the sampling procedure above, Q-learning learns to hold at <span class="math inline">\(x=0\)</span>.</p>
-<p>In the full model, raising from <span class="math inline">\(A\)</span> reaches <span class="math inline">\(B\)</span>, where the next raise costs zero. The averaged model sees <span class="math inline">\(x=0\)</span> again and puts weight <span class="math inline">\(w\)</span> back on <span class="math inline">\(A\)</span>. The continuation value changes enough to reverse the decision.</p>
+<section id="an-optimal-policy" class="level3">
+<h3 class="anchored" data-anchor-id="an-optimal-policy">An optimal policy</h3>
+<p>A policy <span class="math inline">\(\bar\pi(a\given x)\)</span> on the labels acts in the full MDP by choosing actions with probabilities <span class="math inline">\(\pi(a\given s)=\bar\pi(a\given\phi(s))\)</span>. Such a policy can be optimal from every full state exactly when each group has an action that is optimal for all its members,</p>
+<p><span id="eq-sa-common-action"><span class="math display">\[
+\bigcap_{s\in\mathcal S_x}\argmax_{a\in\mathcal A}q^*(s,a)\ne\varnothing
+\qquad\text{for every }x.
+\tag{5.7}\]</span></span></p>
+<p>An optimal policy must put its probability on maximizing actions, so its support at <span class="math inline">\(x\)</span> must lie in the intersection. Conversely, choose an action from each intersection. The optimal state value <span class="math inline">\(v^*(s)=\max_{a\in\mathcal A}q^*(s,a)\)</span> then satisfies the Bellman equation of that policy, hence is its value. The condition requires a common maximizing action. Its value may vary across states in the group. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Li, Walsh, and Littman, Definition 3(5)</a>.</p>
 </section>
-</section>
-<section id="check-your-understanding" class="level2" data-number="5.5">
-<h2 data-number="5.5" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">5.5</span> Check your understanding</h2>
-<p>For the weighting construction, return to <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman, §3.1, Definition 1</a>. For the distinction between representing an optimal policy and finding it, read <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">§3.3, Definition 3</a> and <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">§3.4, Theorems 3–4</a>.</p>
-<ol type="1">
-<li>Start in <span class="math inline">\(A\)</span> or <span class="math inline">\(B\)</span> with equal probability and choose each action by an independent fair coin. You observe <span class="math inline">\(x_1=0\)</span>. If you raise now, what is the probability of <span class="math inline">\(x_2=1\)</span> after a first-period hold? After a first-period raise?</li>
-<li>At what weight <span class="math inline">\(w\)</span> is the averaged MDP indifferent between holding and raising at <span class="math inline">\(x=0\)</span>? Which action does it choose below that weight?</li>
-</ol>
-<div class="callout callout-style-default callout-note callout-titled" title="Answers">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Answers
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li>After a hold, the initial mixture is unchanged, so <span class="math inline">\(s_1=B\)</span> with probability <span class="math inline">\(1/2\)</span>. After a raise with <span class="math inline">\(x_1=0\)</span>, the economy went from <span class="math inline">\(A\)</span> to <span class="math inline">\(B\)</span>, so <span class="math inline">\(s_1=B\)</span> with probability one. Raising from <span class="math inline">\(B\)</span> gives <span class="math inline">\(x_2=1\)</span>.</li>
-<li>Compare the cost of holding forever, <span class="math inline">\(2\)</span>, with the cost of raising once and then acting optimally. At a tie, <a href="#eq-sa-averaged-loss" class="quarto-xref">Equation&nbsp;<span>5.6</span></a> gives <span class="math inline">\(2=w(7/4+1)\)</span>, or <span class="math inline">\(w=8/11\)</span>. If <span class="math inline">\(w&lt;8/11\)</span>, the raise branch evaluated at <span class="math inline">\(\bar V(0)=2\)</span> costs less than <span class="math inline">\(2\)</span>. Its fixed point is <span class="math inline">\((7w/4)/(1-w/2)&lt;2\)</span>, at which raising is optimal.</li>
-</ol>
-</div>
-</div>
-</div>
+<section id="when-solving-the-averaged-mdp-gives-an-optimal-policy" class="level3">
+<h3 class="anchored" data-anchor-id="when-solving-the-averaged-mdp-gives-an-optimal-policy">When solving the averaged MDP gives an optimal policy</h3>
+<p>Suppose each group has both a common optimal action and a common optimal state value <span class="math inline">\(v^*(s)=\bar v(x)\)</span> for <span class="math inline">\(s\in\mathcal S_x\)</span>. The return from taking action <span class="math inline">\(a\)</span> in the averaged MDP and using <span class="math inline">\(\bar v\)</span> for the continuation is</p>
+<p><span id="eq-sa-common-value"><span class="math display">\[
+\bar r(x,a)+\gamma\sum_{y\in\overline{\mathcal S}}\bar p(y\given x,a)\,\bar v(y)
+=\sum_{s\in\mathcal S_x}w_x(s)\,q^*(s,a)
+\leq \bar v(x).
+\tag{5.8}\]</span></span></p>
+<p>A common optimal action attains equality, so <span class="math inline">\(\bar v\)</span> solves the averaged Bellman equation. If every full state in the group has positive weight, an action attains equality only if it maximizes <span class="math inline">\(q^*(s,a)\)</span> at every full state in the group. Thus a greedy policy from the averaged MDP is optimal in the full MDP. With those same sampling weights, Q-learning can learn this policy even when the values of suboptimal actions vary within a group. Changing the mix of samples can prevent those action values from converging. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(4)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Theorems 3 and 4(2)</a>.</p>
+<p>If the common action has different values at different full states, the policy can still use the labels. The averaged Bellman equation replaces those different continuation values by a single value. This can reverse the ranking of actions that lead into the group. In that case both solving the averaged MDP and running Q-learning on samples with its fixed weights can yield a suboptimal policy. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=7">Li, Walsh, and Littman, Theorems 3–4 and Figure 1(b)</a>.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
