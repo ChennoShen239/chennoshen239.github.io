@@ -227,6 +227,13 @@ window.Quarto = {
   <li><a href="#an-optimal-policy" id="toc-an-optimal-policy" class="nav-link" data-scroll-target="#an-optimal-policy">An optimal policy</a></li>
   <li><a href="#when-solving-the-averaged-mdp-gives-an-optimal-policy" id="toc-when-solving-the-averaged-mdp-gives-an-optimal-policy" class="nav-link" data-scroll-target="#when-solving-the-averaged-mdp-gives-an-optimal-policy">When solving the averaged MDP gives an optimal policy</a></li>
   </ul></li>
+  <li><a href="#krusell-smith-benchmark" id="toc-krusell-smith-benchmark" class="nav-link" data-scroll-target="#krusell-smith-benchmark"><span class="header-section-number">5.5</span> The Krusell–Smith benchmark</a>
+  <ul class="collapse">
+  <li><a href="#household-problem-and-equilibrium" id="toc-household-problem-and-equilibrium" class="nav-link" data-scroll-target="#household-problem-and-equilibrium">Household problem and equilibrium</a></li>
+  <li><a href="#what-the-abstract-state-preserves" id="toc-what-the-abstract-state-preserves" class="nav-link" data-scroll-target="#what-the-abstract-state-preserves">What the abstract state preserves</a></li>
+  <li><a href="#solving-with-aggregate-capital" id="toc-solving-with-aggregate-capital" class="nav-link" data-scroll-target="#solving-with-aggregate-capital">Solving with aggregate capital</a></li>
+  <li><a href="#published-forecast-checks" id="toc-published-forecast-checks" class="nav-link" data-scroll-target="#published-forecast-checks">Published forecast checks</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -374,6 +381,81 @@ g_{\bar q}(s,a)
 \tag{5.8}\]</span></span></p>
 <p>A common optimal action attains equality, so <span class="math inline">\(\bar v\)</span> solves the averaged Bellman equation. If every full state in the group has positive weight, an action attains equality only if it maximizes <span class="math inline">\(q^*(s,a)\)</span> at every full state in the group. Thus a greedy policy from the averaged MDP is optimal in the full MDP. With those same sampling weights, Q-learning can learn this policy even when the values of suboptimal actions vary within a group. Changing the mix of samples can prevent those action values from converging. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(4)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Theorems 3 and 4(2)</a>.</p>
 <p>If the common action has different values at different full states, the policy can still use the labels. The averaged Bellman equation replaces those different continuation values by a single value. This can reverse the ranking of actions that lead into the group. In that case both solving the averaged MDP and running Q-learning on samples with its fixed weights can yield a suboptimal policy. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=7">Li, Walsh, and Littman, Theorems 3–4 and Figure 1(b)</a>.</p>
+</section>
+</section>
+<section id="krusell-smith-benchmark" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="krusell-smith-benchmark"><span class="header-section-number">5.5</span> The Krusell–Smith benchmark</h2>
+<p>Households save to insure against employment risk. Their saving determines next period’s aggregate capital and hence the prices they expect to face. The question is how well households can forecast those prices when they summarize the distribution of capital and employment with aggregate capital.</p>
+<section id="household-problem-and-equilibrium" class="level3">
+<h3 class="anchored" data-anchor-id="household-problem-and-equilibrium">Household problem and equilibrium</h3>
+<p>In a population of mass one, each household holds capital <span class="math inline">\(k\geq 0\)</span> and has employment status <span class="math inline">\(e\in\{0,1\}\)</span>. It supplies <span class="math inline">\(\ell\)</span> units of labor if employed (<span class="math inline">\(e=1\)</span>) and zero if unemployed (<span class="math inline">\(e=0\)</span>). Aggregate productivity <span class="math inline">\(z\)</span> moves between good and bad states according to a Markov chain. Write <span class="math inline">\(P(z',e'\given z,e)\)</span> for the joint transition probability of next period’s productivity <span class="math inline">\(z'\)</span> and employment <span class="math inline">\(e'\)</span>. Conditional on the aggregate transition, a law of large numbers applies to the employment shocks. The benchmark transition probabilities fix the employment share at each <span class="math inline">\(z\)</span>. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=7">Krusell and Smith (1998), §II.A</a>.</p>
+<p>Let <span class="math inline">\(\Gamma\)</span> be the joint distribution of capital and employment. The household’s full state is <span class="math inline">\(s=(k,e,z,\Gamma)\)</span>. Aggregate capital is <span class="math inline">\(K=\int k\,d\Gamma\)</span>, and aggregate labor is <span class="math inline">\(L(z)=\ell\int e\,d\Gamma\)</span>. Since population mass is one, <span class="math inline">\(K\)</span> is also mean household capital. With capital share <span class="math inline">\(\alpha\)</span>, aggregate output is <span class="math inline">\(Y=zK^\alpha L(z)^{1-\alpha}\)</span>. Competitive firms pay marginal products, so the wage per unit of labor <span class="math inline">\(w\)</span> and rental rate of capital <span class="math inline">\(\rho\)</span> are</p>
+<p><span id="eq-ks-prices"><span class="math display">\[
+\begin{aligned}
+w(K,z) &amp;= \frac{\partial Y}{\partial L} = (1-\alpha)z\left(\frac{K}{L(z)}\right)^\alpha,\\
+\rho(K,z) &amp;= \frac{\partial Y}{\partial K} = \alpha z\left(\frac{K}{L(z)}\right)^{\alpha-1}.
+\end{aligned}
+\tag{5.9}\]</span></span></p>
+<p>The household’s action <span class="math inline">\(a=k'\)</span> chooses its capital for next period. Let <span class="math inline">\(c\)</span> be consumption and <span class="math inline">\(\delta\)</span> the depreciation rate. Labor income, capital income, and undepreciated capital fund consumption and saving. The budget and borrowing constraint are</p>
+<p><span id="eq-ks-budget"><span class="math display">\[
+c+a=w(K,z)\ell e + \big(1-\delta+\rho(K,z)\big)k,
+\qquad c&gt;0,\quad a\geq 0.
+\tag{5.10}\]</span></span></p>
+<p>Households have flow utility <span class="math inline">\(\log c\)</span> and common discount factor <span class="math inline">\(0&lt;\gamma&lt;1\)</span>. Under the benchmark calibration, next-period unemployment has positive probability from either employment status. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=11">Krusell and Smith (1998), §III.A</a>.</p>
+<p>Let <span class="math inline">\(H(\Gamma,z,z')\)</span> denote the distribution law that a household takes as given. Its own saving has zero weight in the aggregate. Substituting consumption from <a href="#eq-ks-budget" class="quarto-xref">Equation&nbsp;<span>5.10</span></a> gives the Bellman equation</p>
+<p><span id="eq-ks-bellman"><span class="math display">\[
+v(k,e,z,\Gamma)=
+\max_{a}\left\{
+  \log c+\gamma\,\E\!\left[v\big(a,e',z',H(\Gamma,z,z')\big)\given z,e\right]
+\right\}.
+\tag{5.11}\]</span></span></p>
+<p>The maximum is over choices satisfying <a href="#eq-ks-budget" class="quarto-xref">Equation&nbsp;<span>5.10</span></a>. The expectation is over the joint shock transition, and the value at a state with zero resources is <span class="math inline">\(-\infty\)</span>. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=8">Krusell and Smith (1998), §II.B</a>.</p>
+<p>Write <span class="math inline">\(g(k,e,z,\Gamma)\)</span> for the saving rule from <a href="#eq-ks-bellman" class="quarto-xref">Equation&nbsp;<span>5.11</span></a> and <span class="math inline">\(P(e'\given e,z,z')\)</span> for the employment transition probability conditional on <span class="math inline">\(z'\)</span>. For a measurable set <span class="math inline">\(B\)</span> of capital holdings, the mass entering <span class="math inline">\(B\)</span> with employment status <span class="math inline">\(e'\)</span> is</p>
+<p><span id="eq-ks-distribution"><span class="math display">\[
+\Gamma'(B\times\{e'\}) =
+\int \mathbf{1}\{g(k,e,z,\Gamma)\in B\}\,
+  P(e'\given e,z,z')\,d\Gamma(k,e).
+\tag{5.12}\]</span></span></p>
+<p>The indicator selects households that save an amount in <span class="math inline">\(B\)</span>. The conditional probability assigns their next employment status. This defines the distribution law <span class="math inline">\(H_g\)</span> induced by <span class="math inline">\(g\)</span>. Summing over <span class="math inline">\(e'\)</span> and taking the mean of next-period capital gives</p>
+<p><span id="eq-ks-capital"><span class="math display">\[
+K'(\Gamma,z)=\int k'\,d\Gamma'=\int g(k,e,z,\Gamma)\,d\Gamma(k,e).
+\tag{5.13}\]</span></span></p>
+<p>Households choose <span class="math inline">\(k'\)</span> before <span class="math inline">\(z'\)</span> is realized, so current <span class="math inline">\(\Gamma\)</span> and <span class="math inline">\(z\)</span> determine <span class="math inline">\(K'\)</span>. Next period’s prices in <a href="#eq-ks-prices" class="quarto-xref">Equation&nbsp;<span>5.9</span></a> use <span class="math inline">\(K'\)</span> and <span class="math inline">\(z'\)</span>. Integrating <a href="#eq-ks-budget" class="quarto-xref">Equation&nbsp;<span>5.10</span></a> yields <span class="math inline">\(C+K'=Y+(1-\delta)K\)</span>, where <span class="math inline">\(C=\int c\,d\Gamma\)</span>, since factor payments exhaust output. A recursive competitive equilibrium requires competitive prices, a saving rule that solves the household problem given <span class="math inline">\(H\)</span>, and consistency <span class="math inline">\(H=H_g\)</span>.</p>
+</section>
+<section id="what-the-abstract-state-preserves" class="level3">
+<h3 class="anchored" data-anchor-id="what-the-abstract-state-preserves">What the abstract state preserves</h3>
+<p>Replace <span class="math inline">\(\Gamma\)</span> with mean household capital <span class="math inline">\(K\)</span> to obtain the abstract state <span class="math inline">\(x=\phi(s)=(k,e,z,K)\)</span>. Apply the <a href="#can-the-label-predict-what-happens-next">one-step transition condition</a> to the law of the next abstract state. Take two full states in the same group <span class="math inline">\(\mathcal S_x\)</span> and fix the same feasible action <span class="math inline">\(a\)</span> in both. Current prices agree because <span class="math inline">\(K\)</span> and <span class="math inline">\(z\)</span> agree and aggregate labor is fixed by <span class="math inline">\(z\)</span>. The budget set and current utility <span class="math inline">\(\log c\)</span> at that action therefore agree.</p>
+<p>The next abstract state is <span class="math inline">\((a,e',z',K'(\Gamma,z))\)</span>. The law of <span class="math inline">\((z',e')\)</span> depends only on <span class="math inline">\((z,e)\)</span>, and the household’s action fixes its own next capital in both states. Since <span class="math inline">\(K'(\Gamma,z)\)</span> is determined before the shocks arrive, the two projected transition laws agree exactly when the two distributions imply the same <span class="math inline">\(K'\)</span> in <a href="#eq-ks-capital" class="quarto-xref">Equation&nbsp;<span>5.13</span></a>.</p>
+<p>Suppose the saving rule is affine in individual capital, <span class="math inline">\(g(k,e,z,\Gamma)=b_e(z,K)+d(z,K)k\)</span>. The intercept <span class="math inline">\(b_e\)</span> can depend on employment, and the slope <span class="math inline">\(d\)</span> is common across employment states. Integrating gives</p>
+<p><span class="math display">\[
+K'(\Gamma,z)=d(z,K)K+
+\sum_{e=0}^{1} b_e(z,K)\,\Gamma([0,\infty)\times\{e\}).
+\]</span></p>
+<p>Each employment share <span class="math inline">\(\Gamma([0,\infty)\times\{e\})\)</span> depends only on <span class="math inline">\(z\)</span>, so the right-hand side depends only on <span class="math inline">\((z,K)\)</span>. With a nonlinear saving rule, two distributions with the same mean can place different masses where saving responds differently to capital. This can change <span class="math inline">\(K'\)</span>. In the benchmark simulation, most capital is held by households whose saving slopes are close to one another. The poorest households have lower slopes and hold little capital. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=14">Krusell and Smith (1998), §III.D and Figure 2</a>.</p>
+</section>
+<section id="solving-with-aggregate-capital" class="level3">
+<h3 class="anchored" data-anchor-id="solving-with-aggregate-capital">Solving with aggregate capital</h3>
+<p>Let <span class="math inline">\(F_z(K)\)</span> be the household’s forecast of next-period aggregate capital. Krusell and Smith use a log-linear rule with separate coefficients <span class="math inline">\(b_{0,z}\)</span> and <span class="math inline">\(b_{1,z}\)</span> for each productivity state.</p>
+<p><span id="eq-ks-forecast"><span class="math display">\[
+\log F_z(K)=b_{0,z}+b_{1,z}\log K.
+\tag{5.14}\]</span></span></p>
+<ol type="1">
+<li>Guess the coefficients and solve the household problem with the same budget. In <a href="#eq-ks-bellman" class="quarto-xref">Equation&nbsp;<span>5.11</span></a>, use the continuation value <span class="math inline">\(v_F(a,e',z',F_z(K))\)</span> under the forecast. This gives the saving rule <span class="math inline">\(g_F(k,e,z,K)\)</span>.</li>
+<li>Simulate a large panel of households along a productivity path. At each date, evaluate <span class="math inline">\(g_F\)</span> at the panel’s current <span class="math inline">\(K_t\)</span>. Advance the joint distribution as in <a href="#eq-ks-distribution" class="quarto-xref">Equation&nbsp;<span>5.12</span></a> using the chosen capital and new employment of each household. The mean of the choices gives <span class="math inline">\(K_{t+1}\)</span> for the next simulation step.</li>
+<li>After discarding the initial periods, regress <span class="math inline">\(\log K_{t+1}\)</span> on a constant and <span class="math inline">\(\log K_t\)</span> separately for each <span class="math inline">\(z_t\)</span>. Re-solve with the refitted coefficients and repeat until the fitted and conjectured coefficients agree to numerical tolerance.</li>
+</ol>
+<p>At this fixed point, the forecast is the best fit in its class to the aggregate capital series generated by the saving rule it induces. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=9">Krusell and Smith (1998), §II.C</a>.</p>
+</section>
+<section id="published-forecast-checks" class="level3">
+<h3 class="anchored" data-anchor-id="published-forecast-checks">Published forecast checks</h3>
+<p>Krusell and Smith compare one-quarter forecasts <span class="math inline">\(\log F_{z_t}(K_t)\)</span> with <span class="math inline">\(\log K_{t+1}\)</span>, using <span class="math inline">\(K_t\)</span> and <span class="math inline">\(K_{t+1}\)</span> from the household simulation. In 10,000 quarters after burn-in, <span class="math inline">\(R^2=0.999998\)</span> in both productivity states. The standard deviation of the log forecast residual, expressed in percent, is <span class="math inline">\(0.0028\%\)</span> in good times and <span class="math inline">\(0.0036\%\)</span> in bad times. They also report maximum price forecast errors below <span class="math inline">\(0.1\%\)</span> at a horizon of 25 years, given the sequence of future productivity shocks. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=12">Krusell and Smith (1998), §§III.B–C</a>.</p>
+<p>Den Haan’s recursive check starts with a new productivity path and a common initial capital stock. Simulating the household distribution under the given saving rule yields the reference series <span class="math inline">\(K_t\)</span>. On the same productivity path, iterate the forecast on its own predicted capital.</p>
+<p><span id="eq-ks-recursive-forecast"><span class="math display">\[
+\widetilde K_0=K_0,\qquad
+\widetilde K_{t+1}=F_{z_t}(\widetilde K_t).
+\tag{5.15}\]</span></span></p>
+<p>Compare <span class="math inline">\(\log\widetilde K_t\)</span> with <span class="math inline">\(\log K_t\)</span> at each horizon <span class="math inline">\(t\)</span>. The maximum absolute gap shows how far the paths diverge. In den Haan’s illustration with 10,000 observations from a Krusell–Smith simulation, an altered forecast rule retains a one-step <span class="math inline">\(R^2\)</span> of <span class="math inline">\(0.9999\)</span>. The standard deviation of <span class="math inline">\(\log K\)</span> from the household simulation is about <span class="math inline">\(14\%\)</span> higher than the rule implies on its own. <a href="https://wouterdenhaan.com/papers/accuracy.pdf">den Haan (2010), §2.4 and Table 1</a>.</p>
+<p>These checks assess forecasts against aggregates from a given household policy. Accuracy relative to the full-state equilibrium also depends on how household choices change when households forecast the full distribution.</p>
 
 
 </section>
