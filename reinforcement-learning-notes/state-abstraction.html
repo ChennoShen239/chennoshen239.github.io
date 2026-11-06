@@ -215,12 +215,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#can-the-label-predict-what-happens-next" id="toc-can-the-label-predict-what-happens-next" class="nav-link active" data-scroll-target="#can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> Predicting the next state</a></li>
-  <li><a href="#how-much-does-the-label-need-to-tell-us-to-act" id="toc-how-much-does-the-label-need-to-tell-us-to-act" class="nav-link" data-scroll-target="#how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> Choosing an action</a></li>
-  <li><a href="#application-monetary-transmission-with-menu-costs" id="toc-application-monetary-transmission-with-menu-costs" class="nav-link" data-scroll-target="#application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.3</span> Monetary policy and the mean price gap</a>
+  <li><a href="#can-the-label-predict-what-happens-next" id="toc-can-the-label-predict-what-happens-next" class="nav-link active" data-scroll-target="#can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> When is the compressed state Markov?</a></li>
+  <li><a href="#how-much-does-the-label-need-to-tell-us-to-act" id="toc-how-much-does-the-label-need-to-tell-us-to-act" class="nav-link" data-scroll-target="#how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> What does a shared Q-table learn?</a></li>
+  <li><a href="#averaging-over-full-states" id="toc-averaging-over-full-states" class="nav-link" data-scroll-target="#averaging-over-full-states"><span class="header-section-number">5.3</span> Averaging over full states</a></li>
+  <li><a href="#application-monetary-transmission-with-menu-costs" id="toc-application-monetary-transmission-with-menu-costs" class="nav-link" data-scroll-target="#application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.4</span> Monetary policy with menu costs</a>
   <ul class="collapse">
-  <li><a href="#when-is-the-mean-enough-for-an-optimal-policy" id="toc-when-is-the-mean-enough-for-an-optimal-policy" class="nav-link" data-scroll-target="#when-is-the-mean-enough-for-an-optimal-policy">Is the mean enough to choose?</a></li>
+  <li><a href="#when-is-the-mean-enough-for-an-optimal-policy" id="toc-when-is-the-mean-enough-for-an-optimal-policy" class="nav-link" data-scroll-target="#when-is-the-mean-enough-for-an-optimal-policy">Solving with the full state</a></li>
+  <li><a href="#solving-after-averaging" id="toc-solving-after-averaging" class="nav-link" data-scroll-target="#solving-after-averaging">Solving after averaging</a></li>
   </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">5.5</span> Check your understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -260,89 +263,179 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p><a href="./03-notes.html#eq-qlearning">Chapter 3</a> uses a Q-table with one row per state. A state that the learner rarely visits gets few updates. Grouping states lets the learner use observations from several states to update the same row.</p>
+<p><a href="./03-notes.html#eq-qlearning">Chapter 3</a> learns a separate action value for each state and action. Suppose the state records one price gap for each of four groups of firms, with each gap on the same evenly spaced grid of <span class="math inline">\(m\)</span> points. There are <span class="math inline">\(m^4\)</span> possible vectors and <span class="math inline">\(4m-3\)</span> possible means. A Q-table indexed by the mean has fewer rows and can use observations from different vectors to update the same row. Which observations can we pool without changing what the table learns?</p>
 <div id="def-sa-abstraction" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 5.1 (State abstraction)</strong></span> A <strong>state abstraction</strong> is a map <span class="math inline">\(f\)</span> from full states <span class="math inline">\(s\)</span> to summaries <span class="math inline">\(x=f(s)\)</span>. Full states with the same summary are treated as one state.</p>
+<p><span class="theorem-title"><strong>Definition 5.1 (State abstraction)</strong></span> A <strong>state abstraction</strong> is a map <span class="math inline">\(\phi\)</span> that replaces a full state <span class="math inline">\(s\)</span> with a summary <span class="math inline">\(x=\phi(s)\)</span>. Write <span class="math inline">\(S_x=\{s:\phi(s)=x\}\)</span> for the full states assigned to <span class="math inline">\(x\)</span>.</p>
 </div>
-<p>The same choice comes up when solving a Bellman equation. In the pricing example below, the full state is the distribution of firms’ price gaps. Using its mean would give us fewer states to keep track of.</p>
+<p>We will use the mean price gap as the summary. The example gives a case where the central bank can act optimally using the mean, yet Q-learning on that mean can learn the wrong action.</p>
 <section id="can-the-label-predict-what-happens-next" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> Predicting the next state</h2>
-<p>Given the full state <span class="math inline">\(s\)</span> and action <span class="math inline">\(a\)</span>, the probability of a next summary <span class="math inline">\(y\)</span> is the sum of the probabilities of all full states that map to <span class="math inline">\(y\)</span>. <span id="eq-sa-closure"><span class="math display">\[
-\sum_{s':\,f(s')=y}p(s'\given s,a).
-\tag{5.1}\]</span></span> For a single transition law on <span class="math inline">\(x\)</span> to work from every starting state, this sum must agree across all <span class="math inline">\(s\)</span> with the same <span class="math inline">\(x\)</span>, for each <span class="math inline">\(a\)</span> and <span class="math inline">\(y\)</span>. If the expected reward <span class="math inline">\(r(s,a)\)</span> also agrees across those states for each <span class="math inline">\(a\)</span>, we can write the Bellman equation on <span class="math inline">\(x\)</span> alone.</p>
+<h2 data-number="5.1" class="anchored" data-anchor-id="can-the-label-predict-what-happens-next"><span class="header-section-number">5.1</span> When is the compressed state Markov?</h2>
+<p>In a finite MDP, the conditional distribution <span class="math inline">\(p(s'\given s,a)\)</span> depends only on the current state <span class="math inline">\(s\)</span> and action <span class="math inline">\(a\)</span>. For the next summary to be <span class="math inline">\(y\)</span>, the next full state can be any member of <span class="math inline">\(S_y\)</span>. Its probability is <span id="eq-sa-closure"><span class="math display">\[
+p_\phi(y\given s,a)=\sum_{s'\in S_y}p(s'\given s,a).
+\tag{5.1}\]</span></span> The sum compares probabilities of reaching the same <strong>summary</strong>. It can agree for two current states even if they lead to different full states inside <span class="math inline">\(S_y\)</span>.</p>
+<p>Let <span class="math inline">\(h_t\)</span> denote the observed history through <span class="math inline">\(x_t=x\)</span>, before choosing <span class="math inline">\(a_t\)</span>. Given the history and action, we may still be uncertain which <span class="math inline">\(s_t\)</span> in <span class="math inline">\(S_x\)</span> we occupy. The law of total probability gives <span id="eq-sa-history"><span class="math display">\[
+\Prob(x_{t+1}=y\given h_t,a_t=a)
+=\sum_{s\in S_x}\Prob(s_t=s\given h_t,a_t=a)\,p_\phi(y\given s,a).
+\tag{5.2}\]</span></span> If <span class="math inline">\(p_\phi(y\given s,a)\)</span> is the same for all <span class="math inline">\(s\in S_x\)</span>, the weights sum out and history drops from the forecast. For a single controlled transition law valid from every full starting state, this equality must hold for every <span class="math inline">\(x,y,a\)</span>. To see necessity, start in two states with the same <span class="math inline">\(x\)</span> and take the same action. The forecasts must agree at that first step.</p>
+<p>Under a <strong>fixed policy</strong> <span class="math inline">\(\pi(a\given s)\)</span>, average over its action before doing the same check. The condition for a single Markov transition law under <span class="math inline">\(\pi\)</span>, valid from every starting state, is that <span class="math display">\[
+\sum_a \pi(a\given s)\,p_\phi(y\given s,a)
+\]</span> agree across <span class="math inline">\(s\in S_x\)</span> for each <span class="math inline">\(x,y\)</span>. This can hold for the policy being evaluated even if it fails for some other action. To also preserve the one-period expected reward under <span class="math inline">\(\pi\)</span>, check that <span class="math inline">\(\sum_a\pi(a\given s)r(s,a)\)</span> agrees within each group. An MDP on <span class="math inline">\(x\)</span> that preserves the one-step model needs both the probabilities in <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.1</span></a> and the expected reward <span class="math inline">\(r(s,a)\)</span> to agree across <span class="math inline">\(s\in S_x\)</span> for every action. See <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman (2006), §3.3, Definition 3(1)</a>.</p>
 </section>
 <section id="how-much-does-the-label-need-to-tell-us-to-act" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> Choosing an action</h2>
-<p>A policy using only <span class="math inline">\(x\)</span> can be optimal from every starting state if and only if, for each <span class="math inline">\(x\)</span>, some action maximizes <span class="math inline">\(q^*(s,a)\)</span> at every <span class="math inline">\(s\)</span> that maps to <span class="math inline">\(x\)</span>.</p>
-<p>To store the exact <span class="math inline">\(q^*(s,a)\)</span> in a shared Q-table, all states with the same <span class="math inline">\(x\)</span> must agree on the value of every action. At <span class="math inline">\(q^*\)</span>, samples for a given action then give the same Q-learning target on average. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman (2006)</a>.</p>
+<h2 data-number="5.2" class="anchored" data-anchor-id="how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.2</span> What does a shared Q-table learn?</h2>
+<p>With a table <span class="math inline">\(\bar q\)</span> indexed by <span class="math inline">\(x\)</span>, the <a href="./03-notes.html#eq-qlearning">Q-learning update</a> moves <span class="math inline">\(\bar q(x,a)\)</span> toward <span class="math inline">\(r_{t+1}+\gamma\max_b\bar q(x_{t+1},b)\)</span>. Conditional on the full state and action, the expected target is <span id="eq-sa-target"><span class="math display">\[
+\begin{aligned}
+g_{\bar q}(s,a)
+&amp;=\E[r_{t+1}+\gamma\max_b\bar q(x_{t+1},b)\given s_t=s,a_t=a]\\
+&amp;=r(s,a)+\gamma\sum_y p_\phi(y\given s,a)\max_b\bar q(y,b).
+\end{aligned}
+\tag{5.3}\]</span></span></p>
+<p><strong>Preserving transitions and rewards.</strong> The model conditions make <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> agree across <span class="math inline">\(S_x\)</span> for every table. Conversely, setting <span class="math inline">\(\bar q=0\)</span> isolates the reward, and setting <span class="math inline">\(\bar q(y,b)=\mathbf 1\{y=y_0\}\)</span> for every <span class="math inline">\(b\)</span> isolates the transition probability to <span class="math inline">\(y_0\)</span> once rewards agree. Under these conditions, Bellman iteration from zero keeps every iterate constant within each group. Since <span class="math inline">\(0&lt;\gamma&lt;1\)</span>, the iterates converge to <span class="math inline">\(q^*\)</span>, which has the same property.</p>
+<p><strong>Preserving optimal action values.</strong> It is enough that <span class="math inline">\(q^*(s,a)\)</span> agrees across <span class="math inline">\(s\in S_x\)</span> for every <span class="math inline">\(a\)</span>. Then it fits in a table <span class="math inline">\(\bar q^*(x,a)\)</span>, and the full Bellman equation gives <span class="math inline">\(g_{\bar q^*}(s,a)=q^*(s,a)\)</span>. Every state in the group gives the same expected target <em>at this table</em>. Their expected targets can differ at other tables.</p>
+<p><strong>Preserving an optimal action.</strong> An optimal policy can depend on <span class="math inline">\(x\)</span> alone exactly when each group has an action that maximizes <span class="math inline">\(q^*(s,a)\)</span> for every <span class="math inline">\(s\in S_x\)</span>. Choosing that action at every <span class="math inline">\(x\)</span> makes <span class="math inline">\(v^*\)</span> satisfy the Bellman equation of the resulting policy. The value of the maximizing action can differ across the group.</p>
+<p>Each requirement implies the next. The reverse implications fail in general. The three conditions are items 1, 3, and 5 of Definition 3. With infinite visits to every full state-action pair and suitable decreasing step sizes, the paper’s Q-learning result applies when all optimal action values are preserved. A shared optimal action alone gives no such guarantee. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Li, Walsh, and Littman, §3.3 and §3.4, Theorems 2 and 4</a>.</p>
 </section>
-<section id="application-monetary-transmission-with-menu-costs" class="level2" data-number="5.3">
-<h2 data-number="5.3" class="anchored" data-anchor-id="application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.3</span> Monetary policy and the mean price gap</h2>
-<p>A firm’s <strong>price gap</strong> is its target log price minus its current log price. Take four groups of firms with equal weights. Their target log price equals log nominal spending. The mean gap <span class="math inline">\(x\)</span> is log real spending, measured as log nominal spending minus the average log price.</p>
-<p>The central bank can hold nominal spending fixed or raise it by one log percentage point. The increase shifts every price gap up by one before firms adjust. A group resets its price to the target if its gap is at least <span class="math inline">\(2.8\)</span> points in absolute value. Its gap then falls to zero. The threshold represents a cost of changing prices. <a href="https://economics.mit.edu/sites/default/files/publications/Price%20stickiness%20in%20Ss%20models%20-%20New%20interpretation.pdf">Caballero and Engel (2007)</a>.</p>
-<p>Economy A starts at <span class="math inline">\((-1.6,-1.2,1.2,1.6)\)</span> and B at <span class="math inline">\((-2,0,0,2)\)</span>. Both have mean zero. After a one-point increase, every group in A keeps its price. In B, the gap of <span class="math inline">\(2\)</span> rises to <span class="math inline">\(3\)</span> and the group resets its price. Its weight is <span class="math inline">\(1/4\)</span>, so inflation is <span class="math inline">\(3/4\)</span> of a point. Starting from zero, the next mean gap equals the spending increase minus inflation, giving <span class="math inline">\(1\)</span> in A and <span class="math inline">\(1/4\)</span> in B. The same mean and action lead to different next means.</p>
-<div id="cell-fig-sa-impact" class="cell" data-fig-height="2.5" data-fig-width="7.2" data-execution_count="1">
+<section id="averaging-over-full-states" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="averaging-over-full-states"><span class="header-section-number">5.3</span> Averaging over full states</h2>
+<p>Pick weights <span class="math inline">\(w_x(s)\geq 0\)</span> that sum to one over <span class="math inline">\(s\in S_x\)</span>. An MDP on the summaries can always be defined by <span id="eq-sa-weighted-model"><span class="math display">\[
+\begin{aligned}
+\bar r(x,a)&amp;=\sum_{s\in S_x}w_x(s)r(s,a),\\
+\bar p(y\given x,a)&amp;=\sum_{s\in S_x}w_x(s)p_\phi(y\given s,a).
+\end{aligned}
+\tag{5.4}\]</span></span> The transition probabilities sum to one since each of the distributions in the average does. This is the construction in <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman, §3.1, Definition 1</a>.</p>
+<p>The expected Q-learning target for this MDP is <span class="math inline">\(\sum_{s\in S_x}w_x(s)g_{\bar q}(s,a)\)</span>. To sample it in a simulator, select a pair <span class="math inline">\((x,a)\)</span>, draw a fresh starting state <span class="math inline">\(s\)</span> from <span class="math inline">\(w_x\)</span>, and simulate one step with <span class="math inline">\(a\)</span>. With infinitely many such draws for each pair and the usual decreasing step sizes, tabular Q-learning converges to the optimal action values of this averaged MDP.</p>
+<p>Along a trajectory, the weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.2</span></a> are conditional probabilities that can change with the history and action. Changing the behavior policy can then change the expected target for the same table entry. Q-learning takes a maximum over next actions, and its updates still depend on which full states it samples.</p>
+</section>
+<section id="application-monetary-transmission-with-menu-costs" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="application-monetary-transmission-with-menu-costs"><span class="header-section-number">5.4</span> Monetary policy with menu costs</h2>
+<p>Four groups of firms each have weight <span class="math inline">\(1/4\)</span> in the price index. Firms within a group share a price, and all groups target a log price equal to log nominal spending. A firm’s <strong>price gap</strong> is its target log price minus its current log price. The vector of gaps is <span class="math inline">\(s\)</span> and their mean <span class="math inline">\(x\)</span> is log real spending, measured as log nominal spending minus the average log price.</p>
+<p>The central bank either holds nominal spending fixed (<span class="math inline">\(a=0\)</span>) or raises it by one log percentage point (<span class="math inline">\(a=1\)</span>). The action adds <span class="math inline">\(a\)</span> to each gap. A group resets its price to the target if the resulting gap is at least four log percentage points in absolute value. A reset adds that gap to the group’s log price and returns its gap to zero. This pricing rule and the bank’s loss below define a teaching example. For the role of reset thresholds in aggregate price adjustment, see <a href="https://economics.mit.edu/sites/default/files/publications/Price%20stickiness%20in%20Ss%20models%20-%20New%20interpretation.pdf#page=10">Caballero and Engel (2007), §3</a>.</p>
+<p>Start in <span class="math inline">\(A=(-1,-1,-1,3)\)</span> or <span class="math inline">\(B=(0,0,0,0)\)</span>. Both have <span class="math inline">\(x=0\)</span>. A raise in <span class="math inline">\(A\)</span> takes the last gap to four, so that group resets and inflation is <span class="math inline">\(4/4=1\)</span> point. All gaps are then zero, giving <span class="math inline">\(B\)</span> as the next state. A raise in <span class="math inline">\(B\)</span> takes each gap to one with zero inflation, giving <span class="math inline">\(C=(1,1,1,1)\)</span>. Thus <span class="math inline">\(p_\phi(1\given A,1)=0\)</span> and <span class="math inline">\(p_\phi(1\given B,1)=1\)</span>. The full vector determines the next state. If the bank always holds, every gap stays fixed, so the mean alone predicts the next mean.</p>
+<div id="cell-fig-sa-impact" class="cell" data-fig-height="1.65" data-fig-width="7.2" data-execution_count="1">
 <div class="cell-output cell-output-display">
-<div id="fig-sa-impact" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-sa-impact" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A and B are grouped at mean gap zero. An arrow from A to B indicates one point of inflation. An arrow from B to C, at mean gap one, indicates zero inflation.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="state-abstraction_files/figure-html/fig-sa-impact-output-1.png" width="657" height="223" class="figure-img">
+<img src="state-abstraction_files/figure-html/fig-sa-impact-output-1.png" alt="A and B are grouped at mean gap zero. An arrow from A to B indicates one point of inflation. An arrow from B to C, at mean gap one, indicates zero inflation." width="697" height="171" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sa-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.1: How a one-point increase in nominal spending is split between inflation and higher real spending.
+Figure&nbsp;5.1: A one-point spending increase moves A to B and B to C. A and B have the same mean price gap before the action.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p><a href="figures/state-abstraction-inflation.pdf">Download the figure (PDF)</a></p>
 <section id="when-is-the-mean-enough-for-an-optimal-policy" class="level3">
-<h3 class="anchored" data-anchor-id="when-is-the-mean-enough-for-an-optimal-policy">Is the mean enough to choose?</h3>
-<p>The bank minimizes discounted loss over an infinite horizon, with discount factor <span class="math inline">\(1/2\)</span>. Its loss in a period is <span id="eq-sa-loss"><span class="math display">\[
-\text{period loss}=(x'-1)^2+\lambda(\text{inflation})^2.
-\tag{5.2}\]</span></span> Here <span class="math inline">\(x'\)</span> is the mean gap after the action and <span class="math inline">\(\lambda\geq 0\)</span> is the weight on inflation.</p>
-<p>When <span class="math inline">\(\lambda=1/2\)</span>, the bank should raise spending in both starting states, despite their different inflation forecasts. When <span class="math inline">\(\lambda=3\)</span>, it should raise spending in A and hold in B. Across all states reachable from these two starts, a policy using only the mean can be optimal exactly for <span class="math inline">\(2/81\leq\lambda\leq22/9\)</span>.</p>
-<div class="block-derivation callout callout-style-default callout-note callout-titled" title="Deriving the policy range">
+<h3 class="anchored" data-anchor-id="when-is-the-mean-enough-for-an-optimal-policy">Solving with the full state</h3>
+<p>The bank discounts at <span class="math inline">\(\gamma=1/2\)</span>. Its period loss is <span id="eq-sa-loss"><span class="math display">\[
+\ell(s,a)=(x'-1)^2+\tfrac34(\text{inflation})^2,
+\tag{5.5}\]</span></span> where <span class="math inline">\(x'\)</span> and inflation are measured after the action and price resets. The reward in the Q-learning equation is <span class="math inline">\(r(s,a)=-\ell(s,a)\)</span>.</p>
+<p>The table lists every state reachable from <span class="math inline">\(A\)</span> or <span class="math inline">\(B\)</span>. Holding leaves the state unchanged with zero inflation. Each listed transition under a raise has probability one, with probability zero on all other states.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">State <span class="math inline">\(s\)</span></th>
+<th style="text-align: right;">Mean <span class="math inline">\(x\)</span></th>
+<th style="text-align: right;">Loss if hold</th>
+<th style="text-align: left;">Next state if raise</th>
+<th style="text-align: right;">Inflation if raise</th>
+<th style="text-align: right;">Loss if raise</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(A=(-1,-1,-1,3)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(B\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(7/4\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(B=(0,0,0,0)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(C\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(C=(1,1,1,1)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(D\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(D=(2,2,2,2)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(E\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(E=(3,3,3,3)\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(3\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(B\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(13\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Let <span class="math inline">\(V(s)\)</span> be the minimum discounted loss. Holding in <span class="math inline">\(C\)</span> yields zero loss forever, so <span class="math inline">\(V(C)=0\)</span>. Raising in <span class="math inline">\(B\)</span> takes the bank there at zero cost, so <span class="math inline">\(V(B)=0\)</span> too. The Bellman equation in <span class="math inline">\(A\)</span> is <span class="math display">\[
+V(A)=\min\{1+\tfrac12 V(A),\;\tfrac74+\tfrac12 V(B)\}
+     =\min\{1+\tfrac12 V(A),\;\tfrac74\}.
+\]</span> Its solution is <span class="math inline">\(V(A)=7/4\)</span>, since holding first costs <span class="math inline">\(1+\frac12(7/4)=15/8\)</span>. In <span class="math inline">\(D\)</span> and <span class="math inline">\(E\)</span>, holding forever costs <span class="math inline">\(2\)</span> and <span class="math inline">\(8\)</span>, respectively, below the immediate losses from raising. Holding is optimal in both.</p>
+<p>An optimal policy uses only the mean. Raise at <span class="math inline">\(x=0\)</span> and hold at <span class="math inline">\(x=1,2,3\)</span>. The action values of raising at <span class="math inline">\(x=0\)</span> differ, with <span class="math inline">\(q^*(A,1)=-7/4\)</span> and <span class="math inline">\(q^*(B,1)=0\)</span>.</p>
+</section>
+<section id="solving-after-averaging" class="level3">
+<h3 class="anchored" data-anchor-id="solving-after-averaging">Solving after averaging</h3>
+<p>For each one-step training sample at <span class="math inline">\(x=0\)</span>, start the simulator in <span class="math inline">\(A\)</span> with probability <span class="math inline">\(w=3/4\)</span> and in <span class="math inline">\(B\)</span> otherwise, for either action. At all other means there is just one full state. In the averaged MDP, raising at <span class="math inline">\(x=0\)</span> costs <span class="math inline">\(w(7/4)\)</span> in expectation and returns to <span class="math inline">\(x=0\)</span> with probability <span class="math inline">\(w\)</span>. It otherwise goes to <span class="math inline">\(x=1\)</span>, where holding yields zero loss. The averaged Bellman equation is <span id="eq-sa-averaged-loss"><span class="math display">\[
+\bar V(0)=\min\left\{1+\tfrac12\bar V(0),\;
+                       w\big(\tfrac74+\tfrac12\bar V(0)\big)\right\}.
+\tag{5.6}\]</span></span> At <span class="math inline">\(\bar V(0)=2\)</span>, the cost of holding is <span class="math inline">\(2\)</span> and the cost of raising is <span class="math inline">\(\tfrac34(\tfrac74+1)=33/16&gt;2\)</span>. The discounted Bellman equation has a unique solution, so the optimal action in the averaged MDP is <strong>hold</strong>. With the sampling procedure above, Q-learning learns to hold at <span class="math inline">\(x=0\)</span>.</p>
+<p>In the full model, raising from <span class="math inline">\(A\)</span> reaches <span class="math inline">\(B\)</span>, where the next raise costs zero. The averaged model sees <span class="math inline">\(x=0\)</span> again and puts weight <span class="math inline">\(w\)</span> back on <span class="math inline">\(A\)</span>. The continuation value changes enough to reverse the decision.</p>
+</section>
+</section>
+<section id="check-your-understanding" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">5.5</span> Check your understanding</h2>
+<p>For the weighting construction, return to <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman, §3.1, Definition 1</a>. For the distinction between representing an optimal policy and finding it, read <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">§3.3, Definition 3</a> and <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">§3.4, Theorems 3–4</a>.</p>
+<ol type="1">
+<li>Start in <span class="math inline">\(A\)</span> or <span class="math inline">\(B\)</span> with equal probability and choose each action by an independent fair coin. You observe <span class="math inline">\(x_1=0\)</span>. If you raise now, what is the probability of <span class="math inline">\(x_2=1\)</span> after a first-period hold? After a first-period raise?</li>
+<li>At what weight <span class="math inline">\(w\)</span> is the averaged MDP indifferent between holding and raising at <span class="math inline">\(x=0\)</span>? Which action does it choose below that weight?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled" title="Answers">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Deriving the policy range
+<span class="screen-reader-only">Note</span>Answers
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Holding leaves all gaps fixed and produces zero inflation, so holding forever costs <span class="math inline">\(H=2(x-1)^2\)</span>. If expanding now and then acting optimally costs <span class="math inline">\(C\)</span>, holding for <span class="math inline">\(k\)</span> periods before expanding costs <span class="math inline">\(H+2^{-k}(C-H)\)</span>. The minimum is attained by holding forever or expanding now.</p>
-<p>Successive expansions produce these means. The last entry in each row returns to an earlier full state in that row.</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Start</th>
-<th>Means along the expansion path</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>A</td>
-<td><span class="math inline">\(0,1,3/10,13/10,8/5,1/4,5/4,3/2,1/4\)</span></td>
-</tr>
-<tr class="even">
-<td>B</td>
-<td><span class="math inline">\(0,1/4,5/4,3/4,1,5/4\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>Only means shared by two full states can require conflicting choices. At <span class="math inline">\(x=1\)</span>, both states can hold at zero loss. At <span class="math inline">\(x=1/4\)</span>, in both states one expansion reaches <span class="math inline">\(5/4\)</span> with zero inflation. Expanding and holding there costs <span class="math inline">\(1/8\)</span> in total, while holding forever at <span class="math inline">\(1/4\)</span> costs <span class="math inline">\(9/8\)</span>.</p>
-<p>At <span class="math inline">\(x=5/4\)</span>, both states can hold for a total loss of <span class="math inline">\(1/8\)</span>. In A, an expansion moves the mean to <span class="math inline">\(3/2\)</span>, giving an immediate loss of at least <span class="math inline">\(1/4\)</span>. In B, two expansions reach the target <span class="math inline">\(1\)</span> through <span class="math inline">\(3/4\)</span>, with inflation <span class="math inline">\(3/2\)</span> and <span class="math inline">\(3/4\)</span>. That plan costs <span class="math inline">\(1/16+81\lambda/32\)</span>. Expanding once and then holding costs <span class="math inline">\(1/8+9\lambda/4\)</span>. Holding is therefore optimal in both states at <span class="math inline">\(5/4\)</span> exactly when <span class="math inline">\(\lambda\geq 2/81\)</span>.</p>
-<p>At <span class="math inline">\(x=0\)</span>, A can expand straight to the target with zero inflation. In B, an expansion gives inflation <span class="math inline">\(3/4\)</span> and moves the mean to <span class="math inline">\(1/4\)</span>. For <span class="math inline">\(\lambda\geq 2/81\)</span>, the optimal loss starting at that <span class="math inline">\(1/4\)</span> state is <span class="math inline">\(1/8\)</span>. Expanding now therefore costs <span class="math inline">\(9(1+\lambda)/16+(1/2)(1/8)=(10+9\lambda)/16\)</span>, compared with <span class="math inline">\(2\)</span> from holding forever. Both starting states can expand optimally for <span class="math inline">\(\lambda\leq22/9\)</span>. Below the lower cutoff the continuation loss from <span class="math inline">\(1/4\)</span> is at most <span class="math inline">\(1/8\)</span>, so expansion at <span class="math inline">\(x=0\)</span> remains optimal in B. At either cutoff, the state that switches actions is indifferent and can use the action shared by the other state.</p>
+<ol type="1">
+<li>After a hold, the initial mixture is unchanged, so <span class="math inline">\(s_1=B\)</span> with probability <span class="math inline">\(1/2\)</span>. After a raise with <span class="math inline">\(x_1=0\)</span>, the economy went from <span class="math inline">\(A\)</span> to <span class="math inline">\(B\)</span>, so <span class="math inline">\(s_1=B\)</span> with probability one. Raising from <span class="math inline">\(B\)</span> gives <span class="math inline">\(x_2=1\)</span>.</li>
+<li>Compare the cost of holding forever, <span class="math inline">\(2\)</span>, with the cost of raising once and then acting optimally. At a tie, <a href="#eq-sa-averaged-loss" class="quarto-xref">Equation&nbsp;<span>5.6</span></a> gives <span class="math inline">\(2=w(7/4+1)\)</span>, or <span class="math inline">\(w=8/11\)</span>. If <span class="math inline">\(w&lt;8/11\)</span>, the raise branch evaluated at <span class="math inline">\(\bar V(0)=2\)</span> costs less than <span class="math inline">\(2\)</span>. Its fixed point is <span class="math inline">\((7w/4)/(1-w/2)&lt;2\)</span>, at which raising is optimal.</li>
+</ol>
 </div>
 </div>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
