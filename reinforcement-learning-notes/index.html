@@ -2,19 +2,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Chen Gao (高琛)">
-<meta name="description" content="Personal notes on Ben Moll’s four lectures on reinforcement learning.">
+<meta name="description" content="A collection of notes on reinforcement learning.">
 
 <title>Reinforcement Learning</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -35,15 +41,14 @@ ul.task-list li input[type="checkbox"] {
 <link href="./01-notes.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-61b4bc0004779b4202f1f31032b86af2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-00dab45d3bf9c87752ee0c160abfda0b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-11adc450b4e5a03df677c42b89b3c1a7.min.css?v=e0112b" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-fc706b81b4fd675ee261577f26283c68.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -74,7 +79,7 @@ ul.task-list li input[type="checkbox"] {
 <style>html{ scroll-behavior: smooth; }</style>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -104,7 +109,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/custom.css?v=e42ca9fdf4f2">
+<link rel="stylesheet" href="assets/custom.css">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -171,6 +176,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Policy Gradient and Actor-Critic Methods</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./state-abstraction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">State Abstraction</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
@@ -223,7 +234,7 @@ window.Quarto = {
 
 <div>
   <div class="description">
-    <p>Personal notes on Ben Moll’s four lectures on reinforcement learning.</p>
+    <p>A collection of notes on reinforcement learning.</p>
   </div>
 </div>
 
@@ -268,37 +279,36 @@ window.Quarto = {
 \newcommand{\defeq}{\equiv}
 \]</span></p>
 </div>
-<p>I prepared these notes for my own reference from Ben Moll’s four lectures on reinforcement learning. They cover the mathematics and selected applications.</p>
+<p>These notes collect what I have learned about reinforcement learning.</p>
 <section id="sources" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="sources">Sources</h2>
-<p>One chapter per lecture, following each lecture’s scope and ordering:</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Chapter</th>
-<th>Lecture</th>
+<th>Main source</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>1. The Basic Idea of RL, and Its Link to Dynamic Programming</td>
-<td>Lecture 1</td>
+<td><a href="./01-notes.html">1. The Basic Idea of RL, and Its Link to Dynamic Programming</a></td>
+<td>Ben Moll, Lecture 1</td>
 </tr>
 <tr class="even">
-<td>2. Monte Carlo Methods and Stochastic Approximation</td>
-<td>Lecture 2</td>
+<td><a href="./02-notes.html">2. Monte Carlo Methods and Stochastic Approximation</a></td>
+<td>Ben Moll, Lecture 2</td>
 </tr>
 <tr class="odd">
-<td>3. Temporal Difference Learning, Sarsa, and Q-learning</td>
-<td>Lecture 3</td>
+<td><a href="./03-notes.html">3. Temporal Difference Learning, Sarsa, and Q-learning</a></td>
+<td>Ben Moll, Lecture 3</td>
 </tr>
 <tr class="even">
-<td>4. Policy Gradient and Actor-Critic Methods</td>
-<td>Lecture 4</td>
+<td><a href="./04-notes.html">4. Policy Gradient and Actor-Critic Methods</a></td>
+<td>Ben Moll, Lecture 4</td>
+</tr>
+<tr class="odd">
+<td><a href="./state-abstraction.html">5. State Abstraction</a></td>
+<td>Li, Walsh, and Littman (2006)</td>
 </tr>
 </tbody>
 </table>
@@ -306,7 +316,7 @@ window.Quarto = {
 </section>
 <section id="license-attribution" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="license-attribution">License &amp; attribution</h2>
-<p>The exposition and all figures here are my own work, released under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>: share and adapt for non-commercial purposes with attribution and share-alike. The underlying material is not mine. These notes reconstruct Ben Moll’s reinforcement learning lectures, which are in turn adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>. Everything here is rewritten in my own words with original figures: no text, figures, or numbering from the lecture slides or from Zhao’s book is reproduced, and all rights in those original materials remain with their authors. This is a non-commercial educational study aid, not endorsed by or affiliated with Ben Moll, Shiyu Zhao, LSE, or Westlake University. If you are a rights holder with any concern, contact me and I will address it promptly.</p>
+<p>The exposition and all figures here are my own work, released under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>: share and adapt for non-commercial purposes with attribution and share-alike. The underlying material is not mine. The first four chapters reconstruct Ben Moll’s reinforcement learning lectures, which are adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>. Everything here is rewritten in my own words with original figures: no text, figures, or numbering from the lecture slides or from Zhao’s book is reproduced, and all rights in those original materials remain with their authors. This is a non-commercial educational study aid, not endorsed by or affiliated with Ben Moll, Shiyu Zhao, LSE, or Westlake University. If you are a rights holder with any concern, contact me and I will address it promptly.</p>
 
 
 </section>
@@ -737,7 +747,7 @@ window.Quarto = {
       &nbsp;
     </div>
     <div class="nav-footer-right">
-<p>Unofficial study notes based on Ben Moll’s reinforcement learning lectures, themselves adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>; all rights in those original materials remain with their authors.</p>
+<p>The first four chapters follow Ben Moll’s reinforcement learning lectures, adapted from Shiyu Zhao’s <em>Mathematical Foundations of Reinforcement Learning</em>. Rights in those original materials remain with their authors.</p>
 </div>
   </div>
 </footer>
