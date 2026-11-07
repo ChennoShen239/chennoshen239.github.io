@@ -220,6 +220,7 @@ window.Quarto = {
   <li><a href="#values" id="toc-values" class="nav-link" data-scroll-target="#values">Values</a></li>
   <li><a href="#estimates-steps-and-errors" id="toc-estimates-steps-and-errors" class="nav-link" data-scroll-target="#estimates-steps-and-errors">Estimates, steps, and errors</a></li>
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#state-abstraction" id="toc-state-abstraction" class="nav-link" data-scroll-target="#state-abstraction">State abstraction</a></li>
   <li><a href="#macros-used-in-the-source" id="toc-macros-used-in-the-source" class="nav-link" data-scroll-target="#macros-used-in-the-source">Macros used in the source</a></li>
   </ul>
 </nav>
@@ -453,7 +454,7 @@ Table&nbsp;1: Dynamic-programming and RL conventions.
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\mathcal{H}_{k}\)</span></td>
-<td>the history <span class="math inline">\(\{\Delta_{k},\Delta_{k-1},\dots\}\)</span>. Every conditional expectation in the proofs is taken against it</td>
+<td>information available before sampling the next outcome, including the current estimate</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(\|x\|_{\infty}\)</span></td>
@@ -523,6 +524,39 @@ Important
 <p>Actor-critic uses both parameter vectors: <span class="math inline">\(\theta\)</span> for the actor, <span class="math inline">\(w\)</span> for the critic.</p>
 </div>
 </div>
+</section>
+<section id="state-abstraction" class="level2">
+<h2 class="anchored" data-anchor-id="state-abstraction">State abstraction</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(x=\phi(s)\)</span></td>
+<td>abstract state, the label assigned to full state <span class="math inline">\(s\)</span> (<a href="state-abstraction.html#def-sa-abstraction" class="quarto-xref">Definition&nbsp;<span>5.1</span></a>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathcal S_x\)</span></td>
+<td>the full states assigned label <span class="math inline">\(x\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(p_\phi(y\given s,a)\)</span></td>
+<td>probability of reaching label <span class="math inline">\(y\)</span> from full state <span class="math inline">\(s\)</span> under action <span class="math inline">\(a\)</span> (<a href="state-abstraction.html#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\bar q_t(x,a)\)</span></td>
+<td>estimate in the Q-table indexed by abstract state and action (<a href="state-abstraction.html#eq-sa-qlearning" class="quarto-xref">Equation&nbsp;<span>5.1</span></a>)</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="macros-used-in-the-source" class="level2">
 <h2 class="anchored" data-anchor-id="macros-used-in-the-source">Macros used in the source</h2>

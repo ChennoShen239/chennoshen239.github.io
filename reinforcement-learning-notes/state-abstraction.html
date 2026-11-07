@@ -27,6 +27,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -220,20 +255,21 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#under-a-fixed-policy" id="toc-under-a-fixed-policy" class="nav-link" data-scroll-target="#under-a-fixed-policy">Under a fixed policy</a></li>
   </ul></li>
-  <li><a href="#averaging-over-full-states" id="toc-averaging-over-full-states" class="nav-link" data-scroll-target="#averaging-over-full-states"><span class="header-section-number">5.3</span> An MDP on abstract states</a></li>
+  <li><a href="#averaging-over-full-states" id="toc-averaging-over-full-states" class="nav-link" data-scroll-target="#averaging-over-full-states"><span class="header-section-number">5.3</span> An MDP on abstract states</a>
+  <ul class="collapse">
+  <li><a href="#convergence-with-a-fixed-sampling-distribution" id="toc-convergence-with-a-fixed-sampling-distribution" class="nav-link" data-scroll-target="#convergence-with-a-fixed-sampling-distribution">Convergence with a fixed sampling distribution</a></li>
+  </ul></li>
   <li><a href="#how-much-does-the-label-need-to-tell-us-to-act" id="toc-how-much-does-the-label-need-to-tell-us-to-act" class="nav-link" data-scroll-target="#how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.4</span> Preserving values and decisions</a>
   <ul class="collapse">
   <li><a href="#optimal-action-values" id="toc-optimal-action-values" class="nav-link" data-scroll-target="#optimal-action-values">Optimal action values</a></li>
   <li><a href="#an-optimal-policy" id="toc-an-optimal-policy" class="nav-link" data-scroll-target="#an-optimal-policy">An optimal policy</a></li>
   <li><a href="#when-solving-the-averaged-mdp-gives-an-optimal-policy" id="toc-when-solving-the-averaged-mdp-gives-an-optimal-policy" class="nav-link" data-scroll-target="#when-solving-the-averaged-mdp-gives-an-optimal-policy">When solving the averaged MDP gives an optimal policy</a></li>
   </ul></li>
-  <li><a href="#krusell-smith-benchmark" id="toc-krusell-smith-benchmark" class="nav-link" data-scroll-target="#krusell-smith-benchmark"><span class="header-section-number">5.5</span> The Krusell–Smith benchmark</a>
+  <li><a href="#krusell-smith-benchmark" id="toc-krusell-smith-benchmark" class="nav-link" data-scroll-target="#krusell-smith-benchmark"><span class="header-section-number">5.5</span> State abstraction in Krusell–Smith</a>
   <ul class="collapse">
-  <li><a href="#household-problem-and-equilibrium" id="toc-household-problem-and-equilibrium" class="nav-link" data-scroll-target="#household-problem-and-equilibrium">Household problem and equilibrium</a></li>
-  <li><a href="#what-the-abstract-state-preserves" id="toc-what-the-abstract-state-preserves" class="nav-link" data-scroll-target="#what-the-abstract-state-preserves">What the abstract state preserves</a></li>
-  <li><a href="#solving-with-aggregate-capital" id="toc-solving-with-aggregate-capital" class="nav-link" data-scroll-target="#solving-with-aggregate-capital">Solving with aggregate capital</a></li>
-  <li><a href="#published-forecast-checks" id="toc-published-forecast-checks" class="nav-link" data-scroll-target="#published-forecast-checks">Published forecast checks</a></li>
-  <li><a href="#ks-estimation" id="toc-ks-estimation" class="nav-link" data-scroll-target="#ks-estimation">Estimating the discount factor</a></li>
+  <li><a href="#two-distributions-with-the-same-aggregate-capital" id="toc-two-distributions-with-the-same-aggregate-capital" class="nav-link" data-scroll-target="#two-distributions-with-the-same-aggregate-capital">Two distributions with the same aggregate capital</a></li>
+  <li><a href="#one-step-saving-decisions" id="toc-one-step-saving-decisions" class="nav-link" data-scroll-target="#one-step-saving-decisions">One-step saving decisions</a></li>
+  <li><a href="#reproduce-the-calculation" id="toc-reproduce-the-calculation" class="nav-link" data-scroll-target="#reproduce-the-calculation">Reproduce the calculation</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -275,7 +311,7 @@ window.Quarto = {
 \]</span></p>
 </div>
 <p>In <a href="./03-notes.html#eq-qlearning">Chapter 3’s Q-learning update</a>, a transition <span class="math inline">\((s_t,a_t,r_{t+1},s_{t+1})\)</span> revises the estimate <span class="math inline">\(q_t(s_t,a_t)\)</span>. The row that changes is the one for <span class="math inline">\(s_t\)</span>. Giving several states one row reduces the number of entries to estimate and lets visits to any of those states update that row. We want to know when these shared estimates can recover the optimal action values and when they suffice to choose an optimal action.</p>
-<p>We use the finite discounted MDP of Chapters 1–3, with state space <span class="math inline">\(\mathcal S\)</span>, the same finite action set <span class="math inline">\(\mathcal A\)</span> at every state, bounded rewards, and <span class="math inline">\(0&lt;\gamma&lt;1\)</span>. Call a state <span class="math inline">\(s\)</span> of this MDP a <strong>full state</strong>.</p>
+<p>We use the finite discounted MDP of Chapters 1–3, with state space <span class="math inline">\(\mathcal S\)</span>, the same finite action set <span class="math inline">\(\mathcal A\)</span> at every state, bounded rewards <span class="math inline">\(r_{t+1}\)</span>, and discount factor <span class="math inline">\(0&lt;\gamma&lt;1\)</span>. Call a state <span class="math inline">\(s\)</span> of this MDP a <strong>full state</strong>.</p>
 <div id="def-sa-abstraction" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 5.1 (State abstraction)</strong></span> A <strong>state abstraction</strong> maps each full state <span class="math inline">\(s\)</span> to a label <span class="math inline">\(x=\phi(s)\)</span>, called an <strong>abstract state</strong>. Write <span class="math inline">\(\overline{\mathcal S}\)</span> for the set of labels and <span class="math inline">\(\mathcal S_x=\{s\in\mathcal S:\phi(s)=x\}\)</span> for the group with label <span class="math inline">\(x\)</span>.</p>
 </div>
@@ -315,8 +351,16 @@ g_{\bar q}(s,a)
 \Prob(x_{t+1}=y\given h_t,a_t=a)
 =\sum_{s\in\mathcal S_x}\Prob(s_t=s\given h_t,a_t=a)\,p_\phi(y\given s,a).
 \tag{5.4}\]</span></span></p>
-<p>This is the law of total probability. If <span class="math inline">\(p_\phi(y\given s,a)\)</span> agrees across all <span class="math inline">\(s\in\mathcal S_x\)</span> for every <span class="math inline">\(x,y,a\)</span>, we can take it outside the sum. The weights sum to one, and the result depends only on <span class="math inline">\(x\)</span> and <span class="math inline">\(a\)</span>. The condition is also necessary for a single transition law valid from every full starting state. Start separately from any two states in the same group and take the same action. Their first-step distributions over labels must agree.</p>
-<p>To preserve the one-step model, also require <span class="math inline">\(r(s,a)\)</span> to agree within each group for every action. Then <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> agrees within the group for <strong>every</strong> table <span class="math inline">\(\bar q\)</span>. The transition condition only compares the total probability of reaching each group. Within a destination group, the probabilities of reaching particular full states may differ. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(1)</a>.</p>
+<p>The abstract state is Markov for prediction under a given action if the current label and action suffice to predict the next label. A condition for one transition law valid from every full starting state is</p>
+<p><span id="eq-sa-transition-condition"><span class="math display">\[
+\begin{gathered}
+p_\phi(y\given s_1,a)=p_\phi(y\given s_2,a)\\
+\text{for all }x,y,a\text{ and }s_1,s_2\in\mathcal S_x.
+\end{gathered}
+\tag{5.5}\]</span></span></p>
+<p>If the condition holds, the common probability comes outside the sum in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a>. The weights sum to one, so the result depends only on <span class="math inline">\(x\)</span> and <span class="math inline">\(a\)</span>. For necessity, start separately from <span class="math inline">\(s_1\)</span> and <span class="math inline">\(s_2\)</span> and take the same action. Their first-step distributions over labels must agree if one law is to apply to both starts. For a particular initial distribution the mixtures in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> may agree across histories even if some of their terms differ.</p>
+<p>To preserve the model used by the Bellman update, also require the expected reward <span class="math inline">\(r(s,a)\)</span> to agree within each group for every action. Together these conditions make <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> agree within the group for <strong>every</strong> table <span class="math inline">\(\bar q\)</span>. Conversely, if the targets agree for every table, setting <span class="math inline">\(\bar q=0\)</span> gives equality of expected rewards. To check the transition to a particular label <span class="math inline">\(y\)</span>, set every action value at <span class="math inline">\(y\)</span> to one and all other entries to zero. After canceling the expected rewards, equality of the targets gives equality of <span class="math inline">\(\gamma p_\phi(y\given s,a)\)</span>.</p>
+<p>The transition condition compares the total probability of reaching each group. The probabilities of reaching particular full states inside that group may differ. Reproducing the reward draws together with the labels would require equality of their joint distribution. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(1)</a>.</p>
 <section id="under-a-fixed-policy" class="level3">
 <h3 class="anchored" data-anchor-id="under-a-fixed-policy">Under a fixed policy</h3>
 <p>The forecast in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> conditions on the current action. Under a fixed stationary policy <span class="math inline">\(\pi(a\given s)\)</span>, we can instead predict the next label before seeing the action. Chapter 2 averages over the action to get <span class="math inline">\(r_\pi(s)\)</span> and <span class="math inline">\(p_\pi(s'\given s)\)</span> (<a href="02-notes.html#def-policy-averaged" class="quarto-xref">Definition&nbsp;<span>2.1</span></a>). Applying <a href="#eq-sa-closure" class="quarto-xref">Equation&nbsp;<span>5.2</span></a> to <span class="math inline">\(p_\pi\)</span> gives the transition probability to label <span class="math inline">\(y\)</span>,</p>
@@ -324,7 +368,8 @@ g_{\bar q}(s,a)
 \sum_{s'\in\mathcal S_y}p_\pi(s'\given s)
 =\sum_{a\in\mathcal A}\pi(a\given s)\,p_\phi(y\given s,a).
 \]</span></p>
-<p>For a single transition law under <span class="math inline">\(\pi\)</span> valid from every starting state, this sum must agree across <span class="math inline">\(s\in\mathcal S_x\)</span> for every <span class="math inline">\(x,y\)</span>. To preserve the expected reward under <span class="math inline">\(\pi\)</span>, check <span class="math inline">\(r_\pi(s)\)</span> within each group as well. The policy averages can agree even when the probabilities differ for an individual action. If the policy uses only <span class="math inline">\(x\)</span>, agreement for each action also gives agreement after averaging over the policy.</p>
+<p>By the same starting-state argument, one transition law under <span class="math inline">\(\pi\)</span> applies from every start exactly when this sum agrees across <span class="math inline">\(s\in\mathcal S_x\)</span> for every <span class="math inline">\(x,y\)</span>. To preserve the expected reward under <span class="math inline">\(\pi\)</span>, check <span class="math inline">\(r_\pi(s)\)</span> within each group as well. The policy averages can agree even when the probabilities differ for an individual action. When the policy uses only <span class="math inline">\(x\)</span>, the per-action conditions also give agreement after averaging over the policy. A policy on full states can use different action probabilities within a group, so its averages have to be checked using its own action probabilities.</p>
+<p>If both policy averages agree, they define a reward and transition on the labels. Solve the policy evaluation equation there and assign its value at <span class="math inline">\(x\)</span> to every <span class="math inline">\(s\in\mathcal S_x\)</span>. Substituting this assignment into the full policy evaluation equation in <a href="./02-notes.html#def-policy-averaged">Chapter 2</a> gives equality at every full state. Uniqueness of that equation’s solution therefore gives <span class="math inline">\(v_\pi(s)\)</span> on the labels. To compute <span class="math inline">\(q_\pi(s,a)\)</span>, take the reward and transition under the forced first action <span class="math inline">\(a\)</span>, then use <span class="math inline">\(v_\pi\)</span> as the continuation. For a policy that uses only <span class="math inline">\(x\)</span>, the per-action conditions make both terms agree across the group, so <span class="math inline">\(q_\pi\)</span> also fits on the labels.</p>
 </section>
 </section>
 <section id="averaging-over-full-states" class="level2" data-number="5.3">
@@ -335,9 +380,9 @@ g_{\bar q}(s,a)
 \bar r(x,a)&amp;=\sum_{s\in\mathcal S_x} w_x(s)\,r(s,a),\\
 \bar p(y\given x,a)&amp;=\sum_{s\in\mathcal S_x} w_x(s)\,p_\phi(y\given s,a).
 \end{aligned}
-\tag{5.5}\]</span></span></p>
-<p>The second expression averages probability distributions, so it defines a probability distribution for each <span class="math inline">\((x,a)\)</span>. Under the model conditions above, every term in each average agrees and the weights do not affect the result. In general the weights here are fixed by construction. The weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> describe which full state we occupy given the history and action, so they can change from one observation to the next. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman, Definition 1</a>.</p>
-<p>The Bellman optimality operator <span class="math inline">\(\bar T\)</span> for the averaged MDP applies the right-hand side of the Q-learning Bellman equation to the current table. From <a href="#eq-sa-weighted-model" class="quarto-xref">Equation&nbsp;<span>5.5</span></a> and <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a>,</p>
+\tag{5.6}\]</span></span></p>
+<p>The second expression averages probability distributions, so it defines a probability distribution for each <span class="math inline">\((x,a)\)</span>. Under the per-action conditions on reward and transition, every term in each average agrees and the weights do not affect the result. In general the weights here are fixed by construction. The weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a> describe which full state we occupy given the history and action, so they can change from one observation to the next. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=3">Li, Walsh, and Littman, Definition 1</a>.</p>
+<p>The Bellman optimality operator <span class="math inline">\(\bar T\)</span> for the averaged MDP applies the right-hand side of the Q-learning Bellman equation to the current table. From <a href="#eq-sa-weighted-model" class="quarto-xref">Equation&nbsp;<span>5.6</span></a> and <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a>,</p>
 <p><span id="eq-sa-weighted-backup"><span class="math display">\[
 \begin{aligned}
 (\bar T\bar q)(x,a)
@@ -345,23 +390,48 @@ g_{\bar q}(s,a)
                     \max_{b\in\mathcal A}\bar q(y,b)\\
 &amp;=\sum_{s\in\mathcal S_x}w_x(s)\,g_{\bar q}(s,a).
 \end{aligned}
-\tag{5.6}\]</span></span></p>
+\tag{5.7}\]</span></span></p>
 <p>The operator contracts by <span class="math inline">\(\gamma\)</span>. A change of at most <span class="math inline">\(\varepsilon\)</span> in each table entry changes a maximum by at most <span class="math inline">\(\varepsilon\)</span> and the discounted average by at most <span class="math inline">\(\gamma\varepsilon\)</span>. Its unique fixed point <span class="math inline">\(\bar q^*\)</span> is the optimal action-value function of the averaged MDP.</p>
-<p>If each sample for <span class="math inline">\((x,a)\)</span> starts with a fresh draw <span class="math inline">\(s\)</span> from <span class="math inline">\(w_x\)</span> and then takes action <span class="math inline">\(a\)</span> in the full MDP, its expected TD target is <span class="math inline">\((\bar T\bar q)(x,a)\)</span>. Use the per-entry step size conditions in <a href="03-notes.html#thm-sarsa-convergence" class="quarto-xref">Theorem&nbsp;<span>3.3</span></a>. The step sizes on updates to each entry must be positive and at most one, with a divergent sum and a finite sum of squares. For this sampler, choose the step size after selecting <span class="math inline">\((x,a)\)</span> and before drawing <span class="math inline">\(s\)</span>. The step size then cannot change the relative weight of different full states in the update. With infinitely many such samples for each pair, tabular Q-learning converges to <span class="math inline">\(\bar q^*\)</span>.</p>
-<p>Along a trajectory, changing the behavior policy can change which full states supply updates to a shared entry. The expected TD target then averages <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> with the conditional weights in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a>.</p>
+<section id="convergence-with-a-fixed-sampling-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="convergence-with-a-fixed-sampling-distribution">Convergence with a fixed sampling distribution</h3>
+<p>Choose the entry <span class="math inline">\((x_t,a_t)\)</span> and its step size before drawing the reward <span class="math inline">\(r_{t+1}\)</span> and next state <span class="math inline">\(s_{t+1}\)</span>. Let <span class="math inline">\(\mathcal H_t\)</span> record the history through those choices, including the current table. The sampled TD target is <span class="math inline">\(Z_t=r_{t+1}+\gamma\max_b\bar q_t(x_{t+1},b)\)</span>. Let <span class="math inline">\(\bar q_{\mathrm{ref}}\)</span> be a fixed candidate limit and write <span class="math inline">\(\Delta_t=\bar q_t-\bar q_{\mathrm{ref}}\)</span> for the error table. A sufficient condition on the target at the updated entry is</p>
+<p><span id="eq-sa-target-contraction"><span class="math display">\[
+\left|\E[Z_t\given\mathcal H_t]-\bar q_{\mathrm{ref}}(x_t,a_t)\right|
+\leq\gamma\|\Delta_t\|_\infty .
+\tag{5.8}\]</span></span></p>
+<p>Suppose each entry has step sizes in <span class="math inline">\([0,1]\)</span> and, almost surely, an infinite sum and a finite sum of squares. Under <a href="#eq-sa-target-contraction" class="quarto-xref">Equation&nbsp;<span>5.8</span></a>, the shared table converges almost surely to <span class="math inline">\(\bar q_{\mathrm{ref}}\)</span>.</p>
+<div class="block-proof callout callout-style-default callout-note callout-titled" title="Proof of convergence under the target bound">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Proof of convergence under the target bound
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Subtract <span class="math inline">\(\bar q_{\mathrm{ref}}(x_t,a_t)\)</span> from the Q-learning update. The result has the form of <a href="03-notes.html#eq-dvoretzky-ext" class="quarto-xref">Equation&nbsp;<span>3.6</span></a>, with both step sizes equal to <span class="math inline">\(\alpha_t(x_t,a_t)\)</span> and noise term <span class="math inline">\(Z_t-\bar q_{\mathrm{ref}}(x_t,a_t)\)</span>. Set the step sizes and noise to zero at every other entry. The step sizes are fixed by <span class="math inline">\(\mathcal H_t\)</span>, and <a href="#eq-sa-target-contraction" class="quarto-xref">Equation&nbsp;<span>5.8</span></a> bounds the conditional mean of the noise. Bounded rewards and <span class="math inline">\(\|\bar q_t\|_\infty\leq\|\bar q_{\mathrm{ref}}\|_\infty+\|\Delta_t\|_\infty\)</span> bound its conditional variance by a constant times <span class="math inline">\((1+\|\Delta_t\|_\infty)^2\)</span>. Thus <a href="03-notes.html#thm-dvoretzky-ext" class="quarto-xref">Theorem&nbsp;<span>3.2</span></a> applies.</p>
+</div>
+</div>
+</div>
+<p>For the fixed sampler, select <span class="math inline">\((x_t,a_t)\)</span> and the step size, draw <span class="math inline">\(s_t\)</span> from <span class="math inline">\(w_{x_t}\)</span>, then sample the transition under <span class="math inline">\(a_t\)</span> in the full MDP. This gives <span class="math inline">\(\E[Z_t\given\mathcal H_t]=(\bar T\bar q_t)(x_t,a_t)\)</span> by <a href="#eq-sa-weighted-backup" class="quarto-xref">Equation&nbsp;<span>5.7</span></a>. The contraction of <span class="math inline">\(\bar T\)</span> gives <a href="#eq-sa-target-contraction" class="quarto-xref">Equation&nbsp;<span>5.8</span></a> with <span class="math inline">\(\bar q_{\mathrm{ref}}=\bar q^*\)</span>.</p>
+<p>Along a trajectory, changing the behavior policy can change which full states supply updates to a shared entry. With the current table held fixed by the learner’s history, the expected target averages <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> over the conditional distribution of <span class="math inline">\(s_t\)</span> in that history, as in <a href="#eq-sa-history" class="quarto-xref">Equation&nbsp;<span>5.4</span></a>.</p>
+</section>
 </section>
 <section id="how-much-does-the-label-need-to-tell-us-to-act" class="level2" data-number="5.4">
 <h2 data-number="5.4" class="anchored" data-anchor-id="how-much-does-the-label-need-to-tell-us-to-act"><span class="header-section-number">5.4</span> Preserving values and decisions</h2>
 <section id="optimal-action-values" class="level3">
 <h3 class="anchored" data-anchor-id="optimal-action-values">Optimal action values</h3>
-<p>The full optimal action values <span class="math inline">\(q^*(s,a)\)</span> fit in one table on the labels exactly when they agree within every group for each action. The model condition is sufficient. Start value iteration for the full Q-table at zero. If an iterate agrees within each group, its Bellman update is given by <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> and also agrees under the model condition. The limit <span class="math inline">\(q^*\)</span> has the same property.</p>
-<p>Suppose <span class="math inline">\(q^*(s,a)\)</span> agrees within each group, even though some transitions or expected rewards may differ. Define a candidate table by <span class="math inline">\(\bar q(\phi(s),a)=q^*(s,a)\)</span>. Substituting this table into <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> gives <span class="math inline">\(g_{\bar q}(s,a)=q^*(s,a)\)</span> by the full Bellman equation. Consequently every weighted average in <a href="#eq-sa-weighted-backup" class="quarto-xref">Equation&nbsp;<span>5.6</span></a> returns the same entry <span class="math inline">\(\bar q(x,a)\)</span>. This table is the fixed point <span class="math inline">\(\bar q^*\)</span> for any choice of weights.</p>
+<p>The full optimal action values <span class="math inline">\(q^*(s,a)\)</span> fit in one table on the labels exactly when they agree within every group for each action. Preserving the expected reward and transition for each action suffices. Start value iteration for the full Q-table at zero. If an iterate agrees within each group, its Bellman update is given by <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> and also agrees under these conditions. The full Bellman operator contracts by the same argument as <span class="math inline">\(\bar T\)</span>, with each full state in its own group. Its iterates therefore converge to <span class="math inline">\(q^*\)</span>, which still agrees within groups.</p>
+<p>Now suppose only that <span class="math inline">\(q^*(s,a)\)</span> agrees within each group. Define a table by <span class="math inline">\(\bar q(\phi(s),a)=q^*(s,a)\)</span>. Substituting this table into <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> gives <span class="math inline">\(g_{\bar q}(s,a)=q^*(s,a)\)</span> by the full Bellman equation. Consequently every weighted average in <a href="#eq-sa-weighted-backup" class="quarto-xref">Equation&nbsp;<span>5.7</span></a> returns the same entry <span class="math inline">\(\bar q(x,a)\)</span>. This table is the fixed point <span class="math inline">\(\bar q^*\)</span> for any choice of weights. Here the targets need to agree at just one table. Change the next-label probabilities from one member of a group and subtract the resulting change in the discounted continuation term in <a href="#eq-sa-target" class="quarto-xref">Equation&nbsp;<span>5.3</span></a> from its reward. The table still solves the full Bellman equation while the next-label probabilities can differ within that group.</p>
 <p>The same equality explains why Q-learning can recover <span class="math inline">\(q^*\)</span> without a fixed mix of full states. At the table representing <span class="math inline">\(q^*\)</span>, the expected TD error is zero conditional on each full pair <span class="math inline">\((s,a)\)</span>. For any other table <span class="math inline">\(\bar q\)</span>,</p>
 <p><span class="math display">\[
 \big|g_{\bar q}(s,a)-\bar q^*(\phi(s),a)\big|
 \leq \gamma\|\bar q-\bar q^*\|_\infty .
 \]</span></p>
-<p>The contraction argument now applies at each full state before averaging. Suppose each full state-action pair is visited infinitely often and each step size is chosen before the new reward and next state. Under the same per-entry step size bounds and sums, the shared Q-table converges to the table representing <span class="math inline">\(q^*\)</span>. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(3)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Theorem 4(1)</a>.</p>
+<p>On a trajectory, choose the entry <span class="math inline">\((\phi(s_t),a_t)\)</span> and step size before drawing <span class="math inline">\((r_{t+1},s_{t+1})\)</span>. Include the full <span class="math inline">\(s_t\)</span> in <span class="math inline">\(\mathcal H_t\)</span> for the proof. Conditional on this history, the target mean is <span class="math inline">\(g_{\bar q_t}(s_t,a_t)\)</span>. The bound above gives <a href="#eq-sa-target-contraction" class="quarto-xref">Equation&nbsp;<span>5.8</span></a> with the table representing <span class="math inline">\(q^*\)</span> as <span class="math inline">\(\bar q_{\mathrm{ref}}\)</span>. With the same per-entry step size bounds and sums, the shared table converges almost surely to this limit. The bound holds for each full state, so it also holds when the frequencies of those states within an abstract entry change. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(3)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Theorem 4(1)</a>.</p>
 </section>
 <section id="an-optimal-policy" class="level3">
 <h3 class="anchored" data-anchor-id="an-optimal-policy">An optimal policy</h3>
@@ -369,8 +439,8 @@ g_{\bar q}(s,a)
 <p><span id="eq-sa-common-action"><span class="math display">\[
 \bigcap_{s\in\mathcal S_x}\argmax_{a\in\mathcal A}q^*(s,a)\ne\varnothing
 \qquad\text{for every }x.
-\tag{5.7}\]</span></span></p>
-<p>An optimal policy must put its probability on maximizing actions, so its support at <span class="math inline">\(x\)</span> must lie in the intersection. Conversely, choose an action from each intersection. The optimal state value <span class="math inline">\(v^*(s)=\max_{a\in\mathcal A}q^*(s,a)\)</span> then satisfies the Bellman equation of that policy, hence is its value. The condition requires a common maximizing action. Its value may vary across states in the group. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Li, Walsh, and Littman, Definition 3(5)</a>.</p>
+\tag{5.9}\]</span></span></p>
+<p>Under an optimal policy, averaging <span class="math inline">\(q^*(s,a)\)</span> over its action probabilities gives the maximum. Any action with positive probability at <span class="math inline">\(x\)</span> must therefore lie in the intersection. Conversely, choose an action from each intersection. The optimal state value <span class="math inline">\(v^*(s)=\max_{a\in\mathcal A}q^*(s,a)\)</span> then satisfies the Bellman equation of that policy, hence is its value. The condition requires a common maximizing action. Its value may vary across states in the group. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Li, Walsh, and Littman, Definition 3(5)</a>.</p>
 </section>
 <section id="when-solving-the-averaged-mdp-gives-an-optimal-policy" class="level3">
 <h3 class="anchored" data-anchor-id="when-solving-the-averaged-mdp-gives-an-optimal-policy">When solving the averaged MDP gives an optimal policy</h3>
@@ -379,107 +449,83 @@ g_{\bar q}(s,a)
 \bar r(x,a)+\gamma\sum_{y\in\overline{\mathcal S}}\bar p(y\given x,a)\,\bar v(y)
 =\sum_{s\in\mathcal S_x}w_x(s)\,q^*(s,a)
 \leq \bar v(x).
-\tag{5.8}\]</span></span></p>
-<p>A common optimal action attains equality, so <span class="math inline">\(\bar v\)</span> solves the averaged Bellman equation. If every full state in the group has positive weight, an action attains equality only if it maximizes <span class="math inline">\(q^*(s,a)\)</span> at every full state in the group. Thus a greedy policy from the averaged MDP is optimal in the full MDP. With those same sampling weights, Q-learning can learn this policy even when the values of suboptimal actions vary within a group. Changing the mix of samples can prevent those action values from converging. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(4)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Theorems 3 and 4(2)</a>.</p>
-<p>If the common action has different values at different full states, the policy can still use the labels. The averaged Bellman equation replaces those different continuation values by a single value. This can reverse the ranking of actions that lead into the group. In that case both solving the averaged MDP and running Q-learning on samples with its fixed weights can yield a suboptimal policy. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=7">Li, Walsh, and Littman, Theorems 3–4 and Figure 1(b)</a>.</p>
+\tag{5.10}\]</span></span></p>
+<p>A common optimal action attains equality, so <span class="math inline">\(\bar v\)</span> solves the averaged Bellman equation and the left side of <a href="#eq-sa-common-value" class="quarto-xref">Equation&nbsp;<span>5.10</span></a> equals <span class="math inline">\(\bar q^*(x,a)\)</span>. If every full state in the group has positive weight, any action attaining equality maximizes <span class="math inline">\(q^*(s,a)\)</span> at every full state in the group. Thus every greedy policy from the averaged MDP is optimal in the full MDP. A zero weight can hide a strict inequality, letting an action that is suboptimal at that full state tie in the average. Under the fixed sampler above, Q-learning converges to the values in the averaged MDP, even when suboptimal action values vary within the group. In Li, Walsh, and Littman’s Figure 1(a), both merged states have optimal value 4. The other action is worth 1 in one state and 2 in the other. Figure 1(c) shows that action’s estimate fluctuating as the behavior policy switches between favoring one action and favoring the other. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=4">Li, Walsh, and Littman, Definition 3(4)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Theorems 3 and 4(2)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=7">Figure 1(a,c)</a>.</p>
+<p>If the common action has different values at different full states, a policy can still choose it throughout the group. In the counterexample of Li, Walsh, and Littman, Figure 1(b), two actions from a state kept in its own group lead to different full states <span class="math inline">\(s'_1,s'_2\)</span> in one next group. Their expected immediate rewards are <span class="math inline">\(r_1,r_2\)</span>. The averaged MDP uses the same continuation for both, so the first action wins when <span class="math inline">\(r_1&gt;r_2\)</span>. In the full MDP the second action wins if <span class="math inline">\(r_1-r_2&lt;\gamma[v^*(s'_2)-v^*(s'_1)]\)</span>.</p>
+<p>At the terminal state, both actions loop with zero reward, so continuation there is zero. Complete the diagram by sending the unshown action 1 from each merged state to the terminal state with zero reward. Action 2 is then optimal at both merged states, with values <span class="math inline">\(1\)</span> and <span class="math inline">\(2\)</span>. The initial rewards are <span class="math inline">\(r_1=0.5\)</span> and <span class="math inline">\(r_2=0\)</span>, so for <span class="math inline">\(\gamma&gt;0.5\)</span> the rankings reverse. With the fixed sampler, the learned greedy policy takes the suboptimal action 1 at the initial state. <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=5">Li, Walsh, and Littman, Theorems 3 and 4(3)</a>, <a href="https://thomasjwalsh.net/pub/aima06Towards.pdf#page=7">Figure 1(b)</a>.</p>
 </section>
 </section>
 <section id="krusell-smith-benchmark" class="level2" data-number="5.5">
-<h2 data-number="5.5" class="anchored" data-anchor-id="krusell-smith-benchmark"><span class="header-section-number">5.5</span> The Krusell–Smith benchmark</h2>
-<p>Households save to insure against employment risk. Their saving determines next period’s aggregate capital and hence the prices they expect to face. The question is how well households can forecast those prices when they summarize the distribution of capital and employment with aggregate capital.</p>
-<section id="household-problem-and-equilibrium" class="level3">
-<h3 class="anchored" data-anchor-id="household-problem-and-equilibrium">Household problem and equilibrium</h3>
-<p>In a population of mass one, each household holds capital <span class="math inline">\(k\geq 0\)</span> and has employment status <span class="math inline">\(e\in\{0,1\}\)</span>. It supplies <span class="math inline">\(\ell\)</span> units of labor if employed (<span class="math inline">\(e=1\)</span>) and zero if unemployed (<span class="math inline">\(e=0\)</span>). Aggregate productivity <span class="math inline">\(z\)</span> moves between good and bad states according to a Markov chain. Write <span class="math inline">\(P(z',e'\given z,e)\)</span> for the joint transition probability of next period’s productivity <span class="math inline">\(z'\)</span> and employment <span class="math inline">\(e'\)</span>. Conditional on the aggregate transition, a law of large numbers applies to the employment shocks. The benchmark transition probabilities fix the employment share at each <span class="math inline">\(z\)</span>. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=7">Krusell and Smith (1998), §II.A</a>.</p>
-<p>Let <span class="math inline">\(\Gamma\)</span> be the joint distribution of capital and employment. The household’s full state is <span class="math inline">\(s=(k,e,z,\Gamma)\)</span>. Assume aggregate capital <span class="math inline">\(K=\int k\,d\Gamma\)</span> is positive and finite. Aggregate labor is <span class="math inline">\(L(z)=\ell\int e\,d\Gamma\)</span>. Since population mass is one, <span class="math inline">\(K\)</span> is also mean household capital. With capital share <span class="math inline">\(\alpha\)</span>, aggregate output is <span class="math inline">\(Y=zK^\alpha L(z)^{1-\alpha}\)</span>. Competitive firms pay marginal products, so the wage per unit of labor <span class="math inline">\(w\)</span> and rental rate of capital <span class="math inline">\(\rho\)</span> are</p>
-<p><span id="eq-ks-prices"><span class="math display">\[
-\begin{aligned}
-w(K,z) &amp;= \frac{\partial Y}{\partial L} = (1-\alpha)z\left(\frac{K}{L(z)}\right)^\alpha,\\
-\rho(K,z) &amp;= \frac{\partial Y}{\partial K} = \alpha z\left(\frac{K}{L(z)}\right)^{\alpha-1}.
-\end{aligned}
-\tag{5.9}\]</span></span></p>
-<p>The household’s action <span class="math inline">\(a=k'\)</span> chooses its capital for next period. Let <span class="math inline">\(c\)</span> be consumption and <span class="math inline">\(\delta\)</span> the depreciation rate. Labor income, capital income, and undepreciated capital fund consumption and saving. The budget and borrowing constraint are</p>
-<p><span id="eq-ks-budget"><span class="math display">\[
-c+a=w(K,z)\ell e + \big(1-\delta+\rho(K,z)\big)k,
-\qquad c&gt;0,\quad a\geq 0.
-\tag{5.10}\]</span></span></p>
-<p>Households have flow utility <span class="math inline">\(\log c\)</span> and common discount factor <span class="math inline">\(0&lt;\gamma&lt;1\)</span>. Under the benchmark calibration, next-period unemployment has positive probability from either employment status. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=11">Krusell and Smith (1998), §III.A</a>.</p>
-<p>Let <span class="math inline">\(H(\Gamma,z,z')\)</span> denote the distribution law that a household takes as given. Its own saving has zero weight in the aggregate. Substituting consumption from <a href="#eq-ks-budget" class="quarto-xref">Equation&nbsp;<span>5.10</span></a> gives the Bellman equation</p>
-<p><span id="eq-ks-bellman"><span class="math display">\[
-v(k,e,z,\Gamma)=
-\max_{a}\left\{
-  \log c+\gamma\,\E\!\left[v\big(a,e',z',H(\Gamma,z,z')\big)\given z,e\right]
-\right\}.
-\tag{5.11}\]</span></span></p>
-<p>The maximum is over choices satisfying <a href="#eq-ks-budget" class="quarto-xref">Equation&nbsp;<span>5.10</span></a>. The expectation is over the joint shock transition, and the value at a state with zero resources is <span class="math inline">\(-\infty\)</span>. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=8">Krusell and Smith (1998), §II.B</a>.</p>
-<p>Write <span class="math inline">\(g(k,e,z,\Gamma)\)</span> for the saving rule from <a href="#eq-ks-bellman" class="quarto-xref">Equation&nbsp;<span>5.11</span></a> and <span class="math inline">\(P(e'\given e,z,z')\)</span> for the employment transition probability conditional on <span class="math inline">\(z'\)</span>. For a measurable set <span class="math inline">\(B\)</span> of capital holdings, the mass entering <span class="math inline">\(B\)</span> with employment status <span class="math inline">\(e'\)</span> is</p>
-<p><span id="eq-ks-distribution"><span class="math display">\[
-\Gamma'(B\times\{e'\}) =
-\int \mathbf{1}\{g(k,e,z,\Gamma)\in B\}\,
-  P(e'\given e,z,z')\,d\Gamma(k,e).
-\tag{5.12}\]</span></span></p>
-<p>The indicator selects households that save an amount in <span class="math inline">\(B\)</span>. The conditional probability assigns their next employment status. This defines the distribution law <span class="math inline">\(H_g\)</span> induced by <span class="math inline">\(g\)</span>. Summing over <span class="math inline">\(e'\)</span> and taking the mean of next-period capital gives</p>
+<h2 data-number="5.5" class="anchored" data-anchor-id="krusell-smith-benchmark"><span class="header-section-number">5.5</span> State abstraction in Krusell–Smith</h2>
+<p>Krusell and Smith find that mean capital gives accurate forecasts despite inexact aggregation, with small utility gains from richer forecasts. They also vary initial wealth dispersion in a two-period model. Here we use one pair of distributions to compare next-state laws under a common action and measure the loss from sharing one saving action. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=12">Krusell and Smith (1998), §III.C</a> and <a href="https://doi.org/10.1017/CBO9781139052269.010">Krusell and Smith (2006), §4.1</a>.</p>
+<section id="two-distributions-with-the-same-aggregate-capital" class="level3">
+<h3 class="anchored" data-anchor-id="two-distributions-with-the-same-aggregate-capital">Two distributions with the same aggregate capital</h3>
+<p>The household’s full state is <span class="math inline">\(s=(k,e,z,\Gamma)\)</span>, where <span class="math inline">\(k\)</span> is its capital, <span class="math inline">\(e\)</span> its employment status, <span class="math inline">\(z\)</span> aggregate productivity, and <span class="math inline">\(\Gamma\)</span> the joint distribution of capital and employment. The abstract state <span class="math inline">\(x=(k,e,z,K)\)</span> keeps only mean capital <span class="math inline">\(K=\int k\,d\Gamma\)</span> from the distribution. In the benchmark, <span class="math inline">\(z\)</span> fixes the employment share, so current prices depend on <span class="math inline">\(K\)</span> and <span class="math inline">\(z\)</span>. At a common <span class="math inline">\(x\)</span> the household therefore has the same current resources <span class="math inline">\(m&gt;0\)</span>. Saving <span class="math inline">\(a=k'\)</span> gives the same reward <span class="math inline">\(\log(m-a)\)</span> for any common feasible action <span class="math inline">\(0\leq a&lt;m\)</span>. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=6">Krusell and Smith (1998), §§II.A–B</a>.</p>
+<p>Starting from one simulated cross-section <span class="math inline">\(\Gamma_A\)</span>, form <span class="math inline">\(\Gamma_B\)</span> by moving weight from the middle of the employed capital distribution to both tails, keeping mean capital and the employment shares fixed. In both states, <span class="math inline">\(K=37.3509\)</span> and employment is 90 percent. Keep the same employed household and productivity state, and fix the benchmark population saving rule <span class="math inline">\(g(k,e,z,K)\)</span>. The household is a price taker with zero weight in the population. Its action sets its own next capital. The population saves before the next shocks, so the next abstract state in case <span class="math inline">\(i\)</span> is</p>
 <p><span id="eq-ks-capital"><span class="math display">\[
-K'(\Gamma,z)=\int k'\,d\Gamma'=\int g(k,e,z,\Gamma)\,d\Gamma(k,e).
-\tag{5.13}\]</span></span></p>
-<p>Households choose <span class="math inline">\(k'\)</span> before <span class="math inline">\(z'\)</span> is realized, so current <span class="math inline">\(\Gamma\)</span> and <span class="math inline">\(z\)</span> determine <span class="math inline">\(K'\)</span>. Next period’s prices in <a href="#eq-ks-prices" class="quarto-xref">Equation&nbsp;<span>5.9</span></a> use <span class="math inline">\(K'\)</span> and <span class="math inline">\(z'\)</span>. Integrating <a href="#eq-ks-budget" class="quarto-xref">Equation&nbsp;<span>5.10</span></a> yields <span class="math inline">\(C+K'=Y+(1-\delta)K\)</span>, where <span class="math inline">\(C=\int c\,d\Gamma\)</span>, since factor payments exhaust output. A recursive competitive equilibrium requires competitive prices, a saving rule that solves the household problem given <span class="math inline">\(H\)</span>, and consistency <span class="math inline">\(H=H_g\)</span>.</p>
+x'_i=(a,e',z',K'_i),\qquad
+K'_i=\int g(k,e,z,K)\,d\Gamma_i(k,e),\qquad i\in\{A,B\}.
+\tag{5.11}\]</span></span></p>
+<p>The shock law for <span class="math inline">\((e',z')\)</span> is common to the two cases. The event that next mean capital equals <span class="math inline">\(K'_A\)</span> has probability one in state A and zero in state B because <span class="math inline">\(K'_A\ne K'_B\)</span> in <a href="#tbl-ks-decision" class="quarto-xref">Table&nbsp;<span>5.1</span></a>. This fails the transition test in <a href="#eq-sa-transition-condition" class="quarto-xref">Equation&nbsp;<span>5.5</span></a>. The redistribution matters because saving per additional unit of capital varies across employed households. With a constant slope, total saving by that group would depend only on its mass and total capital, both of which are held fixed. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=14">Krusell and Smith (1998), §III.D</a>.</p>
 </section>
-<section id="what-the-abstract-state-preserves" class="level3">
-<h3 class="anchored" data-anchor-id="what-the-abstract-state-preserves">What the abstract state preserves</h3>
-<p>Replace <span class="math inline">\(\Gamma\)</span> with mean household capital <span class="math inline">\(K\)</span> to obtain the abstract state <span class="math inline">\(x=\phi(s)=(k,e,z,K)\)</span>. Capital and saving choices are continuous. The <a href="#can-the-label-predict-what-happens-next">transition condition from the finite model</a> requires the probability laws of the next abstract state to agree on every measurable set. Take two full states in the same group <span class="math inline">\(\mathcal S_x\)</span> and fix the same feasible action <span class="math inline">\(a\)</span> in both. Current prices agree because <span class="math inline">\(K\)</span> and <span class="math inline">\(z\)</span> agree and aggregate labor is fixed by <span class="math inline">\(z\)</span>. The budget set and current utility <span class="math inline">\(\log c\)</span> at that action therefore agree.</p>
-<p>The next abstract state is <span class="math inline">\((a,e',z',K'(\Gamma,z))\)</span>. The law of <span class="math inline">\((z',e')\)</span> depends only on <span class="math inline">\((z,e)\)</span>, and the household’s action fixes its own next capital in both states. Since <span class="math inline">\(K'(\Gamma,z)\)</span> is determined before the shocks arrive, the laws of the next abstract state agree exactly when the two distributions imply the same <span class="math inline">\(K'\)</span> in <a href="#eq-ks-capital" class="quarto-xref">Equation&nbsp;<span>5.13</span></a>.</p>
-<p>Suppose the saving rule is affine in individual capital, <span class="math inline">\(g(k,e,z,\Gamma)=b_e(z,K)+d(z,K)k\)</span>. The intercept <span class="math inline">\(b_e\)</span> can depend on employment, and the slope <span class="math inline">\(d\)</span> is common across employment states. Integrating gives</p>
-<p><span class="math display">\[
-K'(\Gamma,z)=d(z,K)K+
-\sum_{e=0}^{1} b_e(z,K)\,\Gamma([0,\infty)\times\{e\}).
-\]</span></p>
-<p>Each employment share <span class="math inline">\(\Gamma([0,\infty)\times\{e\})\)</span> depends only on <span class="math inline">\(z\)</span>, so the right-hand side depends only on <span class="math inline">\((z,K)\)</span>. With a nonlinear saving rule, two distributions with the same mean can place different masses where saving responds differently to capital. This can change <span class="math inline">\(K'\)</span>. In the benchmark simulation, most capital is held by households whose saving slopes are close to one another. The poorest households have lower slopes and hold little capital. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=14">Krusell and Smith (1998), §III.D and Figure 2</a>.</p>
+<section id="one-step-saving-decisions" class="level3">
+<h3 class="anchored" data-anchor-id="one-step-saving-decisions">One-step saving decisions</h3>
+<p>Use the same numerical continuation <span class="math inline">\(v_{\mathrm{ref}}\)</span> in both cases. For each <span class="math inline">\((e',z',K')\)</span>, integrate <span class="math inline">\(R/c_{\mathrm{ref}}\)</span> in own capital, where <span class="math inline">\(R\)</span> is the gross capital return and <span class="math inline">\(c_{\mathrm{ref}}\)</span> is consumption under the benchmark rule. The Bellman objective for <span class="math inline">\(0&lt;a&lt;m\)</span> is</p>
+<p><span id="eq-ks-action-value"><span class="math display">\[
+q_i(a)=\log(m-a)+\gamma\,\E\big[v_{\mathrm{ref}}(a,e',z',K'_i)\given z,e\big].
+\tag{5.12}\]</span></span></p>
+<p>Only the continuation differs across the two objectives. The script checks that <span class="math inline">\(c_{\mathrm{ref}}\)</span> is nondecreasing in own capital at the successor states, so the continuation is concave and the log reward makes each <span class="math inline">\(q_i\)</span> strictly concave. At zero saving, next-period unemployment can leave the household with no consumption, giving <span class="math inline">\(q_i(0)=-\infty\)</span>. With <span class="math inline">\(\Gamma\)</span> observed, the household can choose its maximizer <span class="math inline">\(a_i^*\)</span>. With only <span class="math inline">\(x\)</span>, the best shared action <span class="math inline">\(a_S\)</span> under equal weights maximizes <span class="math inline">\((q_A+q_B)/2\)</span>. Its loss in state <span class="math inline">\(i\)</span> is <span class="math inline">\(q_i(a_i^*)-q_i(a_S)\)</span>.</p>
+<div id="tbl-ks-decision" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ks-decision-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5.1: Two full states at one abstract state. Capital is in units per household and losses are in discounted log utility units.
+</figcaption>
+<div aria-describedby="tbl-ks-decision-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 36%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th style="text-align: right;"><span class="math inline">\(\Gamma_A\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(\Gamma_B\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Next mean capital <span class="math inline">\(K'\)</span></td>
+<td style="text-align: right;">37.2600</td>
+<td style="text-align: right;">37.2778</td>
+</tr>
+<tr class="even">
+<td>Best saving action <span class="math inline">\(a_i^*\)</span></td>
+<td style="text-align: right;">33.03745</td>
+<td style="text-align: right;">33.03693</td>
+</tr>
+<tr class="odd">
+<td>Loss at shared action <span class="math inline">\(a_S=33.03719\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4.482\times10^{-9}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4.483\times10^{-9}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A higher <span class="math inline">\(K'\)</span> lowers the next rental rate and raises the next wage for a given <span class="math inline">\(z'\)</span>. These prices enter the marginal continuation value of saving. The common-maximizer test in <a href="#eq-sa-common-action" class="quarto-xref">Equation&nbsp;<span>5.9</span></a> fails for the two one-step objectives. At either interior optimum the derivative with respect to saving is zero, so a small deviation has no first-order utility cost. The reported losses concern one decision at these two states, with the population rule and continuation fixed.</p>
 </section>
-<section id="solving-with-aggregate-capital" class="level3">
-<h3 class="anchored" data-anchor-id="solving-with-aggregate-capital">Solving with aggregate capital</h3>
-<p>Let <span class="math inline">\(F_z(K)\)</span> be the household’s forecast of next-period aggregate capital. Krusell and Smith use a log-linear rule with separate coefficients <span class="math inline">\(b_{0,z}\)</span> and <span class="math inline">\(b_{1,z}\)</span> for each productivity state.</p>
-<p><span id="eq-ks-forecast"><span class="math display">\[
-\log F_z(K)=b_{0,z}+b_{1,z}\log K.
-\tag{5.14}\]</span></span></p>
-<ol type="1">
-<li>Guess the coefficients and solve the household problem with the same budget. In <a href="#eq-ks-bellman" class="quarto-xref">Equation&nbsp;<span>5.11</span></a>, use the continuation value <span class="math inline">\(v_F(a,e',z',F_z(K))\)</span> under the forecast. This gives the saving rule <span class="math inline">\(g_F(k,e,z,K)\)</span>.</li>
-<li>Simulate a large panel of households along a productivity path. At each date, evaluate <span class="math inline">\(g_F\)</span> at the panel’s current <span class="math inline">\(K_t\)</span>. Advance the joint distribution as in <a href="#eq-ks-distribution" class="quarto-xref">Equation&nbsp;<span>5.12</span></a> using the chosen capital and new employment of each household. In their finite panel, the authors adjusted simulated employment statuses to match the employment share implied by productivity in that quarter. The mean of the saving choices gives <span class="math inline">\(K_{t+1}\)</span> for the next simulation step. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=28">Krusell and Smith (1998), Appendix A, p.&nbsp;893</a>.</li>
-<li>After discarding the initial periods, regress <span class="math inline">\(\log K_{t+1}\)</span> on a constant and <span class="math inline">\(\log K_t\)</span> separately for each <span class="math inline">\(z_t\)</span>. Re-solve with the refitted coefficients and repeat until the fitted and conjectured coefficients agree to numerical tolerance.</li>
-</ol>
-<p>At this fixed point, the forecast is the best fit in its class to the aggregate capital series generated by the saving rule it induces. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=9">Krusell and Smith (1998), §II.C</a>.</p>
-</section>
-<section id="published-forecast-checks" class="level3">
-<h3 class="anchored" data-anchor-id="published-forecast-checks">Published forecast checks</h3>
-<p>Krusell and Smith compare one-quarter forecasts <span class="math inline">\(\log F_{z_t}(K_t)\)</span> with <span class="math inline">\(\log K_{t+1}\)</span>, using <span class="math inline">\(K_t\)</span> and <span class="math inline">\(K_{t+1}\)</span> from the household simulation. They retain 10,000 quarters after discarding the first 1,000. In each productivity state, the share of variation in <span class="math inline">\(\log K_{t+1}\)</span> explained by the regression is <span class="math inline">\(R^2=0.999998\)</span>. The standard deviation of the log forecast residual, expressed in percent, is <span class="math inline">\(0.0028\%\)</span> in good times and <span class="math inline">\(0.0036\%\)</span> in bad times. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=12">Krusell and Smith (1998), §§III.B–C</a>.</p>
-<p>Den Haan’s recursive check starts with a new productivity path and a common initial capital stock. Simulating the household distribution under the given saving rule yields the reference series <span class="math inline">\(K_t\)</span>. On the same productivity path, iterate the forecast on its own predicted capital.</p>
-<p><span id="eq-ks-recursive-forecast"><span class="math display">\[
-\widetilde K_0=K_0,\qquad
-\widetilde K_{t+1}=F_{z_t}(\widetilde K_t).
-\tag{5.15}\]</span></span></p>
-<p>Compare <span class="math inline">\(\log\widetilde K_t\)</span> with <span class="math inline">\(\log K_t\)</span> at each horizon <span class="math inline">\(t\)</span>. The maximum absolute gap shows how far the paths diverge. <a href="https://wouterdenhaan.com/papers/accuracy.pdf#page=10">den Haan (2010), §2.4</a>.</p>
-<p>In a separate illustration, den Haan fits a forecast rule to 10,000 observations from a simulation of the Krusell–Smith model using Young’s household policies. One altered rule has a one-step <span class="math inline">\(R^2\)</span> of <span class="math inline">\(0.9999\)</span> on those observations. The standard deviation of <span class="math inline">\(\log K\)</span> implied by the fitted rule is close to that in the household simulation and about <span class="math inline">\(14\%\)</span> higher than that implied by the altered rule. <a href="https://wouterdenhaan.com/papers/accuracy.pdf#page=35">den Haan (2010), Table 1</a>.</p>
-<p>These checks assess forecasts against aggregates from a given household policy. Accuracy relative to the full-state equilibrium also depends on how household choices change when households forecast the full distribution.</p>
-</section>
-<section id="ks-estimation" class="level3">
-<h3 class="anchored" data-anchor-id="ks-estimation">Estimating the discount factor</h3>
-<p>Vary the common discount factor <span class="math inline">\(0&lt;\gamma&lt;1\)</span> and hold the remaining calibration fixed. For each candidate, solve the full-state equilibrium with <span class="math inline">\(s\)</span>. With the abstract state <span class="math inline">\(x\)</span>, solve the household problem and refit <span class="math inline">\(F_z\)</span> to convergence as above. Start all simulations from the same distribution, with positive capital for every household, a finite mean, and the employment share implied by initial productivity. Use the same productivity path in all simulations and the same employment shock draws in household panels.</p>
-<p>After discarding the same initial quarters, keep the next <span class="math inline">\(T\)</span> quarters from each simulation. Compute <span class="math inline">\(K_t\)</span> from simulated saving choices using <a href="#eq-ks-capital" class="quarto-xref">Equation&nbsp;<span>5.13</span></a> and use quarterly output <span class="math inline">\(Y_t=z_tK_t^\alpha L(z_t)^{1-\alpha}\)</span>. For each representation <span class="math inline">\(j\in\{\mathrm{full},\mathrm{abstract}\}\)</span>, average the capital-output ratio and the zero-capital share <span class="math inline">\(p_{0,t}\)</span>.</p>
-<p><span id="eq-ks-moments"><span class="math display">\[
-p_{0,t}=\int \mathbf{1}\{k=0\}\,d\Gamma_t(k,e),\qquad
-m_j(\gamma)=\frac{1}{T}\sum_{t=1}^T
-\begin{pmatrix}K_t/Y_t\\ p_{0,t}\end{pmatrix}.
-\tag{5.16}\]</span></span></p>
-<p>The share uses the full simulated <span class="math inline">\(\Gamma_t\)</span> even when households forecast with <span class="math inline">\(x\)</span>. Across arbitrary distributions, the same mean <span class="math inline">\(K_t\)</span> is consistent with different zero-capital shares because higher holdings among households with positive capital can offset a larger mass at zero.</p>
-<p>Under either representation, choosing <span class="math inline">\(a=0\)</span> leaves the household with zero resources if it is unemployed next quarter, by <a href="#eq-ks-budget" class="quarto-xref">Equation&nbsp;<span>5.10</span></a>. That event has positive probability from either current employment status, so the action gives expected lifetime utility <span class="math inline">\(-\infty\)</span>. Starting with positive resources, consider saving a fixed fraction of current resources each quarter, with the fraction strictly between zero and one. Because <span class="math inline">\(1-\delta&gt;0\)</span>, consumption along this plan is bounded below by a positive geometric sequence. For <span class="math inline">\(0&lt;\gamma&lt;1\)</span>, discounted log utility along that plan is bounded below. An optimal choice therefore has strictly positive next-period capital <span class="math inline">\(k'\)</span>. <a href="https://www.liuyanecon.com/wp-content/uploads/KrusellSmith-1998.pdf#page=11">Krusell and Smith (1998), §III.A</a>.</p>
-<p>Write <span class="math inline">\(g_t(k,e)\)</span> for either saving rule evaluated at the current aggregate state. Summing <a href="#eq-ks-distribution" class="quarto-xref">Equation&nbsp;<span>5.12</span></a> over <span class="math inline">\(e'\)</span> for <span class="math inline">\(B=\{0\}\)</span> gives a zero share from the first transition onward.</p>
-<p><span id="eq-ks-zero-capital-share"><span class="math display">\[
-p_{0,t+1}=\int \mathbf{1}\{g_t(k,e)=0\}\,d\Gamma_t(k,e)=0.
-\tag{5.17}\]</span></span></p>
-<p>Let <span class="math inline">\(\widehat m_1\)</span> and <span class="math inline">\(\widehat m_2\)</span> be the observed targets, calculated as time averages of the same two quarterly measures in <a href="#eq-ks-moments" class="quarto-xref">Equation&nbsp;<span>5.16</span></a>. For each <span class="math inline">\(j\)</span>, minimize the criterion on a common grid of <span class="math inline">\(\gamma\)</span> values using these targets and the same positive weights <span class="math inline">\(\omega_1\)</span> and <span class="math inline">\(\omega_2\)</span>.</p>
-<p><span id="eq-ks-moment-criterion"><span class="math display">\[
-J_j(\gamma)=\omega_1\big[m_{j,1}(\gamma)-\widehat m_1\big]^2
-           +\omega_2\big[m_{j,2}(\gamma)-\widehat m_2\big]^2.
-\tag{5.18}\]</span></span></p>
-<p>The zero-capital share is a diagnostic of fit with a constant contribution <span class="math inline">\(\omega_2\widehat m_2^2\)</span> in both representations. Compare changes in <span class="math inline">\(m_{j,1}(\gamma)\)</span> between nearby candidates with simulation error and solution error. Use longer simulations and finer solution grids to gauge those errors. Compare the minimizing candidates across representations and check whether separated candidates fit equally well.</p>
+<section id="reproduce-the-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="reproduce-the-calculation">Reproduce the calculation</h3>
+<p>The script uses the <a href="https://github.com/ChennoShen239/compecon-notes/blob/67221bda0b90400a85a584ef8bb4ad38a3e83b64/materials/lec05/KSMethod.ipynb">pinned course notebook</a> for the calibrated saving rule and simulation. Tightening the household solver tolerance from <span class="math inline">\(10^{-8}\)</span> to <span class="math inline">\(10^{-10}\)</span> changes the <span class="math inline">\(K'\)</span> gap by less than <span class="math inline">\(10^{-9}\)</span>, each action by less than <span class="math inline">\(3\times10^{-7}\)</span>, and each loss by less than <span class="math inline">\(3\times10^{-15}\)</span>.</p>
+<p>Download <a href="resources/ks_abstraction.py" download="ks_abstraction.py"><code>ks_abstraction.py</code></a> and run the following commands in its directory.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3.12</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> pip install jax==0.9.0 jaxlib==0.9.0 <span class="dt">\</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  numpy==2.3.5 scipy==1.17.0 matplotlib==3.10.8</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> ks_abstraction.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section>
