@@ -20,15 +20,15 @@ class Photo:
 
 PHOTOS = [
     Photo(
+        "window",
+        description="Berkeley, as seen from the window.",
+        alt="Sunlit foliage and a parked car seen through a dark window frame.",
+    ),
+    Photo(
         "sunset",
         description="Afterglow in Xiamen.",
         alt="Orange light breaks through clouds above distant mountains and reflects on the water.",
     ),  # DSC_5280
-    Photo(
-        "window",
-        description="Berkeley, as seen from the window.",
-        alt="Sunlit foliage and a parked car seen through a dark window frame.",
-    ),  # DSC_4465
     Photo(
         "dsc-1661",
         description="Heaven Lake, Changbai Mountain.",
